@@ -27,6 +27,17 @@ import FollowOff from 'src/assets/images/followOff.png'
 import ForYouOff from 'src/assets/images/forYouOff.png'
 
 import IncognitoOff from 'src/assets/images/incognitoOff.png'
+import googleIcon from 'src/assets/images/googleIcon.png'
+import facebookButton from 'src/assets/images/faceBookIcon.png'
+import orumIcon from 'src/assets/images/orumIcon.png'
+import backIcon from 'src/assets/images/Backicon.png'
+
+
+
+
+
+
+
 
 
 
@@ -55,6 +66,10 @@ export default {
   ForYouOff,
   FollowOff,
   IncognitoOff,
-  HomeImage
+  HomeImage,
+  googleIcon,
+  facebookButton,
+  orumIcon,
+  backIcon
   
 }
