@@ -4,8 +4,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
 const Tab = createBottomTabNavigator()
 
-import Comment from "screens/comment"
-
 import Home from "screens/Home"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
@@ -42,20 +40,7 @@ const BottomNavigator = props => {
         tabBarStyle: {backgroundColor:'#242A38',height:hp("9%")}
       }}
     >
-      <Tab.Screen
-        name="Comments"
-        component={Home}
-        options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={focused ? HomeOn : HomeOff}
-              style={{ width: 21, height: 20 }}
-            />
-          ),
-          header: () => null
-        }}
-      />
+      
 
       <Tab.Screen
         name="EmptyScreen2"
@@ -129,7 +114,6 @@ const MainNavigator = () => (
     initialRouteName="BottomBar"
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
-    {/* <mainStack.Screen name="Comment" component={Comment} /> */}
   </mainStack.Navigator>
 )
 

@@ -3,7 +3,6 @@ import { createStackNavigator } from "@react-navigation/stack"
 // import BottomTabNavigator from '@/Navigators/Main'
 
 // screens
-import Comment from 'screens/comment'
 import Home from "screens/Home"
 
 const authStack = createStackNavigator()

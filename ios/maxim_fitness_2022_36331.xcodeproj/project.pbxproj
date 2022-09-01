@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		8005ADCCC10B47BEF37DA969 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79153E376510DD96B0975779 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */; };
+		73BA90D280D63CA34056D35F /* libPods-maxim_fitness_2022_36331.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E2A761738F21567011D45CB3 /* libPods-maxim_fitness_2022_36331.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		CF63BDD5AFBC2E3E23215108 /* libPods-maxim_fitness_2022_36331.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 30087E52AEBB333C400E4567 /* libPods-maxim_fitness_2022_36331.a */; };
+		BE059CBA87FD753F0BE55957 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 05838FEE9E0A284FDD87B755 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,19 +30,19 @@
 		00E356EE1AD99517003FC87E /* maxim_fitness_2022_36331Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = maxim_fitness_2022_36331Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* maxim_fitness_2022_36331Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = maxim_fitness_2022_36331Tests.m; sourceTree = "<group>"; };
+		03709DD968BCA27D40FEA919 /* Pods-maxim_fitness_2022_36331.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331.debug.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331.debug.xcconfig"; sourceTree = "<group>"; };
+		05838FEE9E0A284FDD87B755 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* maxim_fitness_2022_36331.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = maxim_fitness_2022_36331.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = maxim_fitness_2022_36331/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = maxim_fitness_2022_36331/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = maxim_fitness_2022_36331/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = maxim_fitness_2022_36331/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = maxim_fitness_2022_36331/main.m; sourceTree = "<group>"; };
-		272339111408829435CDB70E /* Pods-maxim_fitness_2022_36331.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331.release.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331.release.xcconfig"; sourceTree = "<group>"; };
-		30087E52AEBB333C400E4567 /* libPods-maxim_fitness_2022_36331.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maxim_fitness_2022_36331.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		79153E376510DD96B0975779 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = maxim_fitness_2022_36331/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		8DCC0403B39A006236CF33FC /* Pods-maxim_fitness_2022_36331.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331.debug.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331.debug.xcconfig"; sourceTree = "<group>"; };
-		8F4E798E88BEAACB82078839 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig"; sourceTree = "<group>"; };
-		983F46C3CFE111E59D39FDF3 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		C816A438CF41C12D50F04AA4 /* Pods-maxim_fitness_2022_36331.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331.release.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331.release.xcconfig"; sourceTree = "<group>"; };
+		D1C2B24CBFC84347039A0AD1 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig"; sourceTree = "<group>"; };
+		D5A821FD069541BB4F4D82F6 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		E2A761738F21567011D45CB3 /* libPods-maxim_fitness_2022_36331.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maxim_fitness_2022_36331.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -51,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8005ADCCC10B47BEF37DA969 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a in Frameworks */,
+				BE059CBA87FD753F0BE55957 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF63BDD5AFBC2E3E23215108 /* libPods-maxim_fitness_2022_36331.a in Frameworks */,
+				73BA90D280D63CA34056D35F /* libPods-maxim_fitness_2022_36331.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,18 +83,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		07ECCA6526D129CC7D32AF44 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				8DCC0403B39A006236CF33FC /* Pods-maxim_fitness_2022_36331.debug.xcconfig */,
-				272339111408829435CDB70E /* Pods-maxim_fitness_2022_36331.release.xcconfig */,
-				983F46C3CFE111E59D39FDF3 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */,
-				8F4E798E88BEAACB82078839 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* maxim_fitness_2022_36331 */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,10 +100,22 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				30087E52AEBB333C400E4567 /* libPods-maxim_fitness_2022_36331.a */,
-				79153E376510DD96B0975779 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */,
+				E2A761738F21567011D45CB3 /* libPods-maxim_fitness_2022_36331.a */,
+				05838FEE9E0A284FDD87B755 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		67D4B25C169F8D14CAFD109A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				03709DD968BCA27D40FEA919 /* Pods-maxim_fitness_2022_36331.debug.xcconfig */,
+				C816A438CF41C12D50F04AA4 /* Pods-maxim_fitness_2022_36331.release.xcconfig */,
+				D5A821FD069541BB4F4D82F6 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */,
+				D1C2B24CBFC84347039A0AD1 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -133,7 +133,7 @@
 				00E356EF1AD99517003FC87E /* maxim_fitness_2022_36331Tests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				07ECCA6526D129CC7D32AF44 /* Pods */,
+				67D4B25C169F8D14CAFD109A /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -156,11 +156,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "maxim_fitness_2022_36331Tests" */;
 			buildPhases = (
-				0F60C18931259F40EC95B8EC /* [CP] Check Pods Manifest.lock */,
+				2136158A83B401976D728C8D /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				3ECE48CAC222A1522AA4BCDA /* [CP] Copy Pods Resources */,
+				7FF23DF46A4BFB80642965E2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -176,13 +176,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "maxim_fitness_2022_36331" */;
 			buildPhases = (
-				7DE131A38C7C0E153BF12868 /* [CP] Check Pods Manifest.lock */,
+				3C2B31649FB4BDDEBD68C8E7 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				BC03B1E899828AC8EE3E999E /* [CP] Copy Pods Resources */,
+				57D9FC56593E40E7068CD5BA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -263,7 +263,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		0F60C18931259F40EC95B8EC /* [CP] Check Pods Manifest.lock */ = {
+		2136158A83B401976D728C8D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -285,24 +285,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3ECE48CAC222A1522AA4BCDA /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7DE131A38C7C0E153BF12868 /* [CP] Check Pods Manifest.lock */ = {
+		3C2B31649FB4BDDEBD68C8E7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -324,7 +307,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BC03B1E899828AC8EE3E999E /* [CP] Copy Pods Resources */ = {
+		57D9FC56593E40E7068CD5BA /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -339,6 +322,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7FF23DF46A4BFB80642965E2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests/Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -393,7 +393,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 983F46C3CFE111E59D39FDF3 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */;
+			baseConfigurationReference = D5A821FD069541BB4F4D82F6 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -420,7 +420,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8F4E798E88BEAACB82078839 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */;
+			baseConfigurationReference = D1C2B24CBFC84347039A0AD1 /* Pods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -444,7 +444,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DCC0403B39A006236CF33FC /* Pods-maxim_fitness_2022_36331.debug.xcconfig */;
+			baseConfigurationReference = 03709DD968BCA27D40FEA919 /* Pods-maxim_fitness_2022_36331.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -470,7 +470,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 272339111408829435CDB70E /* Pods-maxim_fitness_2022_36331.release.xcconfig */;
+			baseConfigurationReference = C816A438CF41C12D50F04AA4 /* Pods-maxim_fitness_2022_36331.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

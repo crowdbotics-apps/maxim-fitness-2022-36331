@@ -8,13 +8,11 @@ import {
 import { color } from "utils"
 import { Images } from "src/theme"
 
-import { Header } from "components/header"
 const { HomeImage } = Images
 
 const Home = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Header />
       <ScrollView contentContainerStyle={{flex:1}}>
         <ImageBackground
           source={HomeImage}
