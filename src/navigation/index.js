@@ -22,8 +22,8 @@ const Navigation = props => {
     }}>
       <authStack.Navigator screenOptions={{ headerShown: false }}>
         {
-        // props.accessToken
-       true ? (
+        props.accessToken
+        ? (
           <authStack.Screen name="MainStack" component={MainNavigator} />
         ) : (
           <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
@@ -34,7 +34,7 @@ const Navigation = props => {
 }
 
 const mapStateToProps = state => ({
-  // accessToken: state.login.accessToken
+  accessToken: state.login.accessToken
 })
 
 export default connect(mapStateToProps, null)(Navigation)

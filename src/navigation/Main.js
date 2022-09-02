@@ -8,6 +8,7 @@ import Comment from "src/screens/comment"
 
 import Home from "src/screens/Home"
 import SignIn from "../screens/SignIn"
+import SignUp from "../screens/SignUp"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
   widthPercentageToDP as wp,
@@ -38,14 +39,14 @@ const BottomNavigator = props => {
 
   return (
     <Tab.Navigator
-      initialRouteName="SignIn"
+      initialRouteName="Home"
       screenOptions={{
         tabBarStyle: {backgroundColor:'#242A38',height:hp("9%")}
       }}
     >
       <Tab.Screen
         name="Comments"
-        component={SignIn}
+        component={Home}
         options={{
           tabBarLabel: () => null,
           tabBarIcon: ({ focused }) => (
