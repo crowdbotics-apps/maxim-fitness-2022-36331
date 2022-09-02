@@ -1,24 +1,18 @@
-import React, { useCallback, useMemo, useRef } from "react"
-import { View, StyleSheet, SafeAreaView, ImageBackground , ScrollView} from "react-native"
-
-
-import { color } from "src/utils"
-import { Images } from "src/theme"
-
-// import { Header } from "components/header"
-const { HomeImage } = Images
+import React from "react"
+import {StyleSheet, SafeAreaView, FlatList} from "react-native"
+import FeedCard from "../../components/FeedCard"
+import {Text} from 'src/components';
 
 const Home = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      {/* <Header />/ */}
-      <ScrollView contentContainerStyle={{flex:1}}>
-        <ImageBackground
-          source={HomeImage}
-          resizeMode="cover"
-          style={styles.image}
-        />
-      </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.content} text="Ltest..." />
+      <FlatList
+        data={[1]}
+        renderItem={(item, i) => {
+          return <FeedCard />
+        }}
+      />
     </SafeAreaView>
   )
 }
@@ -26,11 +20,13 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderRadius: 15
+    backgroundColor: 'white',
   },
-
-  image: {
-    height: "100%"
+  content: {
+    fontSize: 15,
+    // backgroundColor: 'red',
+    color: 'gray',
+    paddingHorizontal: 15,
   }
 })
 
