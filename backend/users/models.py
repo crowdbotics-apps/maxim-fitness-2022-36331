@@ -59,6 +59,21 @@ class User(AbstractUser):
 
         self.settings.update_values(kwargs)
 
+class AnswerProgram(models.Model):
+    program = models.ForeignKey("program.Program", on_delete=models.CASCADE)
+    age_min = models.PositiveIntegerField()
+    age_max = models.PositiveIntegerField()
+    exercise_level = models.PositiveIntegerField(null=True, blank=True)
+    activity_level = models.PositiveIntegerField(null=True, blank=True)
+    understanding_level = models.PositiveIntegerField(null=True, blank=True)
+    number_of_meal = models.PositiveIntegerField(null=True, blank=True)
+    number_of_training_days = models.PositiveIntegerField(null=True, blank=True)
+    fitness_goal = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.program)
+
+
 
 def create_settings(sender, instance, created, **kwargs):
     if created:

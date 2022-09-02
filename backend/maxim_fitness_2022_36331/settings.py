@@ -73,6 +73,8 @@ INSTALLED_APPS = [
 LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
+    "program",
+    "notification"
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -87,7 +89,14 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'drf_yasg',
     'storages',
-'django_rest_passwordreset',
+    'django_rest_passwordreset',
+    'nested_admin',
+    "friendship",
+    "solo",
+
+    # end fcm_django push notifications
+    "push_notifications",
+    "django_crontab",
 ]
 MODULES_APPS = get_modules()
 
@@ -245,8 +254,7 @@ if USE_S3:
     )
     MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
+    MEDIA_URL = '/mediafiles/'
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
@@ -292,3 +300,6 @@ DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
         "max_number": 9999
     }
 }
+
+NIX_APP_ID = env.str("NIX_APP_ID", "")
+NIX_API_KEY = env.str("NIX_API_KEY", "")
