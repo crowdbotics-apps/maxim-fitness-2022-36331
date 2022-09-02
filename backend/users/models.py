@@ -7,6 +7,19 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django_rest_passwordreset.signals import reset_password_token_created
+from django.conf import settings
+
+import boto3
+from botocore.client import Config
+
+AWS_KWARGS = {
+    "aws_access_key_id": settings.AWS_ACCESS_KEY_ID,
+    "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
+    "region_name": settings.AWS_STORAGE_REGION,
+    "config": Config(s3={'addressing_style': 'path'})
+}
+
+s3 = boto3.client('s3', **AWS_KWARGS)
 
 
 class User(AbstractUser):
@@ -49,6 +62,42 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+
+    def profile_url(self):
+        if self.socialaccount_set.all():
+            return self.socialaccount_set.all()[0].get_avatar_url()
+        return ""
+
+    def set_profile_picture(self, picture, file_name):
+        self.profile_picture.save(file_name, picture)
+
+    def set_background_picture(self, picture, file_name):
+        self.background_picture.save(file_name, picture)
+
+    @property
+    def profile_picture_url(self):
+        if self.profile_picture:
+            url = s3.generate_presigned_url(
+                ClientMethod='get_object',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': "media/" + self.profile_picture.name
+                })
+            return url
+        return None
+
+    @property
+    def background_picture_url(self):
+        if self.background_picture:
+            url = s3.generate_presigned_url(
+                ClientMethod='get_object',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': "media/" + self.background_picture.name
+                })
+            return url
+        return None
+
 
 
     def update_settings(self, plan, product):
