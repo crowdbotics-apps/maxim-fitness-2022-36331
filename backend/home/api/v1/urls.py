@@ -12,4 +12,5 @@ router.register("login", LoginViewSet, basename="login")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path('forgot-password/', include('django_rest_passwordreset.urls', namespace='password_reset'))
 ]
