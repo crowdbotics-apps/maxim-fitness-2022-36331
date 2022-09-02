@@ -312,3 +312,7 @@ STRIPE_TEST_PUBLIC_KEY = env.str('STRIPE_TEST_PUBLIC_KEY', '')
 STRIPE_TEST_SECRET_KEY = env.str('STRIPE_TEST_SECRET_KEY', '')
 STRIPE_LIVE_MODE = False
 DJSTRIPE_WEBHOOK_VALIDATION='retrieve_event'
+
+CRONJOBS = [
+    ('0 0 * * *', 'home.cron.send_weight_update_notification')
+]
