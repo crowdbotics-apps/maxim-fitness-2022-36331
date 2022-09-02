@@ -86,6 +86,8 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.apple',
     'django_extensions',
     'drf_yasg',
     'storages',
@@ -303,3 +305,14 @@ DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
 
 NIX_APP_ID = env.str("NIX_APP_ID", "")
 NIX_API_KEY = env.str("NIX_API_KEY", "")
+
+STRIPE_LIVE_PUBLIC_KEY = env.str('STRIPE_LIVE_PUBLIC_KEY', '')
+STRIPE_LIVE_SECRET_KEY = env.str('STRIPE_LIVE_SECRET_KEY', '')
+STRIPE_TEST_PUBLIC_KEY = env.str('STRIPE_TEST_PUBLIC_KEY', '')
+STRIPE_TEST_SECRET_KEY = env.str('STRIPE_TEST_SECRET_KEY', '')
+STRIPE_LIVE_MODE = False
+DJSTRIPE_WEBHOOK_VALIDATION='retrieve_event'
+
+CRONJOBS = [
+    ('0 0 * * *', 'home.cron.send_weight_update_notification')
+]
