@@ -68,7 +68,12 @@ class SignupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name']
+        fields =  ['id', 'username', 'email', 'first_name', 'last_name', "profile_picture", "background_picture",
+                  "gender", 'dob', "height", "weight", "unit",
+                  "exercise_level", "activity_level",
+                  "understanding_level", "number_of_meal", "number_of_training_days",
+                  "fitness_goal", "settings", 'stripe_customer_id', "is_survey", "is_superuser"
+                  ]
 
 
 class PasswordSerializer(PasswordResetSerializer):
