@@ -22,7 +22,7 @@ const Header = () => {
 
       <View style={styles.currentTabStyle}>
         <ProfileHeaderFeed
-          imageUrl={Images.home}
+          imageUrl={Images.profile}
           // onAvatarChange={onAvatarChange}
           style={styles.profileStyle}
         />
@@ -30,12 +30,10 @@ const Header = () => {
       </View>
       <View style={styles.currentTab}>
         <TouchableOpacity style={styles.iconStyle}>
-          <Icon type="MaterialIcons" name="search" />
+          <Image source={Images.searchIcon} style={{width: 20, height: 20, marginRight: 20}} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconStyle}>
-          {/* <Icon type="MaterialIcons" name="add" /> */}
-
-          <Icon type='FontAwesome5' name='plus' />
+          <Image source={Images.addIcon} style={{width: 30, height: 30}} />
         </TouchableOpacity>
       </View>
     </View>
@@ -43,19 +41,20 @@ const Header = () => {
 };
 const styles = StyleSheet.create({
   mainContainer: {
-    height: 50,
+    // height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'red',
-    borderBottomWidth: 3,
-    borderColor: Colors.alto,
+    // borderBottomWidth: 3,
+    // borderColor: Colors.alto,
     paddingHorizontal: 15,
-    marginTop: 10
+    // marginTop: 10,
+    paddingVertical: 10
   },
-  profileStyle: {backgroundColor: 'yellow', borderRadius: 100},
+  profileStyle: {
+    borderRadius: 100
+  },
   currentTabStyle: {
-    backgroundColor: 'blue',
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start'
@@ -66,7 +65,8 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontWeight: 'bold',
   },
-  currentTab: {flexDirection: 'row', backgroundColor: 'pink', flex: 1, justifyContent: 'flex-end'}
+  currentTab: {flexDirection: 'row', flex: 1, justifyContent: 'flex-end'},
+  iconStyle: {alignItems: 'center', justifyContent: 'center'}
 })
 
 export default Header;

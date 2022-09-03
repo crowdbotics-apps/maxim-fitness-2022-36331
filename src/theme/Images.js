@@ -29,4 +29,11 @@ export default {
   feed: require('src/assets/images/feed.png'),
   nutrition: require('src/assets/images/nutrition.png'),
   exercise: require('src/assets/images/exercise.png'),
+  etc: require('src/assets/images/etc.png'),
+  addIcon: require('src/assets/images/add.png'),
+  searchIcon: require('src/assets/images/search.png'),
+  heartIcon: require('src/assets/images/heart.png'),
+  shareIcon: require('src/assets/images/share.png'),
+  messageIcon: require('src/assets/images/message.png'),
+  foodImage: require('src/assets/images/food.jpeg'),
 }

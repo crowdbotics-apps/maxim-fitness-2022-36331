@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
-      <Text style={styles.content} text="Ltest..." />
+      <Text style={styles.content} text="Latest..." />
       <FlatList
         data={[1]}
         renderItem={(item, i) => {
@@ -26,9 +26,9 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 15,
-    // backgroundColor: 'red',
     color: 'gray',
     paddingHorizontal: 15,
+    marginTop: 10
   }
 })
 
