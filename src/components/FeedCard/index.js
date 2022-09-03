@@ -10,9 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Text from '../Text';
-import {Icon} from 'native-base';
 import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
-import Video from 'react-native-video';
 import {calculatePostTime} from 'src/utils/functions';
 
 const FeedCard = () => {

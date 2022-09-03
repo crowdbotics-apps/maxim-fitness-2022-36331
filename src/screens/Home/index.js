@@ -2,10 +2,12 @@ import React from "react"
 import {StyleSheet, SafeAreaView, FlatList} from "react-native"
 import FeedCard from "../../components/FeedCard"
 import {Text} from 'src/components';
+import Header from "../../components/Header";
 
 const Home = () => {
   return (
     <SafeAreaView style={styles.container}>
+      <Header />
       <Text style={styles.content} text="Ltest..." />
       <FlatList
         data={[1]}

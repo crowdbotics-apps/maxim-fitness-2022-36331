@@ -1,13 +1,10 @@
 import React from "react"
 import {View, Image, Text, StyleSheet} from "react-native"
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
-
-
-import Home from "src/screens/Home"
-import SignIn from "../screens/SignIn"
 import {createStackNavigator} from "@react-navigation/stack"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen"
 import {Images} from "src/theme"
+import Home from "../screens/Home"
 
 const {home, profile, feed, nutrition, exercise} = Images
 
@@ -19,13 +16,13 @@ const BottomNavigator = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeScreen"
       screenOptions={{
         tabBarStyle: {backgroundColor: 'white', height: hp("10%")}
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="HomeScreen"
         component={Home}
         options={{
           tabBarLabel: ({focused}) => (
@@ -47,8 +44,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="EmptyScreen2"
-        component={SignIn}
+        name="Home1"
+        component={Home}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -69,7 +66,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="EmptyScreen3"
+        name="Home2"
         component={Home}
         options={{
           tabBarLabel: ({focused}) => (
@@ -91,7 +88,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="profileScreens"
+        name="Home3"
         component={Home}
         options={{
           tabBarLabel: ({focused}) => (
