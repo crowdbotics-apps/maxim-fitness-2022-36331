@@ -20,7 +20,9 @@ const RESET = "SCREEN/RESET"
 const initialState = {
   requesting: false,
   userDetail: false,
-  accessToken: false
+  accessToken: false,
+  googleRequesting: false,
+  faceBookRequesting: false,
 }
 
 //Actions
@@ -61,7 +63,17 @@ export const loginReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
+     case GOOGLE_LOGIN:
+      return {
+        ...state,
+        googleRequesting: true
+      }
 
+      case FACEBOOK_LOGIN:
+        return {
+          ...state,
+          faceBookRequesting: true
+        }
     case SET_ACCESS_TOKEN:
       return {
         ...state,
@@ -78,7 +90,9 @@ export const loginReducer = (state = initialState, action) => {
     case RESET:
       return {
         ...state,
-        requesting: false
+        requesting: false,
+        googleRequesting: false,
+        faceBookRequesting: false
       }
 
     default:
@@ -100,7 +114,6 @@ function loginAPI(data) {
 function* login({ data }) {
     try {
       const response = yield call(loginAPI, data)
-      console.log('response-----', response);
       AsyncStorage.setItem("authToken", response.data.token) 
       yield put(setAccessToken(response.data.token))
       yield put(setUserDetail(response.data.user))
@@ -137,10 +150,9 @@ function* facebookLogin({ data }) {
   try {
     const res = yield call(facebookLoginAPI, data)
     console.log('facebook login success response0000', res);
-    // AsyncStorage.setItem("authToken", res.data.key)
-
-    // yield put(setAccessToken(res.data.key))
-    // yield put(setUserDetail(res.data.user_detail))
+    AsyncStorage.setItem("authToken", res.data.key)
+    yield put(setAccessToken(res.data.key))
+    yield put(setUserDetail(res.data.user_detail))
     showMessage({
       message: "Facebook login successfully",
       type: "success"

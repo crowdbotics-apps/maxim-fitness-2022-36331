@@ -4,10 +4,10 @@ import FeedCard from "../../components/FeedCard"
 import {Text} from 'src/components';
 import Header from "../../components/Header";
 
-const Home = () => {
+const Home = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
+      <Header onPressPlus={()=> navigation.navigate('AddPost')} />
       <Text style={styles.content} text="Latest..." />
       <FlatList
         data={[1]}

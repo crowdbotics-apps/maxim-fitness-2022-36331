@@ -15,7 +15,7 @@ import {calculatePostTime} from 'src/utils/functions';
 import ProfileHeaderFeed from '../ProfileHeaderFeed';
 import {Icon} from 'native-base'
 
-const Header = () => {
+const Header = ({onPressPlus}) => {
 
   return (
     <View style={styles.mainContainer}>
@@ -32,7 +32,7 @@ const Header = () => {
         <TouchableOpacity style={styles.iconStyle}>
           <Image source={Images.searchIcon} style={{width: 20, height: 20, marginRight: 20}} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconStyle}>
+        <TouchableOpacity style={styles.iconStyle} onPress={onPressPlus}>
           <Image source={Images.addIcon} style={{width: 30, height: 30}} />
         </TouchableOpacity>
       </View>

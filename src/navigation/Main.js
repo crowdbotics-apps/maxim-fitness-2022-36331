@@ -5,6 +5,7 @@ import {createStackNavigator} from "@react-navigation/stack"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen"
 import {Images} from "src/theme"
 import Home from "../screens/Home"
+import AddPost from "../screens/AddPost"
 
 const {home, profile, feed, nutrition, exercise} = Images
 
@@ -151,7 +152,7 @@ const MainNavigator = () => (
     initialRouteName="BottomBar"
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
-    {/* <mainStack.Screen name="Comment" component={Comment} /> */}
+    <mainStack.Screen name="AddPost" component={AddPost} />
   </mainStack.Navigator>
 )
 
