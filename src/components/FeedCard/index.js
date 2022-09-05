@@ -29,17 +29,29 @@ const FeedCard = () => {
         <View style={styles.cardBody}>
           <Image source={Images.foodImage} style={styles.foodImageStyle} />
         </View>
-        <Text text="Orum_training_oficial" style={{paddingHorizontal: 15, paddingVertical: 5, fontSize: 15, lineHeight: 16}} />
-        <View style={styles.cardHeader}>
-          <View style={styles.username}>
+        <View style={styles.bottomTextStyle}>
+          <Text
+            text="Try out this power bowl that our favorite chef"
+            style={{flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16}}
+            numberOfLines={1}
+          />
+          <Text
+            text="see more"
+            style={{paddingVertical: 5, fontSize: 15, lineHeight: 16, color: 'blue'}}
+          />
+        </View>
+        <View style={styles.cardHeader1}>
+          <View style={styles.socialIcons}>
             <Image source={Images.messageIcon} style={styles.socialImg1} />
-            <Text text="2 m" style={styles.text2} />
+            <Text text="723" style={styles.text2} />
           </View>
-          <View style={styles.username}>
+          <View style={styles.socialIcons}>
             <Image source={Images.heartIcon} style={styles.socialImg} />
             <Text text="1.3k" style={styles.text2} />
           </View>
-          <Image source={Images.shareIcon} style={styles.socialImg2} />
+          <View style={styles.socialIcons}>
+            <Image source={Images.shareIcon} style={styles.socialImg2} />
+          </View>
         </View>
       </View>
     </View>
@@ -75,15 +87,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 15,
   },
+  cardHeader1: {
+    height: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    // marginHorizontal: 15,
+  },
   cardBody: {justifyContent: 'center', alignItems: 'center', marginTop: 10, borderRadius: 15},
-  text1: {fontSize: 15, marginRight: 10},
+  text1: {fontSize: 15, marginLeft: 10},
   text2: {fontSize: 15, marginLeft: 10},
-  username: {flexDirection: 'row', alignItems: 'center', flex: 1, marginHorizontal: 10},
+  username: {flexDirection: 'row', alignItems: 'center', flex: 1},
+  socialIcons: {flexDirection: 'row', alignItems: 'center'},
   profileImg: {width: 30, height: 30},
-  socialImg: {width: 40, height: 40, resizeMode: 'contain'},
-  socialImg1: {width: 20, height: 20, resizeMode: 'contain'},
-  socialImg2: {width: 20, height: 20, resizeMode: 'contain'},
-  foodImageStyle: {width: '91%', height: 260, paddingHorizontal: 15, borderRadius: 15}
+  socialImg: {width: 25, height: 25, resizeMode: 'contain'},
+  socialImg1: {width: 25, height: 25, resizeMode: 'contain'},
+  socialImg2: {width: 22, height: 22, resizeMode: 'contain'},
+  foodImageStyle: {width: '91%', height: 260, paddingHorizontal: 15, borderRadius: 15},
+  bottomTextStyle: {flexDirection: 'row', flex: 1, paddingHorizontal: 15}
 })
 
 export default FeedCard;

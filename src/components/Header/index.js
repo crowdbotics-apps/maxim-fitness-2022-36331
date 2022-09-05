@@ -1,36 +1,27 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Image,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  ImageBackground,
-  Dimensions,
 } from 'react-native';
-import Text from '../Text';
-import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
-import {calculatePostTime} from 'src/utils/functions';
+import {Images, Colors} from 'src/theme';
 import ProfileHeaderFeed from '../ProfileHeaderFeed';
-import {Icon} from 'native-base'
 
-const Header = ({onPressPlus}) => {
+const Header = ({imageUrl, onAvatarChange, item, index, onPressPlus}) => {
 
   return (
     <View style={styles.mainContainer}>
-
       <View style={styles.currentTabStyle}>
         <ProfileHeaderFeed
-          imageUrl={Images.profile}
-          // onAvatarChange={onAvatarChange}
+          imageUrl={imageUrl}
+          onAvatarChange={onAvatarChange}
           style={styles.profileStyle}
         />
-        {/* <Text style={styles.currentTabText} text="Posts" /> */}
       </View>
       <View style={styles.currentTab}>
         <TouchableOpacity style={styles.iconStyle}>
-          <Image source={Images.searchIcon} style={{width: 20, height: 20, marginRight: 20}} />
+          <Image source={Images.searchIcon} style={{width: 25, height: 25, marginRight: 20, resizeMode: 'contain'}} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconStyle} onPress={onPressPlus}>
           <Image source={Images.addIcon} style={{width: 30, height: 30}} />
@@ -41,14 +32,10 @@ const Header = ({onPressPlus}) => {
 };
 const styles = StyleSheet.create({
   mainContainer: {
-    // height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // borderBottomWidth: 3,
-    // borderColor: Colors.alto,
     paddingHorizontal: 15,
-    // marginTop: 10,
     paddingVertical: 10
   },
   profileStyle: {

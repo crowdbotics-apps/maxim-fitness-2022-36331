@@ -1,14 +1,14 @@
-import { all, call, put, takeLatest } from "redux-saga/effects"
+import {all, call, put, takeLatest} from "redux-saga/effects"
 // import AsyncStorage from "@react-native-community/async-storage"
-import { showMessage } from "react-native-flash-message"
-import { navigate } from "../navigation/NavigationService"
+import {showMessage} from "react-native-flash-message"
+import {navigate} from "../navigation/NavigationService"
 
 // config
-import { appConfig } from "src/config/app"
+import {APP_URL} from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
-import { NavigationContainer } from "@react-navigation/native"
+import {NavigationContainer} from "@react-navigation/native"
 
 //Types
 const SIGN_UP = "SCREEN/SIGNUP"
@@ -49,7 +49,7 @@ export const signUpReducer = (state = initialState, action) => {
 
 //Saga
 function SignUpAPI(data) {
-  const URL = `${appConfig.backendServerURL}/signup/`
+  const URL = `${APP_URL}/signup/`
   const options = {
     method: "POST",
     data
@@ -58,32 +58,32 @@ function SignUpAPI(data) {
   return XHR(URL, options)
 }
 
-function* SignUp({ data }) {
-    try {
-      const response = yield call(SignUpAPI, data)
-      navigate('SignIn')
-      console.log('signUp Success response', response)
+function* SignUp({data}) {
+  try {
+    const response = yield call(SignUpAPI, data)
+    navigate('SignIn')
+    console.log('signUp Success response', response)
     //   AsyncStorage.setItem("authToken", response.data.token)
-  
+
     //   yield put(setAccessToken(response.data.token))
     //   yield put(setUserDetail(response.data.user))
-  
+
     //   showMessage({
     //     message: "Login successfully",
     //     type: "success"
     //   })
-    } catch (e) {
-        const {response} = e
-        console.log('registration error response', response);
-      showMessage({
-        message: response && response.data.email[0],
-        type: "danger"
-      })
-    }
-    finally{
-        yield put(reset())
-    }
+  } catch (e) {
+    const {response} = e
+    console.log('registration error response', response);
+    showMessage({
+      message: response && response.data.email[0],
+      type: "danger"
+    })
   }
+  finally {
+    yield put(reset())
+  }
+}
 
 export default all([
   takeLatest(SIGN_UP, SignUp),

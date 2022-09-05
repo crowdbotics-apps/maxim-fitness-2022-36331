@@ -1,8 +1,7 @@
 import axios from 'axios';
 // config
-import { appConfig } from '../config/app';
+import { APP_URL } from '../config/app';
 
-// axios.defaults.headers.common['apiKey'] = appConfig.apiKey;
 
 function parseJSON(response) {
   if (response.status === 204 || response.status === 205) {

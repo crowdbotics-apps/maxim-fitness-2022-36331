@@ -4,7 +4,8 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
 import {createStackNavigator} from "@react-navigation/stack"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen"
 import {Images} from "src/theme"
-import Home from "../screens/Home"
+import Feeds from "../screens/Feeds"
+import ViewPost from "../screens/ViewPost"
 import AddPost from "../screens/AddPost"
 
 const {home, profile, feed, nutrition, exercise} = Images
@@ -24,7 +25,7 @@ const BottomNavigator = () => {
     >
       <Tab.Screen
         name="HomeScreen"
-        component={Home}
+        component={Feeds}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -46,7 +47,7 @@ const BottomNavigator = () => {
 
       <Tab.Screen
         name="Home1"
-        component={Home}
+        component={Feeds}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -68,7 +69,7 @@ const BottomNavigator = () => {
 
       <Tab.Screen
         name="Home2"
-        component={Home}
+        component={Feeds}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -90,7 +91,7 @@ const BottomNavigator = () => {
 
       <Tab.Screen
         name="Home3"
-        component={Home}
+        component={Feeds}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -112,7 +113,7 @@ const BottomNavigator = () => {
 
       <Tab.Screen
         name="profileScreen"
-        component={Home}
+        component={Feeds}
         options={{
           tabBarLabel: ({focused}) => (
             <View style={styles.textContainer}>
@@ -153,6 +154,7 @@ const MainNavigator = () => (
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
     <mainStack.Screen name="AddPost" component={AddPost} />
+    <mainStack.Screen name="ViewPost" component={ViewPost} />
   </mainStack.Navigator>
 )
 

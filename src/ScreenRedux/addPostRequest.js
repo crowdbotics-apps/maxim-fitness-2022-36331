@@ -4,7 +4,7 @@ import { showMessage } from "react-native-flash-message"
 import { navigate } from "../navigation/NavigationService"
 
 // config
-import { appConfig } from "src/config/app"
+import { APP_URL } from "src/config/app"
 
 // utils
 import XHR from "src/utils/XHR"
@@ -49,7 +49,7 @@ export const addPostReducer = (state = initialState, action) => {
 
 //Saga
 async function addPostAPI(data) {
-  const URL = `${appConfig.backendServerURL}/post/`
+  const URL = `${APP_URL}/post/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "POST",

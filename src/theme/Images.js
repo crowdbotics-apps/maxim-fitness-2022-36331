@@ -36,6 +36,7 @@ export default {
   shareIcon: require('src/assets/images/share.png'),
   messageIcon: require('src/assets/images/message.png'),
   foodImage: require('src/assets/images/food.jpeg'),
+  backArrow: require('src/assets/images/back.png'),
   faceBookIcon: require('src/assets/images/FacebookIcon.png'),
   smallGoogleIcon: require('src/assets/images/GoogleIcon.png'),
   closeIcon: require('src/assets/images/closeIcon.png'),
