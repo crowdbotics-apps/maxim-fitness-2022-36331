@@ -5,7 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import signup from 'screens/Signup/redux/reducer';
 // import signin from 'screens/SignIn/redux/reducer';
 import {signUpReducer} from '../ScreenRedux/signUpRedux'
-import {loginReducer} from '../ScreenRedux/loginRedux' 
+import {loginReducer} from '../ScreenRedux/loginRedux'
+import {feedsReducer} from '../screens/Feeds/redux';
 
 const appPersistConfig = {
   key: 'login',
@@ -15,5 +16,6 @@ const appPersistConfig = {
 
 export default {
   login: persistReducer(appPersistConfig, loginReducer),
-  signUpReducer
+  signUpReducer,
+  feedsReducer
 };
