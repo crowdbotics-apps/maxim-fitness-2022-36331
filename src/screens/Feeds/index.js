@@ -15,7 +15,7 @@ import {connect} from "react-redux";
 import {useNetInfo} from '@react-native-community/netinfo';
 
 const Feeds = (props) => {
-  const {feeds, requesting} = props
+  const {feeds, requesting, navigation} = props
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1);
   console.log('feeds: ', feeds);
@@ -64,7 +64,7 @@ const Feeds = (props) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header imageUrl={Images.profile} />
+      <Header imageUrl={Images.profile} onPressPlus={()=>navigation.navigate('AddPost')}/>
       <Text style={styles.content} text="Latest..." />
 
       {netInfo?.isConnected ? (
