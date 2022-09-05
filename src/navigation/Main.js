@@ -1,104 +1,109 @@
 import React from "react"
-import { View, Image } from "react-native"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import {View, Image, Text, StyleSheet} from "react-native"
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
+import {createStackNavigator} from "@react-navigation/stack"
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen"
+import {Images} from "src/theme"
+import Home from "../screens/Home"
 
-const Tab = createBottomTabNavigator()
-
-import Comment from "src/screens/comment"
-
-import Home from "src/screens/Home"
-import SignIn from "../screens/SignIn"
-import SignUp from "../screens/SignUp"
-import { createStackNavigator } from "@react-navigation/stack"
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen"
-
-import { Images } from "src/theme"
-const {
-  // HomeOn,
-  HomeOff,
-  AccountOn,
-  AccountOff,
-  CollabOn,
-  CollabOff,
-  Camera,
-  ExploreOn,
-  ExploreOff,
-  HomeOn
-} = Images
+const {home, profile, feed, nutrition, exercise} = Images
 
 const mainStack = createStackNavigator()
+const Tab = createBottomTabNavigator()
 
 // @refresh reset
-const BottomNavigator = props => {
-  const {
-    route: { state }
-  } = props
+const BottomNavigator = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeScreen"
       screenOptions={{
-        tabBarStyle: {backgroundColor:'#242A38',height:hp("9%")}
+        tabBarStyle: {backgroundColor: 'white', height: hp("10%")}
       }}
     >
       <Tab.Screen
-        name="Comments"
+        name="HomeScreen"
         component={Home}
         options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={focused ? HomeOn : HomeOff}
-              style={{ width: 21, height: 20 }}
-            />
+          tabBarLabel: ({focused}) => (
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>Home</Text>
+              <View style={[styles.bottom, {borderBottomColor: focused ? '#0460BB' : 'white'}]}></View>
+            </View>
+          ),
+          tabBarIcon: () => (
+            <View style={styles.tabIcon}>
+              <Image
+                source={home}
+                style={styles.iconStyle1}
+              />
+            </View>
           ),
           header: () => null
         }}
       />
 
       <Tab.Screen
-        name="EmptyScreen2"
+        name="Home1"
         component={Home}
         options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={focused ? ExploreOn : ExploreOff}
-              style={{ width: 20, height: 20 }}
-            />
+          tabBarLabel: ({focused}) => (
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>Profile</Text>
+              <View style={[styles.bottom, {borderBottomColor: focused ? '#0460BB' : 'white'}]}></View>
+            </View>
+          ),
+          tabBarIcon: ({focused}) => (
+            <View style={styles.tabIcon}>
+              <Image
+                source={profile}
+                style={styles.image1}
+              />
+            </View>
           ),
           header: () => null
         }}
       />
 
       <Tab.Screen
-        name="EmptyScreen3"
+        name="Home2"
         component={Home}
         options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={focused ? Camera : Camera}
-              style={{ width: 44, height: 44 }}
-            />
+          tabBarLabel: ({focused}) => (
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>Feed</Text>
+              <View style={[styles.bottom, {borderBottomColor: focused ? '#0460BB' : 'white'}]}></View>
+            </View>
+          ),
+          tabBarIcon: () => (
+            <View style={styles.tabIcon}>
+              <Image
+                source={feed}
+                style={styles.iconStyle1}
+              />
+            </View>
           ),
           header: () => null
         }}
       />
 
       <Tab.Screen
-        name="profileScreens"
+        name="Home3"
         component={Home}
         options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={focused ? CollabOn : CollabOff}
-              style={{ width: 18, height: 18 }}
-            />
+          tabBarLabel: ({focused}) => (
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>Nurition</Text>
+              <View style={[styles.bottom, {borderBottomColor: focused ? '#0460BB' : 'white'}]}></View>
+            </View>
+          ),
+          tabBarIcon: () => (
+            <View style={styles.tabIcon}>
+              <Image
+                source={nutrition}
+                style={styles.image2}
+              />
+            </View>
           ),
           header: () => null
         }}
@@ -108,16 +113,20 @@ const BottomNavigator = props => {
         name="profileScreen"
         component={Home}
         options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) =>
-            (
+          tabBarLabel: ({focused}) => (
+            <View style={styles.textContainer}>
+              <Text style={styles.text}>Exercise</Text>
+              <View style={[styles.bottom, {borderBottomColor: focused ? '#0460BB' : 'white'}]} />
+            </View>
+          ),
+          tabBarIcon: () => (
+            <View style={styles.tabIcon}>
               <Image
-              source={focused ? AccountOn : AccountOff}
-              style={{ width: 17, height: 20 }}
-            />
-            ),
-          
-          // focused ? <HomeOnn /> : <HomeOnn />,
+                source={exercise}
+                style={styles.imageStyle}
+              />
+            </View>
+          ),
           header: () => null
         }}
       />
@@ -125,9 +134,20 @@ const BottomNavigator = props => {
   )
 }
 
+const styles = StyleSheet.create({
+  textContainer: {justifyContent: 'center', alignItems: 'center'},
+  text: {fontSize: 12, color: '#0460BB'},
+  bottom: {borderBottomWidth: 5, marginTop: 10, width: 33, borderRadius: 10},
+  tabIcon: {marginTop: 18},
+  imageStyle: {width: 26, height: 13, resizeMode: 'contain'},
+  iconStyle1: {width: 20, height: 19, resizeMode: 'contain'},
+  image1: {width: 20, height: 21, resizeMode: 'contain'},
+  image2: {width: 20, height: 21, resizeMode: 'contain'},
+})
+
 const MainNavigator = () => (
   <mainStack.Navigator
-    screenOptions={{ headerShown: false, animationEnabled: false }}
+    screenOptions={{headerShown: false, animationEnabled: false}}
     initialRouteName="BottomBar"
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />

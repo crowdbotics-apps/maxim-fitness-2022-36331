@@ -1,9 +1,9 @@
 import React from "react"
-import {DefaultTheme, NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import {DefaultTheme, NavigationContainer} from "@react-navigation/native"
+import {createStackNavigator} from "@react-navigation/stack"
 // import { createDrawerNavigator } from "@react-navigation/drawer"
-import { connect } from "react-redux"
-import { navigationRef } from "./NavigationService"
+import {connect} from "react-redux"
+import {navigationRef} from "./NavigationService"
 
 import AuthStackScreen from "./AuthScreens"
 import MainNavigator from "./Main"
@@ -20,7 +20,7 @@ const Navigation = props => {
         ...DefaultTheme.colors,
       },
     }}>
-      <authStack.Navigator screenOptions={{ headerShown: false }}>
+      <authStack.Navigator screenOptions={{headerShown: false}}>
         {
         props.accessToken
         ? (
