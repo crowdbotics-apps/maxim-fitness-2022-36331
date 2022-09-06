@@ -4,7 +4,7 @@ import {View, Image, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 const ProfileHeaderFeed = ({imageUrl, onAvatarChange, style}) => {
   return (
     <View style={[styles.profileWrapper, style]}>
-      <TouchableWithoutFeedback onPress={onAvatarChange} style={{backgroundColor: 'red'}}>
+      <TouchableWithoutFeedback onPress={onAvatarChange}>
         <View style={styles.profileImageContainer}>
           <Image source={imageUrl} style={styles.profileImage} />
         </View>

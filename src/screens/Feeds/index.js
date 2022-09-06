@@ -4,22 +4,22 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
-  Dimensions,
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity
 } from "react-native";
 import {Text, Header, FeedCard} from 'src/components';
 import {Images} from 'src/theme';
-import {getFeedsRequest} from '../Feeds/redux';
+import {getFeedsRequest, postLikeRequest} from '../../ScreenRedux/feedRedux';
 import {connect} from "react-redux";
 import {useNetInfo} from '@react-native-community/netinfo';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const Feeds = (props) => {
-  const {feeds, requesting, navigation} = props
+  const {feeds, requesting, navigation, profile} = props
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1);
-  console.log('feeds: ', feeds);
+  // const [uploadAvatar, setUploadAvatar] = useState('');
 
   let netInfo = useNetInfo();
   useEffect(() => {
@@ -41,11 +41,6 @@ const Feeds = (props) => {
     }
   }, [feeds]);
 
-
-  let deviceWidth = Dimensions.get('window').width;
-  let deviceHeight = Dimensions.get('window').height;
-
-
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity onPress={()=> navigation.navigate('ViewPost', item)}>
@@ -53,11 +48,13 @@ const Feeds = (props) => {
         item={item}
         index={index}
         feeds={feeds}
+        profile={profile}
+        postLikeRequest={props.postLikeRequest}
+        setFeedsState={setFeedsState}
       />
       </TouchableOpacity>
     );
   };
-
 
   const onPullToRefresh = () => {
     setPage(1);
@@ -65,16 +62,48 @@ const Feeds = (props) => {
     moveToTop();
   };
 
+  // const onAvatarChange = () => {
+  //   ImagePicker.openPicker({
+  //     width: 300,
+  //     height: 400,
+  //     cropping: true,
+  //     includeBase64: true,
+  //   }).then(image => {
+  //     const img = {
+  //       uri: image.path,
+  //       name: image.path,
+  //       type: image.mime,
+  //     };
+  //     const data = {
+  //       image: `data:${img.type};base64, ${image.data}`,
+  //     };
+
+  //     setUploadAvatar(image?.path);
+  //     // props.changeAvatarImage(data);
+  //   });
+  // };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Header imageUrl={Images.profile} onPressPlus={()=>navigation.navigate('AddPost')}/>
-      <Text style={styles.content} text="Latest..." />
+      <Header
+        imageUrl={
+          profile && profile.profile_picture_url === null
+            ? Images.profile
+            : {uri: profile?.profile_picture_url}
+        }
+        onPressPlus={() => navigation.navigate('AddPost')}
+      />
+      <Text style={styles.content} text="Latest" />
 
       {netInfo?.isConnected ? (
         requesting ? (
-          <ActivityIndicator size="large" color="#000" style={{margin: 65}} />
+          <View style={styles.loaderStyle}>
+            <ActivityIndicator size="large" color="green" />
+          </View>
         ) :
-          feedsState.length > 0 ?
+          setInterval(() => {
+            feedsState.length > 0;
+          }, 2000) ?
             (
               <FlatList
                 ref={flatList}
@@ -97,11 +126,11 @@ const Feeds = (props) => {
                 keyboardShouldPersistTaps={'handled'}
               />
             ) : (
-              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <View style={styles.loaderStyle}>
                 <Text style={styles.comingSoon} text="No post are available!" bold />
               </View>
             )) : (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.loaderStyle}>
           <Text style={styles.emptyListLabel}>{'Network error!'}</Text>
         </View>
       )
@@ -120,16 +149,19 @@ const styles = StyleSheet.create({
     color: 'gray',
     paddingHorizontal: 15,
     marginTop: 10
-  }
+  },
+  loaderStyle: {flex: 1, justifyContent: 'center', alignItems: 'center'}
 })
 
 const mapStateToProps = state => ({
   requesting: state.feedsReducer.requesting,
-  feeds: state.feedsReducer.feeds
+  feeds: state.feedsReducer.feeds,
+  profile: state.login.userDetail
 })
 
 const mapDispatchToProps = dispatch => ({
   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
+  postLikeRequest: data => dispatch(postLikeRequest(data)),
 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(Feeds)

@@ -8,5 +8,5 @@ import addPost from "../ScreenRedux/addPostRequest"
 import ViewPost from "../ScreenRedux/viewPostRedux"
 
 export function* mainSaga() {
-  yield all([SignIn, SignUp, FeedRedux, addPost, ViewPost])
+  yield all([SignIn, SignUp, feedSaga, addPost, ViewPost])
 }

@@ -1,22 +1,27 @@
 import {all, call, put, takeLatest} from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import {showMessage} from "react-native-flash-message"
 
 // config
-import {APP_URL} from "../../../config/app"
+import {API_URL} from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
-// import { errorAlert } from "src/utils/alerts"
 
 //Types
 const FEEDS_REQUEST = "FEEDS_SCREEN/FEEDS_REQUEST"
 const FEEDS_SUCCESS = "FEEDS_SCREEN/FEEDS_SUCCESS"
 const FEEDS_FAILURE = "FEEDS_SCREEN/FEEDS_FAILURE"
 
+const LIKE_REQUEST = "FEEDS_SCREEN/LIKE_REQUEST"
+const LIKE_SUCCESS = "FEEDS_SCREEN/LIKE_SUCCESS"
+const LIKE_FAILURE = "FEEDS_SCREEN/LIKE_FAILURE"
+
 const initialState = {
   requesting: false,
   feeds: false,
+  feedError: false,
+  loading: false,
+  likeSuccess: false,
   feedError: false
 }
 
@@ -33,6 +38,21 @@ export const getFeedsSuccess = data => ({
 
 export const getFeedsFailure = error => ({
   type: FEEDS_FAILURE,
+  error
+})
+
+export const postLikeRequest = data => ({
+  type: LIKE_REQUEST,
+  data
+})
+
+export const postLikeSuccess = data => ({
+  type: LIKE_SUCCESS,
+  data
+})
+
+export const postLikeFailure = error => ({
+  type: LIKE_FAILURE,
   error
 })
 
@@ -58,6 +78,25 @@ export const feedsReducer = (state = initialState, action) => {
         requesting: false
       }
 
+    case LIKE_REQUEST:
+      return {
+        ...state,
+        loading: true
+      }
+
+    case LIKE_SUCCESS:
+      return {
+        ...state,
+        likeSuccess: action.data,
+        loading: false
+      }
+    case LIKE_FAILURE:
+      return {
+        ...state,
+        likeError: action.error,
+        loading: false
+      }
+
     default:
       return state
   }
@@ -68,7 +107,7 @@ async function getFeedAPI(data) {
   const page = data
   const limit = 10
   const offset = 0
-  const URL = `${APP_URL}/post/?page=${page}&limit=${limit}&offset=${offset}`
+  const URL = `${API_URL}/post/?page=${page}&limit=${limit}&offset=${offset}`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "GET",
@@ -93,6 +132,33 @@ function* getFeeds({data}) {
   }
 }
 
+async function postLikeAPI(feedId) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/post/${feedId}/add_like/`;
+  const options = {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'POST',
+  };
+  return XHR(URL, options);
+}
+
+function* postLike({data}) {
+  let feedId = data.feedId;
+  try {
+    const response = yield call(postLikeAPI, feedId);
+    console.log('Like RESPONSE: ', response);
+    yield put(postLikeSuccess(response));
+    data.callBack(true);
+  } catch (error) {
+    console.log('Like Error: ', error);
+    yield put(postLikeFailure(error));
+  }
+}
+
 export default all([
-  takeLatest(FEEDS_REQUEST, getFeeds)
+  takeLatest(FEEDS_REQUEST, getFeeds),
+  takeLatest(LIKE_REQUEST, postLike),
 ])

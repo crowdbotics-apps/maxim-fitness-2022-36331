@@ -8,7 +8,7 @@ import Feeds from "../screens/Feeds"
 import ViewPost from "../screens/ViewPost"
 import AddPost from "../screens/AddPost"
 
-const {home, profile, feed, nutrition, exercise} = Images
+const {home, profileTab, feed, nutrition, exercise} = Images
 
 const mainStack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -58,7 +58,7 @@ const BottomNavigator = () => {
           tabBarIcon: ({focused}) => (
             <View style={styles.tabIcon}>
               <Image
-                source={profile}
+                source={profileTab}
                 style={styles.image1}
               />
             </View>

@@ -4,7 +4,7 @@ import {showMessage} from "react-native-flash-message"
 import {navigate} from "../navigation/NavigationService"
 
 // config
-import {APP_URL} from "../config/app"
+import {API_URL} from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
@@ -49,7 +49,7 @@ export const signUpReducer = (state = initialState, action) => {
 
 //Saga
 function SignUpAPI(data) {
-  const URL = `${APP_URL}/signup/`
+  const URL = `${API_URL}/signup/`
   const options = {
     method: "POST",
     data
