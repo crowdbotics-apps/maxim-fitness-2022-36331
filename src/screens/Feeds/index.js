@@ -5,8 +5,7 @@ import {
   SafeAreaView,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity
+  ActivityIndicator
 } from "react-native";
 import {Text, Header, FeedCard} from 'src/components';
 import {Images} from 'src/theme';
@@ -43,15 +42,15 @@ const Feeds = (props) => {
 
   const renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity onPress={()=> navigation.navigate('ViewPost', item)}>
-      <FeedCard
-        item={item}
-        index={index}
-        feeds={feeds}
-        profile={profile}
-        postLikeRequest={props.postLikeRequest}
-        setFeedsState={setFeedsState}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
+        <FeedCard
+          item={item}
+          index={index}
+          feeds={feeds}
+          profile={profile}
+          postLikeRequest={props.postLikeRequest}
+          setFeedsState={setFeedsState}
+        />
       </TouchableOpacity>
     );
   };

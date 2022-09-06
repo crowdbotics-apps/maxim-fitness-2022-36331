@@ -125,7 +125,7 @@ function* login({data}) {
     const {response} = e
     console.log('error response---', response);
     showMessage({
-      message: response && response.data.non_field_errors[0],
+      message: 'Some thing went wrong!',
       type: "danger"
     })
   }
