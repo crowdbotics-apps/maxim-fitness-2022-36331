@@ -31,8 +31,6 @@ import {
 const {
   backIcon,
   orumIcon,
-  facebookButton,
-  googleIcon,
   smallGoogleIcon,
   faceBookIcon
 } = Images
