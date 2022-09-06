@@ -353,7 +353,6 @@ const mapStateToProps = state => ({
   requesting: state.login.requesting,
   googleRequesting: state.login.googleRequesting,
   faceBookRequesting: state.login.faceBookRequesting
-  // user: state.login.userDetail
 })
 
 const mapDispatchToProps = dispatch => ({

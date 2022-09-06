@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -11,14 +11,83 @@ import {
   ScrollView,
   SafeAreaView
 } from 'react-native';
+import moment from 'moment';
 import {Text} from 'src/components';
 import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
 import {calculatePostTime} from 'src/utils/functions';
 import {Icon} from 'native-base'
+import {connect} from "react-redux";
+//action
+import {getPost, addComment} from '../../ScreenRedux/viewPostRedux'
 
 
 const ViewPost = (props) => {
-  const {navigation: {goBack}} = props
+  const {navigation: {goBack}, route, requesting, postData} = props
+  const {circleClose} = Images
+  const [commentData, setCommentData] = useState(false)
+  const [postComments, setPostComments] = useState([])
+  const [heartIcondata, setHeartIcon] = useState([])
+
+
+  useEffect(()=>{
+    if(postData){
+      formarttedData()
+    }
+  },[postData])
+
+  const formarttedData=()=>{
+    const now = moment(postData?.created_at);
+    const expiration = moment(new Date());
+    const diff = expiration.diff(now);
+    const diffDuration = moment.duration(diff);
+    return(
+      diffDuration.months() ? `${diffDuration.months()} month` : diffDuration.days() ? `${diffDuration.days()} day` : diffDuration.hours() ? `${diffDuration.hours()} hour` : `${diffDuration.minutes()} minutes`
+    )
+  }
+
+
+  console.log('formarttedData', formarttedData());
+
+
+  useEffect(()=>{
+    if(route?.params?.id){
+     props.getPost(route?.params?.id)
+    }
+  },[route?.params?.id])
+
+
+  useEffect(()=>{
+    if(postData&&postData?.comments?.length){
+      let data = [
+        postData&&postData?.comments?.length && postData.comments.map((item)=>({
+          image: Images.profile,
+          text: item.content,
+          userName: item.user.username,
+          subComment: []
+        }))
+      ]
+      setPostComments(data[0])
+    }
+  },[postData?.comments])
+
+    
+
+  const addAComment=()=>{
+    let newData={
+      image: Images.profile,
+      text: commentData,
+      userName: props.userDetail.username,
+      subComment: []
+      }
+      let newdata = [newData, ...postComments]
+      setPostComments(newdata)
+    const apiData={
+      comment: commentData,
+      id: route?.params?.id
+    }
+    setCommentData(false)
+    props.addComment(apiData)
+  }
 
   const ProfileHeader = () => {
     return (
@@ -26,8 +95,8 @@ const ViewPost = (props) => {
         <Image source={Images.profile} style={styles.profileImg} />
         <View style={{flex: 1}}>
           <View style={styles.profileSection}>
-            <Text text="Orum Training" style={styles.nameText} />
-            <Text text="23 min" style={styles.timeText} />
+            <Text text={postData?.user?.username} style={styles.nameText} />
+            <Text text={formarttedData()} style={styles.timeText} />
           </View>
           <Text text="#Orum_training_oficial" style={styles.pageText} />
         </View>
@@ -36,23 +105,10 @@ const ViewPost = (props) => {
     )
   }
 
-  const data = [
-    {
-      image: Images.profile,
-      text: 'comment',
-      subComment: [
-        {
-          image: Images.profile,
-          text: 'comment',
-        }
-      ]
-    },
-    {
-      image: Images.profile,
-      text: 'comment',
-      subComment: []
-    }
-  ]
+  const likeComment=(i)=>{
+      
+  }
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.mainContainer}>
@@ -67,18 +123,18 @@ const ViewPost = (props) => {
           <View style={styles.cardSocials}>
             <View style={styles.socialIcons}>
               <Image source={Images.messageIcon} style={styles.msgIconStyle} />
-              <Text text="723" style={styles.timeText} />
+              <Text text={postData?.comments?.length} style={styles.timeText} />
             </View>
             <View style={styles.socialIcons}>
               <Image source={Images.heartIcon} style={styles.likeImageStyle} />
-              <Text text="1.3k" style={styles.timeText} />
+              <Text text={postData?.likes?.toString()} style={styles.timeText} />
             </View>
             <View style={styles.socialIcons}>
               <Image source={Images.shareIcon} style={styles.shareImageStyle} />
             </View>
           </View>
         </View>
-        {data.map((comment, i) => {
+        {postComments.map((comment, i) => {
           return (
             <View key={i}>
               <View style={styles.commentStyle}>
@@ -88,13 +144,13 @@ const ViewPost = (props) => {
                     <View style={styles.commentBodyStyle}>
                       <View style={styles.commentUsername}>
                         <View style={styles.commentHeading}>
-                          <Text text="Orum Training" style={styles.nameText} />
+                          <Text text={comment.userName} style={styles.nameText} />
                           <Text text="23 min" style={styles.timeText} />
                         </View>
                         <Image source={Images.etc} style={styles.profileImg} />
                       </View>
                       <Text
-                        text="Try out this power bowl that our favorite chef  this power bowl that our favorite cheft this power bowl that our favorite chef"
+                        text={comment.text}
                         style={styles.commentBodyText}
                       />
                     </View>
@@ -105,7 +161,9 @@ const ViewPost = (props) => {
                       </View>
                       <View style={styles.socialIcons}>
                         <Text text="23" style={styles.comText2} />
-                        <Image source={Images.heartIcon} style={styles.comImage} />
+                        <TouchableOpacity onPress={()=>likeComment(i)}>
+                        <Image source={Images.fillheart} style={[styles.comImage, {tintColor:'yellow'}]} />
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </View>
@@ -153,6 +211,12 @@ const ViewPost = (props) => {
           )
         })}
       </ScrollView>
+      <View style={{flexDirection: 'row'}}>
+      <TextInput placeholder='Write a comment' value={commentData} onChangeText={(value)=>setCommentData(value)} style={{paddingHorizontal: 20,width: '90%'}} />
+      <TouchableOpacity style={{justifyContent: 'center'}} onPress={()=> addAComment()}>
+      <Image source={circleClose} style={{height: 30, width: 30}}/>
+      </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -299,4 +363,15 @@ const styles = StyleSheet.create({
   },
 })
 
-export default ViewPost;
+const mapStateToProps = state => ({
+  requesting: state.postReducer.requesting,
+  postData: state.postReducer.postData,
+  userDetail: state.login.userDetail
+})
+
+const mapDispatchToProps = dispatch => ({
+  getPost: data => dispatch(getPost(data)),
+  addComment: data => dispatch(addComment(data)),
+
+})
+export default connect(mapStateToProps, mapDispatchToProps)(ViewPost)

@@ -8,6 +8,7 @@ import {signUpReducer} from '../ScreenRedux/signUpRedux'
 import {loginReducer} from '../ScreenRedux/loginRedux'
 import {feedsReducer} from '../screens/Feeds/redux';
 import {addPostReducer} from '../ScreenRedux/addPostRequest'
+import {postReducer} from '../ScreenRedux/viewPostRedux'
 
 const appPersistConfig = {
   key: 'login',
@@ -19,5 +20,6 @@ export default {
   login: persistReducer(appPersistConfig, loginReducer),
   signUpReducer,
   feedsReducer,
-  addPostReducer
+  addPostReducer,
+  postReducer
 };

@@ -1,4 +1,4 @@
-import React from "react"
+import React,{useEffect} from "react"
 import { CheckBox } from 'react-native-elements';
 import {
   View,
@@ -13,6 +13,11 @@ import {
   ActivityIndicator
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
+import {
+  GoogleSignin,
+  statusCodes
+} from "@react-native-google-signin/google-signin"
+import { AccessToken, LoginManager } from "react-native-fbsdk"
 import { Images } from "src/theme"
 import useForm from "../../utils/useForm"
 import validator from "../../utils/validation"
@@ -22,7 +27,12 @@ import {
   signUpUser,
 } from "../../ScreenRedux/signUpRedux"
 
-const { backIcon, orumIcon, facebookButton, googleIcon } = Images
+import {
+  googleLoginUser,
+  facebookLoginUser
+} from "../../ScreenRedux/loginRedux"
+
+const { backIcon, orumIcon, smallGoogleIcon, faceBookIcon } = Images
 const SignUp = (props) => {
 
   const stateSchema = {
@@ -62,6 +72,68 @@ const SignUp = (props) => {
   props.signUpUser(signUpData)
   }
 
+  useEffect(() => {
+    GoogleSignin.configure({
+      scopes: ["https://www.googleapis.com/auth/userinfo.profile"], // what API you want to access on behalf of the user, default is email and profile
+      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+      // iosClientId: '<FROM DEVELOPER CONSOLE>', // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+      androidClientId:
+        "146444618570-j1bm5q05buo6586id5eldmarctlad14e.apps.googleusercontent.com"
+    })
+  }, [])
+
+  const signInGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices()
+      const userInfo = await GoogleSignin.signIn()
+      const myToken = await GoogleSignin.getTokens()
+        .then(res => {
+          return res.accessToken
+        })
+        .catch(err => console.log("err", err))
+      let apiData = { access_token: myToken }
+      myToken && props.googleLoginUser(apiData)
+      // this.setState({ userInfo });
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  }
+
+  const facebooksignUp = async () => {
+    try {
+      if (Platform.OS === "android") {
+        LoginManager.setLoginBehavior("web_only")
+      }
+      const result = await LoginManager.logInWithPermissions([
+        "email",
+        "public_profile"
+      ])
+
+      if (result.isCancelled) {
+      } else {
+        await AccessToken.getCurrentAccessToken()
+          .then(async res => {
+            const token = res.accessToken.toString()
+            let data = { access_token: token }
+            props.facebookLoginUser(data)
+          })
+          .catch(err => {
+            err
+          })
+      }
+    } catch (err) {
+      err
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
@@ -75,8 +147,69 @@ const SignUp = (props) => {
             <Text style={styles.mainTextStyle}>training</Text>
           </View>
           <Text style={styles.getStarted}>Get Register With</Text>
-          <Image source={facebookButton} style={styles.faceBookIcon} />
-          <Image source={googleIcon} style={styles.googleIcon} />
+          <TouchableOpacity
+            style={[
+              styles.fbCardcard,
+              {
+                marginTop: 9,
+                height: 49,
+                borderRadius: 10,
+                paddingHorizontal: 15,
+                flexDirection: "row"
+              }
+            ]}
+            onPress={() => facebooksignUp()}
+          >
+            <View style={{ justifyContent: "center", flex: 1 }}>
+              <Image source={faceBookIcon} style={{ height: 19, width: 9 }} />
+            </View>
+            {props.faceBookRequesting ? (
+              <ActivityIndicator
+                style={{ flex: 6, marginRight: 30 }}
+                color="black"
+              />
+            ) : (
+              <View style={{ justifyContent: "center", flex: 2 }}>
+                <Text
+                  style={{ color: "white", fontSize: 14, fontWeight: "700" }}
+                >
+                  Login via Facebook
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.card,
+              {
+                marginTop: 16,
+                height: 49,
+                borderRadius: 10,
+                paddingHorizontal: 15,
+                flexDirection: "row"
+              }
+            ]}
+            onPress={() => signInGoogle()}
+          >
+            <View style={{ justifyContent: "center", flex: 1 }}>
+              <Image source={smallGoogleIcon} style={{}} />
+            </View>
+            {props.googleRequesting ? (
+              <ActivityIndicator
+                style={{ flex: 6, marginRight: 30 }}
+                color="black"
+              />
+            ) : (
+              <View style={{ justifyContent: "center", flex: 2 }}>
+                <Text
+                  style={{ color: "#303042", fontSize: 14, fontWeight: "700" }}
+                >
+                  Login via Google
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
           <Text style={styles.loginTextStyle}>Or Register with</Text>
           <View style={{ marginHorizontal: 3 }}>
             <TextInput
@@ -95,7 +228,7 @@ const SignUp = (props) => {
             <Text style={{ color: "red" }}>{state.password.error}</Text>
             <TouchableOpacity onPress={()=>OnSignUpPress() } disabled={disable}>
             <LinearGradient
-              style={styles.logInButton}
+              style={[styles.logInButton]}
               colors={["#048ECC", "#0460BB", "#0480C6"]}
             >
               {props.requesting ? <ActivityIndicator
@@ -156,14 +289,45 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 53
   },
-  loginText: { fontSize: 16, color: "white", fontWeight: "700" }
+  loginText: { fontSize: 16, color: "white", fontWeight: "700" },
+  card: {
+    width: "100%",
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 10
+  },
+
+  fbCardcard: {
+    width: "100%",
+    backgroundColor: "#3C5A9A",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 10
+  },
 })
 
 const mapStateToProps = state => ({
   requesting: state.signUpReducer.requesting,
+  googleRequesting: state.login.googleRequesting,
+  faceBookRequesting: state.login.faceBookRequesting
 })
 
 const mapDispatchToProps = dispatch => ({
   signUpUser: data => dispatch(signUpUser(data)),
+  googleLoginUser: data => dispatch(googleLoginUser(data)),
+  facebookLoginUser: data => dispatch(facebookLoginUser(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(SignUp)
