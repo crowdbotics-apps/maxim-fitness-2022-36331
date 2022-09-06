@@ -5,7 +5,8 @@ import {
   SafeAreaView,
   FlatList,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableOpacity
 } from "react-native";
 import {Text, Header, FeedCard} from 'src/components';
 import {Images} from 'src/theme';
