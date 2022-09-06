@@ -1,14 +1,11 @@
-import { all, call, put, takeLatest } from "redux-saga/effects"
+import {all, call, put, takeLatest} from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { showMessage } from "react-native-flash-message"
-import { navigate } from "../navigation/NavigationService"
 
 // config
-import { APP_URL } from "src/config/app"
+import {API_URL} from "src/config/app"
 
 // utils
 import XHR from "src/utils/XHR"
-import { NavigationContainer } from "@react-navigation/native"
 
 //Types
 const ADD_POST = "SCREEN/ADDPOST"
@@ -49,7 +46,7 @@ export const addPostReducer = (state = initialState, action) => {
 
 //Saga
 async function addPostAPI(data) {
-  const URL = `${APP_URL}/post/`
+  const URL = `${API_URL}/post/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "POST",
@@ -61,23 +58,18 @@ async function addPostAPI(data) {
   return XHR(URL, options)
 }
 
-function* AddPost({ data }) {
-    console.log('add post data====', data);
-    try {
-      const response = yield call(addPostAPI, data)
-      console.log('add success response', response)
-    //   AsyncStorage.setItem("authToken", response.data.token)
-  
-    //   yield put(setAccessToken(response.data.token))
-    //   yield put(setUserDetail(response.data.user))
-    } catch (e) {
-        const {response} = e
-        console.log('add post failure response---', response);
-    }
-    finally{
-        yield put(reset())
-    }
+function* AddPost({data}) {
+  try {
+    const response = yield call(addPostAPI, data)
+    console.log('add success response', response)
+  } catch (e) {
+    const {response} = e
+    console.log('add post failure response---', response);
   }
+  finally {
+    yield put(reset())
+  }
+}
 
 export default all([
   takeLatest(ADD_POST, AddPost),

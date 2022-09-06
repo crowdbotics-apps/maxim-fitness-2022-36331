@@ -4,27 +4,24 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  TouchableWithoutFeedback
 } from 'react-native';
-import {Images, Colors} from 'src/theme';
-import ProfileHeaderFeed from '../ProfileHeaderFeed';
+import {Images} from 'src/theme';
 
-const Header = ({imageUrl, onAvatarChange, item, index, onPressPlus}) => {
-
+const Header = ({imageUrl, onAvatarChange, onPressPlus}) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.currentTabStyle}>
-        <ProfileHeaderFeed
-          imageUrl={imageUrl}
-          onAvatarChange={onAvatarChange}
-          style={styles.profileStyle}
-        />
+        <TouchableWithoutFeedback onPress={onAvatarChange}>
+          <Image source={imageUrl} style={styles.profileImage} />
+        </TouchableWithoutFeedback>
       </View>
       <View style={styles.currentTab}>
         <TouchableOpacity style={styles.iconStyle}>
-          <Image source={Images.searchIcon} style={{width: 25, height: 25, marginRight: 20, resizeMode: 'contain'}} />
+          <Image source={Images.searchIcon} style={styles.searchImage} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconStyle} onPress={onPressPlus}>
-          <Image source={Images.addIcon} style={{width: 30, height: 30}} />
+          <Image source={Images.addIcon} style={styles.addImage} />
         </TouchableOpacity>
       </View>
     </View>
@@ -38,22 +35,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10
   },
-  profileStyle: {
-    borderRadius: 100
-  },
   currentTabStyle: {
     flex: 1,
     justifyContent: 'flex-start',
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
   },
-  currentTabText: {
-    fontSize: 18,
-    paddingVertical: 5,
-    color: Colors.black,
-    fontWeight: 'bold',
+  currentTab: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'flex-end'
   },
-  currentTab: {flexDirection: 'row', flex: 1, justifyContent: 'flex-end'},
-  iconStyle: {alignItems: 'center', justifyContent: 'center'}
+  iconStyle: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  searchImage: {
+    width: 25,
+    height: 25,
+    marginRight: 20,
+    resizeMode: 'contain'
+  },
+  addImage: {
+    width: 30,
+    height: 30
+  },
+  profileImage: {
+    borderRadius: 100,
+    width: 50,
+    height: 50,
+    resizeMode: 'cover',
+  },
 })
 
 export default Header;

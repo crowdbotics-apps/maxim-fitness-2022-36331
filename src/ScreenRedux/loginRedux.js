@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import {showMessage} from "react-native-flash-message"
 
 // config
-import {APP_URL} from "../config/app"
+import {API_URL} from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
@@ -63,17 +63,17 @@ export const loginReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
-     case GOOGLE_LOGIN:
+    case GOOGLE_LOGIN:
       return {
         ...state,
         googleRequesting: true
       }
 
-      case FACEBOOK_LOGIN:
-        return {
-          ...state,
-          faceBookRequesting: true
-        }
+    case FACEBOOK_LOGIN:
+      return {
+        ...state,
+        faceBookRequesting: true
+      }
     case SET_ACCESS_TOKEN:
       return {
         ...state,
@@ -102,7 +102,7 @@ export const loginReducer = (state = initialState, action) => {
 
 //Saga
 function loginAPI(data) {
-  const URL = `${APP_URL}/login/`
+  const URL = `${API_URL}/login/`
   const options = {
     method: "POST",
     data
@@ -111,33 +111,33 @@ function loginAPI(data) {
   return XHR(URL, options)
 }
 
-function* login({ data }) {
-    try {
-      const response = yield call(loginAPI, data)
-      AsyncStorage.setItem("authToken", response.data.token) 
-      yield put(setAccessToken(response.data.token))
-      yield put(setUserDetail(response.data.user))
-      showMessage({
-        message: "Login successfully",
-        type: "success"
-      })
-    } catch (e) {
-        const {response} = e
-        console.log('error response---', response);
-      showMessage({
-        message: response && response.data.non_field_errors[0],
-        type: "danger"
-      })
-    }
-    finally{
-      yield put(reset())
-    }
+function* login({data}) {
+  try {
+    const response = yield call(loginAPI, data)
+    AsyncStorage.setItem("authToken", response.data.token)
+    yield put(setAccessToken(response.data.token))
+    yield put(setUserDetail(response.data.user))
+    showMessage({
+      message: "Login successfully",
+      type: "success"
+    })
+  } catch (e) {
+    const {response} = e
+    console.log('error response---', response);
+    showMessage({
+      message: response && response.data.non_field_errors[0],
+      type: "danger"
+    })
   }
-  
+  finally {
+    yield put(reset())
+  }
+}
+
 
 function facebookLoginAPI(data) {
   console.log('fb data in saga--', data);
-  const URL = `${APP_URL}/login/facebook/`
+  const URL = `${API_URL}/login/facebook/`
   const options = {
     method: "POST",
     data
@@ -170,7 +170,7 @@ function* facebookLogin({data}) {
 
 function googleLoginAPI(data) {
   console.log('accessToken----- in saga', data);
-  const URL = `${APP_URL}/login/google/`
+  const URL = `${API_URL}/login/google/`
   const options = {
     method: "POST",
     data

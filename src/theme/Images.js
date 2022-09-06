@@ -42,4 +42,5 @@ export default {
   closeIcon: require('src/assets/images/closeIcon.png'),
   colorAddIcon: require('src/assets/images/addIcon.png'),
   circleClose: require('src/assets/images/circleClose.png'),
+  profileTab: require('src/assets/images/profileTab.png'),
 }
