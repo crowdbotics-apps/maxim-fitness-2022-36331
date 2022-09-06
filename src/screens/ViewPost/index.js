@@ -12,7 +12,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import moment from 'moment';
-import {Text} from 'src/components';
+import {Text, Loader} from 'src/components';
 import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
 import {calculatePostTime} from 'src/utils/functions';
 import {Icon} from 'native-base'
@@ -26,7 +26,7 @@ const ViewPost = (props) => {
   const {circleClose} = Images
   const [commentData, setCommentData] = useState(false)
   const [postComments, setPostComments] = useState([])
-  const [heartIcondata, setHeartIcon] = useState([])
+  const [focusreply, setFocusReply] = useState(false)
 
 
   useEffect(()=>{
@@ -44,9 +44,6 @@ const ViewPost = (props) => {
       diffDuration.months() ? `${diffDuration.months()} month` : diffDuration.days() ? `${diffDuration.days()} day` : diffDuration.hours() ? `${diffDuration.hours()} hour` : `${diffDuration.minutes()} minutes`
     )
   }
-
-
-  console.log('formarttedData', formarttedData());
 
 
   useEffect(()=>{
@@ -108,9 +105,10 @@ const ViewPost = (props) => {
   const likeComment=(i)=>{
       
   }
-
+  
   return (
     <SafeAreaView style={{flex: 1}}>
+      <Loader isLoading={requesting} />
       <ScrollView contentContainerStyle={styles.mainContainer}>
         <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
           <Image source={Images.backArrow} style={styles.backArrowStyle} />
@@ -157,7 +155,9 @@ const ViewPost = (props) => {
                     <View style={styles.commentSecond}>
                       <View style={styles.socialIcons}>
                         <Text text="5 min" style={styles.comText} />
+                        <TouchableOpacity onPress={()=>setFocusReply(true)}>
                         <Text text="Reply" style={styles.comText1} />
+                        </TouchableOpacity>
                       </View>
                       <View style={styles.socialIcons}>
                         <Text text="23" style={styles.comText2} />
@@ -212,7 +212,7 @@ const ViewPost = (props) => {
         })}
       </ScrollView>
       <View style={{flexDirection: 'row'}}>
-      <TextInput placeholder='Write a comment' value={commentData} onChangeText={(value)=>setCommentData(value)} style={{paddingHorizontal: 20,width: '90%'}} />
+      <TextInput placeholder='Write a comment' value={commentData} onChangeText={(value)=>setCommentData(value)} style={{paddingHorizontal: 20,width: '90%'}} autoFocus={focusreply} />
       <TouchableOpacity style={{justifyContent: 'center'}} onPress={()=> addAComment()}>
       <Image source={circleClose} style={{height: 30, width: 30}}/>
       </TouchableOpacity>
