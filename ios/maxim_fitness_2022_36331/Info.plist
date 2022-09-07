@@ -20,8 +20,35 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1123564435225618</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.146444618570-57mrfdva3ths48nhte71f12l7lqbu7t1</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>1123564435225618</string>
+	<key>FacebookDisplayName</key>
+	<string>maxim-fitness-2022-36331</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
