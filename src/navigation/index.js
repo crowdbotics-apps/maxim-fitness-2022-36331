@@ -21,13 +21,12 @@ const Navigation = props => {
       },
     }}>
       <authStack.Navigator screenOptions={{headerShown: false}}>
-        {
-          !props.accessToken
-            ? (
-              <authStack.Screen name="MainStack" component={MainNavigator} />
-            ) : (
-              <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
-            )}
+        {props.accessToken
+          ? (
+            <authStack.Screen name="MainStack" component={MainNavigator} />
+          ) : (
+            <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
+          )}
       </authStack.Navigator>
     </NavigationContainer>
   )
