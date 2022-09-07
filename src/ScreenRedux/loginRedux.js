@@ -125,7 +125,7 @@ function* login({data}) {
     const {response} = e
     console.log('error response---', response);
     showMessage({
-      message: 'Some thing went wrong!',
+      message: 'Unable to log in with provided credentials.',
       type: "danger"
     })
   }

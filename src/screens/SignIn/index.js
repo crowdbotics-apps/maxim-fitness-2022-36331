@@ -9,7 +9,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import {
@@ -242,7 +242,7 @@ const SignIn = props => {
             >
               Forgot Password ?
             </Text>
-            <TouchableOpacity onPress={() => OnLogInPress()} disabled={disable}>
+            <TouchableOpacity onPress={() => OnLogInPress()} disabled={disable} style={{marginTop: 53,}}>
               <LinearGradient
                 style={styles.logInButton}
                 colors={["#048ECC", "#0460BB", "#0480C6"]}
@@ -316,7 +316,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 53
   },
   card: {
     width: "100%",
