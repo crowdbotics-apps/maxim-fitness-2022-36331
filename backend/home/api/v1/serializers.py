@@ -420,7 +420,7 @@ class CommentLikeSerializer(serializers.ModelSerializer):
 class CommentReplySerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField(read_only=True)
     liked = serializers.SerializerMethodField(read_only=True)
-    user_detail = UserSerializer(read_only=True)
+    user_detail = UserSerializer(source="user", read_only=True)
 
     class Meta:
         model = PostCommentReply
@@ -431,8 +431,7 @@ class CommentReplySerializer(serializers.ModelSerializer):
 
     def get_liked(self, comment):
         request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
+        user = self.context['request'].user
         return comment.get_like(user)
 
 
@@ -441,7 +440,6 @@ class CommentSerializer(serializers.ModelSerializer):
     sub_comment = CommentReplySerializer(source='post_comment_reply', many=True, read_only=True)
     likes = serializers.SerializerMethodField(read_only=True)
     liked = serializers.SerializerMethodField(read_only=True)
-
 
     class Meta:
         model = Comment
@@ -483,12 +481,6 @@ class PostSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             user = request.user
         return post.get_like(user)
-
-
-# class PostImageVideoSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = PostImageVideo
-#         fields = "__all__"
 
 
 class AnswerSerializer(serializers.ModelSerializer):
