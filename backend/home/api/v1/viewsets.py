@@ -1262,6 +1262,12 @@ class CommentReplyViewSet(ModelViewSet):
         queryset = self.queryset
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        serializer = CommentReplySerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
 class CommentLikeViewSet(ModelViewSet):
     queryset = PostCommentLike.objects.all()
