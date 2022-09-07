@@ -14,7 +14,6 @@ import Share from 'react-native-share';
 
 const FeedCard = (props) => {
   const {item, feeds, setFeedsState} = props
-  const [showContent, setShowContent] = useState(item && item.content ? item.content : "Try out this power bowl that our favorite chef Try out this power bowl that our favorite chef")
   const [showMore, setShowMore] = useState(false)
 
   const addLikeAction = () => {
@@ -58,10 +57,10 @@ const FeedCard = (props) => {
     const data = {message: "hello"};
     await Share.open(data)
       .then((res) => {
-        console.log('res----------', res);
+        console.log('SHARE RESPONSE: ', res);
       })
       .catch((err) => {
-        err && console.log('err--------', err);
+        err && console.log("SHARE ERROR: ", err);
       });
   }
 
@@ -90,12 +89,12 @@ const FeedCard = (props) => {
         </View>
         <View style={styles.bottomTextStyle}>
           <Text
-            text={showContent}
+            text={item && item.content}
             style={styles.contentStyle}
             numberOfLines={showMore ? 5 : 1}
             onPress={() => setShowMore(!showMore)}
           />
-          {!showMore && showContent.length > 50 ? <Text text="see more" style={styles.seeMoreStyle} onPress={() => setShowMore(!showMore)} /> : null}
+          {!showMore && item?.content?.length > 50 ? <Text text="see more" style={styles.seeMoreStyle} onPress={() => setShowMore(!showMore)} /> : null}
         </View>
         <View style={styles.cardHeader1}>
           <View style={styles.socialIcons}>

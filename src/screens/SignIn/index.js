@@ -139,7 +139,7 @@ const SignIn = props => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: "#FFFFFF"}}>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1, paddingBottom: 60}}
+        contentContainerStyle={{flexGrow: 1, paddingBottom: 30}}
         showsVerticalScrollIndicator={false}
       >
         <Image source={backIcon} style={styles.backIconStyle} />
@@ -242,7 +242,7 @@ const SignIn = props => {
             >
               Forgot Password ?
             </Text>
-            <TouchableOpacity onPress={() => OnLogInPress()} disabled={disable} style={{marginTop: 53,}}>
+            <TouchableOpacity onPress={() => OnLogInPress()} disabled={disable} style={{marginTop: 53, }}>
               <LinearGradient
                 style={styles.logInButton}
                 colors={["#048ECC", "#0460BB", "#0480C6"]}

@@ -6,7 +6,8 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  TouchableWithoutFeedback
 } from "react-native";
 import {Text, Header, FeedCard} from 'src/components';
 import {Images} from 'src/theme';
@@ -43,7 +44,7 @@ const Feeds = (props) => {
 
   const renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
+      <TouchableWithoutFeedback onPress={() => navigation.navigate('ViewPost', item)}>
         <FeedCard
           item={item}
           index={index}
@@ -52,7 +53,7 @@ const Feeds = (props) => {
           postLikeRequest={props.postLikeRequest}
           setFeedsState={setFeedsState}
         />
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     );
   };
 
