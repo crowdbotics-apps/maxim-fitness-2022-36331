@@ -13,7 +13,6 @@ import {Images} from 'src/theme';
 import {getFeedsRequest, postLikeRequest} from '../../ScreenRedux/feedRedux';
 import {connect} from "react-redux";
 import {useNetInfo} from '@react-native-community/netinfo';
-import ImagePicker from 'react-native-image-crop-picker';
 
 const Feeds = (props) => {
   const {feeds, requesting, navigation, profile} = props

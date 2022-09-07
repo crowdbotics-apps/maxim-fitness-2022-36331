@@ -36,15 +36,21 @@ const AddPost = props => {
     formData.append('content', content);
 
     if (imageData.length) {
-      formData.append('image', imageData.map((item)=>(
-      {
-        uri: item.path,
-        type: item.mime,
-        name: item.path,
-      }
-      )));
+      // formData.append('image', JSON.stringify(imageData.map((item)=>(
+      //   {
+      //     uri: item.path,
+      //     type: item.mime,
+      //     name: 'asas',
+      //   }
+      //   ))) );
+
+      formData.append('image', {
+        uri: imageData[0].path,
+        type: imageData[0].mime,
+        name: imageData[0].path,
+      });
+    
     }
-    console.log('formData-------', formData);
     props.AddPostData(formData)
   }
 
