@@ -1,21 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react'
 
 // components
-import {View, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import {Content, Icon} from 'native-base';
-import {Text, Button} from '../../components';
-import Card from './component/Card';
-import Card1 from './component/Card1';
-import Card2 from './component/Card2';
-import {connect} from 'react-redux';
+import {View, Image, StyleSheet, TouchableOpacity} from 'react-native'
+import {Content, Icon} from 'native-base'
+import {Text, Button} from '../../components'
+import Card from './component/Card'
+import Card1 from './component/Card1'
+import Card2 from './component/Card2'
+import {connect} from 'react-redux'
 // import {
 //   getSubscriptionAction,
 //   getPlansAction,
 //   getCustomerId,
 // } from '@/redux/modules/subscriptionReducer';
 
-import {Gutters, Layout, Global, Images} from '../../theme';
-import Modal from 'react-native-modal';
+import {Gutters, Layout, Global, Images} from '../../theme'
+import Modal from 'react-native-modal'
 
 const SubscriptionScreen = props => {
   const {navigation} = props;
@@ -80,7 +80,7 @@ const SubscriptionScreen = props => {
             // onPress={card}
             setIsVisible={setIsVisible}
             navigation={navigation}
-          // getPlans={getPlans}
+            // getPlans={getPlans}
           />
         )}
         {curentTab === 1 && (
@@ -88,7 +88,7 @@ const SubscriptionScreen = props => {
             // onPress={card1}
             setIsVisible={setIsVisible}
             navigation={navigation}
-          // getPlans={getPlans}
+            // getPlans={getPlans}
           />
         )}
         {curentTab === 2 && (
@@ -96,7 +96,7 @@ const SubscriptionScreen = props => {
             // onPress={card2}
             setIsVisible={setIsVisible}
             navigation={navigation}
-          // getPlans={getPlans}
+            // getPlans={getPlans}
           />
         )}
       </Content>
@@ -121,7 +121,7 @@ const SubscriptionScreen = props => {
                       height: 40,
                       width: 100,
                       backgroundColor: 'transparent',
-                      borderColor: 'white',
+                      borderColor: 'white'
                     },
                   ]}
                   onPress={() => setData('Yes')}
@@ -137,7 +137,7 @@ const SubscriptionScreen = props => {
                       height: 40,
                       width: 100,
                       backgroundColor: 'transparent',
-                      borderColor: 'white',
+                      borderColor: 'white'
                     },
                   ]}
                   onPress={() => setData('No')}
@@ -166,7 +166,7 @@ const SubscriptionScreen = props => {
                         height: 40,
                         width: 100,
                         backgroundColor: 'transparent',
-                        borderColor: 'white',
+                        borderColor: 'white'
                       },
                     ]}
                     onPress={() => setIsVisible(false)}

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment'
 
 export const getMessageTime = dateString => {
   const messageDate = moment(new Date(dateString));
@@ -17,21 +17,21 @@ export const calculatePostTime = item => {
   const seconds = parseInt((Math.abs(endDate.getTime() - today.getTime()) / 1000) % 60);
 
   if (months > 12) {
-    return years + ' y';
+    return years + ' y'
   }
   if (days > 30) {
-    return months + ' m';
+    return months + ' m'
   }
   if (days > 0) {
-    return days + ' d';
+    return days + ' d'
   }
   if (hours > 0) {
-    return hours + ' h';
+    return hours + ' h'
   }
   if (minutes > 0) {
-    return minutes + ' min';
+    return minutes + ' min'
   }
   if (seconds > 0) {
-    return seconds + ' s';
+    return seconds + ' s'
   }
 };

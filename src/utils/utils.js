@@ -1,13 +1,13 @@
-export const getDisplayNameFromFieldName = (name) => {
+export const getDisplayNameFromFieldName = name => {
   switch (name) {
     case 'password':
-      return 'password';
+      return 'password'
     case 'old_password':
-      return 'Old password';
+      return 'Old password'
     case 'confirm_password':
-      return 'Confirm password';
+      return 'Confirm password'
     case 'last_name':
-      return 'last name';
+      return 'last name'
     default:
       return name;
   }
@@ -23,7 +23,7 @@ export const getServerError = (errorObject, errorMessage) => {
       const fields = Object.keys(errorObject);
       const messages = [];
 
-      fields.forEach((fieldName) => {
+      fields.forEach(fieldName => {
         const message = errorObject[fieldName];
         if (fieldName === 'non_field_errors') {
           if (typeof message === 'string') {
@@ -38,9 +38,7 @@ export const getServerError = (errorObject, errorMessage) => {
           const displayName = getDisplayNameFromFieldName(fieldName);
           if (typeof message === 'string') {
             messages.push(
-              !Number.isNaN(Number(displayName))
-                ? message
-                : `${message} ${displayName}`,
+              !Number.isNaN(Number(displayName)) ? message : `${message} ${displayName}`
             );
           } else if (typeof message === 'object') {
             const messageContentData = Object.values(message);
@@ -49,7 +47,7 @@ export const getServerError = (errorObject, errorMessage) => {
             messages.push(
               !Number.isNaN(Number(displayName))
                 ? messageContent
-                : `${messageContent} (${displayName})`,
+                : `${messageContent} (${displayName})`
             );
           }
         }

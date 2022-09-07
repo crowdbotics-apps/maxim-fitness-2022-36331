@@ -1,12 +1,6 @@
-import React from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback
-} from 'react-native';
-import {Images} from 'src/theme';
+import React from 'react'
+import {View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback} from 'react-native'
+import {Images} from 'src/theme'
 
 const Header = ({imageUrl, onAvatarChange, onPressPlus}) => {
   return (
@@ -38,7 +32,7 @@ const styles = StyleSheet.create({
   currentTabStyle: {
     flex: 1,
     justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   currentTab: {
     flexDirection: 'row',
@@ -63,7 +57,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     width: 50,
     height: 50,
-    resizeMode: 'cover',
+    resizeMode: 'cover'
   },
 })
 

@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react'
+import {useState, useEffect, useCallback} from 'react'
 /**
  * Determines a value if it's an object
  *
  * @param {object} value
  */
-const isObject = (value) => value !== null && typeof value === 'object'
+const isObject = value => value !== null && typeof value === 'object'
 /**
  * Returns true if the value is RegExp
  *
  * @param {RegExp} value
  */
-const isRegExp = (value) => value instanceof RegExp
+const isRegExp = value => value instanceof RegExp
 /**
  * Custom hooks to validate your Form
  *
@@ -27,7 +27,7 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
   // Wrapped in useCallback to cached the function to avoid intensive memory leaked
   // in every re-render in component
   const validateState = useCallback(() => {
-    const hasErrorInState = Object.keys(validationSchema).some((key) => {
+    const hasErrorInState = Object.keys(validationSchema).some(key => {
       const isInputFieldRequired = validationSchema[key].required
       const stateValue = state[key].value // state value
       const stateError = state[key].error // state error
@@ -63,29 +63,24 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       }
     }
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
-      [name]: { value, error },
+      [name]: {value, error},
     }))
   }
-  const handlePhoneNumberChange = (
-    name,
-    value,
-    countryCode,
-    countryDialCode,
-  ) => {
+  const handlePhoneNumberChange = (name, value, countryCode, countryDialCode) => {
     setIsDirty(true)
     let error = ''
     // if (validationSchema[name].required) {
@@ -100,28 +95,28 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       }
     }
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
-      [name]: { value, error, countryCode, countryDialCode },
+      [name]: {value, error, countryCode, countryDialCode},
     }))
   }
   const handleOnSubmit = (name, value) => {
     setIsDirty(true)
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
-      [name]: { value, error: '' },
+      [name]: {value, error: ''},
     }))
   }
   const validateOnBlur = (name, value) => {
@@ -138,21 +133,21 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const { validator } = validationSchema[name]
+          const {validator} = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       }
     }
-    setState((prevState) => ({
+    setState(prevState => ({
       ...prevState,
-      [name]: { value, error },
+      [name]: {value, error},
     }))
   }
   return {
@@ -166,4 +161,4 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
     disable,
   }
 }
-export default useForm
+export default useForm;

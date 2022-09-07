@@ -1,7 +1,6 @@
-import axios from 'axios';
+import axios from 'axios'
 // config
-import {API_URL} from '../config/app';
-
+import {API_URL} from '../config/app'
 
 function parseJSON(response) {
   if (response.status === 204 || response.status === 205) {
@@ -21,7 +20,4 @@ function checkStatus(response) {
   throw error;
 }
 
-export default (url, options) =>
-  axios(url, options)
-    .then(checkStatus)
-    .then(parseJSON);
+export default (url, options) => axios(url, options).then(checkStatus).then(parseJSON);

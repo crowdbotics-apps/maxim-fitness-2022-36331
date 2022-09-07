@@ -29,7 +29,7 @@ export const Colors = {
   // new added color
   punch: '#db3b26',
 
-  error: '#dc3545',
+  error: '#dc3545'
 };
 
 /**

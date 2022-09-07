@@ -1,18 +1,18 @@
-import {all, call, put, takeLatest} from "redux-saga/effects"
+import {all, call, put, takeLatest} from 'redux-saga/effects';
 // import AsyncStorage from "@react-native-community/async-storage"
-import {showMessage} from "react-native-flash-message"
-import {navigate} from "../navigation/NavigationService"
+import {showMessage} from 'react-native-flash-message';
+import {navigate} from '../navigation/NavigationService';
 
 // config
-import {API_URL} from "../config/app"
+import {API_URL} from '../config/app';
 
 // utils
-import XHR from "src/utils/XHR"
-import {NavigationContainer} from "@react-navigation/native"
+import XHR from 'src/utils/XHR';
+import {NavigationContainer} from '@react-navigation/native';
 
 //Types
-const SIGN_UP = "SCREEN/SIGNUP"
-const RESET = "SCREEN/RESET"
+const SIGN_UP = 'SCREEN/SIGNUP';
+const RESET = 'SCREEN/RESET';
 
 const initialState = {
   requesting: false,
@@ -51,7 +51,7 @@ export const signUpReducer = (state = initialState, action) => {
 function SignUpAPI(data) {
   const URL = `${API_URL}/signup/`
   const options = {
-    method: "POST",
+    method: 'POST',
     data
   }
 
@@ -77,14 +77,11 @@ function* SignUp({data}) {
     console.log('registration error response', response);
     showMessage({
       message: response && response.data.email[0],
-      type: "danger"
+      type: 'danger',
     })
-  }
-  finally {
+  } finally {
     yield put(reset())
   }
 }
 
-export default all([
-  takeLatest(SIGN_UP, SignUp),
-])
+export default all([takeLatest(SIGN_UP, SignUp)])

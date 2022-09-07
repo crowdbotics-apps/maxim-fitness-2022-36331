@@ -1,18 +1,18 @@
-import {all, call, put, takeLatest} from "redux-saga/effects"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import {all, call, put, takeLatest} from 'redux-saga/effects';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
-import {API_URL} from "src/config/app"
+import {API_URL} from '../config/app';
 
 // utils
-import XHR from "src/utils/XHR"
+import XHR from 'src/utils/XHR';
 
 //Types
-const ADD_POST = "SCREEN/ADDPOST"
-const RESET = "SCREEN/ADDPOST/RESET"
+const ADD_POST = 'SCREEN/ADDPOST';
+const RESET = 'SCREEN/ADDPOST/RESET';
 
 const initialState = {
-  requesting: false,
+  requesting: false
 }
 
 //Actions
@@ -47,11 +47,14 @@ export const addPostReducer = (state = initialState, action) => {
 //Saga
 async function addPostAPI(data) {
   const URL = `${API_URL}/post/`
-  const token = await AsyncStorage.getItem("authToken")
+  const token = await AsyncStorage.getItem('authToken')
   const options = {
-    method: "POST",
-    'Content-Type': 'multipart/form-data',
-    'Authorization': `Token  ${token}`,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Token  ${token}`,
+    },
+    method: 'POST',
     data
   }
 
@@ -61,16 +64,11 @@ async function addPostAPI(data) {
 function* AddPost({data}) {
   try {
     const response = yield call(addPostAPI, data)
-    console.log('add success response', response)
   } catch (e) {
     const {response} = e
-    console.log('add post failure response---', response);
-  }
-  finally {
+  } finally {
     yield put(reset())
   }
 }
 
-export default all([
-  takeLatest(ADD_POST, AddPost),
-])
+export default all([takeLatest(ADD_POST, AddPost)])

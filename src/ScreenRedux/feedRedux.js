@@ -1,20 +1,20 @@
-import {all, call, put, takeLatest} from "redux-saga/effects"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import {all, call, put, takeLatest} from 'redux-saga/effects';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
-import {API_URL} from "../config/app"
+import {API_URL} from '../config/app';
 
 // utils
-import XHR from "src/utils/XHR"
+import XHR from 'src/utils/XHR';
 
 //Types
-const FEEDS_REQUEST = "FEEDS_SCREEN/FEEDS_REQUEST"
-const FEEDS_SUCCESS = "FEEDS_SCREEN/FEEDS_SUCCESS"
-const FEEDS_FAILURE = "FEEDS_SCREEN/FEEDS_FAILURE"
+const FEEDS_REQUEST = 'FEEDS_SCREEN/FEEDS_REQUEST';
+const FEEDS_SUCCESS = 'FEEDS_SCREEN/FEEDS_SUCCESS';
+const FEEDS_FAILURE = 'FEEDS_SCREEN/FEEDS_FAILURE';
 
-const LIKE_REQUEST = "FEEDS_SCREEN/LIKE_REQUEST"
-const LIKE_SUCCESS = "FEEDS_SCREEN/LIKE_SUCCESS"
-const LIKE_FAILURE = "FEEDS_SCREEN/LIKE_FAILURE"
+const LIKE_REQUEST = 'FEEDS_SCREEN/LIKE_REQUEST';
+const LIKE_SUCCESS = 'FEEDS_SCREEN/LIKE_SUCCESS';
+const LIKE_FAILURE = 'FEEDS_SCREEN/LIKE_FAILURE';
 
 const initialState = {
   requesting: false,
@@ -108,12 +108,12 @@ async function getFeedAPI(data) {
   const limit = 10
   const offset = 0
   const URL = `${API_URL}/post/?page=${page}&limit=${limit}&offset=${offset}`
-  const token = await AsyncStorage.getItem("authToken")
+  const token = await AsyncStorage.getItem('authToken')
   const options = {
-    method: "GET",
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token  ${token}`
+      Authorization: `Token  ${token}`
     }
   }
 
@@ -133,14 +133,14 @@ function* getFeeds({data}) {
 }
 
 async function postLikeAPI(feedId) {
-  const token = await AsyncStorage.getItem("authToken")
+  const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/post/${feedId}/add_like/`;
   const options = {
     headers: {
       Accept: 'application/json',
       Authorization: `Token ${token}`,
     },
-    method: 'POST',
+    method: 'POST'
   };
   return XHR(URL, options);
 }
@@ -158,7 +158,4 @@ function* postLike({data}) {
   }
 }
 
-export default all([
-  takeLatest(FEEDS_REQUEST, getFeeds),
-  takeLatest(LIKE_REQUEST, postLike),
-])
+export default all([takeLatest(FEEDS_REQUEST, getFeeds), takeLatest(LIKE_REQUEST, postLike)])

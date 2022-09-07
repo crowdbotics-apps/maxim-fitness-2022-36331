@@ -1,94 +1,94 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native'
 
 export default StyleSheet.create({
   /* Column Layouts */
   column: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   columnReverse: {
-    flexDirection: 'column-reverse',
+    flexDirection: 'column-reverse'
   },
   colCenter: {
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   colVCenter: {
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   colHCenter: {
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   /* Row Layouts */
   row: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   rowReverse: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row-reverse'
   },
   rowCenter: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   rowVCenter: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   rowHCenter: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   /* Default Layouts */
   center: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   selfCenter: {
-    alignSelf: 'center',
+    alignSelf: 'center'
   },
   alignItemsCenter: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   alignItemsStart: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   alignItemsEnd: {
-    alignItems: 'flex-end',
+    alignItems: 'flex-end'
   },
   alignItemsStretch: {
-    alignItems: 'stretch',
+    alignItems: 'stretch'
   },
   justifyContentCenter: {
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   justifyContentStart: {
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-start'
   },
   justifyContentEnd: {
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   justifyContentAround: {
-    justifyContent: 'space-around',
+    justifyContent: 'space-around'
   },
   justifyContentBetween: {
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   justifyContentSpaceEvenly: {
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-evenly'
   },
   scrollSpaceAround: {
     flexGrow: 1,
-    justifyContent: 'space-around',
+    justifyContent: 'space-around'
   },
   scrollSpaceBetween: {
     flexGrow: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   selfStretch: {
-    alignSelf: 'stretch',
+    alignSelf: 'stretch'
   },
   fillGrow: {
     flexGrow: 1,
@@ -116,26 +116,26 @@ export default StyleSheet.create({
     flex: 5,
   },
   wrap: {
-    flexWrap: 'wrap',
+    flexWrap: 'wrap'
   },
   fullSize: {
     height: '100%',
-    width: '100%',
+    width: '100%'
   },
   fullWidth: {
-    width: '100%',
+    width: '100%'
   },
   halfWidth: {
-    width: '50%',
+    width: '50%'
   },
   quarter: {
-    width: '33.33%',
+    width: '33.33%'
   },
   fullHeight: {
-    height: '100%',
+    height: '100%'
   },
   halfHeight: {
-    height: '50%',
+    height: '50%'
   },
   /* Operation Layout */
   mirror: {
@@ -154,9 +154,9 @@ export default StyleSheet.create({
     transform: [{rotate: '-180deg'}],
   },
   positionR: {
-    position: 'relative',
+    position: 'relative'
   },
   positionA: {
-    position: 'absolute',
+    position: 'absolute'
   },
 });

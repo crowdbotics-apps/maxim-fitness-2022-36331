@@ -1,8 +1,8 @@
 /**
  * This file contains all application's style relative to fonts
  */
-import {StyleSheet} from 'react-native';
-import {FontSize} from './Variables';
+import {StyleSheet} from 'react-native'
+import {FontSize} from './Variables'
 
 export default StyleSheet.create({
   textSmall: {
@@ -33,18 +33,18 @@ export default StyleSheet.create({
     fontSize: FontSize.small * 4, // 40
   },
   textCenter: {
-    textAlign: 'center',
+    textAlign: 'center'
   },
   textJustify: {
-    textAlign: 'justify',
+    textAlign: 'justify'
   },
   textLeft: {
-    textAlign: 'left',
+    textAlign: 'left'
   },
   textRight: {
-    textAlign: 'right',
+    textAlign: 'right'
   },
   textUnderline: {
-    textDecorationLine: 'underline',
+    textDecorationLine: 'underline'
   },
 });

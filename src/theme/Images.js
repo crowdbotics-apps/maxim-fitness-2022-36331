@@ -1,4 +1,3 @@
-
 export default {
   HomeOn: require('src/assets/images/home_On.png'),
   HomeOff: require('src/assets/images/home_off.png'),
@@ -45,5 +44,4 @@ export default {
   profileTab: require('src/assets/images/profileTab.png'),
   fillheart: require('src/assets/images/filledHeart.png'),
   check: require('src/assets/images/check.png'),
-
 }

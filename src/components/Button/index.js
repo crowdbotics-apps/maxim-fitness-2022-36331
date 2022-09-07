@@ -1,9 +1,9 @@
-import React from 'react';
-import {Button as NBButton} from 'native-base';
-import {Text, ActivityIndicator} from 'react-native';
+import React from 'react'
+import {Button as NBButton} from 'native-base'
+import {Text, ActivityIndicator} from 'react-native'
 
 // styles
-import styles from './styles';
+import styles from './styles'
 
 const Button = ({
   color,

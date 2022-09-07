@@ -3,12 +3,12 @@
  *
  * Use it to define generic component styles (e.g. the default text styles, default button styles...).
  */
-import {Colors} from './Variables';
-import {StyleSheet} from 'react-native';
+import {Colors} from './Variables'
+import {StyleSheet} from 'react-native'
 
 export default StyleSheet.create({
   transparentBg: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent'
   },
   primary: {
     color: Colors.white,
@@ -32,10 +32,10 @@ export default StyleSheet.create({
     backgroundColor: Colors.punch,
   },
   blackOpacityBg: {
-    backgroundColor: 'rgb(214,214,214)',
+    backgroundColor: 'rgb(214,214,214)'
   },
   halfOpacityBg: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5);',
+    backgroundColor: 'rgba(0, 0, 0, 0.5);'
   },
   border: {
     borderWidth: 1,

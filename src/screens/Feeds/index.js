@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, {useState, useEffect, useRef} from 'react'
 import {
   View,
   StyleSheet,
@@ -6,46 +6,44 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity,
-  TouchableWithoutFeedback
-} from "react-native"
-import { Text, Header, FeedCard } from "../../components"
-import { Images } from "src/theme"
-import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
-import { connect } from "react-redux"
-import { useNetInfo } from "@react-native-community/netinfo"
-import ImagePicker from "react-native-image-crop-picker"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+  TouchableOpacity
+} from 'react-native';
+import {Text, Header, FeedCard} from 'src/components'
+import {Images} from 'src/theme'
+import {getFeedsRequest, postLikeRequest} from '../../ScreenRedux/feedRedux'
+import {connect} from 'react-redux'
+import {useNetInfo} from '@react-native-community/netinfo'
+import ImagePicker from 'react-native-image-crop-picker'
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile } = props
+  const {feeds, requesting, navigation, profile} = props
   const [feedsState, setFeedsState] = useState([])
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
-  let netInfo = useNetInfo()
+  let netInfo = useNetInfo();
   useEffect(() => {
     props.getFeedsRequest(page)
   }, [])
-  const flatList = useRef()
+  const flatList = useRef();
   const moveToTop = () => {
-    props.getFeedsRequest(1)
-    flatList?.current?.scrollToIndex({ index: 0, animated: true })
-  }
+    props.getFeedsRequest(1);
+    flatList?.current?.scrollToIndex({index: 0, animated: true});
+  };
 
-  useEffect(async () => {
+  useEffect(() => {
     if (feeds?.results?.length) {
       if (feedsState.length && page > 1) {
-        setFeedsState([...feedsState, ...feeds.results])
+        setFeedsState([...feedsState, ...feeds.results]);
       } else {
-        setFeedsState(feeds?.results)
+        setFeedsState(feeds?.results);
       }
     }
-  }, [feeds])
+  }, [feeds]);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("ViewPost", item)}>
+      <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
         <FeedCard
           item={item}
           index={index}
@@ -55,14 +53,14 @@ const Feeds = props => {
           setFeedsState={setFeedsState}
         />
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const onPullToRefresh = () => {
-    setPage(1)
-    props.getFeedsRequest(page)
-    moveToTop()
-  }
+    setPage(1);
+    props.getFeedsRequest(page);
+    moveToTop();
+  };
 
   // const onAvatarChange = () => {
   //   ImagePicker.openPicker({
@@ -84,16 +82,16 @@ const Feeds = props => {
   //     // props.changeAvatarImage(data);
   //   });
   // };
-  console.log("profile: ", profile)
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
         imageUrl={
           profile && profile.profile_picture_url === null
             ? Images.profile
-            : { uri: profile?.profile_picture_url }
+            : {uri: profile?.profile_picture_url}
         }
-        onPressPlus={() => navigation.navigate("AddPost")}
+        onPressPlus={() => navigation.navigate('AddPost')}
       />
       <Text style={styles.content} text="Latest" />
 
@@ -103,13 +101,13 @@ const Feeds = props => {
             <ActivityIndicator size="large" color="green" />
           </View>
         ) : setInterval(() => {
-            feedsState.length > 0
+            feedsState.length > 0;
           }, 2000) ? (
           <FlatList
             ref={flatList}
             refreshControl={
               <RefreshControl
-                colors={["#9Bd35A", "#689F38"]}
+                colors={['#9Bd35A', '#689F38']}
                 refreshing={requesting}
                 onRefresh={() => onPullToRefresh()}
                 progressViewOffset={20}
@@ -123,20 +121,16 @@ const Feeds = props => {
             windowSize={250}
             // onViewableItemsChanged={onViewRef.current}
             // viewabilityConfig={viewConfigRef.current}
-            keyboardShouldPersistTaps={"handled"}
+            keyboardShouldPersistTaps={'handled'}
           />
         ) : (
           <View style={styles.loaderStyle}>
-            <Text
-              style={styles.comingSoon}
-              text="No post are available!"
-              bold
-            />
+            <Text style={styles.comingSoon} text="No post are available!" bold />
           </View>
         )
       ) : (
         <View style={styles.loaderStyle}>
-          <Text style={styles.emptyListLabel}>{"Network error!"}</Text>
+          <Text style={styles.emptyListLabel}>{'Network error!'}</Text>
         </View>
       )}
     </SafeAreaView>
@@ -146,15 +140,15 @@ const Feeds = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white"
+    backgroundColor: 'white'
   },
   content: {
     fontSize: 15,
-    color: "gray",
+    color: 'gray',
     paddingHorizontal: 15,
     marginTop: 10
   },
-  loaderStyle: { flex: 1, justifyContent: "center", alignItems: "center" }
+  loaderStyle: {flex: 1, justifyContent: 'center', alignItems: 'center'}
 })
 
 const mapStateToProps = state => ({
@@ -165,6 +159,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
-  postLikeRequest: data => dispatch(postLikeRequest(data))
+  postLikeRequest: data => dispatch(postLikeRequest(data)),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(Feeds)

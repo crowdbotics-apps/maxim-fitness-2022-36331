@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Image, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import React from 'react'
+import {View, Image, StyleSheet, TouchableWithoutFeedback} from 'react-native'
 
 const ProfileHeaderFeed = ({imageUrl, onAvatarChange, style}) => {
   return (
@@ -21,17 +21,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderColor: '#000',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   profileImage: {
     borderRadius: 100,
     width: 50,
     height: 50,
-    resizeMode: 'cover',
+    resizeMode: 'cover'
   },
   profileWrapper: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
 });
 

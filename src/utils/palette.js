@@ -4,5 +4,5 @@ export const palette = {
   offWhite: '#EBEBEB',
   angry: '#dd3333',
   darkGray: '#636972',
-  primary: '#38C9BA',
+  primary: '#38C9BA'
 };

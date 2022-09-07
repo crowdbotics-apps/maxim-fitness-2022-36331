@@ -1,23 +1,23 @@
-import React, { useState } from "react"
-import { View, Image, StyleSheet, Dimensions, Pressable } from "react-native"
-import Text from "../Text"
-import { Images } from "src/theme"
-import { calculatePostTime } from "src/utils/functions"
-import { SliderBox } from "react-native-image-slider-box"
-import Share from "react-native-share"
+import React, {useState} from 'react';
+import {View, Image, StyleSheet, Dimensions, Pressable} from 'react-native';
+import Text from '../Text';
+import {Images} from 'src/theme';
+import {calculatePostTime} from 'src/utils/functions';
+import {SliderBox} from 'react-native-image-slider-box';
+import Share from 'react-native-share';
 
 const FeedCard = props => {
-  const { item, feeds, setFeedsState } = props
+  const {item, feeds, setFeedsState} = props
   const [showMore, setShowMore] = useState(false)
 
   const addLikeAction = () => {
     let feedId = item.id
     filterData(feedId)
     const callBack = status => {
-      console.log("status: ", status)
+      console.log('status: ', status)
     }
 
-    const data = { feedId, item, callBack }
+    const data = {feedId, item, callBack}
     props.postLikeRequest(data)
   }
 
@@ -44,17 +44,17 @@ const FeedCard = props => {
     Images.foodImage
   ]
 
-  let deviceWidth = Dimensions.get("window").width
-  let deviceHeight = Dimensions.get("window").height
+  let deviceWidth = Dimensions.get('window').width
+  let deviceHeight = Dimensions.get('window').height
 
   const sharePost = async () => {
-    const data = { message: "hello" }
+    const data = {message: 'hello'}
     await Share.open(data)
       .then(res => {
-        console.log("SHARE RESPONSE: ", res)
+        console.log('SHARE RESPONSE: ', res)
       })
       .catch(err => {
-        err && console.log("SHARE ERROR: ", err)
+        err && console.log('SHARE ERROR: ', err)
       })
   }
 
@@ -75,7 +75,7 @@ const FeedCard = props => {
               text={
                 item && item.user && item.user.username
                   ? item.user.username
-                  : "Orum_training_oficial"
+                  : 'Orum_training_oficial'
               }
               style={styles.text1}
             />
@@ -118,27 +118,17 @@ const FeedCard = props => {
           <View style={styles.socialIcons}>
             <Image source={Images.messageIcon} style={styles.socialImg1} />
             <Text
-              text={
-                item && item.comments && item.comments.length
-                  ? item.comments.length
-                  : null
-              }
+              text={item && item.comments && item.comments.length ? item.comments.length : null}
               style={styles.text2}
             />
           </View>
           <Pressable style={styles.socialIcons} onPress={addLikeAction}>
             <Image
               source={Images.heartIcon}
-              style={[
-                styles.socialImg,
-                { tintColor: item.liked ? "red" : "black" }
-              ]}
-              tintColor={item.liked ? "red" : "black"}
+              style={[styles.socialImg, {tintColor: item.liked ? 'red' : 'black'}]}
+              tintColor={item.liked ? 'red' : 'black'}
             />
-            <Text
-              text={item && item.likes ? item.likes : null}
-              style={styles.text2}
-            />
+            <Text text={item && item.likes ? item.likes : null} style={styles.text2} />
           </Pressable>
           <Pressable style={styles.socialIcons} onPress={sharePost}>
             <Image source={Images.shareIcon} style={styles.socialImg2} />
@@ -151,16 +141,16 @@ const FeedCard = props => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "white",
-    alignItems: "center",
+    backgroundColor: 'white',
+    alignItems: 'center',
     paddingHorizontal: 15,
     paddingVertical: 15
   },
   card: {
-    width: "100%",
+    width: '100%',
     borderRadius: 10,
-    backgroundColor: "white",
-    shadowColor: "#000",
+    backgroundColor: 'white',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 5
@@ -172,43 +162,43 @@ const styles = StyleSheet.create({
   },
   cardHeader: {
     height: 50,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     marginHorizontal: 15
   },
   cardHeader1: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     paddingVertical: 15
   },
   cardBody: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 10,
     marginBottom: 30,
     borderRadius: 15
   },
-  text1: { fontSize: 15, marginLeft: 10 },
-  text2: { fontSize: 15, marginLeft: 10 },
-  username: { flexDirection: "row", alignItems: "center", flex: 1 },
+  text1: {fontSize: 15, marginLeft: 10},
+  text2: {fontSize: 15, marginLeft: 10},
+  username: {flexDirection: 'row', alignItems: 'center', flex: 1},
   socialIcons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1
   },
-  profileImg: { width: 30, height: 30 },
-  socialImg: { width: 25, height: 25, resizeMode: "contain" },
-  socialImg1: { width: 25, height: 25, resizeMode: "contain" },
-  socialImg2: { width: 22, height: 22, resizeMode: "contain" },
+  profileImg: {width: 30, height: 30},
+  socialImg: {width: 25, height: 25, resizeMode: 'contain'},
+  socialImg1: {width: 25, height: 25, resizeMode: 'contain'},
+  socialImg2: {width: 22, height: 22, resizeMode: 'contain'},
   foodImageStyle: {
-    width: "100%",
+    width: '100%',
     height: 260,
-    alignSelf: "center",
+    alignSelf: 'center',
     borderRadius: 15
   },
   sliderBoxStyle: {
@@ -220,14 +210,14 @@ const styles = StyleSheet.create({
     margin: 0,
     top: 40
   },
-  bottomTextStyle: { flexDirection: "row", flex: 1, paddingHorizontal: 15 },
+  bottomTextStyle: {flexDirection: 'row', flex: 1, paddingHorizontal: 15},
   seeMoreStyle: {
     paddingVertical: 5,
     fontSize: 15,
     lineHeight: 16,
-    color: "blue"
+    color: 'blue',
   },
-  contentStyle: { flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16 }
+  contentStyle: {flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16}
 })
 
 export default FeedCard

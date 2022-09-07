@@ -1,7 +1,7 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native'
 
 // styles
-import {Colors} from '../../theme';
+import {Colors} from '../../theme'
 
 export default StyleSheet.create({
   primary: {
@@ -37,6 +37,6 @@ export default StyleSheet.create({
   borderStyle: {
     borderColor: Colors.deepsapphire,
     borderWidth: 1,
-    shadowColor: 'transparent',
+    shadowColor: 'transparent'
   },
 });

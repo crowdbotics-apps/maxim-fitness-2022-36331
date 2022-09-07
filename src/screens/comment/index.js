@@ -1,21 +1,23 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import React, {useCallback, useMemo, useRef} from 'react'
+import {Pressable, StyleSheet} from 'react-native'
 // import BottomSheet from '@gorhom/bottom-sheet';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { color } from 'src/utils';
+import {color} from 'src/utils'
 
-import CommentField from './CommentField';
+import CommentField from './CommentField'
 
 const Comment = () => {
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['75%'], []);
 
-  const handleSheetChanges = useCallback((index) => {
+  const handleSheetChanges = useCallback(index => {
     console.log('handleSheetChanges', index);
   }, []);
 
   return (
-   <View><Text>dfs</Text></View>
+    <View>
+      <Text>dfs</Text>
+    </View>
   );
 };
 
@@ -46,4 +48,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Comment
+export default Comment;

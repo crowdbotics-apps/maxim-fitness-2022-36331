@@ -1,5 +1,5 @@
-import {StyleSheet} from 'react-native';
-import {Colors} from 'src/theme';
+import {StyleSheet} from 'react-native'
+import {Colors} from 'src/theme'
 
 export default StyleSheet.create({
   boldFont: {fontWeight: 'bold'},

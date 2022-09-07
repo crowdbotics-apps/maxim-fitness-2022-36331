@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 
 // components
-import {View, StyleSheet} from 'react-native';
-import {Text} from '../../../components';
+import {View, StyleSheet} from 'react-native'
+import {Text} from '../../../components'
 import Button from '../../../components/Button'
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient'
 
-import {Gutters, Layout, Global} from '../../../theme';
+import {Gutters, Layout, Global} from '../../../theme'
 
 const Card2s = ({onPress, getPlans}) => {
   const {
@@ -39,12 +39,7 @@ const Card2s = ({onPress, getPlans}) => {
         style={[fill, mediumHMargin, regularVPadding, regularTMargin, styles.gradientWrapper]}
       >
         <View style={[row, center, fill, mediumTMargin]}>
-          <Text
-            text={`$1200`}
-            regularTitle
-            color="secondary"
-            bold
-          />
+          <Text text={'$1200'} regularTitle color="secondary" bold />
           <Text text={' / month'} large color="secondary" />
         </View>
         <View style={[fill3x, justifyContentAround, mediumHMargin]}>

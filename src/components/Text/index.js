@@ -1,9 +1,9 @@
-import React from 'react';
-import {Text as NBText} from 'react-native';
+import React from 'react'
+import {Text as NBText} from 'react-native'
 
 // styles
-import styles from './styles';
-import {Fonts} from 'src/theme';
+import styles from './styles'
+import {Fonts} from 'src/theme'
 
 const Text = ({
   text,

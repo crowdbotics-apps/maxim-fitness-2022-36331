@@ -1,17 +1,14 @@
 import React from 'react'
-import { Dimensions, StyleSheet, TextInput } from 'react-native'
-import { color } from 'src/utils'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import {Dimensions, StyleSheet, TextInput} from 'react-native'
+import {color} from 'src/utils'
+import {SafeAreaView} from 'react-native-safe-area-context'
 
-const { width } = Dimensions.get('screen')
+const {width} = Dimensions.get('screen')
 
 const CommentField = () => {
   return (
     <SafeAreaView style={styles.content} edges={['bottom']}>
-      <TextInput
-        style={styles.input}
-        placeholder='Write Comment'
-      />
+      <TextInput style={styles.input} placeholder="Write Comment" />
     </SafeAreaView>
   )
 }
@@ -30,4 +27,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default CommentField
+export default CommentField;

@@ -1,5 +1,5 @@
-import {MetricsSizes} from './Variables';
-import {StyleSheet} from 'react-native';
+import {MetricsSizes} from './Variables'
+import {StyleSheet} from 'react-native'
 
 export default StyleSheet.create({
   ...Object.entries(MetricsSizes).reduce(
