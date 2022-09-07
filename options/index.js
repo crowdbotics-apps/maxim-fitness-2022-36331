@@ -1,14 +1,13 @@
-import React from "react"
-import opts from "./../modules/*/options.js";
+import React from 'react';
+import opts from './../modules/*/options.js';
 
-import { modulesOptions, globalOptions } from "./options"
+import {modulesOptions, globalOptions} from './options';
 
 let options = {}
 
 opts.map(opt => {
   options[opt.package] = opt.value
 })
-
 
 export function getOptions(pakage) {
   let target = options[pakage] || {}

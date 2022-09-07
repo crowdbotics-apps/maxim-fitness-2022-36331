@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React from 'react';
+import {StyleSheet, View, Text} from 'react-native';
 
 const YourApp = () => {
   return (
@@ -21,11 +21,11 @@ const styles = StyleSheet.create({
 })
 
 export const YourAppModule = {
-  name: "YourApp",
-  path: "./",
-  package: "@modules",
+  name: 'YourApp',
+  path: './',
+  package: '@modules',
   value: {
-    title: "Your App",
+    title: 'Your App',
     navigator: YourApp
   }
 }
