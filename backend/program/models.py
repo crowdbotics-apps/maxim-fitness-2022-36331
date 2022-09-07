@@ -3,19 +3,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 # Create your models here.
 
-import boto3
 from datetime import datetime, timedelta
-from botocore.client import Config
-
-AWS_KWARGS = {
-    "aws_access_key_id": settings.AWS_ACCESS_KEY_ID,
-    "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
-    "region_name": settings.AWS_STORAGE_REGION,
-    "config": Config(signature_version='s3v4')
-}
-
-s3 = boto3.client('s3', **AWS_KWARGS)
-
 User = get_user_model()
 
 
@@ -69,18 +57,6 @@ class ExerciseImages(models.Model):
     def __str__(self):
         return self.exercise.name
 
-    @property
-    def image_url(self):
-        if self.image:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.image.name
-                })
-            return url
-        return None
-
 
 class ExerciseType(models.Model):
     name = models.CharField(max_length=250)
@@ -88,18 +64,6 @@ class ExerciseType(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def image_url(self):
-        if self.image:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.image.name
-                })
-            return url
-        return None
 
 
 class Exercise(models.Model):
@@ -111,18 +75,6 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def video_url(self):
-        if self.video:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.video.name
-                })
-            return url
-        return None
 
 
 class Program(models.Model):

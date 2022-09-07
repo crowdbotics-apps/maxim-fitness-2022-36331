@@ -257,19 +257,6 @@ class Recipe(models.Model):
         return self.name
 
     @property
-    def image_url(self):
-        print(self.image.name)
-        if self.image:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.image.name
-                })
-            return url
-        return None
-
-    @property
     def carbohydrate(self):
         foods = self.recipe_items.all()
         carb = float()
