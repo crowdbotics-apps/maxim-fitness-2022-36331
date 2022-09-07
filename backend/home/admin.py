@@ -5,8 +5,8 @@ from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
-    RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like,\
-    ConsumeCalories, ReportAPost, BlockUser
+    RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
+    ConsumeCalories, ReportAPost, BlockUser, PostImageVideo, PostCommentReply, PostCommentLike
 import nested_admin
 
 
@@ -142,6 +142,10 @@ class BlockUserAdmin(admin.ModelAdmin):
     list_display = ["requested_user", "blocked_user", "created"]
 
 
+class PostImageVideoAdmin(admin.ModelAdmin):
+    list_display = ["id", "post", "image", "video", "created"]
+
+
 admin.site.register(Form, FormAdmin)
 admin.site.register(QuestionType)
 admin.site.register(UserProgram, UserProgramAdmin)
@@ -152,5 +156,9 @@ admin.site.register(ConsumeCalories, ConsumeCaloriesAdmin)
 admin.site.register(ProductUnit)
 admin.site.register(ReportAPost, ReportAPostAdmin)
 admin.site.register(BlockUser, BlockUserAdmin)
+admin.site.register(PostImageVideo, PostImageVideoAdmin)
+admin.site.register(PostCommentReply)
+admin.site.register(PostCommentLike)
+
 
 # admin.site.register(Settings, SingletonModelAdmin)

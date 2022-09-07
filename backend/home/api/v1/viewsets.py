@@ -1,4 +1,5 @@
 import base64
+import json
 from collections import OrderedDict
 
 from django.db.models import Prefetch, Q
@@ -24,7 +25,7 @@ from rest_auth.registration.views import SocialLoginView
 from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
-from home.models import UserProgram, CaloriesRequired, Following, Chat
+from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImageVideo, PostCommentReply, PostCommentLike
 from users.models import Settings
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -49,7 +50,8 @@ from home.api.v1.serializers import (
     SetSerializer,
     CaloriesRequiredSerializer,
     ConsumeCaloriesSerializer,
-    ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer
+    ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
+    PostImageVideoSerializer, CommentReplySerializer, CommentLikeSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -817,11 +819,45 @@ class PostViewSet(ModelViewSet):
         #     file_name = f'{datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")}.{ext}'
         #     video = ContentFile(base64.b64decode(video_str), file_name)
         #     request_data['video'] = video
+        post_image = []
+        # image1 = request.data.get("image", None)
+        image1 = request.data["image"]
+        # image = json.loads(image1)
+        video = request.data.get("video", None)
+        post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
+        # post_id = request.data["post_id"]
 
-        serializer = self.get_serializer(data=request_data)
+        serializer = self.get_serializer(data=post_content)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
+            data = {"post": serializer.data.get("id"), "image": image1}
+            post_image.append(data)
+
+            post_image_serializer = PostImageVideoSerializer(data=data)
+            if post_image_serializer.is_valid(raise_exception=True):
+                post_image_serializer.save()
+
+            # if image or video:
+            #     if image:
+            #         for i in image:
+            #             if video:
+            #                 for v in video:
+            #                     data = {'post': serializer.data.get("id"), 'image': i, "video": v}
+            #                     post_image.append(data)
+            #                     video.remove(v)
+            #                     break
+            #             else:
+            #                 data = {'post': serializer.data.get("id"), 'image': i}
+            #                 post_image.append(data)
+            #     if video:
+            #         for v in video:
+            #             data = {'post': serializer.data.get("id"), "video": v}
+            #             post_image.append(data)
+            #
+            #     post_image_serializer = PostImageVideoSerializer(data=post_image, many=True)
+            #     if post_image_serializer.is_valid(raise_exception=True):
+            #         post_image_serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -846,6 +882,32 @@ class PostViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class PostImageVideoViewSet(ModelViewSet):
+    serializer_class = PostImageVideoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        post_id = self.request.query_params.get("post_id")
+        queryset = PostImageVideo.objects.filter(post_id=post_id)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+
+        post_image = []
+
+        image = request.data["image"]
+        post_id = request.data["post_id"]
+        for i in image:
+            data = {'post': post_id, 'image': i}
+            post_image.append(data)
+
+        serializer = PostImageVideoSerializer(data=post_image, many=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FollowViewSet(ViewSet):
@@ -1044,7 +1106,7 @@ class PaymentViewSet(ViewSet):
                 if cus_sub:
                     stripe.Subscription.delete(cus_sub.id)
 
-                request.user.update_settings(plan, self.get_product(data.get("product")))
+                # request.user.update_settings(plan, self.get_product(data.get("product")))
                 # request.user.update_settings(plan, self.get_product(plan.product))
 
             except stripe.error.InvalidRequestError as E:
@@ -1190,3 +1252,36 @@ class ChatViewSet(ModelViewSet):
         if user:
             return Chat.objects.filter(Q(user=user) | Q(match_id=user))
         return Chat.objects.filter(user=self.request.user)
+
+
+class CommentReplyViewSet(ModelViewSet):
+    queryset = PostCommentReply.objects.all()
+    serializer_class = CommentReplySerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        return queryset
+
+
+class CommentLikeViewSet(ModelViewSet):
+    queryset = PostCommentLike.objects.all()
+    serializer_class = CommentLikeSerializer
+
+    def create(self, request, *args, **kwargs):
+        comment = request.data.get("comment")
+        comment_reply = request.data.get("comment_reply")
+        user = request.data.get("user")
+        if comment:
+            comment_exit = PostCommentLike.objects.filter(comment_id=comment, user_id=user)
+            if comment_exit:
+                comment_exit.delete()
+                return Response("unlike")
+        if comment_reply:
+            comment_reply_exit = PostCommentLike.objects.filter(comment_reply_id=comment_reply, user_id=user)
+            if comment_reply_exit:
+                comment_reply_exit.delete()
+                return Response("unlike")
+        serializer = CommentLikeSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.save()
+        return Response("like")

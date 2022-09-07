@@ -14,7 +14,9 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
-    Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat
+    Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImageVideo,\
+    PostCommentReply, PostCommentLike
+
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings
 
@@ -184,16 +186,15 @@ class BlockedUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_picture_url = serializers.SerializerMethodField(read_only=True)
-    background_picture_url = serializers.SerializerMethodField(read_only=True)
     settings = SettingsSerializer(read_only=True)
     request_user = BlockedUserSerializer(read_only=True, many=True)
     block_user = BlockedUserSerializer(read_only=True, many=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', "profile_url", "profile_picture_url",
-                  "background_picture_url",
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', "profile_url", "profile_picture",
+                  "background_picture",
+
                   "gender", 'dob', "height", "weight", "unit",
                   "exercise_level", "activity_level",
                   "understanding_level", "number_of_meal", "number_of_training_days",
@@ -207,19 +208,6 @@ class UserSerializer(serializers.ModelSerializer):
             request = request._request
         return request
 
-    def get_profile_picture_url(self, user):
-        request = self._get_request()
-        if user.profile_picture:
-            image_url = user.profile_picture_url
-            return request.build_absolute_uri(image_url)
-        return None
-
-    def get_background_picture_url(self, user):
-        request = self._get_request()
-        if user.background_picture:
-            image_url = user.background_picture_url
-            return request.build_absolute_uri(image_url)
-        return None
 
 
 class CustomTokenSerializer(serializers.ModelSerializer):
@@ -423,21 +411,64 @@ class ReportSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CommentLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCommentLike
+        fields = "__all__"
+
+
+class CommentReplySerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField(read_only=True)
+    liked = serializers.SerializerMethodField(read_only=True)
+    user_detail = UserSerializer(read_only=True)
+
+    class Meta:
+        model = PostCommentReply
+        fields = "__all__"
+
+    def get_likes(self, comment):
+        return comment.likes_count
+
+    def get_liked(self, comment):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return comment.get_like(user)
+
+
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    sub_comment = CommentReplySerializer(source='post_comment_reply', many=True, read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+    liked = serializers.SerializerMethodField(read_only=True)
+
 
     class Meta:
         model = Comment
         fields = '__all__'
 
+    def get_likes(self, comment):
+        return comment.likes_count
+
+    def get_liked(self, comment):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return comment.get_like(user)
+
+
+class PostImageVideoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PostImageVideo
+        fields = "__all__"
+
 
 class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
+    post_image_video = PostImageVideoSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField(read_only=True)
-    image_url = serializers.SerializerMethodField(read_only=True)
-    video_url = serializers.SerializerMethodField(read_only=True)
-    video_thumbnail_url = serializers.SerializerMethodField(read_only=True)
     liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -447,26 +478,17 @@ class PostSerializer(serializers.ModelSerializer):
     def get_likes(self, post):
         return post.likes_count
 
-    def get_image_url(self, post):
-        request = self.context.get('request')
-        image_url = post.image_url
-        return request.build_absolute_uri(image_url)
-
-    def get_video_url(self, post):
-        request = self.context.get('request')
-        video_url = post.video_url
-        return request.build_absolute_uri(video_url)
-
-    def get_video_thumbnail_url(self, post):
-        request = self.context.get('request')
-        video_thumbnail_url = post.video_thumbnail_url
-        return request.build_absolute_uri(video_thumbnail_url)
-
     def get_liked(self, post):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             user = request.user
         return post.get_like(user)
+
+
+# class PostImageVideoSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PostImageVideo
+#         fields = "__all__"
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -504,7 +526,7 @@ class CardDetailSerializer(serializers.Serializer):
     card_exp_year = serializers.CharField(required=True)
     card_cvv = serializers.CharField(required=True)
     plan_id = serializers.CharField(required=True)
-    product = serializers.CharField(required=True)
+    product = serializers.CharField(required=False)
 
 
 class CaloriesRequiredSerializer(serializers.ModelSerializer):
@@ -533,3 +555,5 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = "__all__"
+
+
