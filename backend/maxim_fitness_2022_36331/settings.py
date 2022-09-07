@@ -256,7 +256,8 @@ if USE_S3:
     )
     MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-    MEDIA_URL = '/mediafiles/'
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
@@ -312,6 +313,14 @@ STRIPE_TEST_PUBLIC_KEY = env.str('STRIPE_TEST_PUBLIC_KEY', '')
 STRIPE_TEST_SECRET_KEY = env.str('STRIPE_TEST_SECRET_KEY', '')
 STRIPE_LIVE_MODE = False
 DJSTRIPE_WEBHOOK_VALIDATION='retrieve_event'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'],
+}
 
 CRONJOBS = [
     ('0 0 * * *', 'home.cron.send_weight_update_notification')

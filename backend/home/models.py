@@ -15,20 +15,10 @@ from django.dispatch import receiver
 from solo.models import SingletonModel
 from home.nutritionix import Nutritionix
 
-import boto3
-from botocore.client import Config
 
 from program.models import Program, Session
 from users.models import AnswerProgram
 
-AWS_KWARGS = {
-    "aws_access_key_id": settings.AWS_ACCESS_KEY_ID,
-    "aws_secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
-    "region_name": settings.AWS_STORAGE_REGION,
-    "config": Config(signature_version='s3v4')
-}
-
-s3 = boto3.client('s3', **AWS_KWARGS)
 
 User = get_user_model()
 nix = Nutritionix(settings.NIX_APP_ID, settings.NIX_API_KEY)
@@ -355,11 +345,8 @@ class FavoriteRecipe(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(User, related_name='posts', null=True, on_delete=models.CASCADE)
-    image = models.FileField(upload_to='post_images', null=True, blank=True)
-    video = models.FileField(upload_to='post_videos', null=True, blank=True)
-    video_thumbnail = models.FileField(upload_to='post_video/thumbnail', null=True, blank=True)
     title = models.CharField(max_length=500, null=True, blank=True)
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     hide = models.BooleanField(default=False)
 
@@ -393,41 +380,17 @@ class Post(models.Model):
     def likes_count(self):
         return self.likes.all().count()
 
-    @property
-    def image_url(self):
-        if self.image:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.image.name
-                })
-            return url
-        return None
 
-    @property
-    def video_url(self):
-        if self.video:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.video.name
-                })
-            return url
-        return None
 
-    @property
-    def video_thumbnail_url(self):
-        if self.video_thumbnail:
-            url = s3.generate_presigned_url(
-                ClientMethod='get_object',
-                Params={
-                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                    'Key': "media/" + self.video_thumbnail.name
-                })
-            return url
-        return None
+class PostImageVideo(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_image_video")
+    image = models.FileField(upload_to="post_image/image", null=True, blank=True)
+    video = models.FileField(upload_to="post_video/video", null=True, blank=True)
+    video_thumbnail = models.FileField(upload_to='post_video/thumbnail', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.post.title)
 
 
 class Comment(models.Model):
@@ -441,6 +404,17 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created',)
+
+    def get_like(self, user):
+        comment_like = PostCommentLike.objects.filter(comment=self, user=user)
+        if comment_like:
+            return True
+        return False
+
+    @property
+    def likes_count(self):
+        return self.comment_like.all().count()
+
 
 
 class Like(models.Model):
@@ -602,3 +576,29 @@ def resolve_post(sender, instance, created,  **kwargs):
         notification = Notification.objects.filter(post_id=instance.post_id)
         if notification:
             notification.delete()
+
+
+class PostCommentReply(models.Model):
+    comment = models.ForeignKey('Comment', related_name='post_comment_reply', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_comment_reply', on_delete=models.CASCADE)
+    content = models.TextField()
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.comment)
+
+    def get_like(self, user):
+        comment_like = PostCommentLike.objects.filter(comment_reply=self, user=user)
+        if comment_like:
+            return True
+        return False
+
+    @property
+    def likes_count(self):
+        return self.comment_like_reply.all().count()
+
+
+class PostCommentLike(models.Model):
+    comment = models.ForeignKey('Comment', related_name='comment_like', on_delete=models.CASCADE, null=True, blank=True)
+    comment_reply = models.ForeignKey('PostCommentReply', related_name='comment_like_reply', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='user_like_comment', on_delete=models.CASCADE)

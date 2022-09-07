@@ -28,7 +28,7 @@ from home.api.v1.viewsets import (
     ProductUnitViewSet,
     CheckUserViewSet,
     ReportAPostViewSet,
-    BlockedUserViewSet, ChatViewSet
+    BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet
 )
 
 from rest_framework import permissions
@@ -60,7 +60,11 @@ router.register('meal', MealViewSet, basename='meal')
 router.register('recipe', RecipeViewSet, basename='recipe')
 router.register('category', CategoryViewSet, basename='category')
 router.register('post', PostViewSet, basename='post')
+router.register('post-image', PostImageVideoViewSet, basename='post_image')
 router.register('form', FormViewSet, basename='form')
+router.register('comment-reply', CommentReplyViewSet, basename='comment-reply')
+router.register('comment-like', CommentLikeViewSet, basename='comment-like')
+
 
 router.register('exercise', ExerciseViewSet, basename='exercise')
 router.register('session', SessionViewSet, basename='session')
