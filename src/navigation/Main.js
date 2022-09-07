@@ -7,6 +7,7 @@ import {Images} from "src/theme"
 import Feeds from "../screens/Feeds"
 import ViewPost from "../screens/ViewPost"
 import AddPost from "../screens/AddPost"
+import Subscription from "../screens/Subscription"
 
 const {home, profileTab, feed, nutrition, exercise} = Images
 
@@ -155,6 +156,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
     <mainStack.Screen name="AddPost" component={AddPost} />
     <mainStack.Screen name="ViewPost" component={ViewPost} />
+    <mainStack.Screen name="Subscription" component={Subscription} />
   </mainStack.Navigator>
 )
 

@@ -22,7 +22,7 @@ const Navigation = props => {
     }}>
       <authStack.Navigator screenOptions={{headerShown: false}}>
         {
-          props.accessToken
+          !props.accessToken
             ? (
               <authStack.Screen name="MainStack" component={MainNavigator} />
             ) : (
