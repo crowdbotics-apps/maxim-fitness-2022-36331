@@ -170,7 +170,7 @@ const ViewPost = props => {
     return (
       <View style={styles.cardHeader}>
         <Image source={Images.profile} style={styles.profileImg} />
-        <View style={{ flex: 1 }}>
+        <View style={{  flex: 1  }}>
           <View style={styles.profileSection}>
             <Text text={postData?.user?.username} style={styles.nameText} />
             <Text text={calculatePostTime(postData)} style={styles.timeText} />
@@ -183,7 +183,7 @@ const ViewPost = props => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{  flex: 1  }}>
       <Loader isLoading={requesting} />
       <ScrollView contentContainerStyle={styles.mainContainer}>
         <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
@@ -202,8 +202,11 @@ const ViewPost = props => {
             <View style={styles.socialIcons}>
               <Image source={Images.heartIcon} style={styles.likeImageStyle} />
               <Text
+               
                 text={postData?.likes?.toString()}
+               
                 style={styles.timeText}
+             
               />
             </View>
             <View style={styles.socialIcons}>
@@ -271,8 +274,11 @@ const ViewPost = props => {
                     <View style={styles.subCom1}>
                       <View style={styles.commentSection}>
                         <Image
+                         
                           source={Images.profile}
+                         
                           style={styles.profileImg}
+                       
                         />
                         <View style={styles.commentBody}>
                           <View style={styles.commentBodyStyle}>
@@ -284,8 +290,11 @@ const ViewPost = props => {
                                 />
                               </View>
                               <Image
+                               
                                 source={Images.etc}
+                               
                                 style={styles.profileImg}
+                             
                               />
                             </View>
                             <Text

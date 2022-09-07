@@ -1,5 +1,5 @@
-import React,{useEffect} from "react"
-import { CheckBox } from 'react-native-elements';
+import React, { useEffect, useState } from "react"
+import { CheckBox } from "react-native-elements"
 import {
   View,
   StyleSheet,
@@ -10,7 +10,8 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Pressable
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import {
@@ -23,9 +24,7 @@ import useForm from "../../utils/useForm"
 import validator from "../../utils/validation"
 import { connect } from "react-redux"
 //actions
-import {
-  signUpUser,
-} from "../../ScreenRedux/signUpRedux"
+import { signUpUser } from "../../ScreenRedux/signUpRedux"
 
 import {
   googleLoginUser,
@@ -33,10 +32,9 @@ import {
 } from "../../ScreenRedux/loginRedux"
 
 const { backIcon, orumIcon, smallGoogleIcon, faceBookIcon } = Images
-const SignUp = (props) => {
-
+const SignUp = props => {
+  const [check, setCheck] = useState(false)
   const stateSchema = {
-   
     email: {
       value: "",
       error: ""
@@ -44,11 +42,10 @@ const SignUp = (props) => {
     password: {
       value: "",
       error: ""
-    },
+    }
   }
 
   const validationStateSchema = {
-   
     email: {
       required: true,
       validator: validator.email
@@ -56,7 +53,7 @@ const SignUp = (props) => {
     password: {
       required: true,
       validator: validator.password
-    },
+    }
   }
 
   const { state, handleOnChange, disable } = useForm(
@@ -64,19 +61,20 @@ const SignUp = (props) => {
     validationStateSchema
   )
 
-  const OnSignUpPress=()=>{
-  let signUpData = {
-    email: state.email.value,
-    password: state.password.value,
-  }
-  props.signUpUser(signUpData)
+  const OnSignUpPress = () => {
+    let signUpData = {
+      email: state.email.value,
+      password: state.password.value
+    }
+    props.signUpUser(signUpData)
   }
 
   useEffect(() => {
     GoogleSignin.configure({
       scopes: ["https://www.googleapis.com/auth/userinfo.profile"], // what API you want to access on behalf of the user, default is email and profile
       forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-      // iosClientId: '<FROM DEVELOPER CONSOLE>', // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+      iosClientId:
+        "146444618570-57mrfdva3ths48nhte71f12l7lqbu7t1.apps.googleusercontent.com", // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
       androidClientId:
         "146444618570-j1bm5q05buo6586id5eldmarctlad14e.apps.googleusercontent.com"
     })
@@ -135,8 +133,11 @@ const SignUp = (props) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#E5E5E5" }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.mainContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewStyle}
+        showsVerticalScrollIndicator={false}
+      >
         <Image source={backIcon} style={styles.backIconStyle} />
         <View style={{ marginHorizontal: 22 }}>
           <View style={{ alignItems: "center" }}>
@@ -148,52 +149,23 @@ const SignUp = (props) => {
           </View>
           <Text style={styles.getStarted}>Get Register With</Text>
           <TouchableOpacity
-            style={[
-              styles.fbCardcard,
-              {
-                marginTop: 9,
-                height: 49,
-                borderRadius: 10,
-                paddingHorizontal: 15,
-                flexDirection: "row"
-              }
-            ]}
+            style={styles.fbCardcard}
             onPress={() => facebooksignUp()}
           >
-            <View style={{ justifyContent: "center", flex: 1 }}>
-              <Image source={faceBookIcon} style={{ height: 19, width: 9 }} />
+            <View style={styles.imageStyle}>
+              <Image source={faceBookIcon} style={styles.fbImageStyle} />
             </View>
             {props.faceBookRequesting ? (
-              <ActivityIndicator
-                style={{ flex: 6, marginRight: 30 }}
-                color="black"
-              />
+              <ActivityIndicator style={styles.loaderStyle} color="black" />
             ) : (
-              <View style={{ justifyContent: "center", flex: 2 }}>
-                <Text
-                  style={{ color: "white", fontSize: 14, fontWeight: "700" }}
-                >
-                  Login via Facebook
-                </Text>
+              <View style={styles.loginTextContainer}>
+                <Text style={styles.loginTxt}>Login via Facebook</Text>
               </View>
             )}
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.card,
-              {
-                marginTop: 16,
-                height: 49,
-                borderRadius: 10,
-                paddingHorizontal: 15,
-                flexDirection: "row"
-              }
-            ]}
-            onPress={() => signInGoogle()}
-          >
+          <TouchableOpacity style={styles.card} onPress={() => signInGoogle()}>
             <View style={{ justifyContent: "center", flex: 1 }}>
-              <Image source={smallGoogleIcon} style={{}} />
+              <Image source={smallGoogleIcon} />
             </View>
             {props.googleRequesting ? (
               <ActivityIndicator
@@ -218,7 +190,7 @@ const SignUp = (props) => {
               onChangeText={value => handleOnChange("email", value)}
               placeholder="Email"
             />
-             <Text style={{ color: "red" }}>{state.email.error}</Text>
+            <Text style={{ color: "red" }}>{state.email.error}</Text>
             <TextInput
               secureTextEntry={true}
               style={[styles.inputStyle, { marginTop: 18 }]}
@@ -226,17 +198,58 @@ const SignUp = (props) => {
               placeholder="Password"
             />
             <Text style={{ color: "red" }}>{state.password.error}</Text>
-            <TouchableOpacity onPress={()=>OnSignUpPress() } disabled={disable} style={{marginTop: 53}}>
-            <LinearGradient
-              style={[styles.logInButton]}
-              colors={["#048ECC", "#0460BB", "#0480C6"]}
+            <View
+              style={{
+                height: 50,
+                marginBottom: 20,
+                flexDirection: "row",
+                alignItems: "center"
+              }}
             >
-              {props.requesting ? <ActivityIndicator
-          color="white"
-        /> :<Text style={styles.loginText}>Register</Text>}
-            </LinearGradient>
+              <TouchableOpacity
+                onPress={() => setCheck(!check)}
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#C4C4C4",
+                  height: 20,
+                  width: 20,
+                  borderRadius: 5,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {check ? (
+                  <Image
+                    source={Images.check}
+                    style={{ width: 13, height: 13 }}
+                  />
+                ) : null}
+              </TouchableOpacity>
+              <Text
+                style={{
+                  color: "#0460BB",
+                  marginLeft: 10,
+                  fontStyle: "italic"
+                }}
+              >
+                {"I have accept terms & conditions"}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => OnSignUpPress()}
+              disabled={disable}
+            >
+              <LinearGradient
+                style={styles.logInButton}
+                colors={["#048ECC", "#0460BB", "#0480C6"]}
+              >
+                {props.requesting ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.loginText}>Register</Text>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
-           
           </View>
         </View>
       </ScrollView>
@@ -244,6 +257,8 @@ const SignUp = (props) => {
   )
 }
 const styles = StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: "#fff" },
+  scrollViewStyle: { flexGrow: 1, paddingBottom: 30 },
   backIconStyle: {
     height: 16,
     width: 8,
@@ -286,10 +301,15 @@ const styles = StyleSheet.create({
     height: 53,
     borderRadius: 12,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   loginText: { fontSize: 16, color: "white", fontWeight: "700" },
   card: {
+    marginTop: 16,
+    height: 49,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    flexDirection: "row",
     width: "100%",
     backgroundColor: "white",
     shadowColor: "#000",
@@ -304,6 +324,11 @@ const styles = StyleSheet.create({
   },
 
   fbCardcard: {
+    marginTop: 9,
+    height: 49,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    flexDirection: "row",
     width: "100%",
     backgroundColor: "#3C5A9A",
     shadowColor: "#000",
@@ -316,6 +341,11 @@ const styles = StyleSheet.create({
 
     elevation: 10
   },
+  imageStyle: { justifyContent: "center", flex: 1 },
+  fbImageStyle: { height: 19, width: 9 },
+  loaderStyle: { flex: 6, marginRight: 30 },
+  loginTextContainer: { justifyContent: "center", flex: 2 },
+  loginTxt: { color: "white", fontSize: 14, fontWeight: "700" }
 })
 
 const mapStateToProps = state => ({
