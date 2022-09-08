@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,15 +8,16 @@ import {
   ActivityIndicator,
   TouchableOpacity
 } from 'react-native';
-import {Text, Header, FeedCard} from 'src/components'
-import {Images} from 'src/theme'
-import {getFeedsRequest, postLikeRequest} from '../../ScreenRedux/feedRedux'
-import {connect} from 'react-redux'
-import {useNetInfo} from '@react-native-community/netinfo'
+import { Text, Header, FeedCard } from '../../components'
+import { Images } from 'src/theme'
+import { getFeedsRequest, postLikeRequest } from '../../ScreenRedux/feedRedux'
+import { connect } from 'react-redux'
+import { useNetInfo } from '@react-native-community/netinfo'
 import ImagePicker from 'react-native-image-crop-picker'
 
 const Feeds = props => {
-  const {feeds, requesting, navigation, profile} = props
+  const { feeds, requesting, navigation, profile } = props
+  console.log('profile: ', profile);
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1);
   // const [uploadAvatar, setUploadAvatar] = useState('');
@@ -28,7 +29,7 @@ const Feeds = props => {
   const flatList = useRef();
   const moveToTop = () => {
     props.getFeedsRequest(1);
-    flatList?.current?.scrollToIndex({index: 0, animated: true});
+    flatList?.current?.scrollToIndex({ index: 0, animated: true });
   };
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const Feeds = props => {
     }
   }, [feeds]);
 
-  const renderItem = ({item, index}) => {
+  const renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
         <FeedCard
@@ -87,9 +88,9 @@ const Feeds = props => {
     <SafeAreaView style={styles.container}>
       <Header
         imageUrl={
-          profile && profile.profile_picture_url === null
+          profile && profile.profile_picture === null
             ? Images.profile
-            : {uri: profile?.profile_picture_url}
+            : { uri: profile?.profile_picture }
         }
         onPressPlus={() => navigation.navigate('AddPost')}
       />
@@ -101,8 +102,8 @@ const Feeds = props => {
             <ActivityIndicator size="large" color="green" />
           </View>
         ) : setInterval(() => {
-            feedsState.length > 0;
-          }, 2000) ? (
+          feedsState.length > 0;
+        }, 2000) ? (
           <FlatList
             ref={flatList}
             refreshControl={
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 10
   },
-  loaderStyle: {flex: 1, justifyContent: 'center', alignItems: 'center'}
+  loaderStyle: { flex: 1, justifyContent: 'center', alignItems: 'center' }
 })
 
 const mapStateToProps = state => ({

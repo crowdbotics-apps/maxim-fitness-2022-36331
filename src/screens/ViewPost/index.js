@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -13,24 +13,24 @@ import {
   Pressable
 } from 'react-native';
 import moment from 'moment';
-import {Text, Loader} from 'src/components';
-import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
-import {calculatePostTime} from 'src/utils/functions';
-import {Icon} from 'native-base';
-import {connect} from 'react-redux';
+import { Text, Loader } from 'src/components';
+import { Images, Layout, Global, Gutters, Colors } from 'src/theme';
+import { calculatePostTime } from 'src/utils/functions';
+import { Icon } from 'native-base';
+import { connect } from 'react-redux';
 //action
-import {getPost, addComment, replyComment, likeComment} from '../../ScreenRedux/viewPostRedux';
+import { getPost, addComment, replyComment, likeComment } from '../../ScreenRedux/viewPostRedux';
 
 import Share from 'react-native-share';
 
 const ViewPost = props => {
   const {
-    navigation: {goBack},
+    navigation: { goBack },
     route,
     requesting,
     postData
   } = props
-  const {circleClose} = Images
+  const { circleClose } = Images
   const [commentData, setCommentData] = useState(false)
   const [postComments, setPostComments] = useState([])
   const [newCommentData, setNewCommentData] = useState(false)
@@ -61,18 +61,18 @@ const ViewPost = props => {
     } else if (postData && postData?.comments?.length) {
       let data = [
         postData &&
-          postData?.comments?.length &&
-          postData.comments.map(item => ({
-            image: Images.profile,
-            text: item.content,
-            userName: item.user.username,
-            id: item.id,
-            userId: item.user.id,
-            liked: item.liked,
-            likes: item.likes,
-            created_at: item.created,
-            subComment: item.sub_comment.length ? item.sub_comment : []
-          }))
+        postData?.comments?.length &&
+        postData.comments.map(item => ({
+          image: Images.profile,
+          text: item.content,
+          userName: item.user.username,
+          id: item.id,
+          userId: item.user.id,
+          liked: item.liked,
+          likes: item.likes,
+          created_at: item.created,
+          subComment: item.sub_comment.length ? item.sub_comment : []
+        }))
       ]
       setPostComments(data[0])
     }
@@ -141,10 +141,10 @@ const ViewPost = props => {
   }
 
   const sharePost = async () => {
-    const data = {message: 'hello'}
+    const data = { message: 'hello' }
     await Share.open(data)
-      .then(res => {})
-      .catch(err => {})
+      .then(res => { })
+      .catch(err => { })
   }
 
   const likeSubComment = item => {
@@ -161,7 +161,7 @@ const ViewPost = props => {
     return (
       <View style={styles.cardHeader}>
         <Image source={Images.profile} style={styles.profileImg} />
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <View style={styles.profileSection}>
             <Text text={postData?.user?.username} style={styles.nameText} />
             <Text text={calculatePostTime(postData)} style={styles.timeText} />
@@ -174,7 +174,7 @@ const ViewPost = props => {
   }
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <Loader isLoading={requesting} />
       <ScrollView contentContainerStyle={styles.mainContainer}>
         <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
@@ -203,7 +203,7 @@ const ViewPost = props => {
         </View>
         {postComments.map((comment, i) => {
           return (
-            <View key={i} style={{paddingHorizontal: 10}}>
+            <View key={i} style={{ paddingHorizontal: 10 }}>
               <View style={styles.commentStyle}>
                 <View style={styles.commentSection}>
                   <Image source={Images.profile} style={styles.profileImg} />
@@ -230,7 +230,7 @@ const ViewPost = props => {
                         <TouchableOpacity onPress={() => likeComment(comment)}>
                           <Image
                             source={Images.fillheart}
-                            style={[styles.comImage, {tintColor: comment.liked ? 'red' : 'black'}]}
+                            style={[styles.comImage, { tintColor: comment.liked ? 'red' : 'black' }]}
                           />
                         </TouchableOpacity>
                       </View>
@@ -295,16 +295,16 @@ const ViewPost = props => {
           )
         })}
       </ScrollView>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{ flexDirection: 'row' }}>
         <TextInput
           placeholder="Write a comment"
           value={commentData}
           onChangeText={value => setCommentData(value)}
-          style={{paddingHorizontal: 20, width: '90%'}}
+          style={{ paddingHorizontal: 20, width: '90%' }}
           ref={inputRef}
         />
-        <TouchableOpacity style={{justifyContent: 'center'}} onPress={() => addAComment()}>
-          <Image source={circleClose} style={{height: 30, width: 30}} />
+        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => addAComment()}>
+          <Image source={circleClose} style={{ height: 30, width: 30 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -386,16 +386,16 @@ const styles = StyleSheet.create({
     height: 22,
     resizeMode: 'contain'
   },
-  foodImageStyle: {width: '100%', height: 260},
-  bottomTextStyle: {flexDirection: 'row', flex: 1, paddingHorizontal: 15},
-  leftArrow: {width: '100%', paddingHorizontal: 15},
-  backArrowStyle: {width: 30, height: 40, resizeMode: 'contain'},
-  iconWrapper: {fontSize: 10},
+  foodImageStyle: { width: '100%', height: 260 },
+  bottomTextStyle: { flexDirection: 'row', flex: 1, paddingHorizontal: 15 },
+  leftArrow: { width: '100%', paddingHorizontal: 15 },
+  backArrowStyle: { width: 30, height: 40, resizeMode: 'contain' },
+  iconWrapper: { fontSize: 10 },
 
-  commentStyle: {flex: 1, marginTop: 20},
-  subCommentStyle: {flex: 1, flexDirection: 'row'},
-  subCom: {flex: 0.5},
-  subCom1: {flex: 4, marginTop: 10},
+  commentStyle: { flex: 1, marginTop: 20 },
+  subCommentStyle: { flex: 1, flexDirection: 'row' },
+  subCom: { flex: 0.5 },
+  subCom1: { flex: 4, marginTop: 10 },
   commentBodyText: {
     flex: 1,
     paddingBottom: 15,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  commentHeading: {flexDirection: 'row'},
+  commentHeading: { flexDirection: 'row' },
   commentSecond: {
     flexDirection: 'row',
     justifyContent: 'space-between',

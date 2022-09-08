@@ -1,8 +1,8 @@
 import React from 'react'
-import {View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback} from 'react-native'
-import {Images} from 'src/theme'
+import { View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
+import { Images } from 'src/theme'
 
-const Header = ({imageUrl, onAvatarChange, onPressPlus}) => {
+const Header = ({ imageUrl, onAvatarChange, onPressPlus }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.currentTabStyle}>
@@ -57,7 +57,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     width: 50,
     height: 50,
-    resizeMode: 'cover'
+    resizeMode: 'cover',
+    borderWidth: 1,
+    borderColor: 'gray'
   },
 })
 

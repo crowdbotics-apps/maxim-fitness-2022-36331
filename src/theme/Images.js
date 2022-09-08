@@ -44,4 +44,5 @@ export default {
   profileTab: require('src/assets/images/profileTab.png'),
   fillheart: require('src/assets/images/filledHeart.png'),
   check: require('src/assets/images/check.png'),
+  iconDoneProgram: require('src/assets/images/icon_program_done.png')
 }
