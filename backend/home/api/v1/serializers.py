@@ -322,7 +322,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     protein = serializers.ReadOnlyField()
     fat = serializers.ReadOnlyField()
     calories = serializers.ReadOnlyField()
-    # fav = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -333,11 +332,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         image_url = image.image_url
         return request.build_absolute_uri(image_url)
 
-    # def get_fav(self, recipe):
-    #     request = self.context.get("request")
-    #     if request and hasattr(request, "user"):
-    #         user = request.user
-    #     return recipe.get_fav(user)
 
 
 class ExerciseTypeSerializer(serializers.ModelSerializer):
