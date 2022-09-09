@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -21,62 +21,71 @@ import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
 
 //action
-import {AddPostData} from '../../ScreenRedux/addPostRequest'
+import {AddPostData} from '../../ScreenRedux/addPostRequest';
+import { useIsFocused } from '@react-navigation/native';
 
-const {closeIcon, colorAddIcon, circleClose} = Images
+const {closeIcon, colorAddIcon, circleClose} = Images;
 const AddPost = props => {
-  const {navigation, AddPostData} = props
+  const {navigation, AddPostData} = props;
 
-  const [showPost, setShowPost] = useState(false)
-  const [imageData, setImageData] = useState([])
-  const [content, setContent] = useState(false)
+  const [showPost, setShowPost] = useState(false);
+  const [imageData, setImageData] = useState([]);
+  const [content, setContent] = useState(false);
+  const isFocused = useIsFocused();
+
+  useEffect(()=>{
+    if(isFocused){
+      setImageData([])
+    setShowPost(false)
+    setContent(false)
+    }
+  },[isFocused])
 
   const addData = () => {
     const formData = new FormData();
     formData.append('content', content);
 
     if (imageData.length) {
-      // formData.append('image', JSON.stringify(imageData.map((item)=>(
-      //   {
-      //     uri: item.path,
-      //     type: item.mime,
-      //     name: 'asas',
-      //   }
-      //   ))) );
-
-      formData.append('image', {
-        uri: imageData[0].path,
-        type: imageData[0].mime,
-        name: imageData[0].path,
-      });
+      imageData.map((item) =>
+         item.mime === 'video/mp4' ? 
+        formData.append('video', {
+          uri: item.path,
+          type: item.mime,
+          name: item.path,
+        })
+        :
+        formData.append("image", {
+          uri: item.path,
+          type: item.mime,
+          name: item.path,
+        })
+      );
     }
     props.AddPostData(formData)
-  }
+  };
 
   const onChangePostImage = () => {
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       mediaType: 'any',
-      multiple: true
+      multiple: true,
     }).then(image => {
-      let newArray = []
+      let newArray = [];
       image.length &&
         image.map(item => {
-          newArray.push(item)
-        })
-      setImageData(newArray)
-    })
-  }
+          newArray.push(item);
+        });
+      setImageData(newArray);
+    });
+  };
 
-  console.log('imageData', imageData);
-
-  const {width} = Dimensions.get('window')
+  const {width} = Dimensions.get('window');
 
   const filterData = item => {
-    let filterData = imageData.filter(v => v.path !== item.path)
-    setImageData(filterData)
-  }
+    let filterData = imageData.filter(v => v.path !== item.path);
+    setImageData(filterData);
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
@@ -90,7 +99,7 @@ const AddPost = props => {
             borderBottomWidth: 1,
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
           }}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -134,7 +143,7 @@ const AddPost = props => {
                   style={{
                     height: (173 / 375) * width,
                     width: (145 / 375) * width,
-                    borderRadius: 15
+                    borderRadius: 15,
                   }}
                   source={{uri: item.path}}
                 />
@@ -164,12 +173,12 @@ const AddPost = props => {
           <Image source={colorAddIcon} style={{height: 31, width: 31}} />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => content && addData()}
+          onPress={() => content && imageData.length && addData()}
           style={{
             height: 44,
             width: 81,
             borderRadius: 10,
-            backgroundColor: content ? 'blue' : 'gray',
+            backgroundColor: content && imageData.length ? '#4194cb' : 'gray',
             justifyContent: 'center',
           }}
         >
@@ -181,27 +190,27 @@ const AddPost = props => {
               textAlign: 'center',
             }}
           >
-            Post
+          {props.requesting ? <ActivityIndicator size="small" color="#000" /> : "Post"}
           </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   backIconStyle: {
     height: 16,
     width: 8,
     marginTop: 46,
-    marginLeft: 22
-  }
-})
+    marginLeft: 22,
+  },
+});
 
 const mapStateToProps = state => ({
   requesting: state.addPostReducer.requesting,
-})
+});
 
 const mapDispatchToProps = dispatch => ({
   AddPostData: data => dispatch(AddPostData(data)),
-})
-export default connect(mapStateToProps, mapDispatchToProps)(AddPost)
+});
+export default connect(mapStateToProps, mapDispatchToProps)(AddPost);

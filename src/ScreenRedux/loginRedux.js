@@ -192,12 +192,6 @@ function* googleLogin({data}) {
   } catch (e) {
     const {response} = e
     console.log('google login error response---', response);
-    // showMessage({
-    //   message: response?.data?.non_field_errors[0]
-    //     ? response.data.non_field_errors[0]
-    //     : "Something want wrong",
-    //   type: "danger"
-    // })
   } finally {
     yield put(reset())
   }

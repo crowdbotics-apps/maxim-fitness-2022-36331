@@ -1,5 +1,7 @@
 import {all, call, put, takeLatest} from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {navigate} from '../navigation/NavigationService'
+import {getFeedsRequest} from './feedRedux'
 
 // config
 import {API_URL} from '../config/app';
@@ -64,6 +66,8 @@ async function addPostAPI(data) {
 function* AddPost({data}) {
   try {
     const response = yield call(addPostAPI, data)
+    navigate('Feeds')
+    // yield put((getFeedsRequest(1)))
   } catch (e) {
     const {response} = e
   } finally {

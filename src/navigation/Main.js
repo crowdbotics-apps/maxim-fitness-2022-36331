@@ -159,6 +159,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="Subscription" component={Subscription} />
     <mainStack.Screen name="CreditCard" component={CreditCard} />
     <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
+    <mainStack.Screen name="Feeds" component={Feeds} />
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
   </mainStack.Navigator>
 )
