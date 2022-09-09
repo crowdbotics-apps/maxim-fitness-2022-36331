@@ -142,8 +142,8 @@ const WorkoutComponent = ({
 
   return (
     <>
-      {/* <View style={turtiaryBg}> */}
-      <View style={{ backgroundColor: 'pink' }}>
+      <View style={turtiaryBg}>
+        {/* <View style={{ backgroundColor: 'pink' }}> */}
         <View style={[alignItemsStart, regularHPadding]}>
           <Text style={[small2xTPadding, mediumXBPadding, titleLarge]} text={calDate()} bold />
         </View>
@@ -393,7 +393,7 @@ const WorkoutComponent = ({
                 ]}
               >
                 <Image
-                  source={Images.swipeIcon}
+                  source={Images.iconSwap}
                   style={{ width: 50, height: 50, resizeMode: 'contain' }}
                 />
                 <View

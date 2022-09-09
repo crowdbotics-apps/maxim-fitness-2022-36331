@@ -1,56 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import * as Progress from 'react-native-progress';
 import Timer from '../Timer';
 
 const RestContainer = ({
-  startCount,
-  restContainerStyleProp,
-  secondsRest,
-  stopCountFunc,
-  activeSet,
-  startRest,
-  NextScreen,
+  onPress,
   showBar,
   loading,
   isDisable,
 }) => {
   const widthProgress = Dimensions.get('screen').width;
-  const [seconds, setSeconds] = useState('');
-  const [intervalRef, setIntervalRef] = useState(null);
   const [increment, setIncrement] = useState(0);
-
-  // useEffect(() => {
-  //   if (!seconds) {
-  //     setSeconds(activeSet?.timer);
-  //   }
-  // }, [secondsRest, startCount, activeSet, seconds]);
-
-  // useInterval(
-  //   () => {
-  //     if (seconds > 0 && startCount) {
-  //       setSeconds(seconds - 1);
-  //     } else {
-  //       stopCountFunc(setSeconds);
-  //       if (seconds === 0) {
-  //         clearInterval(intervalRef);
-  //       }
-  //     }
-  //   },
-  //   1000,
-  //   setIntervalRef,
-  //   startCount
-  // );
-
-  // useEffect(() => {
-  //   if (startRest) {
-  //     setTimeout(() => {
-  //       setIncrement(increment + 1 / 90);
-  //     }, 1000);
-  //   } else {
-  //     setIncrement(0);
-  //   }
-  // }, [increment, startRest]);
 
   return (
     <View style={{ marginTop: 20, marginHorizontal: 20 }}>
@@ -106,9 +66,8 @@ const RestContainer = ({
         </View>
       )}
       <TouchableOpacity
-        onPress={NextScreen}
+        onPress={onPress}
         style={[
-          restContainerStyleProp,
           {
             backgroundColor: !isDisable ? '#838383' : '#db3b26',
             borderRadius: 10,
@@ -133,24 +92,5 @@ const RestContainer = ({
     </View>
   );
 };
-
-function useInterval(callback, delay, setIntervalRef, startCount) {
-  const savedCallback = useRef();
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  // Set up the interval.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (startCount) {
-      let id = setInterval(tick, delay);
-      setIntervalRef(id);
-      return () => clearInterval(id);
-    }
-  }, [delay, setIntervalRef, startCount]);
-}
 
 export default RestContainer;

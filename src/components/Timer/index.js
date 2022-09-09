@@ -1,7 +1,7 @@
 import React from 'react';
 import CountDown from 'react-native-countdown-component';
 
-const Timer = ({until, running}) => {
+const Timer = ({ until, running }) => {
   return (
     <CountDown
       until={until}
@@ -11,10 +11,10 @@ const Timer = ({until, running}) => {
         padding: 0,
         height: 20,
       }}
-      digitTxtStyle={{fontWeight: 'bold', color: 'black', fontSize: 15}}
+      digitTxtStyle={{ fontWeight: 'bold', color: 'black', fontSize: 15 }}
       timeToShow={['M', 'S']}
-      timeLabels={{m: null, s: null}}
-      running={{running}}
+      timeLabels={{ m: null, s: null }}
+      running={{ running }}
       showSeparator
     />
   );

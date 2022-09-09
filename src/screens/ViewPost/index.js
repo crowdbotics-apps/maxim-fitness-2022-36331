@@ -5,18 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
-  ImageBackground,
   Dimensions,
   ScrollView,
   SafeAreaView,
   Pressable,
 } from 'react-native';
-import moment from 'moment';
-import { Text, Loader } from 'src/components';
-import { Images, Layout, Global, Gutters, Colors } from 'src/theme';
+import { Text, Loader, ProfileHeader } from 'src/components';
+import { Images } from 'src/theme';
 import { calculatePostTime } from 'src/utils/functions';
-import { Icon } from 'native-base';
 import { connect } from 'react-redux';
 import { SliderBox } from 'react-native-image-slider-box';
 //action
@@ -32,7 +28,6 @@ const ViewPost = props => {
     postData,
     feeds,
   } = props;
-  const { circleClose } = Images;
   const [commentData, setCommentData] = useState(false);
   const [postComments, setPostComments] = useState([]);
   const [newCommentData, setNewCommentData] = useState(false);
@@ -206,22 +201,6 @@ const ViewPost = props => {
     props.likeComment(apiData);
   };
 
-  const ProfileHeader = () => {
-    return (
-      <View style={styles.cardHeader}>
-        <Image source={Images.profile} style={styles.profileImg} />
-        <View style={{ flex: 1 }}>
-          <View style={styles.profileSection}>
-            <Text text={postData?.user?.username} style={styles.nameText} />
-            <Text text={calculatePostTime(postData)} style={styles.timeText} />
-          </View>
-          <Text text={postData?.content} style={styles.pageText} />
-        </View>
-        <Image source={Images.etc} style={styles.profileImg} />
-      </View>
-    );
-  };
-
   let deviceWidth = Dimensions.get('window').width
 
   const addLikeAction = () => {
@@ -249,7 +228,7 @@ const ViewPost = props => {
     updatedFeeds[index] = objToUpdate || param;
     setFeedsState(updatedFeeds);
   };
-
+  console.log('postData', postData);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loader isLoading={requesting} />
@@ -258,26 +237,26 @@ const ViewPost = props => {
           <Image source={Images.backArrow} style={styles.backArrowStyle} />
         </TouchableOpacity>
         <View style={styles.profileStyle}>
-          <ProfileHeader />
-          <View style={styles.feedImageContainer}>
-            <View style={styles.cardBody}>
-              <SliderBox
-                images={
-                  param?.post_image_video?.length > 0
-                    ? param?.post_image_video?.map(item => item.image)
-                    : []
-                }
-                style={styles.foodImageStyle}
-                sliderBoxHeight={260}
-                parentWidth={deviceWidth - 60}
-                dotColor="#D4D4D4"
-                inactiveDotColor="#D4D4D4"
-                dotStyle={styles.sliderBoxStyle}
-                paginationBoxVerticalPadding={20}
-              />
-            </View>
-            {/* <Image source={Images.foodImage} style={styles.foodImageStyle} /> */}
-          </View>
+          <ProfileHeader
+            source={postData?.user?.profile_picture === null ? Images.profile : postData?.user?.profile_picture}
+            userName={postData?.user?.username}
+            time={calculatePostTime(postData)}
+            content={postData?.content}
+          />
+          <SliderBox
+            images={
+              param?.post_image_video?.length > 0
+                ? param?.post_image_video?.map(item => item.image)
+                : []
+            }
+            style={styles.foodImageStyle}
+            sliderBoxHeight={260}
+            parentWidth={deviceWidth}
+            dotColor="#D4D4D4"
+            inactiveDotColor="#D4D4D4"
+            dotStyle={styles.sliderBoxStyle}
+            paginationBoxVerticalPadding={20}
+          />
           <View style={styles.cardSocials}>
             <View style={styles.socialIcons}>
               <Image source={Images.messageIcon} style={styles.msgIconStyle} />
@@ -430,16 +409,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   cardSocials: {
+    marginTop: 40,
     height: 50,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
   },
   feedImageContainer: {
+    height: 260,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
-    borderRadius: 15,
   },
   nameText: {
     fontSize: 14,
@@ -488,7 +467,6 @@ const styles = StyleSheet.create({
     height: 22,
     resizeMode: 'contain',
   },
-  foodImageStyle: { width: '100%', height: 260 },
   bottomTextStyle: { flexDirection: 'row', flex: 1, paddingHorizontal: 15 },
   leftArrow: { width: '100%', paddingHorizontal: 15 },
   backArrowStyle: { width: 30, height: 40, resizeMode: 'contain' },
@@ -560,19 +538,21 @@ const styles = StyleSheet.create({
     height: 22,
     resizeMode: 'contain',
   },
-  cardBody: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 30,
-    borderRadius: 15
-  },
   foodImageStyle: {
     width: '100%',
     height: 260,
     alignSelf: 'center',
-    borderRadius: 15
+    marginTop: 10
+  },
+
+  sliderBoxStyle: {
+    width: 8,
+    height: 8,
+    borderRadius: 5,
+    marginHorizontal: -10,
+    padding: 0,
+    margin: 0,
+    top: 40
   },
 });
 

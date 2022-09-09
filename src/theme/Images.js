@@ -45,5 +45,8 @@ export default {
   fillheart: require('src/assets/images/filledHeart.png'),
   check: require('src/assets/images/check.png'),
   sendMessage: require('src/assets/images/icon_arrow.png'),
-  iconDoneProgram: require('src/assets/images/icon_program_done.png')
+  iconDoneProgram: require('src/assets/images/icon_program_done.png'),
+  iconSwap: require('src/assets/images/icon_swap.png'),
+  iconDoneStartRest: require('src/assets/images/icon_done_start_rest.png'),
+  detailIcon: require('src/assets/images/icon_details_ex.png'),
 }

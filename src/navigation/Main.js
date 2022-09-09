@@ -117,7 +117,7 @@ const BottomNavigator = () => {
 
       <Tab.Screen
         name="profileScreen"
-        component={Feeds}
+        component={ProgramScreen}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>

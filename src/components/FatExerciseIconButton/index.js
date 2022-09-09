@@ -3,8 +3,8 @@ import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 
 import { Images } from '../../theme';
 
-const FatExerciseIconButton = ({ buttonIcon, buttonText, onClick }) => (
-  <TouchableOpacity style={styles.buttonContainer} onPress={onClick}>
+const FatExerciseIconButton = ({ buttonIcon, buttonText, onPress }) => (
+  <TouchableOpacity style={styles.buttonContainer} onPress={onPress}>
     <View style={styles.iconContainer}>
       <Image source={buttonIcon || Images.iconDone} style={styles.iconStyle} />
     </View>

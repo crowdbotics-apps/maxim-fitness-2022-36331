@@ -96,44 +96,35 @@ const Feeds = props => {
       />
       <Text style={styles.content} text="Latest" />
 
-      {netInfo?.isConnected ? (
-        requesting ? (
-          <View style={styles.loaderStyle}>
-            <ActivityIndicator size="large" color="green" />
-          </View>
-        ) :
-          feedsState.length > 0
-            ? (
-              <FlatList
-                ref={flatList}
-                refreshControl={
-                  <RefreshControl
-                    colors={['#9Bd35A', '#689F38']}
-                    refreshing={requesting}
-                    onRefresh={() => onPullToRefresh()}
-                    progressViewOffset={20}
-                  />
-                }
-                data={feedsState}
-                renderItem={renderItem}
-                keyExtractor={item => item.id.toString()}
-                extraData={feedsState}
-                // onEndReached={onEnd}
-                windowSize={250}
-                // onViewableItemsChanged={onViewRef.current}
-                // viewabilityConfig={viewConfigRef.current}
-                keyboardShouldPersistTaps={'handled'}
-              />
-            ) : (
-              <View style={styles.loaderStyle}>
-                <Text style={styles.comingSoon} text="No post are available!" bold />
-              </View>
-            )
-      ) : (
+      {requesting ? (
         <View style={styles.loaderStyle}>
-          <Text style={styles.emptyListLabel}>{'Network error!'}</Text>
+          <ActivityIndicator size="large" color="green" />
         </View>
-      )}
+      ) :
+        feedsState.length > 0
+          ? (
+            <FlatList
+              ref={flatList}
+              refreshControl={
+                <RefreshControl
+                  colors={['#9Bd35A', '#689F38']}
+                  refreshing={requesting}
+                  onRefresh={() => onPullToRefresh()}
+                  progressViewOffset={20}
+                />
+              }
+              data={feedsState}
+              renderItem={renderItem}
+              keyExtractor={item => item.id.toString()}
+              extraData={feedsState}
+              // onEndReached={onEnd}
+              windowSize={250}
+              // onViewableItemsChanged={onViewRef.current}
+              // viewabilityConfig={viewConfigRef.current}
+              keyboardShouldPersistTaps={'handled'}
+            />
+          ) : null
+      }
     </SafeAreaView>
   )
 }

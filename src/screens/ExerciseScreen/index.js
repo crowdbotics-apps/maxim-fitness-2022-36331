@@ -2,171 +2,33 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Image,
-  Keyboard,
   StyleSheet,
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  ActivityIndicator,
 } from 'react-native';
-
-import ScrollableTabView from 'react-native-scrollable-tab-view';
-import ExerciseTabHeader from '../../components/ExerciseTabHeader';
-import SetButton from '../../components/SetButton';
-import VideoExercise from '../../components/VideoExercise';
-import FatExerciseButton from '../../components/FatExerciseButton';
-import FatExerciseIconButton from '../../components/FatExerciseIconButton';
-import FatGradientIconButton from '../../components/FatGradientIconButton';
-import RestContainer from '../../components/RestContainer';
-import BottomSheet from '../../components/BottomSheet'
-// import Routes from '../../Routes';
-import Modal from 'react-native-modal';
-import { Input } from 'native-base';
-import { Button, Text } from '../../components';
+import {
+  Text,
+  SetButton,
+  VideoExercise,
+  FatExerciseButton,
+  FatExerciseIconButton,
+  FatGradientIconButton,
+  RestContainer,
+  BottomSheet,
+  StaticTimer
+} from '../../components';
 import { Layout, Global, Gutters, Images, Colors } from '../../theme';
-import FatExerciseButtonWeight from '../../components/FatExerciseButtonWeight';
 import LinearGradient from 'react-native-linear-gradient';
-import StaticTimer from '../../components/StaticTimer';
-import moment from 'moment';
 import { getAllSessionRequest } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
 const ExerciseScreen = props => {
-  const {
-    navigation,
-    exercisesObj,
-    selectedSession,
-    findAndMarkAsDoneSetAction,
-    pickSessionAction,
-    nextWorkout,
-    updateSetWeightAction,
-    updateSetWeightActionReps,
-    markWorkoutDone,
-    individualSetsDetails,
-    individualSets,
-    route,
-    allSessions,
-    pickExerciseObject,
-    innerExercise,
-  } = props;
-
-  let refRBSheet = useRef('');
-  let refRBSheetWeight = useRef('');
+  const { navigation } = props;
   let refRBSheetDescription = useRef('');
-
-  const [activeSet, setActiveSet] = useState({});
-  const [isClickedOnActive, setIsClickedOnActive] = useState(false);
-  const [startCount, setStartCount] = useState(false);
-  const [allDone, setAllDone] = useState(false);
-  const [freeToGoToNext, setFreeToGoToNext] = useState(false);
-  const [showModalWeightTwo, setShowModalWeightTwo] = useState(false);
-  const [showModalWeightThree, setShowModalWeightThree] = useState(false);
-  const [showModalRepsTwo, setShowModalRepsTwo] = useState(false);
-  const [showModalRepsThree, setShowModalRepsThree] = useState(false);
-
-  const [weight, setWeight] = useState('');
-  const [weightTwo, setWeightTwo] = useState('');
-  const [weightThree, setWeightThree] = useState('');
-  const [reps, setReps] = useState('');
-  const [repsTwo, setRepsTwo] = useState('');
-  const [repsThree, setRepsThree] = useState('');
-
-  const [startTimer, setStartTimer] = useState(false);
-  const [startRest, setStartRest] = useState(false);
-  const [setsDone, setSetsDone] = useState(0);
-  const [loadingReps, setLoadingReps] = useState(0);
-  const [loadingWeight, setLoadingWeight] = useState(0);
-  const [loadingSecond, setLoadingSecond] = useState(0);
-  const [showBar, setShowBar] = useState(false);
-  const [changeCol, setChangeCol] = useState(false);
-  const [changeColor, setChangeColor] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [videoLoader, setVideoLoader] = useState(false);
-
-  // let active = activeSet?.set_type;
-
-  // useEffect(() => {
-  //   const newDate = moment(new Date()).format('YYYY-MM-DD');
-  //   // setWeekDate(newDate);
-  //   props.getAllSessionRequest(newDate);
-  // }, [])
-
-  // useEffect(() => {
-  //   activeSet?.exercises?.reverse();
-  // }, [activeSet]);
-
-  // useEffect(() => {
-  //   pickExerciseObject(activeSet?.exercises?.length > 0 && activeSet?.exercises[0]);
-  // }, [activeSet]);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (active && active.toLowerCase() === 'ss') {
-  //       setOpenModal(!openModal);
-  //     }
-  //     if (active && active.toLowerCase() === 'gs') {
-  //       setOpenModal(!openModal);
-  //     }
-  //     if (active && active.toLowerCase() === 'ds') {
-  //       setOpenModal(!openModal);
-  //     }
-  //     if (active && active.toLowerCase() === 'tds') {
-  //       setOpenModal(!openModal);
-  //     }
-  //     if (active && active.toLowerCase() === 'ct') {
-  //       setOpenModal(!openModal);
-  //     }
-  //   }, 500);
-  // }, [activeSet]);
-
-  // useEffect(() => {
-  //   isFocused && setFreeToGoToNext(setWorkoutDone.status === 200);
-  // }, [isFocused]);
-
-  // useEffect(() => {
-  //   const [activeSetFind] = exercisesObj.sets && exercisesObj?.sets?.filter(item => item?.id);
-  //   setAllDone(!activeSetFind);
-  //   setActiveSet(activeSetFind);
-  // }, [exercisesObj, activeSet]);
-
-  // useEffect(() => {
-  //   if (isClickedOnActive) {
-  //     setStartCount(true);
-  //   }
-  // }, [isClickedOnActive]);
-
-  // const stopTimer = () => {
-  //   if (startTimer) {
-  //     setStartTimer(false);
-  //   }
-  // };
-
-  // const NextScreen = async () => {
-  //   let workoutId = 0;
-  //   allSessions &&
-  //     allSessions.query &&
-  //     allSessions.query.map(item => {
-  //       item.workouts.map(workout => {
-  //         if (workout.id === selectedSession[0].id) {
-  //           workoutId = item.id;
-  //         }
-  //       });
-  //     });
-  //   setLoadingSecond(true);
-  //   const newDate = moment(new Date()).format('YYYY-MM-DD');
-  //   props.getAllSessions(newDate);
-  //   let obj =
-  //     allSessions &&
-  //     allSessions.query &&
-  //     allSessions.query.find(session => session.id === workoutId);
-  //   setLoadingSecond(false);
-  //   stopTimer();
-  //   navigation.navigate('WorkoutCard', { item: obj.workouts, uppercard: route });
-  // };
-
-  // let countLength = exercisesObj?.sets?.length - 1;
+  const [active, setActive] = useState(0);
 
   const {
     row,
@@ -208,66 +70,6 @@ const ExerciseScreen = props => {
     tiny2xHPadding,
   } = Gutters;
 
-  // const onUpdate = async () => {
-  //   refRBSheetWeight.current.close();
-  //   activeSet?.id && setChangeColor(true);
-  //   setLoadingWeight(true);
-  //   await updateSetWeightAction(
-  //     individualSets ? individualSets.id : activeSet.id,
-  //     `${weight}${showModalWeightTwo ? '/' : ''}${showModalWeightThree ? '/' : ''}${weightTwo}${showModalWeightThree ? '/' : ''
-  //     }${weightThree}`
-  //   );
-  //   setActiveSet({
-  //     ...activeSet,
-  //     weight: `${weight}${showModalWeightTwo ? '/' : ''}${showModalWeightThree ? '/' : ''
-  //       }${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`,
-  //   });
-  //   setWeight('');
-  //   setWeightTwo('');
-  //   setWeightThree('');
-
-  //   const newDate = moment(new Date()).format('YYYY-MM-DD');
-  //   props.getAllSessions(newDate);
-  //   setLoadingWeight(false);
-  // };
-  // const onUpdateSets = async () => {
-  //   refRBSheet.current.close();
-  //   activeSet?.id && setChangeCol(true);
-  //   setLoadingReps(true);
-  //   await updateSetWeightActionReps(
-  //     individualSets ? individualSets.id : activeSet.id,
-  //     `${reps}${showModalRepsTwo ? '/' : ''}${showModalRepsThree ? '/' : ''}${repsTwo}${showModalRepsThree ? '/' : ''
-  //     }${repsThree}`
-  //   );
-  //   setActiveSet({
-  //     ...activeSet,
-  //     reps: `${reps}${showModalRepsTwo ? '/' : ''}${showModalRepsThree ? '/' : ''}${repsTwo}${showModalRepsThree ? '/' : ''
-  //       }${repsThree}`,
-  //   });
-  //   setReps('');
-  //   setRepsTwo('');
-  //   setRepsThree('');
-
-  //   const newDate = moment(new Date()).format('YYYY-MM-DD');
-  //   props.getAllSessions(newDate);
-  //   setLoadingReps(false);
-  // };
-
-  // const getIndividualData = async id => {
-  //   setLoadingReps(true);
-  //   setLoadingWeight(true);
-  //   if (activeSet.id && activeSet.done) {
-  //     setChangeCol(false);
-  //     setChangeColor(false);
-  //   } else {
-  //     setChangeCol(true);
-  //     setChangeColor(true);
-  //   }
-  //   await individualSetsDetails(id);
-  //   setLoadingReps(false);
-  //   setLoadingWeight(false);
-  // };
-
   const startSocial = { x: 0, y: 0 };
   const endSocial = { x: 1, y: 0 };
 
@@ -288,158 +90,110 @@ const ExerciseScreen = props => {
     );
   };
 
-  // const doneButtonAction = async item => {
-  //   findAndMarkAsDoneSetAction();
-  //   setSetsDone(setsDone + 1);
-  //   if (setsDone === item.sets.length - 1) {
-  //     markWorkoutDone(item.id);
-  //     setSetsDone(0);
-  //     setFreeToGoToNext(true);
-  //     setStartRest(true);
-  //     setShowBar(true);
-  //     const newDate = moment(new Date()).format('YYYY-MM-DD');
-  //     props.getAllSessions(newDate);
-  //   }
-  //   if (allDone) {
-  //     setFreeToGoToNext(!freeToGoToNext);
-  //   }
-  //   setStartRest(!startRest);
-  //   setShowBar(!showBar);
-  //   if (active && active.toLowerCase() === 'gs') {
-  //     setStartRest(false);
-  //     setShowBar(false);
-  //   }
-  //   if (active && active.toLowerCase() === 'ds') {
-  //     setStartRest(false);
-  //     setShowBar(false);
-  //   }
-  //   if (active && active.toLowerCase() === 'tds') {
-  //     setStartRest(false);
-  //     setShowBar(false);
-  //   }
-  // };
-
   return (
-    <SafeAreaView style={[fill]}>
-      <ScrollView contentContainerStyle={[fillGrow, secondaryBg]}>
-        <View style={[row, alignItemsCenter, justifyContentCenter, smallVMargin]}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftIconStyle}>
-            <Image style={styles.leftImageStyle} source={Images.backArrow} />
-          </TouchableOpacity>
-          <View style={[row, alignItemsCenter, styles.timerStyle]}>
-            <StaticTimer startTimer={startTimer} />
-          </View>
-          <View />
+    <SafeAreaView style={[fill, { backgroundColor: '#DBD7D2' }]}>
+      <View style={[row, alignItemsCenter, justifyContentCenter, smallVMargin, regularHMargin]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftIconStyle}>
+          <Image style={styles.leftImageStyle} source={Images.backArrow} />
+        </TouchableOpacity>
+        <View style={[row, alignItemsEnd, styles.timerStyle]}>
+          <StaticTimer startTimer={true} />
         </View>
-
-        <View style={fill}>
-
-          <View style={[row, alignItemsCenter, { backgroundColor: 'white', height: 60 }]}>
-
-            <ScrollView
-              horizontal
-              contentContainerStyle={fillGrow}
-              showsHorizontalScrollIndicator={false}
-              automaticallyAdjustContentInsets={false}
-            >
-
-              {[1, 2, 3, 4, 5, 6].map((item, i) => {
-                return (
-                  <>
-                    <TouchableOpacity
-                      style={[row, center, borderR10, height40, { minWidth: 100, marginHorizontal: 5, backgroundColor: 'pink' }]}
-                    >
-                      <View style={[center, row, fill, smallHPadding]}>
-                        <Text
-                          center
-                          regular
-                          color="quinary"
-                          ellipsizeMode="tail"
-                          numberOfLines={3}
-                          text={'name'}
-                        />
-                      </View>
-                    </TouchableOpacity>
-                    {/* <TouchableOpacity
-                    style={[borderR10, height40, { minWidth: 100, marginLeft: 10, backgroundColor: 'red', position: 'absolute', top: -20, zIndex: 999 }]}
-                  >
-                    <View style={[center, row, fill, smallHPadding]}>
-                      <Text
-                        center
-                        regular
-                        color="quinary"
-                        ellipsizeMode="tail"
-                        numberOfLines={3}
-                        text={'name'}
-                      />
-                    </View>
-                  </TouchableOpacity> */}
-                  </>
-                )
-              })}
-
-
-            </ScrollView>
+        <View />
+      </View>
+      <View style={[row, center, secondaryBg]}>
+        <ScrollView
+          horizontal
+          contentContainerStyle={[
+            fillGrow,
+            alignItemsEnd,
+            { height: 70, backgroundColor: '#DBD7D2' }
+          ]}
+          showsHorizontalScrollIndicator={false}
+          automaticallyAdjustContentInsets={false}
+        >
+          <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
+            {[1, 2, 3, 4, 5].map((item, i) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => setActive(i)}
+                  style={[
+                    row,
+                    center,
+                    {
+                      minWidth: 100,
+                      height: active === i ? 75 : 50,
+                      borderRadius: active === i ? 8 : 10,
+                      marginHorizontal: active === i ? 0 : 2,
+                      backgroundColor: active === i ? "white" : '#DBD7D2'
+                    }
+                  ]}
+                >
+                  <View style={[center, row, fill, smallHPadding]}>
+                    <Text
+                      center
+                      regular
+                      color="quinary"
+                      ellipsizeMode="tail"
+                      numberOfLines={3}
+                      text={'name'}
+                    />
+                  </View>
+                </TouchableOpacity>
+              )
+            })}
           </View>
-          {/*===============================================*/}
-          <View style={[fill, row, center, { backgroundColor: 'pink' }]}>
-            <VideoExercise
-              videoUrl={{
-                uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
-              }}
-              onLoadStart={() => setVideoLoader(true)}
-              onLoad={() => setVideoLoader(false)}
-              style={{ backgroundColor: 'red', weight: '100%', height: '100%' }}
-            />
-          </View>
-          <View style={[center, { height: 60, backgroundColor: 'blue' }]}>
-            <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} />
-          </View>
+        </ScrollView>
+      </View>
+      <View style={[row, center, secondaryBg]}>
+        <VideoExercise
+          videoUrl={{
+            uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
+          }}
+          onLoadStart={() => setVideoLoader(true)}
+          onLoad={() => setVideoLoader(false)}
+        />
+      </View>
 
-          <View style={[row, alignItemsCenter, { height: 60, backgroundColor: 'yellow' }]}>
-            <ScrollView
-              horizontal
-              contentContainerStyle={fillGrow}
-              showsHorizontalScrollIndicator={false}
-              automaticallyAdjustContentInsets={false}
-            >
-              {[1, 2, 3, 4].map((item, i) => {
-                return (
-                  <>
-                    <TouchableOpacity style={height40}>
-                      <SetButton />
-                    </TouchableOpacity>
-                  </>
-                )
-              })}
-            </ScrollView>
-          </View>
+      {false && (
+        <View style={[center, secondaryBg, { height: 60 }]}>
+          <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} />
+        </View>
+      )}
 
+      <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
+        <ScrollView
+          horizontal
+          contentContainerStyle={fillGrow}
+          showsHorizontalScrollIndicator={false}
+          automaticallyAdjustContentInsets={false}
+        >
+          {[1, 2, 3, 4].map((item, i) => {
+            return (
+              <TouchableOpacity style={height40} key={i}>
+                <SetButton />
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      </View>
 
-          <View style={[row, tinyHPadding, styles.buttonWrapper]}>
-            <FatExerciseButton
-              buttonLabel="Reps"
-              onClick={() => refRBSheet.current.open()}
-              changeCol={changeCol}
-            />
-            <FatExerciseButtonWeight
-              buttonLabel="Weight"
-              onClick={() => refRBSheetWeight.current.open()}
-              changeColor={changeColor}
-            />
+      <View style={[fill, secondaryBg]}>
+        <ScrollView contentContainerStyle={[fillGrow]}>
+          <View style={[row, tinyHPadding]}>
+            <FatExerciseButton buttonLabel="Reps" reps />
+            <FatExerciseButton buttonLabel="Weight" weight />
           </View>
 
-          <View style={[fullWidth, row, tinyHPadding, styles.buttonWrapper]}>
+          <View style={[row, tinyHPadding]}>
             <FatExerciseIconButton
               buttonText="Exercise Description"
-              onClick={() => refRBSheetDescription.current.open()}
               buttonIcon={Images.detailIcon}
             />
             <FatExerciseIconButton
               buttonText="Swap Exercise"
               buttonIcon={Images.iconSwap}
             />
-
             <FatGradientIconButton
               buttonText={
                 true
@@ -452,235 +206,8 @@ const ExerciseScreen = props => {
             />
           </View>
           <RestContainer upNext={'next'} showBar={true} />
-          {/*===============================================*/}
-        </View>
-      </ScrollView>
-      {/*===============================================*/}
-      <BottomSheet reff={refRBSheetWeight} h={360}>
-        <KeyboardAvoidingView
-          behavior="padding"
-          enabled
-          style={[fill, { width: '100%', marginTop: 20 }]}
-        >
-          <View style={[fill, zeroMargin, zeroPadding]}>
-            <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-              <View style={[fill, row, regularHMargin, justifyContentBetween, { minHeight: 60 }]}>
-                <View style={[alignItemsCenter, fill, height40, row]}>
-                  <Text text="Round One" color="septenary" bold center medium />
-                </View>
-
-                <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                  <Input
-                    inputStyle={border}
-                    value={weight}
-                    onChangeText={val => setWeight(val)}
-                    placeholder="Enter Weight"
-                    autoCapitalize="none"
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-            {showModalWeightTwo && (
-              <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                <View style={[fill, row, regularHMargin, justifyContentBetween, { minHeight: 60 }]}>
-                  <View style={[alignItemsCenter, fill, height40, row]}>
-                    <Text text="Round Two" color="septenary" bold center medium />
-                  </View>
-                  <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                    <Input
-                      inputStyle={border}
-                      value={weightTwo}
-                      onChangeText={val => setWeightTwo(val)}
-                      placeholder="Enter Weight"
-                      autoCapitalize="none"
-                      keyboardType="numeric"
-                    />
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-            {showModalWeightThree && (
-              <>
-                <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                  <View style={[fill, row, regularHMargin, justifyContentBetween, { minHeight: 60 }]}>
-                    <View style={[alignItemsCenter, fill, height40, row]}>
-                      <Text text="Round Two" color="septenary" bold center medium />
-                    </View>
-                    <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                      <Input
-                        inputStyle={border}
-                        value={weightTwo}
-                        onChangeText={val => setWeightTwo(val)}
-                        placeholder="Enter Weight"
-                        autoCapitalize="none"
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                  <View style={[fill, row, regularHMargin, justifyContentBetween, { minHeight: 60 }]}>
-                    <View style={[alignItemsCenter, fill, height40, row]}>
-                      <Text text="Round Three" color="septenary" bold center medium />
-                    </View>
-                    <View style={[row, fill, border, center, height40, styles.inputModalStyle]}>
-                      <Input
-                        inputStyle={border}
-                        value={weightThree}
-                        onChangeText={val => setWeightThree(val)}
-                        placeholder="Enter Weight"
-                        autoCapitalize="none"
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-              </>
-            )}
-          </View>
-          <View style={[row, regularVMargin]}>
-            <Button
-              color="primary"
-              // onPress={onUpdate}
-              text="Update"
-              style={[regularHMargin, fill, height40, center]}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </BottomSheet>
-
-      {/*===============================================*/}
-      <BottomSheet reff={refRBSheet} h={360}>
-        <KeyboardAvoidingView
-          behavior="padding"
-          enabled
-          style={[fill, { width: '100%', marginTop: 20 }]}
-        >
-          <View style={[fill, zeroMargin, zeroPadding]}>
-            <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-              <View
-                style={[
-                  fill,
-                  row,
-                  regularHMargin,
-                  // alignItemsCenter,
-                  justifyContentBetween,
-                  { minHeight: 60 },
-                ]}
-              >
-                <View style={[alignItemsCenter, fill, height40, row]}>
-                  <Text text="Round One" color="septenary" bold center medium />
-                </View>
-
-                <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                  <Input
-                    inputStyle={border}
-                    value={reps}
-                    onChangeText={val => setReps(val)}
-                    placeholder="Enter Reps"
-                    autoCapitalize="none"
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-            {showModalRepsTwo && (
-              <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                <View
-                  style={[
-                    fill,
-                    row,
-                    regularHMargin,
-                    // alignItemsCenter,
-                    justifyContentBetween,
-                    { minHeight: 60 },
-                  ]}
-                >
-                  <View style={[alignItemsCenter, fill, height40, row]}>
-                    <Text text="Round Two" color="septenary" bold center medium />
-                  </View>
-                  <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                    <Input
-                      inputStyle={border}
-                      value={repsTwo}
-                      onChangeText={val => setRepsTwo(val)}
-                      placeholder="Enter Reps"
-                      autoCapitalize="none"
-                      keyboardType="numeric"
-                    />
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-            {showModalRepsThree && (
-              <>
-                <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                  <View
-                    style={[
-                      fill,
-                      row,
-                      regularHMargin,
-                      // alignItemsCenter,
-                      justifyContentBetween,
-                      { minHeight: 60 },
-                    ]}
-                  >
-                    <View style={[alignItemsCenter, fill, height40, row]}>
-                      <Text text="Round Two" color="septenary" bold center medium />
-                    </View>
-                    <View style={[border, row, center, fill, height40, styles.inputModalStyle]}>
-                      <Input
-                        inputStyle={border}
-                        value={repsTwo}
-                        onChangeText={val => setRepsTwo(val)}
-                        placeholder="Enter Reps"
-                        autoCapitalize="none"
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback style={fill} onPress={() => Keyboard.dismiss()}>
-                  <View
-                    style={[
-                      fill,
-                      row,
-                      regularHMargin,
-                      // alignItemsCenter,
-                      justifyContentBetween,
-                      { minHeight: 60 },
-                    ]}
-                  >
-                    <View style={[alignItemsCenter, fill, height40, row]}>
-                      <Text text="Round Three" color="septenary" bold center medium />
-                    </View>
-                    <View style={[row, fill, border, center, height40, styles.inputModalStyle]}>
-                      <Input
-                        inputStyle={border}
-                        value={repsThree}
-                        onChangeText={val => setRepsThree(val)}
-                        placeholder="Enter Reps"
-                        autoCapitalize="none"
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-              </>
-            )}
-          </View>
-          <View style={[row, regularVMargin]}>
-            <Button
-              color="primary"
-              text="Update"
-              style={[regularHMargin, fill, height40, center]}
-
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </BottomSheet>
-
+        </ScrollView>
+      </View>
       {/*===============================================*/}
       <BottomSheet reff={refRBSheetDescription} h={400}>
         <KeyboardAvoidingView
@@ -693,151 +220,7 @@ const ExerciseScreen = props => {
           </View>
         </KeyboardAvoidingView>
       </BottomSheet>
-
       {/*===============================================*/}
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={openModal}
-        onBackButtonPress={() => setOpenModal(!openModal)}
-        style={[fill, zeroMargin, halfOpacityBg]}
-      >
-        <TouchableOpacity style={fillHalf} onPress={() => setOpenModal(!openModal)} />
-        <View
-          style={[justifyContentStart, alignItemsCenter, secondaryBg, topLRBorderRadius20, fill4x]}
-        >
-          <View style={[regularVMargin, styles.lineStyle]} />
-          <View style={[row, center]}>
-            {/* <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} /> */}
-          </View>
-          <View style={[regularHMargin, regularVMargin]}>
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Perform two consecutive exercises with no rest in between.'}
-            />
-
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Begin rest when second exercise is Complete.'}
-            />
-          </View>
-          <View style={[regularHMargin, regularVMargin]}>
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Perform three consecutive exercises with no rest in between.'}
-            />
-
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Begin rest when the third exercise is complete.'}
-            />
-          </View>
-
-
-          <View style={[regularHMargin, regularVMargin]}>
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={
-                'Perform a round of the exercise with a certain weight, then reduce the weight to complete another round for more reps without resting immediately after. '
-              }
-            />
-
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Once both rounds of reps are complete, then begin your rest.'}
-            />
-          </View>
-
-
-          <View style={[regularHMargin, regularVMargin]}>
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={
-                'Perform a round of the exercise with a certain weight, then reduce the weight to complete another round for more reps, then complete a third round without resting immediately after. '
-              }
-            />
-
-            <Text
-              style={smallVMargin}
-              medium
-              color="septenary"
-              text={'Once all three rounds of reps are complete, then begin your rest.'}
-            />
-          </View>
-
-
-          <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
-
-            <View style={justifyContentCenter}>
-              <View style={[row, fill, regularVMargin]}>
-                <Text
-                  regularTitle
-                  color="quinary"
-                  text='name'
-                />
-              </View>
-              <View style={center}>
-                <Image
-                  source={{
-                    uri: ''
-                  }}
-                  style={styles.modalImageStyle}
-                />
-              </View>
-            </View>
-            <View style={[row, fill, regularVMargin]}>
-              <Text
-                regularTitle
-                color="quinary"
-                text={`1. ${'exercise.name'}`}
-              />
-            </View>
-            <View style={center}>
-              <Image
-                source={{
-                  uri: ''
-                }}
-                style={styles.modalImageStyle}
-              />
-            </View>
-
-            <View style={[fill, row, center, regularVMargin]}>
-              <View style={fillOnePoint5} />
-              <LinearGradient
-                start={startSocial}
-                end={endSocial}
-                colors={['#fa201b', '#fe5b06']}
-                style={[fill2x, punchBg, center, row, borderR10, height40, tiny2xHPadding]}
-              >
-                <Text
-                  large
-                  color="secondary"
-                  bold
-                  text="Got it"
-                  onPress={() => setOpenModal(!openModal)}
-                />
-              </LinearGradient>
-              <View style={fillOnePoint5} />
-            </View>
-          </ScrollView>
-        </View>
-      </Modal>
-      {/*===============================================*/}
-
     </SafeAreaView>
   );
 };
@@ -866,8 +249,6 @@ const styles = StyleSheet.create({
   modalButton: { height: 50 },
   inputStyle: { height: 50, backgroundColor: '#f5f5f5' },
   modalCrossIcon: { margin: 10 },
-  buttonWrapper: {
-  },
   modalImageStyle: {
     borderRadius: 20,
     width: 170,
@@ -875,10 +256,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   leftIconStyle: {
-    left: 20,
+    left: 0,
     zIndex: 22,
-    top: 0,
+    top: '13%',
     position: 'absolute',
+
   },
   leftImageStyle: { width: 30, height: 30, resizeMode: 'contain' },
   timerStyle: { height: 30 },
