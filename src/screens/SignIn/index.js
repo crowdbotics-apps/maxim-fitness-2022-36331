@@ -18,6 +18,8 @@ import {Images} from 'src/theme';
 import {connect} from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
+import { useIsFocused } from '@react-navigation/native';
+
 //actions
 import {loginUser, googleLoginUser, facebookLoginUser} from '../../ScreenRedux/loginRedux';
 import appleAuth, {AppleButton} from '@invertase/react-native-apple-authentication';
@@ -48,7 +50,7 @@ const SignIn = props => {
     }
   }
 
-  const {state, handleOnChange, disable} = useForm(stateSchema, validationStateSchema)
+  const {state, handleOnChange, disable, setState} = useForm(stateSchema, validationStateSchema)
 
   const OnLogInPress = () => {
     let loginData = {
@@ -157,6 +159,12 @@ const SignIn = props => {
       }
     }
   }
+  const isFocused = useIsFocused();
+  useEffect(()=>{
+    if(isFocused){
+      setState(stateSchema)
+    }
+  },[isFocused])
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
@@ -243,6 +251,7 @@ const SignIn = props => {
           <View style={{marginHorizontal: 3}}>
             <TextInput
               keyboardType="email-address"
+              value={state.email.value}
               onChangeText={value => handleOnChange('email', value)}
               style={[styles.inputStyle, {marginTop: 9}]}
               placeholder="Email"
@@ -250,6 +259,7 @@ const SignIn = props => {
             <Text style={{color: 'red'}}>{state.email.error}</Text>
             <TextInput
               secureTextEntry={true}
+              value={state.password.value}
               onChangeText={value => handleOnChange('password', value)}
               style={[styles.inputStyle, {marginTop: 18}]}
               placeholder="Password"
