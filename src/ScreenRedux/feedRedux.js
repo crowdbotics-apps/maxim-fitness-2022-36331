@@ -1,8 +1,8 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
-import {API_URL} from '../config/app';
+import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -120,13 +120,13 @@ async function getFeedAPI(data) {
   return XHR(URL, options)
 }
 
-function* getFeeds({data}) {
+function* getFeeds({ data }) {
   try {
     const response = yield call(getFeedAPI, data)
     console.log('FEEDS RESPONSE: ', response);
     yield put(getFeedsSuccess(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('FEEDS ERROR: ', e);
     yield put(getFeedsFailure(e))
   }
@@ -145,7 +145,7 @@ async function postLikeAPI(feedId) {
   return XHR(URL, options);
 }
 
-function* postLike({data}) {
+function* postLike({ data }) {
   let feedId = data.feedId;
   try {
     const response = yield call(postLikeAPI, feedId);

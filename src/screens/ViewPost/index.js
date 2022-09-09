@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -13,38 +13,48 @@ import {
   Pressable,
 } from 'react-native';
 import moment from 'moment';
-import {Text, Loader} from 'src/components';
-import {Images, Layout, Global, Gutters, Colors} from 'src/theme';
-import {calculatePostTime} from 'src/utils/functions';
-import {Icon} from 'native-base';
-import {connect} from 'react-redux';
+import { Text, Loader } from 'src/components';
+import { Images, Layout, Global, Gutters, Colors } from 'src/theme';
+import { calculatePostTime } from 'src/utils/functions';
+import { Icon } from 'native-base';
+import { connect } from 'react-redux';
+import { SliderBox } from 'react-native-image-slider-box';
 //action
-import {getPost, addComment, replyComment, likeComment} from '../../ScreenRedux/viewPostRedux';
-
+import { getPost, addComment, replyComment, likeComment } from '../../ScreenRedux/viewPostRedux';
+import { postLikeRequest } from '../../ScreenRedux/feedRedux'
 import Share from 'react-native-share';
 
 const ViewPost = props => {
   const {
-    navigation: {goBack},
+    navigation: { goBack },
     route,
     requesting,
     postData,
+    feeds,
   } = props;
-  const {circleClose} = Images;
+  const { circleClose } = Images;
   const [commentData, setCommentData] = useState(false);
   const [postComments, setPostComments] = useState([]);
   const [newCommentData, setNewCommentData] = useState(false);
   const [subCommentData, setSubCommentData] = useState(false);
   const [showCancelOption, setCancelOption] = useState(false)
   const [focusreply, setFocusReply] = useState(false);
+  const [param, setParam] = useState([]);
+  const [feedsState, setFeedsState] = useState([]);
 
   const inputRef = useRef();
 
   useEffect(() => {
-    if (route?.params?.id) {
-      props.getPost(route?.params?.id);
+    if (route?.params) {
+      setParam(route.params);
     }
-  }, [route?.params?.id]);
+  }, [route]);
+
+  useEffect(() => {
+    if (param?.id) {
+      props.getPost(param?.id);
+    }
+  }, [param?.id]);
 
 
   useEffect(() => {
@@ -62,46 +72,46 @@ const ViewPost = props => {
       };
       setPostComments([data, ...postComments]);
     }
-    else if(subCommentData) {
+    else if (subCommentData) {
       let data = [
         postData &&
-          postData?.comments?.length &&
-          postData.comments.map(item => ({
-            image: Images.profile,
-            text: item.content,
-            userName: item.user.username,
-            id: item.id,
-            userId: item.user.id,
-            liked: item.liked,
-            likes: item.likes,
-            created_at: item.created,
-            subComment:
-              subCommentData && subCommentData.comment === item.id
-                ? item.sub_comment.length
-                  ? [...item.sub_comment, subCommentData]
-                  : [subCommentData]
-                : item.sub_comment.length
+        postData?.comments?.length &&
+        postData.comments.map(item => ({
+          image: Images.profile,
+          text: item.content,
+          userName: item.user.username,
+          id: item.id,
+          userId: item.user.id,
+          liked: item.liked,
+          likes: item.likes,
+          created_at: item.created,
+          subComment:
+            subCommentData && subCommentData.comment === item.id
+              ? item.sub_comment.length
+                ? [...item.sub_comment, subCommentData]
+                : [subCommentData]
+              : item.sub_comment.length
                 ? item.sub_comment
                 : [],
-          })),
+        })),
       ];
       setPostComments(data[0]);
     }
     else if (postData && postData?.comments?.length) {
       let data = [
         postData &&
-          postData?.comments?.length &&
-          postData.comments.map(item => ({
-            image: Images.profile,
-            text: item.content,
-            userName: item.user.username,
-            id: item.id,
-            userId: item.user.id,
-            liked: item.liked,
-            likes: item.likes,
-            created_at: item.created,
-            subComment: item.sub_comment.length ? item.sub_comment : [],
-          })),
+        postData?.comments?.length &&
+        postData.comments.map(item => ({
+          image: Images.profile,
+          text: item.content,
+          userName: item.user.username,
+          id: item.id,
+          userId: item.user.id,
+          liked: item.liked,
+          likes: item.likes,
+          created_at: item.created,
+          subComment: item.sub_comment.length ? item.sub_comment : [],
+        })),
       ];
       setPostComments(data[0]);
     }
@@ -120,7 +130,7 @@ const ViewPost = props => {
     } else {
       const apiData = {
         comment: commentData,
-        id: route?.params?.id,
+        id: param?.id
       };
       setCommentData(false);
       props.addComment(apiData, setNewCommentData);
@@ -181,10 +191,10 @@ const ViewPost = props => {
   };
 
   const sharePost = async () => {
-    const data = {message: 'hello'};
+    const data = { message: 'hello' };
     await Share.open(data)
-      .then(res => {})
-      .catch(err => {});
+      .then(res => { })
+      .catch(err => { });
   };
 
   const likeSubComment = item => {
@@ -200,7 +210,7 @@ const ViewPost = props => {
     return (
       <View style={styles.cardHeader}>
         <Image source={Images.profile} style={styles.profileImg} />
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <View style={styles.profileSection}>
             <Text text={postData?.user?.username} style={styles.nameText} />
             <Text text={calculatePostTime(postData)} style={styles.timeText} />
@@ -212,8 +222,36 @@ const ViewPost = props => {
     );
   };
 
+  let deviceWidth = Dimensions.get('window').width
+
+  const addLikeAction = () => {
+    let feedId = param?.id
+    likeFilter(feedId)
+    const callBack = status => {
+      console.log('status: ', status)
+    }
+
+    const data = { feedId, callBack }
+    props.postLikeRequest(data)
+  }
+
+  const likeFilter = postId => {
+    const updatedFeeds = [...feeds.results];
+    const index = updatedFeeds.findIndex(item => item.id === postId);
+    const objToUpdate = updatedFeeds[index];
+    if (param.liked) {
+      param.liked = !param.liked;
+      param.likes = param.likes - 1;
+    } else {
+      param.liked = !param.liked;
+      param.likes = param.likes + 1;
+    }
+    updatedFeeds[index] = objToUpdate || param;
+    setFeedsState(updatedFeeds);
+  };
+
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <Loader isLoading={requesting} />
       <ScrollView contentContainerStyle={styles.mainContainer}>
         <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
@@ -222,17 +260,36 @@ const ViewPost = props => {
         <View style={styles.profileStyle}>
           <ProfileHeader />
           <View style={styles.feedImageContainer}>
-            <Image source={Images.foodImage} style={styles.foodImageStyle} />
+            <View style={styles.cardBody}>
+              <SliderBox
+                images={
+                  param?.post_image_video?.length > 0
+                    ? param?.post_image_video?.map(item => item.image)
+                    : []
+                }
+                style={styles.foodImageStyle}
+                sliderBoxHeight={260}
+                parentWidth={deviceWidth - 60}
+                dotColor="#D4D4D4"
+                inactiveDotColor="#D4D4D4"
+                dotStyle={styles.sliderBoxStyle}
+                paginationBoxVerticalPadding={20}
+              />
+            </View>
+            {/* <Image source={Images.foodImage} style={styles.foodImageStyle} /> */}
           </View>
           <View style={styles.cardSocials}>
             <View style={styles.socialIcons}>
               <Image source={Images.messageIcon} style={styles.msgIconStyle} />
               <Text text={postComments?.length} style={styles.timeText} />
             </View>
-            <View style={styles.socialIcons}>
-              <Image source={Images.heartIcon} style={styles.likeImageStyle} />
-              <Text text={postData?.likes?.toString()} style={styles.timeText} />
-            </View>
+            <Pressable style={styles.socialIcons} onPress={addLikeAction}>
+              <Image source={Images.heartIcon}
+                style={[styles.likeImageStyle, { tintColor: param.liked ? 'red' : 'black' }]}
+                tintColor={param.liked ? 'red' : 'black'}
+              />
+              <Text text={param.likes ? param.likes : ''} style={styles.timeText} />
+            </Pressable>
             <View style={styles.socialIcons}>
               <Pressable onPress={() => sharePost()}>
                 <Image source={Images.shareIcon} style={styles.shareImageStyle} />
@@ -242,7 +299,7 @@ const ViewPost = props => {
         </View>
         {postComments.map((comment, i) => {
           return (
-            <View key={i} style={{paddingHorizontal: 10}}>
+            <View key={i} style={{ paddingHorizontal: 10 }}>
               <View style={styles.commentStyle}>
                 <View style={styles.commentSection}>
                   <Image source={Images.profile} style={styles.profileImg} />
@@ -269,7 +326,8 @@ const ViewPost = props => {
                         <TouchableOpacity onPress={() => likeComment(comment)}>
                           <Image
                             source={Images.heartIcon}
-                            style={[styles.comImage, {tintColor: comment.liked ? 'red' : 'black'}]}
+                            style={[styles.comImage, { tintColor: comment.liked ? 'red' : 'black' }]}
+                            tintColor={comment.liked ? 'red' : 'black'}
                           />
                         </TouchableOpacity>
                       </View>
@@ -335,20 +393,20 @@ const ViewPost = props => {
         })}
       </ScrollView>
       {showCancelOption &&
-      <TouchableOpacity style={{backgroundColor: 'white', paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between'}} onPress={()=> setCancelOption(false)}>
-      <Text style={{fontWeight: '700'}}>reply to {focusreply && focusreply.name}</Text>
-      <Text style={{fontWeight: '700'}}>Cancel</Text>
-      </TouchableOpacity>}
-      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={{ backgroundColor: 'white', paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }} onPress={() => setCancelOption(false)}>
+          <Text style={{ fontWeight: '700' }}>reply to {focusreply && focusreply.name}</Text>
+          <Text style={{ fontWeight: '700' }}>Cancel</Text>
+        </TouchableOpacity>}
+      <View style={{ flexDirection: 'row' }}>
         <TextInput
           placeholder="Write a comment"
           value={commentData}
           onChangeText={value => setCommentData(value)}
-          style={{paddingHorizontal: 20, width: '90%'}}
+          style={{ paddingHorizontal: 20, width: '90%' }}
           ref={inputRef}
         />
-        <TouchableOpacity style={{justifyContent: 'center'}} onPress={() => {commentData && addAComment()}}>
-          <Image source={Images.sendMessage} style={{height: 30, width: 30}} />
+        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { commentData && addAComment() }}>
+          <Image source={Images.sendMessage} style={{ height: 30, width: 30 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -430,16 +488,16 @@ const styles = StyleSheet.create({
     height: 22,
     resizeMode: 'contain',
   },
-  foodImageStyle: {width: '100%', height: 260},
-  bottomTextStyle: {flexDirection: 'row', flex: 1, paddingHorizontal: 15},
-  leftArrow: {width: '100%', paddingHorizontal: 15},
-  backArrowStyle: {width: 30, height: 40, resizeMode: 'contain'},
-  iconWrapper: {fontSize: 10},
+  foodImageStyle: { width: '100%', height: 260 },
+  bottomTextStyle: { flexDirection: 'row', flex: 1, paddingHorizontal: 15 },
+  leftArrow: { width: '100%', paddingHorizontal: 15 },
+  backArrowStyle: { width: 30, height: 40, resizeMode: 'contain' },
+  iconWrapper: { fontSize: 10 },
 
-  commentStyle: {flex: 1, marginTop: 20},
-  subCommentStyle: {flex: 1, flexDirection: 'row'},
-  subCom: {flex: 0.5},
-  subCom1: {flex: 4, marginTop: 10},
+  commentStyle: { flex: 1, marginTop: 20 },
+  subCommentStyle: { flex: 1, flexDirection: 'row' },
+  subCom: { flex: 0.5 },
+  subCom1: { flex: 4, marginTop: 10 },
   commentBodyText: {
     flex: 1,
     paddingBottom: 15,
@@ -471,7 +529,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  commentHeading: {flexDirection: 'row'},
+  commentHeading: { flexDirection: 'row' },
   commentSecond: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -502,12 +560,27 @@ const styles = StyleSheet.create({
     height: 22,
     resizeMode: 'contain',
   },
+  cardBody: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+    borderRadius: 15
+  },
+  foodImageStyle: {
+    width: '100%',
+    height: 260,
+    alignSelf: 'center',
+    borderRadius: 15
+  },
 });
 
 const mapStateToProps = state => ({
   requesting: state.postReducer.requesting,
   postData: state.postReducer.postData,
   userDetail: state.login.userDetail,
+  feeds: state.feedsReducer.feeds,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -515,5 +588,6 @@ const mapDispatchToProps = dispatch => ({
   addComment: (data, setNewCommentData) => dispatch(addComment(data, setNewCommentData)),
   replyComment: (data, setSubCommentData) => dispatch(replyComment(data, setSubCommentData)),
   likeComment: data => dispatch(likeComment(data)),
+  postLikeRequest: data => dispatch(postLikeRequest(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ViewPost);
