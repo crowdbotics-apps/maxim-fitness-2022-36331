@@ -121,7 +121,7 @@ class RestSocialLoginSerializer(SocialLoginSerializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password', "is_staff", "is_superuser")
+        fields = ('id', 'name', 'email', 'password')
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -157,9 +157,7 @@ class SignupSerializer(serializers.ModelSerializer):
                 validated_data.get('name'),
                 validated_data.get('email'),
                 'user'
-            ]),
-            is_staff=validated_data.get('is_staff'),
-            is_superuser=validated_data.get('is_superuser'),
+            ])
 
         )
         user.set_password(validated_data.get('password'))
