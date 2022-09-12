@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 // components
 import { View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Content, Icon } from 'native-base'
-import { Text, Button } from '../../components'
+import { Text, Button, Loader } from '../../components'
 import Card from './component/Card'
 import Card1 from './component/Card1'
 import Card2 from './component/Card2'
@@ -66,6 +66,8 @@ const SubscriptionScreen = props => {
         <Image source={Images.backArrow} style={styles.backArrowStyle} />
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
+      <Loader isLoading={props.requesting} />
+
         <TouchableOpacity onPress={() => setCurentTab(0)} style={[center, alignItemsCenter, fill]}>
           <Text text="Diet" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
@@ -202,6 +204,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
   customerId: state.subscriptionReducer.getCISuccess,
+  requesting: state.subscriptionReducer.requesting,
   // subscription: state.subscription.subscription,
 });
 

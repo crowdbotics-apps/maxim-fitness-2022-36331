@@ -22,7 +22,7 @@ import validator from '../../utils/validation';
 
 //action
 import {AddPostData} from '../../ScreenRedux/addPostRequest';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 const {closeIcon, colorAddIcon, circleClose} = Images;
 const AddPost = props => {
@@ -33,35 +33,56 @@ const AddPost = props => {
   const [content, setContent] = useState(false);
   const isFocused = useIsFocused();
 
-  useEffect(()=>{
-    if(isFocused){
-      setImageData([])
-    setShowPost(false)
-    setContent(false)
+  useEffect(() => {
+    if (isFocused) {
+      setImageData([]);
+      setShowPost(false);
+      setContent(false);
     }
-  },[isFocused])
+  }, [isFocused]);
+
+  const aa = () => {
+    let formData = new FormData();
+    formData.append('content', content);
+     imageData.map((item, index) => {
+      if(item.mime === 'video/mp4'){
+        formData.append('video', {
+          uri: item.path,
+          type: item.mime,
+          name: item.path,
+        });
+      }
+      else{
+        formData.append('image', {
+          uri: item.path,
+          type: item.mime,
+          name: item.path,
+        });
+      }
+    });
+    return formData
+  };
 
   const addData = () => {
     const formData = new FormData();
     formData.append('content', content);
 
     if (imageData.length) {
-      imageData.map((item) =>
-         item.mime === 'video/mp4' ? 
-        formData.append('video', {
-          uri: item.path,
-          type: item.mime,
-          name: item.path,
-        })
-        :
-        formData.append("image", {
-          uri: item.path,
-          type: item.mime,
-          name: item.path,
-        })
+      imageData.map((item, index) =>
+        item.mime === 'video/mp4'
+          ? formData.append('video', {
+              uri: item.path,
+              type: item.mime,
+              name: item.path,
+            })
+          : formData.append(`image ${index}`, {
+              uri: item.path,
+              type: item.mime,
+              name: item.path,
+            })
       );
     }
-    props.AddPostData(formData)
+    props.AddPostData(aa())
   };
 
   const onChangePostImage = () => {
@@ -190,7 +211,7 @@ const AddPost = props => {
               textAlign: 'center',
             }}
           >
-          {props.requesting ? <ActivityIndicator size="small" color="#000" /> : "Post"}
+            {props.requesting ? <ActivityIndicator size="small" color="#000" /> : 'Post'}
           </Text>
         </TouchableOpacity>
       </View>

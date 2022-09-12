@@ -52,47 +52,69 @@ const ViewPost = props => {
   }, [param?.id]);
 
 
+  // useEffect(() => {
+  //   if (newCommentData && !subCommentData) {
+  //     let data = {
+  //       image: Images.profile,
+  //       text: newCommentData.content,
+  //       userName: newCommentData.user.username,
+  //       id: newCommentData.id,
+  //       userId: newCommentData.user.id,
+  //       liked: newCommentData.liked,
+  //       likes: newCommentData.likes,setNewCommentData
+  //       created_at: newCommentData.created,
+  //       subComment: newCommentData.sub_comment.length ? newCommentData.sub_comment : [],
+  //     };
+  //     setPostComments([data, ...postComments]);
+  //   }
+  //   else if (subCommentData) {
+  //     let data = [
+  //       postData &&
+  //       postData?.comments?.length &&
+  //       postData.comments.map(item => ({
+  //         image: Images.profile,
+  //         text: item.content,
+  //         userName: item.user.username,
+  //         id: item.id,
+  //         userId: item.user.id,
+  //         liked: item.liked,
+  //         likes: item.likes,
+  //         created_at: item.created,
+  //         subComment:
+  //           subCommentData && subCommentData.comment === item.id
+  //             ? item.sub_comment.length
+  //               ? [...item.sub_comment, subCommentData]
+  //               : [subCommentData]
+  //             : item.sub_comment.length
+  //               ? item.sub_comment
+  //               : [],
+  //       })),
+  //     ];
+  //     setPostComments(data[0]);
+  //   }
+  //   else if (postData && postData?.comments?.length) {
+  //     let data = [
+  //       postData &&
+  //       postData?.comments?.length &&
+  //       postData.comments.map(item => ({
+  //         image: Images.profile,
+  //         text: item.content,
+  //         userName: item.user.username,
+  //         id: item.id,
+  //         userId: item.user.id,
+  //         liked: item.liked,
+  //         likes: item.likes,
+  //         created_at: item.created,
+  //         subComment: item.sub_comment.length ? item.sub_comment : [],
+  //       })),
+  //     ];
+  //     setPostComments(data[0]);
+  //   }
+  // }, [subCommentData, postData?.comments, newCommentData]);
+
+
   useEffect(() => {
-    if (newCommentData && !subCommentData) {
-      let data = {
-        image: Images.profile,
-        text: newCommentData.content,
-        userName: newCommentData.user.username,
-        id: newCommentData.id,
-        userId: newCommentData.user.id,
-        liked: newCommentData.liked,
-        likes: newCommentData.likes,
-        created_at: newCommentData.created,
-        subComment: newCommentData.sub_comment.length ? newCommentData.sub_comment : [],
-      };
-      setPostComments([data, ...postComments]);
-    }
-    else if (subCommentData) {
-      let data = [
-        postData &&
-        postData?.comments?.length &&
-        postData.comments.map(item => ({
-          image: Images.profile,
-          text: item.content,
-          userName: item.user.username,
-          id: item.id,
-          userId: item.user.id,
-          liked: item.liked,
-          likes: item.likes,
-          created_at: item.created,
-          subComment:
-            subCommentData && subCommentData.comment === item.id
-              ? item.sub_comment.length
-                ? [...item.sub_comment, subCommentData]
-                : [subCommentData]
-              : item.sub_comment.length
-                ? item.sub_comment
-                : [],
-        })),
-      ];
-      setPostComments(data[0]);
-    }
-    else if (postData && postData?.comments?.length) {
+    if (postData && postData?.comments?.length) {
       let data = [
         postData &&
         postData?.comments?.length &&
@@ -110,7 +132,14 @@ const ViewPost = props => {
       ];
       setPostComments(data[0]);
     }
-  }, [subCommentData, postData?.comments, newCommentData]);
+  }, [postData?.comments]);
+
+  const callBack =(status)=>{
+    if(status){
+      setCommentData(false);
+    }
+  }
+
 
   const addAComment = () => {
     if (showCancelOption) {
@@ -119,22 +148,26 @@ const ViewPost = props => {
         user: focusreply.user,
         content: commentData,
       };
-      setCommentData(false);
+      // setCommentData(false);
       setCancelOption(false)
-      props.replyComment(replyCommentData, setSubCommentData);
+      props.replyComment(replyCommentData, subCommentData, callBack);
     } else {
       const apiData = {
         comment: commentData,
         id: param?.id
       };
-      setCommentData(false);
-      props.addComment(apiData, setNewCommentData);
+      props.addComment(apiData, postData, callBack);
     }
   };
 
   const replyCommentData = item => {
     inputRef.current.focus();
     setCancelOption(true)
+    postData.comments.map((v)=>{
+      if(item.id ===  v.id){
+        setSubCommentData(item)
+      }
+     })
     let apidata = {
       comment: item.id,
       user: item.userId,
@@ -168,7 +201,7 @@ const ViewPost = props => {
     setPostComments(updatedFeeds);
   };
 
-  const filterData1 = (feedId, id) => {
+  const subCommentFilter = (feedId, id) => {
     const updatedFeeds = [...postComments];
     const index = updatedFeeds.findIndex(item => item.id === feedId);
     const mainObject = updatedFeeds[index];
@@ -197,7 +230,7 @@ const ViewPost = props => {
       comment_reply: item.id,
       user: item.user,
     };
-    filterData1(item.comment, item.id)
+    subCommentFilter(item.comment, item.id)
     props.likeComment(apiData);
   };
 
@@ -228,7 +261,7 @@ const ViewPost = props => {
     updatedFeeds[index] = objToUpdate || param;
     setFeedsState(updatedFeeds);
   };
-  console.log('postData', postData);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loader isLoading={requesting} />
@@ -565,8 +598,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getPost: data => dispatch(getPost(data)),
-  addComment: (data, setNewCommentData) => dispatch(addComment(data, setNewCommentData)),
-  replyComment: (data, setSubCommentData) => dispatch(replyComment(data, setSubCommentData)),
+  addComment: (data, postData, callBack) => dispatch(addComment(data, postData, callBack)),
+  replyComment: (data, subCommentData, callBack) => dispatch(replyComment(data, subCommentData, callBack)),
   likeComment: data => dispatch(likeComment(data)),
   postLikeRequest: data => dispatch(postLikeRequest(data)),
 });

@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
 import { API_URL } from '../config/app';
+import {setAccessToken} from './loginRedux'
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -165,7 +166,7 @@ function* getFeeds() {
     console.log('PLANE RESPONSE: ', response);
     yield put(getPlanSuccess(response.data.data))
   } catch (e) {
-    console.log('PLANE ERROR: ', e);
+    const {response} = e
     yield put(getPlanFailure(e))
   }
 }
@@ -214,11 +215,14 @@ function* postSubscription({ data }) {
   console.log("subscription data: ", data);
   try {
     const response = yield call(postSubscriptionAPI, data)
+    const token = AsyncStorage.getItem('authToken')
+    yield put(setAccessToken(token))
     console.log('SUBSCRIPTION RESPONSE: ', response);
-    yield put(postSubscriptionSuccess(response.data.data))
+    // yield put(postSubscriptionSuccess(response.data.data))
   } catch (e) {
     console.log('SUBSCRIPTION ERROR: ', e);
-    yield put(postSubscriptionFailure(e))
+    const {response} = e
+    // yield put(postSubscriptionFailure(e))
   }
 }
 

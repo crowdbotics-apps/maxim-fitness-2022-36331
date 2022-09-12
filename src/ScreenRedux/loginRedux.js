@@ -1,5 +1,6 @@
 import {all, call, put, takeLatest} from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {navigate} from '../navigation/NavigationService';
 import {showMessage} from 'react-native-flash-message';
 
 // config
@@ -115,13 +116,19 @@ function* login({data}) {
   try {
     const response = yield call(loginAPI, data)
     AsyncStorage.setItem('authToken', response.data.token)
-    yield put(setAccessToken(response.data.token))
     yield put(setUserDetail(response.data.user))
-    showMessage({
-      message: 'Login successfully',
-      type: 'success',
-    })
-  } catch (e) {
+    if(response?.data?.subscription === false){
+      navigate('Subscription')
+    }
+    else{
+      yield put(setAccessToken(response.data.token))
+      showMessage({
+        message: 'Login successfully',
+        type: 'success',
+      })
+    }
+  } 
+  catch (e) {
     const {response} = e
     console.log('error response---', response);
     showMessage({

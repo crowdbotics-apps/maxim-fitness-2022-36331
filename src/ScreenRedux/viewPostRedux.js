@@ -41,10 +41,11 @@ export const resetViewPost = error => ({
   error
 })
 
-export const addComment = (data, setNewCommentData) => ({
+export const addComment = (data, postData, callBack) => ({
   type: ADD_COMMENT,
   data,
-  setNewCommentData
+  postData,
+  callBack
 })
 
 export const addCommentSuccess = data => ({
@@ -52,10 +53,11 @@ export const addCommentSuccess = data => ({
   data
 })
 
-export const replyComment = (data, setSubCommentData) => ({
+export const replyComment = (data, subCommentData, callBack) => ({
   type: REPLY_COMMENT,
   data,
-  setSubCommentData
+  subCommentData,
+  callBack
 })
 
 export const likeComment = data => ({
@@ -132,10 +134,12 @@ async function addCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* addCommentData({data, setNewCommentData}) {
+function* addCommentData({data, postData, callBack}) {
   try {
     const response = yield call(addCommentAPI, data)
-    setNewCommentData(response.data)
+    postData.comments = [response.data, ...postData.comments];
+    callBack(true)
+    // setNewCommentData(response.data)
   } catch (e) {
     const {response} = e
   } finally {
@@ -158,12 +162,12 @@ async function replyCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* replyCommentData({data, setSubCommentData}) {
-  console.log('reply comment data-----', data);
+function* replyCommentData({data, subCommentData, callBack}) {
   try {
     const response = yield call(replyCommentAPI, data)
-    console.log('reply comment success response----', response);
-    setSubCommentData(response.data)
+    subCommentData.subComment = subCommentData?.subComment?.length ? [...subCommentData.subComment, response.data] :  [response.data]
+    callBack(true)
+    // setSubCommentData(response.data)
   } catch (e) {
     const {response} = e
     console.log('reply comment failure response----', response);
