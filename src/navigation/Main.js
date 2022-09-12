@@ -21,7 +21,7 @@ const Tab = createBottomTabNavigator()
 const BottomNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="HomeScreen"
+      initialRouteName="ProgramScreen"
       screenOptions={{
         tabBarStyle: {
           shadowColor: '#000',
@@ -116,7 +116,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="profileScreen"
+        name="ProgramScreen"
         component={ProgramScreen}
         options={{
           tabBarLabel: ({ focused }) => (

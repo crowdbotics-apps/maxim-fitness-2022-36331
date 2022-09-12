@@ -1,15 +1,17 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
+import Text from '../Text'
 
 const FatExerciseButton = ({
   buttonLabel,
   onPress,
   loadingReps,
   loadingWeight,
-  individualSets,
-  changeCol,
+  isDone,
+  repsColor,
+  weightColor,
   reps,
-  weight
+  weight,
 }) => {
   return (
     <>
@@ -22,11 +24,11 @@ const FatExerciseButton = ({
               <Text
                 style={[
                   styles.styleButtonText,
-                  { color: individualSets?.done === true || changeCol === true ? 'black' : '#D3D3D3' },
+                  { color: isDone || repsColor ? 'black' : '#D3D3D3' },
                 ]}
-              >
-                {individualSets?.reps || 0}
-              </Text>
+                text={isDone ? isDone : '0'}
+              />
+
             </View>
           )}
           <View style={styles.separator} />
@@ -41,19 +43,17 @@ const FatExerciseButton = ({
             <ActivityIndicator size="small" color="#000" style={{ height: 35 }} />
           ) : false ? (
             <>
-              <View style={styles.iconContainer2}>
+              <View style={styles.iconContainer}>
                 <Text
                   style={[
                     styles.styleButtonText,
                     {
-                      color: individualSets?.done === true || changeCol === true ? 'black' : '#D3D3D3',
+                      color: isDone || weightColor ? 'black' : '#D3D3D3',
                     },
                   ]}
-                >
-                  {0}
-                </Text>
+                  text={isDone ? isDone : '0'}
+                />
               </View>
-
               <View style={styles.separator} />
               <View style={styles.buttonTextStyle}>
                 <Text style={styles.buttonLabelStyle}>{buttonLabel}</Text>
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     marginHorizontal: 5,
-    marginVertical: 5,
     paddingVertical: 20,
     backgroundColor: 'rgb(242, 242, 242)',
     borderRadius: 10,

@@ -15,6 +15,7 @@ import RestContainer from './RestContainer'
 import BottomSheet from './BottomSheet'
 import StaticTimer from './StaticTimer'
 import ProfileHeader from './ProfileHeader';
+import RNModal from './RNModal'
 
 export {
   Text,
@@ -33,5 +34,6 @@ export {
   RestContainer,
   BottomSheet,
   StaticTimer,
-  ProfileHeader
+  ProfileHeader,
+  RNModal
 };
