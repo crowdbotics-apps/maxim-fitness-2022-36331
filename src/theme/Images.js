@@ -49,4 +49,6 @@ export default {
   iconSwap: require('src/assets/images/icon_swap.png'),
   iconDoneStartRest: require('src/assets/images/icon_done_start_rest.png'),
   detailIcon: require('src/assets/images/icon_details_ex.png'),
-}
+  backIcon: require('src/assets/images/backIcon.png'),
+  forwardIcon: require('src/assets/images/forwardIcon.png'),
+};
