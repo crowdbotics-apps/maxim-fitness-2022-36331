@@ -52,9 +52,10 @@ export const addCommentSuccess = data => ({
   data
 })
 
-export const replyComment = data => ({
+export const replyComment = (data, setSubCommentData) => ({
   type: REPLY_COMMENT,
-  data
+  data,
+  setSubCommentData
 })
 
 export const likeComment = data => ({
@@ -157,12 +158,12 @@ async function replyCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* replyCommentData({data}) {
+function* replyCommentData({data, setSubCommentData}) {
   console.log('reply comment data-----', data);
   try {
     const response = yield call(replyCommentAPI, data)
     console.log('reply comment success response----', response);
-    // yield put(getPostSuccess(response.data))
+    setSubCommentData(response.data)
   } catch (e) {
     const {response} = e
     console.log('reply comment failure response----', response);

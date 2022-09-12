@@ -1,54 +1,56 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 
 // components
-import {View, Image, StyleSheet, TouchableOpacity} from 'react-native'
-import {Content, Icon} from 'native-base'
-import {Text, Button} from '../../components'
+import { View, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { Content, Icon } from 'native-base'
+import { Text, Button } from '../../components'
 import Card from './component/Card'
 import Card1 from './component/Card1'
 import Card2 from './component/Card2'
-import {connect} from 'react-redux'
-// import {
-//   getSubscriptionAction,
-//   getPlansAction,
-//   getCustomerId,
-// } from '@/redux/modules/subscriptionReducer';
+import { connect } from 'react-redux'
+import {
+  // getSubscriptionRequest,
+  getPlanRequest,
+  getCustomerIdRequest,
+} from '../../ScreenRedux/subscriptionRedux';
 
-import {Gutters, Layout, Global, Images} from '../../theme'
+import { Gutters, Layout, Global, Images } from '../../theme'
 import Modal from 'react-native-modal'
 
 const SubscriptionScreen = props => {
-  const {navigation} = props;
+  const { navigation, getPlans } = props;
   const [curentTab, setCurentTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [active, setActive] = useState(true);
 
+  console.log('getPlans: ', getPlans);
+
   useEffect(() => {
-    // props.getPlansAction();
-    // props.getCustomerId();
+    props.getPlanRequest();
+    props.getCustomerIdRequest();
   }, []);
 
-  // const card = () => {
-  //   let plan_id = getPlans.length > 0 && getPlans[0].id;
-  //   let product = getPlans.length > 0 && getPlans[0].product;
-  //   navigation.navigate('CreditCard', {plan_id, product});
-  // };
-  // const card1 = () => {
-  //   let plan_id = getPlans.length > 0 && getPlans[1].id;
-  //   let product = getPlans.length > 0 && getPlans[1].product;
-  //   navigation.navigate('CreditCard', {plan_id, product});
-  // };
+  const card = () => {
+    let plan_id = getPlans.length > 0 && getPlans[0].id;
+    let product = getPlans.length > 0 && getPlans[0].product;
+    navigation.navigate('CreditCard', { plan_id, product });
+  };
+  const card1 = () => {
+    let plan_id = getPlans.length > 0 && getPlans[1].id;
+    let product = getPlans.length > 0 && getPlans[1].product;
+    navigation.navigate('CreditCard', { plan_id, product });
+  };
 
-  // const card2 = () => {
-  //   let plan_id = getPlans.length > 0 && getPlans[2].id;
-  //   let product = getPlans.length > 0 && getPlans[2].product;
-  //   navigation.navigate('CreditCard', {plan_id, product});
-  // };
+  const card2 = () => {
+    let plan_id = getPlans.length > 0 && getPlans[2].id;
+    let product = getPlans.length > 0 && getPlans[2].product;
+    navigation.navigate('CreditCard', { plan_id, product });
+  };
 
-  const {largeHMargin, mediumTMargin} = Gutters;
-  const {row, fill, center, alignItemsCenter, justifyContentBetween} = Layout;
-  const {border} = Global;
-  const {leftArrow, iconWrapper} = styles;
+  const { largeHMargin, mediumTMargin } = Gutters;
+  const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
+  const { border } = Global;
+  const { leftArrow, iconWrapper } = styles;
 
   const setData = item => {
     if (item === 'No') {
@@ -65,38 +67,38 @@ const SubscriptionScreen = props => {
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
         <TouchableOpacity onPress={() => setCurentTab(0)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Diet" style={curentTab === 0 && {fontWeight: 'bold'}} smallTitle />
+          <Text text="Diet" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCurentTab(1)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Exercise" style={curentTab === 1 && {fontWeight: 'bold'}} smallTitle />
+          <Text text="Exercise" style={curentTab === 1 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCurentTab(2)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Pro" style={curentTab === 2 && {fontWeight: 'bold'}} smallTitle />
+          <Text text="Pro" style={curentTab === 2 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
       </View>
       <Content>
         {curentTab === 0 && (
           <Card
-            // onPress={card}
+            onPress={card}
             setIsVisible={setIsVisible}
             navigation={navigation}
-            // getPlans={getPlans}
+            getPlans={getPlans}
           />
         )}
         {curentTab === 1 && (
           <Card1
-            // onPress={card1}
+            onPress={card1}
             setIsVisible={setIsVisible}
             navigation={navigation}
-            // getPlans={getPlans}
+            getPlans={getPlans}
           />
         )}
         {curentTab === 2 && (
           <Card2
-            // onPress={card2}
+            onPress={card2}
             setIsVisible={setIsVisible}
             navigation={navigation}
-            // getPlans={getPlans}
+            getPlans={getPlans}
           />
         )}
       </Content>
@@ -149,7 +151,7 @@ const SubscriptionScreen = props => {
                   <Button
                     color="secondary"
                     text={'Orum 50 off'}
-                    style={[border, center, mediumTMargin, {height: 40, width: 150}]}
+                    style={[border, center, mediumTMargin, { height: 40, width: 150 }]}
                     onPress={() => setIsVisible(false)}
                     center
                   />
@@ -198,15 +200,15 @@ const styles = StyleSheet.create({
   },
 });
 const mapStateToProps = state => ({
-  // getPlans: state.subscription.getPlans,
-  // customerId: state.subscription.customerId,
+  getPlans: state.subscriptionReducer.getPlanSuccess,
+  customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
 });
 
 const mapDispatchToProps = dispatch => ({
-  // getPlansAction: () => dispatch(getPlansAction()),
-  // getSubscriptionAction: plan_id => dispatch(getSubscriptionAction(plan_id)),
-  // getCustomerId: () => dispatch(getCustomerId()),
+  getPlanRequest: () => dispatch(getPlanRequest()),
+  // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
+  getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionScreen);

@@ -20,6 +20,7 @@ import {Images} from 'src/theme';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
 import {connect} from 'react-redux';
+
 //actions
 import {signUpUser} from '../../ScreenRedux/signUpRedux';
 
@@ -50,7 +51,7 @@ const SignUp = props => {
     }
   }
 
-  const {state, handleOnChange, disable} = useForm(stateSchema, validationStateSchema)
+  const {state, handleOnChange, disable, setState} = useForm(stateSchema, validationStateSchema)
 
   const OnSignUpPress = () => {
     let signUpData = {
@@ -206,8 +207,8 @@ const SignUp = props => {
                 {'I have accept terms & conditions'}
               </Text>
             </View>
-            <TouchableOpacity onPress={() => OnSignUpPress()} disabled={disable}>
-              <LinearGradient style={styles.logInButton} colors={['#048ECC', '#0460BB', '#0480C6']}>
+            <TouchableOpacity onPress={() => OnSignUpPress()} disabled={(disable || !check)}>
+              <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
                 {props.requesting ? (
                   <ActivityIndicator color="white" />
                 ) : (

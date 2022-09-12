@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
-import {View, Image, StyleSheet, Dimensions, Pressable} from 'react-native';
+import React, { useState } from 'react';
+import { View, Image, StyleSheet, Dimensions, Pressable } from 'react-native';
 import Text from '../Text';
-import {Images} from 'src/theme';
-import {calculatePostTime} from 'src/utils/functions';
-import {SliderBox} from 'react-native-image-slider-box';
+import { Images } from 'src/theme';
+import { calculatePostTime } from 'src/utils/functions';
+import { SliderBox } from 'react-native-image-slider-box';
 import Share from 'react-native-share';
 
 const FeedCard = props => {
-  const {item, feeds, setFeedsState} = props
+  const { item, feeds, setFeedsState } = props
   const [showMore, setShowMore] = useState(false)
 
   const addLikeAction = () => {
@@ -17,7 +17,7 @@ const FeedCard = props => {
       console.log('status: ', status)
     }
 
-    const data = {feedId, item, callBack}
+    const data = { feedId, callBack }
     props.postLikeRequest(data)
   }
 
@@ -36,19 +36,11 @@ const FeedCard = props => {
     setFeedsState(updatedFeeds)
   }
 
-  const imagesData = [
-    Images.foodImage,
-    Images.foodImage,
-    Images.foodImage,
-    Images.foodImage,
-    Images.foodImage
-  ]
-
   let deviceWidth = Dimensions.get('window').width
   let deviceHeight = Dimensions.get('window').height
 
   const sharePost = async () => {
-    const data = {message: 'hello'}
+    const data = { message: 'hello' }
     await Share.open(data)
       .then(res => {
         console.log('SHARE RESPONSE: ', res)
@@ -125,7 +117,7 @@ const FeedCard = props => {
           <Pressable style={styles.socialIcons} onPress={addLikeAction}>
             <Image
               source={Images.heartIcon}
-              style={[styles.socialImg, {tintColor: item.liked ? 'red' : 'black'}]}
+              style={[styles.socialImg, { tintColor: item.liked ? 'red' : 'black' }]}
               tintColor={item.liked ? 'red' : 'black'}
             />
             <Text text={item && item.likes ? item.likes : null} style={styles.text2} />
@@ -182,25 +174,26 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderRadius: 15
   },
-  text1: {fontSize: 15, marginLeft: 10},
-  text2: {fontSize: 15, marginLeft: 10},
-  username: {flexDirection: 'row', alignItems: 'center', flex: 1},
-  socialIcons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1
-  },
-  profileImg: {width: 30, height: 30},
-  socialImg: {width: 25, height: 25, resizeMode: 'contain'},
-  socialImg1: {width: 25, height: 25, resizeMode: 'contain'},
-  socialImg2: {width: 22, height: 22, resizeMode: 'contain'},
   foodImageStyle: {
     width: '100%',
     height: 260,
     alignSelf: 'center',
     borderRadius: 15
   },
+  text1: { fontSize: 15, marginLeft: 10 },
+  text2: { fontSize: 15, marginLeft: 10 },
+  username: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  socialIcons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1
+  },
+  profileImg: { width: 30, height: 30 },
+  socialImg: { width: 25, height: 25, resizeMode: 'contain' },
+  socialImg1: { width: 25, height: 25, resizeMode: 'contain' },
+  socialImg2: { width: 22, height: 22, resizeMode: 'contain' },
+
   sliderBoxStyle: {
     width: 8,
     height: 8,
@@ -210,14 +203,14 @@ const styles = StyleSheet.create({
     margin: 0,
     top: 40
   },
-  bottomTextStyle: {flexDirection: 'row', flex: 1, paddingHorizontal: 15},
+  bottomTextStyle: { flexDirection: 'row', flex: 1, paddingHorizontal: 15 },
   seeMoreStyle: {
     paddingVertical: 5,
     fontSize: 15,
     lineHeight: 16,
     color: 'blue',
   },
-  contentStyle: {flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16}
+  contentStyle: { flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16 }
 })
 
 export default FeedCard
