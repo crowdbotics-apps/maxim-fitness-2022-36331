@@ -267,10 +267,6 @@ class FoodItemPostSerializer(serializers.Serializer):
 
 class MealSerializer(serializers.ModelSerializer):
     food_items = FoodItemSerializer(many=True, read_only=True)
-    # carbohydrate = serializers.ReadOnlyField()
-    # protein = serializers.ReadOnlyField()
-    # fat = serializers.ReadOnlyField()
-    # calories = serializers.ReadOnlyField()
 
     class Meta:
         model = Meal
@@ -317,7 +313,6 @@ class RecipeItemSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     recipe_items = RecipeItemSerializer(many=True, read_only=True)
-    image_url = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     carbohydrate = serializers.ReadOnlyField()
     protein = serializers.ReadOnlyField()
@@ -328,55 +323,35 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = '__all__'
 
-    def get_image_url(self, image):
-        request = self.context.get('request')
-        image_url = image.image_url
-        return request.build_absolute_uri(image_url)
 
 
 class ExerciseTypeSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ExerciseType
         fields = '__all__'
 
-    def get_image_url(self, image):
-        request = self.context.get('request')
-        image_url = image.image_url
-        return request.build_absolute_uri(image_url)
 
 
 class ExerciseImagesSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ExerciseImages
         fields = '__all__'
 
-    def get_image_url(self, image):
-        request = self.context.get('request')
-        image_url = image.image_url
-        return request.build_absolute_uri(image_url)
-
 
 class ExerciseSerializer(serializers.ModelSerializer):
     exercise_type = ExerciseTypeSerializer()
     pictures = ExerciseImagesSerializer(many=True)
-    video_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Exercise
         fields = '__all__'
 
-    def get_video_url(self, video):
-        request = self.context.get('request')
-        video_url = video.video_url
-        return request.build_absolute_uri(video_url)
-
 
 class SetSerializer(serializers.ModelSerializer):
     exercises = ExerciseSerializer(many=True)
+
     class Meta:
         model = Set
         fields = '__all__'
