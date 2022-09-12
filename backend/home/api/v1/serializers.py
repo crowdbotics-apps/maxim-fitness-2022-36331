@@ -14,8 +14,8 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
-    Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImageVideo,\
-    PostCommentReply, PostCommentLike
+    Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
+    PostCommentReply, PostCommentLike, PostVideo
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings
@@ -424,17 +424,25 @@ class CommentSerializer(serializers.ModelSerializer):
         return comment.get_like(user)
 
 
-class PostImageVideoSerializer(serializers.ModelSerializer):
+class PostImageSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = PostImageVideo
+        model = PostImage
+        fields = "__all__"
+
+
+class PostVideoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PostVideo
         fields = "__all__"
 
 
 class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
-    post_image_video = PostImageVideoSerializer(many=True, read_only=True)
+    post_image = PostImageSerializer(source="post_image_video", many=True, read_only=True)
+    post_video = PostVideoSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField(read_only=True)
     liked = serializers.SerializerMethodField(read_only=True)
 
