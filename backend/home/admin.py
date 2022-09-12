@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
     RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
-    ConsumeCalories, ReportAPost, BlockUser, PostImageVideo, PostCommentReply, PostCommentLike
+    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo
 import nested_admin
 
 
@@ -143,7 +143,7 @@ class BlockUserAdmin(admin.ModelAdmin):
 
 
 class PostImageVideoAdmin(admin.ModelAdmin):
-    list_display = ["id", "post", "image", "video", "created"]
+    list_display = ["id", "post", "image", "created"]
 
 
 admin.site.register(Form, FormAdmin)
@@ -156,9 +156,10 @@ admin.site.register(ConsumeCalories, ConsumeCaloriesAdmin)
 admin.site.register(ProductUnit)
 admin.site.register(ReportAPost, ReportAPostAdmin)
 admin.site.register(BlockUser, BlockUserAdmin)
-admin.site.register(PostImageVideo, PostImageVideoAdmin)
+admin.site.register(PostImage, PostImageVideoAdmin)
 admin.site.register(PostCommentReply)
 admin.site.register(PostCommentLike)
+admin.site.register(PostVideo)
 
 
 # admin.site.register(Settings, SingletonModelAdmin)

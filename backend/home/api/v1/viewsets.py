@@ -25,7 +25,7 @@ from rest_auth.registration.views import SocialLoginView
 from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
-from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImageVideo, PostCommentReply, PostCommentLike
+from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike
 from users.models import Settings
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -51,7 +51,7 @@ from home.api.v1.serializers import (
     CaloriesRequiredSerializer,
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
-    PostImageVideoSerializer, CommentReplySerializer, CommentLikeSerializer
+    PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -96,6 +96,7 @@ class LoginViewSet(ViewSet):
     permission_classes = [AllowAny, ]
 
     def create(self, request):
+        subscription = False
         serializer = self.serializer_class(
             data=request.data,
             context={'request': request}
@@ -104,7 +105,12 @@ class LoginViewSet(ViewSet):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         user_serializer = UserSerializer(user, context={'request': request})
-        return Response({'token': token.key, 'user': user_serializer.data})
+        if user_serializer.data["stripe_customer_id"]:
+            subscription = stripe.Subscription.list(customer=user_serializer.data["stripe_customer_id"], limit=1)
+        #
+        # def get_subscription(self, customer_id):
+        #     return stripe.Subscription.list(customer=customer_id, limit=1)
+        return Response({'token': token.key, 'user': user_serializer.data, "subscription": subscription})
 
 
 class ProfileViewSet(ModelViewSet):
@@ -778,6 +784,12 @@ class ReportViewSet(ModelViewSet):
         return Response(final_data)
 
 
+def modify_input_for_multiple_files(post, image):
+    dict = {}
+    dict['post'] = post
+    dict['image'] = image
+    return dict
+
 class PostViewSet(ModelViewSet):
     serializer_class = PostSerializer
     # queryset = Post.objects.filter(hide=False).select_related('user').order_by('-id')
@@ -801,6 +813,7 @@ class PostViewSet(ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
+
         request_data = request.data
 
         # if 'image' in request_data.keys():
@@ -819,45 +832,35 @@ class PostViewSet(ModelViewSet):
         #     file_name = f'{datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")}.{ext}'
         #     video = ContentFile(base64.b64decode(video_str), file_name)
         #     request_data['video'] = video
-        post_image = []
-        # image1 = request.data.get("image", None)
-        image1 = request.data["image"]
-        # image = json.loads(image1)
-        video = request.data.get("video", None)
-        post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
-        # post_id = request.data["post_id"]
 
+        post_image = []
+        post_video = []
+        image = ''
+        video = ''
+        if request.data.get("image"):
+            image = dict((request.data).lists())['image']
+        if request.data.get("video"):
+            video = dict((request.data).lists())['video']
+        post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
         serializer = self.get_serializer(data=post_content)
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            data = {"post": serializer.data.get("id"), "image": image1}
-            post_image.append(data)
+            if image:
+                for i in image:
+                    data = {'post': serializer.data.get("id"), 'image': i}
+                    post_image.append(data)
+                post_image_serializer = PostImageSerializer(data=post_image, many=True)
+                if post_image_serializer.is_valid(raise_exception=True):
+                    post_image_serializer.save()
+            if video:
+                for v in video:
+                    data = {'post': serializer.data.get("id"), "video": v}
+                    post_video.append(data)
+                post_video_serializer = PostVideoSerializer(data=post_video, many=True)
+                if post_video_serializer.is_valid(raise_exception=True):
+                    post_video_serializer.save()
 
-            post_image_serializer = PostImageVideoSerializer(data=data)
-            if post_image_serializer.is_valid(raise_exception=True):
-                post_image_serializer.save()
-
-            # if image or video:
-            #     if image:
-            #         for i in image:
-            #             if video:
-            #                 for v in video:
-            #                     data = {'post': serializer.data.get("id"), 'image': i, "video": v}
-            #                     post_image.append(data)
-            #                     video.remove(v)
-            #                     break
-            #             else:
-            #                 data = {'post': serializer.data.get("id"), 'image': i}
-            #                 post_image.append(data)
-            #     if video:
-            #         for v in video:
-            #             data = {'post': serializer.data.get("id"), "video": v}
-            #             post_image.append(data)
-            #
-            #     post_image_serializer = PostImageVideoSerializer(data=post_image, many=True)
-            #     if post_image_serializer.is_valid(raise_exception=True):
-            #         post_image_serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -885,12 +888,12 @@ class PostViewSet(ModelViewSet):
 
 
 class PostImageVideoViewSet(ModelViewSet):
-    serializer_class = PostImageVideoSerializer
+    serializer_class = PostImageSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         post_id = self.request.query_params.get("post_id")
-        queryset = PostImageVideo.objects.filter(post_id=post_id)
+        queryset = PostImage.objects.filter(post_id=post_id)
         return queryset
 
     def create(self, request, *args, **kwargs):

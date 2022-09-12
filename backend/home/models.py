@@ -368,16 +368,21 @@ class Post(models.Model):
         return self.likes.all().count()
 
 
-
-class PostImageVideo(models.Model):
+class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_image_video")
     image = models.FileField(upload_to="post_image/image", null=True, blank=True)
-    video = models.FileField(upload_to="post_video/video", null=True, blank=True)
+    # video = models.FileField(upload_to="post_video/video", null=True, blank=True)
     video_thumbnail = models.FileField(upload_to='post_video/thumbnail', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.post.title)
+
+
+class PostVideo(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_video")
+    video = models.FileField(upload_to="post_video/video")
+    created = models.DateField(auto_now_add=True)
 
 
 class Comment(models.Model):
