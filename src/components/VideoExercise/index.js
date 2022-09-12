@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Video from 'react-native-video';
 
-const VideoExercise = ({videoUrl, containterStyle, paused, onLoad, onLoadStart}) => (
+const VideoExercise = ({ videoUrl, containterStyle, paused, onLoad, onLoadStart }) => (
   <View style={[styles.videoContainer, containterStyle]}>
     <Video
       source={videoUrl}
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
   },
-  videoStyle: {height: 200, width: '100%'},
+  videoStyle: { height: 260, width: '100%' },
 });
 
 export default VideoExercise;

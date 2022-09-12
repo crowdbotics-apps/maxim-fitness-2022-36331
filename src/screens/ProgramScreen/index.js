@@ -10,9 +10,7 @@ import {
 import { Icon } from 'native-base';
 import { Gutters, Layout, Global, Colors } from '../../theme';
 import moment from 'moment';
-import { useIsFocused } from '@react-navigation/native';
 import { Card, WorkoutComponent, Text } from '../../components';
-import { useNetInfo } from '@react-native-community/netinfo';
 import { getAllSessionRequest } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
@@ -22,39 +20,69 @@ const ProgramScreen = props => {
     getAllSessions,
     loadingAllSession,
   } = props;
+
+  console.log('getAllSessions: ', getAllSessions);
+
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeButton, setActiveButton] = useState(false);
-
-  const [weekDate, setWeekDate] = useState('');
+  const [activeIndex, setActiveIndex] = useState(1);
+  const [show, setShow] = useState(true);
 
   const { tinyLMargin, tinyRMargin } = Gutters;
-  const { row, fill, alignItemsCenter, justifyContentEnd, justifyContentBetween } = Layout;
+  const { row, center, fill, alignItemsCenter, justifyContentEnd, justifyContentBetween } = Layout;
   const { secondaryBg, turtiaryBg } = Global;
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const newDate = moment(new Date()).format('YYYY-MM-DD');
-      setWeekDate(newDate);
       props.getAllSessionRequest(newDate);
     });
     return unsubscribe;
   }, [navigation]);
 
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 3000);
+  }, []);
+
+  const previousExercise = () => {
+    if (activeIndex > 1) {
+      setActiveIndex(prevState => prevState - 1);
+      if (getAllSessions?.query?.length) {
+        const today = new Date(getAllSessions.query[0].date_time);
+        const lastDay = new Date(today.setDate(today.getDate() - 7));
+        const hh = moment(lastDay).format('YYYY-MM-DD');
+        props.getAllSessionRequest(hh);
+      }
+    }
+  };
+
+  const nextExercise = () => {
+    if (getAllSessions?.week > activeIndex) {
+      setActiveIndex(prevState => prevState + 1);
+      if (getAllSessions?.query?.length) {
+        const today = new Date(getAllSessions.query[0].date_time);
+        const lastDay = new Date(today.setDate(today.getDate() + 7));
+        const hh = moment(lastDay).format('YYYY-MM-DD');
+        props.getAllSessionRequest(hh);
+      }
+    }
+  };
+
   return (
     <SafeAreaView style={[fill, secondaryBg]}>
       <ScrollView showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[fill, row, justifyContentBetween, alignItemsCenter, styles.preview]}>
+        <View style={[row, justifyContentBetween, alignItemsCenter, styles.preview]}>
           <TouchableOpacity
             style={[alignItemsCenter, fill, row, styles.buttonWrapper]}
-            disabled={true}
+            onPress={previousExercise}
+            disabled={loading || loadingAllSession}
           >
-            {false && (
+            {getAllSessions?.week > 0 && activeIndex > 1 && (
               <>
                 <Icon type="FontAwesome5" name="caret-left" />
                 <Text
                   color="primary"
-                  text={`Week ${2}`}
+                  text={`Week ${activeIndex + 1}`}
                   style={[tinyLMargin, { fontSize: 15, lineHeight: 18 }]}
                 />
               </>
@@ -62,13 +90,14 @@ const ProgramScreen = props => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[justifyContentEnd, alignItemsCenter, fill, row, styles.buttonWrapper]}
-            disabled={true}
+            onPress={nextExercise}
+            disabled={loading || loadingAllSession}
           >
-            {false && (
+            {getAllSessions?.week > activeIndex && (
               <>
                 <Text
                   color="primary"
-                  text={`Week ${2}`}
+                  text={`Week ${activeIndex + 1}`}
                   style={[tinyRMargin, { fontSize: 15, lineHeight: 18 }]}
                 />
                 <Icon type="FontAwesome5" name="caret-right" />
@@ -76,33 +105,78 @@ const ProgramScreen = props => {
             )}
           </TouchableOpacity>
         </View>
-        <View style={fill}>
-          <View style={fill}>
-            <WorkoutComponent
-              onPress={() => {
-                navigation.navigate('ExerciseScreen')
-              }}
-              isVisible={isVisible}
-              setIsVisible={setIsVisible}
-              activeButton={activeButton}
-              setActiveButton={setActiveButton}
-              navigation={navigation}
-              weekDate={weekDate}
-              setWeekDate={setWeekDate}
-            />
+        {loading || loadingAllSession ? (
+          <View style={[styles.container, styles.horizontal]}>
+            <ActivityIndicator size="large" color="#000" />
           </View>
-          <View>
-            <Card
-              style={
+        )
+          :
+          getAllSessions?.query?.length < 1 ?
+            (
+              <View style={[fill, center, styles.noProgramWrapper]}>
+                <Text text="No Program Assigned!" style={styles.noProgramWrapperText} />
+              </View>
+            )
+            :
+            getAllSessions?.query?.map((item, index) => {
 
-                {
-                  backgroundColor: Colors.alto,
-                }
-              }
-              text={'No WorkOut'}
-            />
-          </View>
-        </View>
+              let currentD = moment(new Date()).format('YYYY-MM-DD');
+              let cardDate = moment(item.date_time).format('YYYY-MM-DD');
+
+              const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(workoutItem => !workoutItem.done);
+              return (
+                <View key={index} style={fill}>
+                  <View style={fill}>
+                    {(show && currentD === cardDate) && (
+                      <>
+                        {item.workouts.length > 0 ? (
+                          <View>
+                            <WorkoutComponent
+                              onPress={() => {
+                                if (itemWorkoutUndone) {
+                                  // pickSessionAction(
+                                  //   itemWorkoutUndone,
+                                  //   item.workouts,
+                                  //   nextWorkout
+                                  // );
+                                  navigation.navigate('ExerciseScreen', { workouts: item.workouts, item: item });
+                                }
+                              }}
+                              workoutDone={!itemWorkoutUndone}
+                              startWorkout={currentD === cardDate}
+                              item={item}
+                              navigation={navigation}
+                              activeIndex={activeIndex}
+                              setActiveIndex={setActiveIndex}
+                              isVisible={isVisible}
+                              setIsVisible={setIsVisible}
+                            />
+                          </View>
+                        ) : (
+                          <View style={[turtiaryBg, center, { height: 100 }]}>
+                            <Text text="No Workout for Today" bold />
+                          </View>
+                        )}
+                      </>
+                    )}
+                  </View>
+                  <View>
+                    <Card
+                      style={
+                        (show
+                          ? show === index + 1
+                          : currentD === cardDate) && {
+                          backgroundColor: Colors.alto,
+                        }
+                      }
+                      onPress={() => setShow(show === index + 1 ? undefined : index + 1)}
+                      text={item.workouts.length > 0 ? item.name : 'No WorkOut'}
+                      item={item}
+                    />
+                  </View>
+                </View>
+              )
+            })}
       </ScrollView>
     </SafeAreaView>
   );
@@ -141,7 +215,7 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     height: 30,
   },
-  noProgramWrapper: { height: 500 },
+  noProgramWrapper: {},
   noProgramWrapperText: { color: 'black', fontSize: 30 },
 });
 

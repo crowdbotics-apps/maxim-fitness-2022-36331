@@ -6,6 +6,7 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
   KeyboardAvoidingView,
 } from 'react-native';
 import {
@@ -25,10 +26,19 @@ import { getAllSessionRequest } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
 const ExerciseScreen = props => {
-  const { navigation } = props;
-  let refRBSheetDescription = useRef('');
+  const { navigation, route } = props;
+  console.log('route: ', route);
+  let refDescription = useRef('');
+  let refWeight = useRef('');
   const [videoLoader, setVideoLoader] = useState(false);
   const [active, setActive] = useState(0);
+  const [params, setParms] = useState({});
+
+  useEffect(() => {
+    if (route) {
+      setParms(route.params)
+    }
+  }, [route])
 
   const {
     row,
@@ -60,6 +70,7 @@ const ExerciseScreen = props => {
     zeroMargin,
     zeroPadding,
     tinyHPadding,
+    tinyVPadding,
     smallVMargin,
     smallHMargin,
     largeTPadding,
@@ -91,7 +102,7 @@ const ExerciseScreen = props => {
   };
 
   return (
-    <SafeAreaView style={[fill, { backgroundColor: '#DBD7D2' }]}>
+    <SafeAreaView style={[fill, { backgroundColor: '#F2F2F2' }]}>
       <View style={[row, alignItemsCenter, justifyContentCenter, smallVMargin, regularHMargin]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftIconStyle}>
           <Image style={styles.leftImageStyle} source={Images.backArrow} />
@@ -107,37 +118,54 @@ const ExerciseScreen = props => {
           contentContainerStyle={[
             fillGrow,
             alignItemsEnd,
-            { height: 70, backgroundColor: '#DBD7D2' }
+            { height: 80, backgroundColor: '#F2F2F2' }
           ]}
           showsHorizontalScrollIndicator={false}
           automaticallyAdjustContentInsets={false}
         >
-          <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
-            {[1, 2, 3, 4, 5].map((item, i) => {
+          <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
+            {params?.workouts?.map((item, i) => {
               return (
                 <TouchableOpacity
                   onPress={() => setActive(i)}
                   style={[
                     row,
                     center,
+                    smallHPadding,
                     {
-                      minWidth: 100,
-                      height: active === i ? 75 : 50,
+                      minHeight: active === i ? 80 : 60,
                       borderRadius: active === i ? 8 : 10,
                       marginHorizontal: active === i ? 0 : 2,
-                      backgroundColor: active === i ? "white" : '#DBD7D2'
+                      backgroundColor: active === i ? "white" : '#F2F2F2',
                     }
                   ]}
                 >
-                  <View style={[center, row, fill, smallHPadding]}>
+                  {item?.done ? (
+                    <View style={styles.doneWrapper}>
+                      <Image source={Images.iconDoneProgram} style={styles.imageWrapper} />
+                    </View>
+                  ) : null}
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      width: 100
+                    }}
+                  >
                     <Text
-                      center
-                      regular
-                      color="quinary"
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        textAlign: 'center',
+
+                      }}
                       ellipsizeMode="tail"
                       numberOfLines={3}
-                      text={'name'}
-                    />
+                    >
+                      {`${i + 1}. ${item?.exercise?.name}`}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               )
@@ -145,71 +173,105 @@ const ExerciseScreen = props => {
           </View>
         </ScrollView>
       </View>
-      <View style={[row, center, secondaryBg]}>
-        <VideoExercise
-          videoUrl={{
-            uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
-          }}
-          onLoadStart={() => setVideoLoader(true)}
-          onLoad={() => setVideoLoader(false)}
-        />
-      </View>
+      {params?.workouts?.map((item, index) => {
+        if (active === index) {
+          return (
+            <View style={[fill]}>
+              <View style={[row, center, { backgroundColor: '#F2F2F2' }]}>
+                <VideoExercise
+                  videoUrl={{
+                    uri: item?.exercise?.video
+                  }}
+                  onLoadStart={() => setVideoLoader(true)}
+                  onLoad={() => setVideoLoader(false)}
+                />
+                {videoLoader && (
+                  <View style={{ left: '45%', top: '45%', position: 'absolute' }}>
+                    <ActivityIndicator size="large" color="White" />
+                  </View>
+                )}
+              </View>
 
-      {false && (
-        <View style={[center, secondaryBg, { height: 60 }]}>
-          <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} />
-        </View>
-      )}
+              {false && (
+                <View style={[center, secondaryBg, { height: 60 }]}>
+                  <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} />
+                </View>
+              )}
 
-      <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
-        <ScrollView
-          horizontal
-          contentContainerStyle={fillGrow}
-          showsHorizontalScrollIndicator={false}
-          automaticallyAdjustContentInsets={false}
-        >
-          {[1, 2, 3, 4].map((item, i) => {
-            return (
-              <TouchableOpacity style={height40} key={i}>
-                <SetButton />
-              </TouchableOpacity>
-            )
-          })}
-        </ScrollView>
-      </View>
+              <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
+                <ScrollView
+                  horizontal
+                  contentContainerStyle={fillGrow}
+                  showsHorizontalScrollIndicator={false}
+                  automaticallyAdjustContentInsets={false}
+                >
+                  {item?.sets?.map((item, i) => {
+                    return (
+                      <TouchableOpacity style={[height40, { marginHorizontal: 10, borderRadius: 10 }]} key={i}>
+                        <SetButton item={item} index={i} />
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+              </View>
 
-      <View style={[fill, secondaryBg]}>
-        <ScrollView contentContainerStyle={[fillGrow]}>
-          <View style={[row, tinyHPadding]}>
-            <FatExerciseButton buttonLabel="Reps" reps />
-            <FatExerciseButton buttonLabel="Weight" weight />
-          </View>
+              <View style={[fill, secondaryBg]}>
+                <ScrollView contentContainerStyle={[fillGrow]}>
+                  <View style={[row, tinyHPadding]}>
+                    <FatExerciseButton
+                      reps
+                      buttonLabel="Reps"
+                    />
+                    <FatExerciseButton
+                      weight
+                      buttonLabel="Weight"
+                      onPress={() => refWeight.current.open()}
+                    />
+                  </View>
 
-          <View style={[row, tinyHPadding]}>
-            <FatExerciseIconButton
-              buttonText="Exercise Description"
-              buttonIcon={Images.detailIcon}
-            />
-            <FatExerciseIconButton
-              buttonText="Swap Exercise"
-              buttonIcon={Images.iconSwap}
-            />
-            <FatGradientIconButton
-              buttonText={
-                true
-                  ? 'Done'
-                  : 'Done, Start Rest'
-              }
-              buttonIcon={Images.iconDoneStartRest}
-              colorsGradient={['#3180BD', '#6EC2FA']}
-              colorsGradientDisable={['#d3d3d3', '#838383']}
-            />
-          </View>
-          <RestContainer upNext={'next'} showBar={true} />
-        </ScrollView>
-      </View>
+                  <View style={[row, tinyHPadding, tinyVPadding]}>
+                    <FatExerciseIconButton
+                      buttonText="Exercise Description"
+                      buttonIcon={Images.detailIcon}
+                      onPress={() => refDescription.current.open()}
+                    />
+                    <FatExerciseIconButton
+                      buttonText="Swap Exercise"
+                      buttonIcon={Images.iconSwap}
+                    />
+                    <FatGradientIconButton
+                      buttonText={
+                        true
+                          ? 'Done'
+                          : 'Done, Start Rest'
+                      }
+                      buttonIcon={Images.iconDoneStartRest}
+                      colorsGradient={['#3180BD', '#6EC2FA']}
+                      colorsGradientDisable={['#d3d3d3', '#838383']}
+                    />
+                  </View>
+                  <RestContainer upNext={'next'} showBar={false} />
+                </ScrollView>
+              </View>
+            </View>
+          )
+        }
+      })
+
+      }
       {/*===============================================*/}
-      <BottomSheet reff={refRBSheetDescription} h={400}>
+      <BottomSheet reff={refDescription} h={400}>
+        <KeyboardAvoidingView
+          enabled
+          behavior="padding"
+          style={[fill, { width: '100%', marginTop: 20 }]}
+        >
+          <View style={[center, regularHMargin]}>
+            <Text text={'No Description is available!'} />
+          </View>
+        </KeyboardAvoidingView>
+      </BottomSheet>
+      <BottomSheet reff={refWeight} h={400}>
         <KeyboardAvoidingView
           enabled
           behavior="padding"
@@ -227,9 +289,9 @@ const ExerciseScreen = props => {
 
 const styles = StyleSheet.create({
   doneWrapper: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 3
   },
   imageWrapper: {
     width: 20,
@@ -264,6 +326,12 @@ const styles = StyleSheet.create({
   },
   leftImageStyle: { width: 30, height: 30, resizeMode: 'contain' },
   timerStyle: { height: 30 },
+  buttonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    // height: 60,
+    flexDirection: 'row',
+  },
 });
 
 const mapStateToProps = state => ({

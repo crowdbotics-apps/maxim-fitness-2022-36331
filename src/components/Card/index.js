@@ -12,14 +12,12 @@ const Card = ({ onPress, text, style, item }) => {
   const { textRegular, textLarge } = Fonts;
 
   const getDayOfWeek = () => {
-    // const dayOfWeek = new Date(item.date_time).getDay();
-    const dayOfWeek = new Date().getDay();
+    const dayOfWeek = new Date(item.date_time).getDay();
     return isNaN(dayOfWeek) ? '' : days[dayOfWeek];
   };
 
   const todayDayStr = () => {
-    // const dateTime = new Date(item.date_time);
-    const dateTime = new Date();
+    const dateTime = new Date(item.date_time);
     return dateTime.getDate();
   };
 
@@ -50,13 +48,12 @@ const Card = ({ onPress, text, style, item }) => {
           smallHPadding,
           alignItemsCenter,
           styles.cardWrapper,
-          // { justifyContent: item && item.cardio === false ? 'center' : 'space-between' },
-          { justifyContent: 'space-between' },
+          { justifyContent: item && item.cardio === false ? 'center' : 'space-between' },
         ]}
       >
-        {/* {((item && item.cardio === false) || !item.workouts.length > 0) && (
+        {((item && item.cardio === false) || !item.workouts.length > 0) && (
           <View style={{ flex: 0.5 }} />
-        )} */}
+        )}
         <View
           style={[
             styles.cardWrapperInner,
@@ -71,18 +68,21 @@ const Card = ({ onPress, text, style, item }) => {
             <Text style={styles.cardText}>{text}</Text>
           )}
         </View>
-        {/* {item && item.cardio === true && item.workouts.length > 0 && ( */}
-        {true && (
+        {item && item.cardio === true && item.workouts.length > 0 && (
           <>
             <View style={{ flex: 0.2 }} />
             <View style={styles.hideWrapper}>
               <Text style={styles.hideWrapperInner}>Cardio</Text>
             </View>
           </>
-        )}
-        {/* {((item && item.cardio === false) || !item.workouts.length > 0) && (
-          <View style={{ flex: 0.5 }} />
-        )} */}
+
+        )
+        }
+        {
+          (item && item.cardio === false) || (!item.workouts.length > 0) && (
+            <View style={{ flex: 0.5 }} />
+          )
+        }
       </View>
     </TouchableOpacity>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -11,30 +11,21 @@ import { Icon } from 'native-base';
 import LinearGradient from 'react-native-linear-gradient';
 import Modal from 'react-native-modal';
 import Text from '../Text';
-import { Gutters, Layout, Global, Fonts, Images, Colors } from '../../theme';
+import { Gutters, Layout, Global, Fonts, Images } from '../../theme';
 
-const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const WorkoutComponent = ({
   isVisible,
   setIsVisible,
   startWorkout,
-  exerciseList,
-  itemData,
+  item,
   onPress,
-  isDone,
-  navigation,
-  saveSwipeDateAction,
-  weekDate,
-  activeIndex,
-  setWeekDate,
-  getAllSwapExercise,
-  setActiveIndex,
+  workoutDone,
+  data
 }) => {
   const {
-    smallTPadding,
     regularHMargin,
-    regularTMargin,
     smallHMargin,
     small2xTPadding,
     mediumXBPadding,
@@ -46,14 +37,7 @@ const WorkoutComponent = ({
     largeHMargin,
     regularVMargin,
     small2xHMargin,
-    smallTMargin,
-    smallVPadding,
-    tinyHPadding,
-    smallHPadding,
     small2xTMargin,
-    smallLMargin,
-    tinyLMargin,
-    tinyRMargin,
   } = Gutters;
 
   const [detailModal, setDetailModal] = useState(false);
@@ -70,49 +54,19 @@ const WorkoutComponent = ({
     justifyContentCenter,
     justifyContentBetween,
   } = Layout;
-  const [exercise, setExercise] = useState(false);
-  const [data, setData] = useState(false);
-  const [loading, setLoading] = useState([]);
   const [imgLoading, setImgLoading] = useState(false);
   const { secondaryBg, turtiaryBg, border, borderR30, borderAlto, altoBg } = Global;
   const { titleLarge } = Fonts;
   const start = { x: 0, y: 0 };
   const end = { x: 1, y: 0 };
 
-  useEffect(() => {
-    itemData?.workouts?.length > 0 &&
-      itemData?.workouts?.map(item => {
-        item.sets.length > 0 &&
-          item.sets.map(data => {
-            setExercise(data?.set_type?.toLowerCase());
-          });
-      });
-  }, []);
-  useEffect(() => {
-    if (exercise === 'r') {
-      setExercise('REGULAR');
-    } else if (exercise === 'ss') {
-      setExercise('SUPERSET');
-    } else if (exercise === 'gs') {
-      setExercise('GIANTSET');
-    } else if (exercise === 'ds') {
-      setExercise('DROPSET');
-    } else if (exercise === 'td') {
-      setExercise('TRIPLE_DROPSET');
-    } else if (exercise === 'Ct') {
-      setExercise('CIRCUIT_TRAINING');
-    }
-  }, [exercise]);
-
   const getDayOfWeek = () => {
-    // const dayOfWeek = new Date(itemData?.date_time).getDay();
-    const dayOfWeek = new Date().getDay();
+    const dayOfWeek = new Date(item?.date_time).getDay();
     return isNaN(dayOfWeek) ? '' : days[dayOfWeek];
   };
 
   const calDate = () => {
-    // const createdDate = new Date(itemData?.date_time).getDay();
-    const createdDate = new Date().getDay();
+    const createdDate = new Date(item?.date_time).getDay();
     const todayDate = new Date().getDay();
     if (createdDate === todayDate) {
       if (startWorkout) {
@@ -125,25 +79,9 @@ const WorkoutComponent = ({
     }
   };
 
-  const filterLoading = i => {
-    setLoading(loading => [...loading, i]);
-  };
-
-  const swipeFunc = () => {
-    setIsVisible(!isVisible);
-    // navigation.navigate(Routes.SwapExerciseScreen, {
-    //   ScreenData: { data, weekDate, dateTime: itemData.date_time, activeIndex },
-    // });
-    // getAllSwapExercise(data?.id);
-    // saveSwipeDateAction(weekDate, itemData.date_time, activeIndex);
-    // setWeekDate('');
-    // setActiveIndex(1);
-  };
-
   return (
     <>
       <View style={turtiaryBg}>
-        {/* <View style={{ backgroundColor: 'pink' }}> */}
         <View style={[alignItemsStart, regularHPadding]}>
           <Text style={[small2xTPadding, mediumXBPadding, titleLarge]} text={calDate()} bold />
         </View>
@@ -162,141 +100,108 @@ const WorkoutComponent = ({
           ]}
         >
           <View style={styles.cardWrapper}>
-            {/* <Text text={itemData?.name} color="secondary" medium numberOfLines={2} /> */}
-            <Text text={'name'} color="secondary" medium numberOfLines={2} />
-            {/* <Text text={`${itemData.workouts[0]?.timer} minutes`} color="secondary" medium /> */}
-            <Text text={`${10} minutes`} color="secondary" medium />
+            <Text text={item?.name} color="secondary" medium numberOfLines={2} />
+            <Text text={`${item.workouts[0]?.timer} minutes`} color="secondary" medium />
           </View>
-          {/* {itemData.cardio === true && ( */}
-          {true && (
-            <View style={styles.cardWrapper2}>
-              <View style={[row, center]}>
-                <Text text={'Cardio'} color="secondary" medium />
-                <Icon
-                  type={'FontAwesome5'}
-                  name={'heart'}
-                  style={{ color: 'red', opacity: 0.8, marginLeft: 8, fontSize: 25 }}
+          {item.cardio === true && (
+            true && (
+              <View style={styles.cardWrapper2}>
+                <View style={[row, center]}>
+                  <Text text={'Cardio'} color="secondary" medium />
+                  <Icon
+                    type={'FontAwesome5'}
+                    name={'heart'}
+                    style={{ color: 'red', opacity: 0.8, marginLeft: 8, fontSize: 25 }}
+                  />
+                </View>
+                <Text
+                  text={`${item.cardio_length && item.cardio_length} minutes`}
+                  color="secondary"
+                  medium
                 />
               </View>
-              <Text
-                // text={`${itemData.cardio_length && itemData.cardio_length} minutes`}
-                text={`${3} minutes`}
-                color="secondary"
-                medium
-              />
-            </View>
-          )}
+            ))
+          }
         </LinearGradient>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={[row, fill, smallHMargin, largeXLMargin, styles.cardWrapperInner]}
         >
-          {/* {itemData.workouts.length > 0
-            ? itemData.workouts.map((item, i) => {
+          {item.workouts.length > 0
+            ? item.workouts.map((item, i) => {
               return (
-                <> */}
-          <TouchableOpacity
-            // key={i}
-            onPress={() => {
-              // setData(item);
-              setIsVisible(true);
-            }}
-            style={[
-              fill,
-              border,
-              borderR30,
-              borderAlto,
-              regularRMargin,
-              secondaryBg,
-              styles.cardWrapperInnerStyle,
-            ]}
-          >
-            <View style={{ flex: 1 }}>
-              <Text
-                // text={item ? item.exercise.name : 'Barbell Bench Press'}
-                text={'Barbell Bench Press'}
-                style={{
-                  marginTop: 10,
-                  marginHorizontal: 20,
-                  lineHeight: 20,
-                  fontSize: 18,
-                  textAlign: 'center',
-                }}
-                bold
-              />
-            </View>
-            <View style={{ flex: 3 }}>
-              {/* {loading && !loading.filter(item => item === i).includes(i) && (
-                <ActivityIndicator size="large" color="#000" style={{ margin: 65 }} />
-              )} */}
-              <Image
-                // source={{ uri: item?.exercise?.pictures[0]?.image_url }}
-                style={{
-                  width: 220,
-                  height: 220,
-                  resizeMode: 'cover',
-                  overflow: 'hidden',
-                }}
-                onLoadStart={() => setLoading(['true'])}
-                onLoad={() => filterLoading(2)}
-              />
-            </View>
-          </TouchableOpacity>
-          {/* </>
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => {
+                    setIsVisible(true);
+                  }}
+                  style={[
+                    fill,
+                    border,
+                    borderR30,
+                    borderAlto,
+                    regularRMargin,
+                    secondaryBg,
+                    styles.cardWrapperInnerStyle,
+                  ]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      text={item ? item.exercise.name : 'Barbell Bench Press'}
+                      style={{
+                        marginTop: 10,
+                        marginHorizontal: 20,
+                        lineHeight: 20,
+                        fontSize: 18,
+                        textAlign: 'center',
+                      }}
+                      bold
+                    />
+                  </View>
+                  <View style={{ flex: 3 }}>
+                    <Image
+                      source={{ uri: item?.exercise?.pictures[0]?.image_url }}
+                      style={{
+                        width: 220,
+                        height: 220,
+                        resizeMode: 'cover',
+                        overflow: 'hidden',
+                      }}
+                    />
+                  </View>
+                </TouchableOpacity>
               );
             })
-            : null} */}
+            : null}
         </ScrollView>
         {startWorkout === false && <View style={{ marginTop: 30 }} />}
-        {/* {startWorkout && ( */}
-        <View style={[fill, center]}>
-          <LinearGradient
-            start={start}
-            end={end}
-            colors={['#5BF547', '#32FC7D']}
-            style={[
-              row,
-              fill,
-              center,
-              tinyHMargin,
-              regularVPadding,
-              regularHPadding,
-              regularVPadding,
-              styles.linearGradient,
-              styles.cardGradiantWrapper,
-            ]}
-          >
-            <TouchableOpacity onPress={onPress} disabled={isDone}>
-              <Text style={styles.startWorkoutWrapper} text="Start Workout" />
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
-        {/* )} */}
-        {exerciseList && (
-          <View style={[fill, center]}>
-            <LinearGradient
-              start={start}
-              end={end}
-              colors={['#ED7A61', '#ED7A61']}
-              style={[
-                row,
-                fill,
-                center,
-                tinyHMargin,
-                regularVPadding,
-                regularHPadding,
-                regularVPadding,
-                styles.linearGradient,
-                styles.cardGradiantWrapper,
-              ]}
-            >
-              <TouchableOpacity>
-                <Text color="secondary" text="Exercise List" center />
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-        )}
+        {
+          startWorkout && (
+            <View style={[fill, center]}>
+              <LinearGradient
+                start={start}
+                end={end}
+                colors={['#5BF547', '#32FC7D']}
+                style={[
+                  row,
+                  fill,
+                  center,
+                  tinyHMargin,
+                  regularVPadding,
+                  regularHPadding,
+                  regularVPadding,
+                  styles.linearGradient,
+                  styles.cardGradiantWrapper,
+                ]}
+              >
+                <TouchableOpacity onPress={onPress} disabled={workoutDone}>
+                  <Text style={styles.startWorkoutWrapper} text="Start Workout" />
+                </TouchableOpacity>
+              </LinearGradient>
+            </View>
+          )
+        }
       </View>
       <Modal
         transparent={true}
@@ -368,7 +273,7 @@ const WorkoutComponent = ({
             ]}
           >
             <TouchableOpacity
-              onPress={swipeFunc}
+              // onPress={swipeFunc}
               style={[
                 altoBg,
                 regularHMargin,
@@ -443,7 +348,6 @@ const WorkoutComponent = ({
           </View>
         </View>
       </Modal>
-
       <Modal
         transparent={true}
         animationType="slide"

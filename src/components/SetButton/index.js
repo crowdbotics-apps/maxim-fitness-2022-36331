@@ -2,31 +2,21 @@ import React from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { Images } from '../../theme'
 
-const SetButton = ({ onClick, setStyle }) => (
+const SetButton = ({ onPress, disabled, setStyle, item, index }) => (
   <View style={[styles.scrollContainer, setStyle]}>
     <TouchableOpacity
-      disabled
-      style={[
-        styles.buttonContainer,
-        {
-          backgroundColor: '#DBD7D2',
-        },
-      ]}
-      onPress={onClick}
+      style={[styles.buttonContainer, { backgroundColor: '#F2F2F2' }]}
+      onPress={onPress}
+      disabled={disabled}
     >
-      {false && (
+      {item?.done && (
         <View style={styles.iconContainer}>
           <Image source={Images.iconDoneProgram} style={styles.iconStyle} />
         </View>
       )}
       <View style={styles.buttonText}>
-        <Text>{`Set`}</Text>
+        <Text>{`Set ${index + 1}`}</Text>
       </View>
-      {false && (
-        <View style={styles.iconContainer}>
-          <View style={styles.iconStyle} />
-        </View>
-      )}
     </TouchableOpacity>
   </View>
 );
@@ -36,11 +26,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 120,
-    paddingHorizontal: 10,
+    width: 100,
+    // paddingHorizontal: 10,
   },
   buttonContainer: {
-    marginRight: 5,
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
