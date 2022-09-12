@@ -73,6 +73,8 @@ INSTALLED_APPS = [
 LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
+    "program",
+    "notification"
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -84,9 +86,19 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.apple',
     'django_extensions',
     'drf_yasg',
     'storages',
+    'django_rest_passwordreset',
+    'nested_admin',
+    "friendship",
+    "solo",
+
+    # end fcm_django push notifications
+    "push_notifications",
+    "django_crontab",
 ]
 MODULES_APPS = get_modules()
 
@@ -234,7 +246,7 @@ USE_S3 = (
 )
 
 if USE_S3:
-    AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", "")
+    # AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", "")
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     AWS_DEFAULT_ACL = env.str("AWS_DEFAULT_ACL", "public-read")
     AWS_MEDIA_LOCATION = env.str("AWS_MEDIA_LOCATION", "media")
@@ -242,6 +254,14 @@ if USE_S3:
     DEFAULT_FILE_STORAGE = env.str(
         "DEFAULT_FILE_STORAGE", "home.storage_backends.MediaStorage"
     )
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_MEDIA_LOCATION)
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = '/media/'
+
 
 # Swagger settings for api docs
 SWAGGER_SETTINGS = {
@@ -273,3 +293,35 @@ if GS_BUCKET_NAME:
     DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     GS_DEFAULT_ACL = "publicRead"
+
+
+# Four Digit Token Generator
+DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
+    "CLASS": "django_rest_passwordreset.tokens.RandomNumberTokenGenerator",
+    "OPTIONS": {
+        "min_number": 1000,
+        "max_number": 9999
+    }
+}
+
+NIX_APP_ID = env.str("NIX_APP_ID", "")
+NIX_API_KEY = env.str("NIX_API_KEY", "")
+
+STRIPE_LIVE_PUBLIC_KEY = env.str('STRIPE_LIVE_PUBLIC_KEY', '')
+STRIPE_LIVE_SECRET_KEY = env.str('STRIPE_LIVE_SECRET_KEY', '')
+STRIPE_TEST_PUBLIC_KEY = env.str('STRIPE_TEST_PUBLIC_KEY', '')
+STRIPE_TEST_SECRET_KEY = env.str('STRIPE_TEST_SECRET_KEY', '')
+STRIPE_LIVE_MODE = False
+DJSTRIPE_WEBHOOK_VALIDATION='retrieve_event'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'],
+}
+
+CRONJOBS = [
+    ('0 0 * * *', 'home.cron.send_weight_update_notification')
+]
