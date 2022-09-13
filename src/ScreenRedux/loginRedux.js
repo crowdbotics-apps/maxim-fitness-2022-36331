@@ -117,16 +117,17 @@ function* login({data}) {
     const response = yield call(loginAPI, data)
     AsyncStorage.setItem('authToken', response.data.token)
     yield put(setUserDetail(response.data.user))
-    if(response?.data?.subscription === false){
-      navigate('Subscription')
-    }
-    else{
-      yield put(setAccessToken(response.data.token))
-      showMessage({
-        message: 'Login successfully',
-        type: 'success',
-      })
-    }
+    yield put(setAccessToken(response.data.token))
+    // if(response?.data?.subscription === false){
+    //   navigate('Subscription')
+    // }
+    // else{
+    //   yield put(setAccessToken(response.data.token))
+    //   showMessage({
+    //     message: 'Login successfully',
+    //     type: 'success',
+    //   })
+    // }
   } 
   catch (e) {
     const {response} = e
