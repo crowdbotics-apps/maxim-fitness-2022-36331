@@ -51,4 +51,5 @@ export default {
   detailIcon: require('src/assets/images/icon_details_ex.png'),
   backIcon: require('src/assets/images/backIcon.png'),
   forwardIcon: require('src/assets/images/forwardIcon.png'),
+  otLogo: require('src/assets/images/otLogo.png')
 };

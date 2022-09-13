@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   SafeAreaView,
+  Modal,
   FlatList,
   RefreshControl,
   ActivityIndicator,
@@ -11,7 +12,9 @@ import {
   ScrollView,
 } from 'react-native';
 
+//Libraires
 import LinearGradient from 'react-native-linear-gradient';
+import {Overlay} from 'react-native-elements';
 
 //Components
 import {Text} from '../../components';
@@ -21,11 +24,17 @@ import HeaderTitle from './Components/headerTitle';
 import Images from '../../theme/Images';
 
 const Gender = props => {
-  const {forwardIcon} = Images;
+  const {forwardIcon, otLogo} = Images;
+
+  const {
+    navigation: {navigate},
+  } = props;
 
   const genderArray = ['Male', 'Female', 'Prefer not to answer'];
 
   const [gender, setGender] = useState(false);
+  const [welcomeModal, setWelcomeModal] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* <ScrollView> */}
@@ -61,19 +70,67 @@ const Gender = props => {
           ]}
           onPress={() => setGender(item)}
         >
-          <Text style={{fontSize: 24, color: '#d3d3d3', fontWeight: '500'}}>{item}</Text>
+          <Text style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}>{item}</Text>
           <Image source={forwardIcon} style={{height: 20, width: 10}} />
         </TouchableOpacity>
       ))}
 
-      <View style={{height: '38%', justifyContent: 'flex-end'}}>
-        <TouchableOpacity style={{marginHorizontal: 40, marginBottom: 25}}>
+      <View style={{height: '42%', justifyContent: 'flex-end'}}>
+        <TouchableOpacity
+          style={{marginHorizontal: 40, marginBottom: 25, opacity: gender !== false ? 1 : 0.7}}
+          disabled={!gender}
+          onPress={() => {
+            setWelcomeModal(true);
+          }}
+        >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
       {/* </ScrollView> */}
+
+      <Modal
+        visible={welcomeModal}
+        style={{backgroundColor: 'red', flex: 1}}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={{backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1}}>
+          <View style={{height: '25%'}}></View>
+          <View style={[styles.centeredView, {zIndex: 1}]}>
+            <Image source={otLogo} style={{height: 110, width: 140}} />
+          </View>
+
+          <View style={[styles.centeredView, {marginTop: 20}]}>
+            <Text style={{fontSize: 24, color: '#fff'}}>Welcome to Orum Training!</Text>
+          </View>
+
+          <View style={[styles.centeredView, {marginTop: 24, marginHorizontal: 39}]}>
+            <Text style={{fontSize: 18, color: '#fff', textAlign: 'left'}}>
+              Next, we are going to ask you questions regarding your exercise goals then nutrition
+              preferences
+            </Text>
+          </View>
+
+          <View style={{height: '41%', justifyContent: 'flex-end'}}>
+            <TouchableOpacity
+              style={{marginHorizontal: 40, marginBottom: 25}}
+              onPress={() => {
+                setWelcomeModal(false);
+                navigate('ExerciseLevel');
+              }}
+            >
+              <LinearGradient
+                style={[styles.logInButton]}
+                colors={['#048ECC', '#0460BB', '#0480C6']}
+              >
+                <Text style={styles.loginText}>Next</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

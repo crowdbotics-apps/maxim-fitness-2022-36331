@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 //Libraries
 import ProgressBar from 'react-native-progress/Bar';
@@ -19,9 +20,12 @@ import {Text} from '../../../components';
 import Images from '../../../theme/Images';
 
 const HeaderTitle = props => {
-  const {orumIcon, backIcon, } = Images;
+  const {orumIcon, backIcon} = Images;
 
   const {percentage, showBackButton} = props;
+
+  const navigation = useNavigation();
+
   return (
     <>
       <View
@@ -35,7 +39,9 @@ const HeaderTitle = props => {
         ]}
       >
         {showBackButton && (
-          <Image source={backIcon} style={{height: 20, width: 10, marginRight: 75}} />
+          <TouchableOpacity style={{marginRight: 75}} onPress={() => navigation.goBack()}>
+            <Image source={backIcon} style={{height: 20, width: 10}} />
+          </TouchableOpacity>
         )}
         <Image source={orumIcon} style={{height: 40, width: 165, marginVertical: 15}} />
       </View>
