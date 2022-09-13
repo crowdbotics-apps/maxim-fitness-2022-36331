@@ -278,8 +278,12 @@ const ViewPost = props => {
           />
           <SliderBox
             images={
-              param?.post_image_video?.length > 0
-                ? param?.post_image_video?.map(item => item.image)
+              param && (param?.post_image?.length && param?.post_video?.length) > 0
+                ? [...param.post_image, ...param.post_video].map(item => (item.image ? item.image : item.video))
+                : param?.post_image?.length > 0
+                ? param.post_image.map(item => item.image)
+                : param?.post_video?.length > 0
+                ? param.post_image.map(item => item.video)
                 : []
             }
             style={styles.foodImageStyle}
