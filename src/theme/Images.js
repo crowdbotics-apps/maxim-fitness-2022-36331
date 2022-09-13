@@ -51,4 +51,12 @@ export default {
   detailIcon: require('src/assets/images/icon_details_ex.png'),
   backIcon: require('src/assets/images/backIcon.png'),
   forwardIcon: require('src/assets/images/forwardIcon.png'),
+  profileBackGround: require('src/assets/images/profileBackgroung.png'),
+  whiteBackArrow: require('src/assets/images/whitebackArrow.png'),
+  whiteDots: require('src/assets/images/whitedots.png'),
+  followButton: require('src/assets/images/followButton.png'),
+  blockIcon: require('src/assets/images/blockIcon.png'),
+  flagIcon: require('src/assets/images/flagIcon.png'),
+  cameraIcon: require('src/assets/images/cameraIcon.png'),
+
 };

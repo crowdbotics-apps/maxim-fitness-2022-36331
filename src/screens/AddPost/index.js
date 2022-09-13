@@ -64,24 +64,6 @@ const AddPost = props => {
   };
 
   const addData = () => {
-    const formData = new FormData();
-    formData.append('content', content);
-
-    if (imageData.length) {
-      imageData.map((item, index) =>
-        item.mime === 'video/mp4'
-          ? formData.append('video', {
-              uri: item.path,
-              type: item.mime,
-              name: item.path,
-            })
-          : formData.append(`image ${index}`, {
-              uri: item.path,
-              type: item.mime,
-              name: item.path,
-            })
-      );
-    }
     props.AddPostData(aa())
   };
 

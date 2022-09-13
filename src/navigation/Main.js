@@ -11,6 +11,8 @@ import Subscription from '../screens/Subscription';
 import CreditCard from '../screens/CreditCard';
 import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import EditProfile from '../screens/EditProfile'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
@@ -59,8 +61,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="Home1"
-        component={Feeds}
+        name="ProfileScreen"
+        component={ProfileScreen}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -161,6 +163,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
     <mainStack.Screen name="Feeds" component={Feeds} />
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
+    <mainStack.Screen name="EditProfile" component={EditProfile} />
   </mainStack.Navigator>
 )
 
