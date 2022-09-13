@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 
 import LinearGradient from 'react-native-linear-gradient';
@@ -15,19 +16,19 @@ import LinearGradient from 'react-native-linear-gradient';
 import {Text} from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
-const Birthday = props => {
+const WeightPounds = props => {
   const {
     navigation: {navigate},
   } = props;
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderTitle percentage={0.02} showBackButton={false} />
+      <HeaderTitle percentage={0.52} showBackButton={true} />
 
       <View style={{marginHorizontal: 40, marginTop: 30}}>
         <Text
           style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
-          text={'When were you born?'}
+          text={'What is your Weight?'}
         />
         {/* 
         <Text style={{marginTop: 18}}>
@@ -47,12 +48,13 @@ const Birthday = props => {
           },
         ]}
       >
-        <Text style={{fontSize: 24, color: '#d3d3d3', fontWeight: '500'}}>Birthday</Text>
+        <TextInput style={{fontSize: 24}} placeholder={'Pounds'} />
       </View>
-      <View style={{height: '68%', justifyContent: 'flex-end'}}>
+
+      <View style={{height: '69%', justifyContent: 'flex-end'}}>
         <TouchableOpacity
           style={{marginHorizontal: 40, marginBottom: 25}}
-          onPress={() => navigate('Gender')}
+          onPress={() => navigate('FitnessGoal')}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -85,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Birthday;
+export default WeightPounds;

@@ -22,7 +22,7 @@ export default {
   // googleIcon: require('src/assets/images/googleIcon.png'),
   // facebookButton: require('src/assets/images/faceBookIcon.png'),
   orumIcon: require('src/assets/images/orumIcon.png'),
-  backIcon: require('src/assets/images/Backicon.png'),
+  // backIcon: require('src/assets/images/Backicon.png'),
   home: require('src/assets/images/home.png'),
   profile: require('src/assets/images/profile.png'),
   feed: require('src/assets/images/feed.png'),
@@ -59,4 +59,5 @@ export default {
   flagIcon: require('src/assets/images/flagIcon.png'),
   cameraIcon: require('src/assets/images/cameraIcon.png'),
 
+  otLogo: require('src/assets/images/otLogo.png')
 };
