@@ -11,7 +11,7 @@ import { Icon } from 'native-base';
 import { Gutters, Layout, Global, Colors } from '../../theme';
 import moment from 'moment';
 import { Card, WorkoutComponent, Text } from '../../components';
-import { getAllSessionRequest } from '../../ScreenRedux/programServices';
+import { getAllSessionRequest, pickSession } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
 const ProgramScreen = props => {
@@ -133,16 +133,16 @@ const ProgramScreen = props => {
                           <View>
                             <WorkoutComponent
                               onPress={() => {
-                                if (itemWorkoutUndone) {
-                                  // pickSessionAction(
-                                  //   itemWorkoutUndone,
-                                  //   item.workouts,
-                                  //   nextWorkout
-                                  // );
-                                  navigation.navigate('ExerciseScreen', { workouts: item.workouts, item: item });
-                                }
+                                // if (itemWorkoutUndone) {
+                                props.pickSession(
+                                  itemWorkoutUndone,
+                                  item.workouts,
+                                  nextWorkout
+                                );
+                                navigation.navigate('ExerciseScreen', { workouts: item.workouts, item: item });
+                                // }
                               }}
-                              workoutDone={!itemWorkoutUndone}
+                              // workoutDone={!itemWorkoutUndone}
                               startWorkout={currentD === cardDate}
                               item={item}
                               navigation={navigation}
@@ -229,6 +229,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: (data) => dispatch(getAllSessionRequest(data)),
+  pickSession: (exerciseObj, selectedSession, nextWorkout) => dispatch(pickSession(exerciseObj, selectedSession, nextWorkout))
   // pickSessionAction: (data) => dispatch(pickSession(data)),
   // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
   // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),

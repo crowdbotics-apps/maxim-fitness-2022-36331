@@ -2,8 +2,8 @@ import React from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { Images } from '../../theme'
 
-const SetButton = ({ onPress, disabled, setStyle, item, index }) => (
-  <View style={[styles.scrollContainer, setStyle]}>
+const SetButton = ({ onPress, disabled, mainContainer, item, index }) => (
+  <View style={[styles.scrollContainer, mainContainer]}>
     <TouchableOpacity
       style={[styles.buttonContainer, { backgroundColor: '#F2F2F2' }]}
       onPress={onPress}

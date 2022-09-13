@@ -7,7 +7,7 @@ const FatExerciseButton = ({
   onPress,
   loadingReps,
   loadingWeight,
-  isDone,
+  text,
   repsColor,
   weightColor,
   reps,
@@ -24,9 +24,9 @@ const FatExerciseButton = ({
               <Text
                 style={[
                   styles.styleButtonText,
-                  { color: isDone || repsColor ? 'black' : '#D3D3D3' },
+                  { color: text || repsColor ? 'black' : '#D3D3D3' },
                 ]}
-                text={isDone ? isDone : '0'}
+                text={text ? text : '0'}
               />
 
             </View>
@@ -48,10 +48,10 @@ const FatExerciseButton = ({
                   style={[
                     styles.styleButtonText,
                     {
-                      color: isDone || weightColor ? 'black' : '#D3D3D3',
+                      color: text || weightColor ? 'black' : '#D3D3D3',
                     },
                   ]}
-                  text={isDone ? isDone : '0'}
+                  text={text ? text : '0'}
                 />
               </View>
               <View style={styles.separator} />

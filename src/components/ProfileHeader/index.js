@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { Text } from 'src/components';
+import Text from '../Text';
 import { Images } from 'src/theme';
 
 const ProfileHeader = (props) => {

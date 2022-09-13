@@ -14,8 +14,10 @@ import FatGradientIconButton from './FatGradientIconButton'
 import RestContainer from './RestContainer'
 import BottomSheet from './BottomSheet'
 import StaticTimer from './StaticTimer'
-import ProfileHeader from './ProfileHeader';
+import ProfileHeader from './ProfileHeader'
 import RNModal from './RNModal'
+import InputField from './InputField'
+import ModalInput from './ModalInput'
 
 export {
   Text,
@@ -35,5 +37,7 @@ export {
   BottomSheet,
   StaticTimer,
   ProfileHeader,
-  RNModal
+  RNModal,
+  InputField,
+  ModalInput
 };

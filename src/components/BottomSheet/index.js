@@ -12,14 +12,13 @@ const BottomSheet = ({ children, reff, h }) => {
           backgroundColor: 'lightgrey',
         },
         container: {
-          alignItems: 'flex-start',
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
           backgroundColor: '#F3F5F6',
         },
       }}
       height={h ? h : 250}
-      openDuration={1000}
+      openDuration={250}
     >
       {children}
     </RBSheet>
