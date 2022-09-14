@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
-import {View, Image, StyleSheet, Dimensions, Pressable} from 'react-native';
+import {View, Image, StyleSheet, Dimensions, Pressable, TouchableOpacity} from 'react-native';
 import Text from '../Text';
 import {Images} from 'src/theme';
 import {calculatePostTime} from 'src/utils/functions';
 import {SliderBox} from 'react-native-image-slider-box';
 import Share from 'react-native-share';
+import {connect} from 'react-redux';
+import {routeData} from '../../ScreenRedux/profileRedux'
 
 const FeedCard = props => {
-  const {item, feeds, setFeedsState} = props;
+  const {item, feeds, setFeedsState, navigation, routeData} = props;
   const [showMore, setShowMore] = useState(false);
 
   const addLikeAction = () => {
@@ -50,6 +52,11 @@ const FeedCard = props => {
       });
   };
 
+  const movetoNextScreen=(item)=>{
+    routeData(item)
+    navigation.navigate('ProfileScreen')
+  }
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.card}>
@@ -62,7 +69,7 @@ const FeedCard = props => {
             }
             style={styles.profileImg}
           />
-          <View style={styles.username}>
+          <TouchableOpacity style={styles.username} onPress={()=>  movetoNextScreen(item)}>
             <Text
               text={
                 item && item.user && item.user.username
@@ -72,8 +79,10 @@ const FeedCard = props => {
               style={styles.text1}
             />
             <Text text={calculatePostTime(item)} style={styles.text2} />
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
           <Image source={Images.etc} style={styles.profileImg} />
+          </TouchableOpacity>
         </View>
         <View style={styles.cardBody}>
           <SliderBox
@@ -217,4 +226,7 @@ const styles = StyleSheet.create({
   contentStyle: {flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16},
 });
 
-export default FeedCard;
+const mapDispatchToProps = dispatch => ({
+  routeData: data => dispatch(routeData(data)),
+});
+export default connect(null, mapDispatchToProps)(FeedCard);

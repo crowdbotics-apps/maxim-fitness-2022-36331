@@ -58,6 +58,7 @@ export default {
   blockIcon: require('src/assets/images/blockIcon.png'),
   flagIcon: require('src/assets/images/flagIcon.png'),
   cameraIcon: require('src/assets/images/cameraIcon.png'),
-
+  followingButton: require('src/assets/images/followingButton.png'),
+  editProfileButton: require('src/assets/images/editProfileButton.png'),
   otLogo: require('src/assets/images/otLogo.png')
 };

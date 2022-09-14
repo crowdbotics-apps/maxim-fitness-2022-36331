@@ -12,11 +12,11 @@ export function navigateAndReset(routes = [], index = 0) {
     })
   );
 }
-export function navigateAndSimpleReset(name, index = 0) {
+export function navigateAndSimpleReset(name, index = 0,params) {
   navigationRef.current?.dispatch(
     CommonActions.reset({
       index,
-      routes: [{name}],
+      routes: [{name,params}],
     })
   );
 }

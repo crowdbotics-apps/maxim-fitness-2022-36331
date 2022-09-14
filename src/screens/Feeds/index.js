@@ -44,7 +44,7 @@ const Feeds = props => {
 
   const renderItem = ({ item, index }) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate('ViewPost', item)}>
+      <TouchableOpacity>
         <FeedCard
           item={item}
           index={index}
@@ -52,6 +52,7 @@ const Feeds = props => {
           profile={profile}
           postLikeRequest={props.postLikeRequest}
           setFeedsState={setFeedsState}
+          navigation={navigation}
         />
       </TouchableOpacity>
     );
