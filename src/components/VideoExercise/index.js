@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
   },
-  videoStyle: { height: 260, width: '100%' },
+  videoStyle: { height: 200, width: '100%' },
 });
 
 export default VideoExercise;

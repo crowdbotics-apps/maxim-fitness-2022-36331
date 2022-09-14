@@ -23,10 +23,11 @@ export const getAllSessionSuccess = data => ({
   data,
 });
 
-export const repsWeightRequest = (id, data) => ({
+export const repsWeightRequest = (id, data, dd) => ({
   type: REPS_WEIGHT_REQUEST,
   id,
   data,
+  dd
 });
 
 export const repsWeightSuccess = data => ({
@@ -89,14 +90,6 @@ export const programReducer = (state = initialState, action) => {
       };
     }
 
-    // case PICK_SESSION: {
-    //   return {
-    //     ...state,
-    //     startCount: true,
-    //     activeSet: action.activeSet,
-    //   };
-    // }
-
     default:
       return state;
   }
@@ -126,12 +119,8 @@ function* getAllSessions({ data }) {
   }
 }
 
-async function updateRepsWeightAPI(id, data) {
-  console.log('data: ', data);
-  // const reps = data.reps
-  // const weight = data.weight
-  // const individual = data.individual
-
+async function updateRepsAPI(id, data) {
+  console.log('id, data, dd: ', id, data);
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/set/${id}/`;
   const options = {
@@ -140,17 +129,53 @@ async function updateRepsWeightAPI(id, data) {
       Authorization: `Token ${token}`,
     },
     method: 'PATCH',
-    data: { data }
+    data: { reps: data }
   };
   return XHR(URL, options);
 }
 
-function* updateRepsWeight({ id, data }) {
-  console.log('id, data : ', id, data);
+async function updateWeightAPI(id, data) {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/set/${id}/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'PATCH',
+    data: { weight: data }
+  };
+  return XHR(URL, options);
+}
+
+async function updateRepsWeightAPI(id) {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/set/${id}/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'PATCH',
+  };
+  return XHR(URL, options);
+}
+
+function* updateRepsWeight({ id, data, dd }) {
   try {
-    const response = yield call(updateRepsWeightAPI, id, data);
-    console.log('reps weight response: ', response);
-    yield put(repsWeightSuccess(response.data));
+    if (dd === 'reps') {
+      const response = yield call(updateRepsAPI, id, data);
+      console.log('reps weight response: ', response);
+      yield put(repsWeightSuccess(response.data));
+    } else if (dd === 'weight') {
+      const response = yield call(updateWeightAPI, id, data);
+      console.log('reps weight response: ', response);
+      yield put(repsWeightSuccess(response.data));
+    } else {
+      const response = yield call(updateRepsWeightAPI, id);
+      console.log('reps weight response: ', response);
+      yield put(repsWeightSuccess(response.data));
+    }
   } catch (e) {
     console.log('reps weight error:', e);
     yield put(repsWeightSuccess(false));

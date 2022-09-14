@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Dimensions,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -23,7 +24,7 @@ import {
   StaticTimer,
   InputField,
   Button,
-  ModalInput
+  ModalInput,
 } from '../../components';
 import { Layout, Global, Gutters, Images, Colors } from '../../theme';
 import LinearGradient from 'react-native-linear-gradient';
@@ -34,7 +35,7 @@ const ExerciseScreen = props => {
   const {
     navigation,
     route,
-    repsWeight,
+    repsWeightState,
     exerciseObj,
     selectedSession,
     nextWorkout
@@ -43,6 +44,7 @@ const ExerciseScreen = props => {
   let refDescription = useRef('');
   let refWeight = useRef('');
   let refReps = useRef('');
+  let refModal = useRef('');
 
   const [videoLoader, setVideoLoader] = useState(false);
   const [active, setActive] = useState(0);
@@ -61,9 +63,80 @@ const ExerciseScreen = props => {
   const [showModalWeightTwo, setShowModalWeightTwo] = useState(false);
   const [showModalWeightThree, setShowModalWeightThree] = useState(false);
 
-  // 
-  const [activeSet, setActiveSet] = useState({})
+  // change color state
+  const [repsColor, setRepsColor] = useState(false)
+  const [weightColor, setWeightColor] = useState(false)
 
+  const [activeSet, setActiveSet] = useState({})
+  const [modal, setModal] = useState(false)
+
+  let deviceHeight = Dimensions.get('window').height;
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
+        setModal('ss')
+        refModal.current.open()
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === 'gs') {
+        setModal('gs')
+        refModal.current.open()
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === 'ds') {
+        setModal('ds')
+        refModal.current.open()
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === 'tds') {
+        setModal('tds')
+        refModal.current.open()
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === 'ct') {
+        setModal('ct')
+        refModal.current.open()
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === 'r') {
+        setModal(null)
+      }
+    }, 500);
+  }, [repsWeightState]);
+
+
+  const checkModalType = (param) => {
+    switch (param) {
+      case 'ss':
+        return (
+          <SetsComponents colors={['#f19a38', '#f7df58']} text={'Super Sets'} />
+        )
+      case 'gs':
+        return (
+          <SetsComponents colors={['#60d937', '#60d937']} text={'Giant Sets'} />
+        )
+      case 'ds':
+        return (
+          <SetsComponents colors={['#60d937', '#60d937']} text={'Drop Sets'} />
+        )
+      case 'tds':
+        return (
+          <SetsComponents colors={['#ed220d', '#ed220d']} text={'Triple Drop Sets'} />
+        )
+      case 'ct':
+        return (
+          <SetsComponents colors={['#f19a38', '#f7df58']} text={'Circuit Training'} />
+        )
+      default:
+        break;
+    }
+
+  }
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      const [findIndex] = nextWorkout.sets.map((set) => set)
+      setActiveSet(findIndex)
+      props.repsWeightRequest(findIndex.id, null, null)
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     if (route) {
@@ -71,7 +144,7 @@ const ExerciseScreen = props => {
     }
   }, [route])
 
-  console.log('repsWeight: ', repsWeight);
+  console.log('repsWeightState: ', repsWeightState);
   console.log('activeSet: ', activeSet);
 
   const {
@@ -121,24 +194,27 @@ const ExerciseScreen = props => {
   const endSocial = { x: 1, y: 0 };
 
   const updateReps = () => {
+    setRepsColor(true)
     refReps.current.close();
-
-    const id = repsWeight.id
+    const id = repsWeightState.id
     const reps = `${repsState}${showModalRepsTwo ? '/' : ''}${showModalRepsThree ? '/' : ''}${repsTwo}${showModalRepsThree ? '/' : ''
       }${repsThree}`
-    console.log('id, reps', id, reps);
-    props.repsWeightRequest(id, reps);
+    console.log('id, reps', id, typeof reps);
+    const dd = 'reps'
+    props.repsWeightRequest(id, reps, dd);
     setReps('');
     setRepsTwo('');
     setRepsThree('');
   };
 
   const updateWeight = () => {
+    setWeightColor(true)
     refWeight.current.close();
-    const id = repsWeight.id
+    const id = repsWeightState.id
     const weight = `${weightState}${showModalWeightTwo ? '/' : ''}${showModalWeightThree ? '/' : ''}${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`
-    console.log('id, weight', id, weight);
-    props.repsWeightRequest(id, weight);
+    console.log('id, weight', id, typeof weight);
+    const dd = 'weight'
+    props.repsWeightRequest(id, weight, dd);
     setWeight('');
     setWeightTwo('');
     setWeightThree('');
@@ -162,9 +238,13 @@ const ExerciseScreen = props => {
   };
 
   const setsData = (set) => {
+    setActiveSet(set)
     const id = set.id
     const individual = null
-    props.repsWeightRequest(id, individual);
+    const dd = null
+    props.repsWeightRequest(id, individual, dd);
+    setRepsColor(false)
+    setWeightColor(false)
   }
   return (
     <SafeAreaView style={[fill, { backgroundColor: '#F2F2F2' }]}>
@@ -192,7 +272,10 @@ const ExerciseScreen = props => {
             {params?.workouts?.map((item, i) => {
               return (
                 <TouchableOpacity
-                  onPress={() => setActive(i)}
+                  onPress={() => {
+                    setActive(i)
+                    props.repsWeightRequest(item?.sets[0]?.id, null, null)
+                  }}
                   style={[
                     row,
                     center,
@@ -256,84 +339,138 @@ const ExerciseScreen = props => {
                   </View>
                 )}
               </View>
-
-              {true && (
-                <View style={[center, secondaryBg, { height: 60 }]}>
-                  <SetsComponents colors={['#f19a38', '#f7df58']} text={item.exercise.name} />
+              {repsWeightState?.set_type?.toLowerCase() === 'cr' ? props.loader ? (
+                <View style={[secondaryBg, { height: 50, justifyContent: 'center' }]}>
+                  <ActivityIndicator size="small" color="green" />
                 </View>
-              )}
+              ) : (
+                <View style={[row, justifyContentCenter, alignItemsEnd, largeTPadding, secondaryBg]}>
+                  <Text text={route?.params?.item?.cardio_length} largeTitle bold />
+                  <Text text="minutes" medium bold style={{ lineHeight: 34 }} />
+                </View>
+              ) : (
+                <>
+                  {console.log('modal------------: ', modal)}
+                  {repsWeightState?.set_type?.toLowerCase() === modal ? modal && props.loader ?
+                    <View style={[secondaryBg, { height: 50, justifyContent: 'center' }]}>
+                      <ActivityIndicator size="small" color="green" />
+                    </View>
+                    : (
+                      <View style={[secondaryBg, { height: 50, justifyContent: 'flex-end' }]}>
+                        {checkModalType(modal)}
+                      </View>
+                    ) : null}
 
-              <View style={[row, alignItemsCenter, secondaryBg, { height: 60 }]}>
-                <ScrollView
-                  horizontal
-                  contentContainerStyle={fillGrow}
-                  showsHorizontalScrollIndicator={false}
-                  automaticallyAdjustContentInsets={false}
-                >
-                  {item?.sets?.map((set, i) => (
-                    <SetButton
-                      key={i}
-                      item={set}
-                      index={i}
-                      onPress={() => setsData(set)}
-                      mainContainer={{ marginLeft: 10 }}
-                    />
-                  )
-                  )}
-                </ScrollView>
-              </View>
-
-              {repsWeight ?
-                <View style={[fill, secondaryBg]}>
-                  <ScrollView contentContainerStyle={[fillGrow]}>
+                  <View style={[row, alignItemsCenter, secondaryBg, { height: 60, paddingHorizontal: 10 }]}>
+                    <ScrollView
+                      horizontal
+                      contentContainerStyle={fillGrow}
+                      showsHorizontalScrollIndicator={false}
+                      automaticallyAdjustContentInsets={false}
+                    >
+                      {item?.sets?.map((set, i) => (
+                        <SetButton
+                          key={i}
+                          item={set}
+                          index={i}
+                          onPress={() => setsData(set)}
+                          mainContainer={{ marginHorizontal: 5 }}
+                          bg={repsWeightState?.id === set?.id && '#A9A9A9'}
+                        />
+                      )
+                      )}
+                    </ScrollView>
+                  </View>
+                </>
+              )
+              }
+              <View style={[fill, secondaryBg]}>
+                <ScrollView contentContainerStyle={[fillGrow]}>
+                  {repsWeightState?.set_type?.toLowerCase() === 'cr' ? null : (
                     <View style={[row, tinyHPadding]}>
                       <FatExerciseButton
                         reps
                         buttonLabel="Reps"
-                        onPress={() => refReps.current.open()}
-                        text={repsState}
+                        text={repsWeightState?.reps}
+                        onPress={() => {
+                          refReps.current.open()
+                          setShowModalRepsTwo(repsWeightState && repsWeightState?.set_type?.toLowerCase() === 'ds');
+                          setShowModalRepsThree(repsWeightState && repsWeightState?.set_type?.toLowerCase() === 'tds');
+                        }}
+                        loadingReps={props.loader}
+                        repsColor={repsColor}
+                        repsWeightState={repsWeightState}
+                        disabled={props.loader}
                       />
                       <FatExerciseButton
                         weight
                         buttonLabel="Weight"
-                        onPress={() => refWeight.current.open()}
-                        isDone={weightState || weightTwo || weightThree}
+                        text={repsWeightState?.weight}
+                        onPress={() => {
+                          refWeight.current.open()
+                          setShowModalWeightTwo(repsWeightState && repsWeightState?.set_type?.toLowerCase() === 'ds');
+                          setShowModalWeightThree(repsWeightState && repsWeightState?.set_type?.toLowerCase() === 'tds');
+                        }}
+                        loadingWeight={props.loader}
+                        weightColor={weightColor}
+                        repsWeightState={repsWeightState}
+                        disabled={props.loader}
                       />
                     </View>
-
-                    <View style={[row, tinyHPadding, tinyVPadding]}>
-                      <FatExerciseIconButton
-                        buttonText="Exercise Description"
-                        buttonIcon={Images.detailIcon}
-                        onPress={() => refDescription.current.open()}
-                      />
-                      <FatExerciseIconButton
-                        buttonText="Swap Exercise"
-                        buttonIcon={Images.iconSwap}
-                      />
-                      <FatGradientIconButton
-                        buttonText={
-                          true
-                            ? 'Done'
-                            : 'Done, Start Rest'
-                        }
-                        buttonIcon={Images.iconDoneStartRest}
-                        colorsGradient={['#3180BD', '#6EC2FA']}
-                        colorsGradientDisable={['#d3d3d3', '#838383']}
-                      />
-                    </View>
-                    <RestContainer
-                      upNext={'next'}
-                      showBar={false}
-                    // onPress={() => setStartTimer(false)}
+                  )}
+                  <View style={[row, tinyHPadding, tinyVPadding]}>
+                    <FatExerciseIconButton
+                      buttonText="Exercise Description"
+                      buttonIcon={Images.detailIcon}
+                      onPress={() => refDescription.current.open()}
                     />
-                  </ScrollView>
-                </View>
-                : null}
+                    <FatExerciseIconButton
+                      buttonText="Swap Exercise"
+                      buttonIcon={Images.iconSwap}
+                    />
+                    <FatGradientIconButton
+                      buttonText={
+                        true
+                          ? 'Done'
+                          : 'Done, Start Rest'
+                      }
+                      buttonIcon={Images.iconDoneStartRest}
+                      colorsGradient={['#3180BD', '#6EC2FA']}
+                      colorsGradientDisable={['#d3d3d3', '#838383']}
+
+                    />
+                  </View>
+                  <RestContainer
+                    upNext={'next'}
+                    showBar={false}
+                  // onPress={() => setStartTimer(false)}
+                  />
+                </ScrollView>
+              </View>
+
             </View>
           )
         }
       })}
+
+      {/*===============================================*/}
+
+      <BottomSheet reff={refDescription} h={400}>
+        <KeyboardAvoidingView
+          enabled
+          behavior="padding"
+          style={[fill, { width: '100%', marginTop: 20 }]}
+        >
+          <View style={[center, regularHMargin]}>
+            {exerciseObj?.exercise?.description ? (
+              <Text text={exerciseObj?.exercise?.description} />
+            ) : (
+              <Text text={'No Description is available!'} />
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </BottomSheet>
+
       {/*===============================================*/}
       <BottomSheet reff={refReps} h={360}>
         <View style={[fill, regularHMargin, regularVMargin]}>
@@ -429,6 +566,164 @@ const ExerciseScreen = props => {
         </View>
       </BottomSheet>
       {/*===============================================*/}
+      <BottomSheet reff={refModal} h={deviceHeight - 100}>
+        <View
+          style={[justifyContentStart, alignItemsCenter, fill4x]}
+        >
+          <View style={[row, center, { marginTop: 20 }]}>
+            {checkModalType(modal)}
+          </View>
+          <>
+            {modal === 'ss' ? (
+              <View style={[regularHMargin, regularVMargin]}>
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Perform two consecutive exercises with no rest in between.'}
+                />
+
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Begin rest when second exercise is Complete.'}
+                />
+              </View>
+            ) : null}
+          </>
+          <>
+            {modal === 'gs' ? (
+              <View style={[regularHMargin, regularVMargin]}>
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Perform three consecutive exercises with no rest in between.'}
+                />
+
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Begin rest when the third exercise is complete.'}
+                />
+              </View>
+            ) : null}
+          </>
+          <>
+            {modal === 'ds' ? (
+              <View style={[regularHMargin, regularVMargin]}>
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={
+                    'Perform a round of the exercise with a certain weight, then reduce the weight to complete another round for more reps without resting immediately after. '
+                  }
+                />
+
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Once both rounds of reps are complete, then begin your rest.'}
+                />
+              </View>
+            ) : null}
+          </>
+          <>
+            {modal === 'tds' ? (
+              <View style={[regularHMargin, regularVMargin]}>
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={
+                    'Perform a round of the exercise with a certain weight, then reduce the weight to complete another round for more reps, then complete a third round without resting immediately after. '
+                  }
+                />
+
+                <Text
+                  style={smallVMargin}
+                  medium
+                  color="septenary"
+                  text={'Once all three rounds of reps are complete, then begin your rest.'}
+                />
+              </View>
+            ) : null}
+          </>
+
+          <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
+            {(modal === 'ss') ||
+              (modal === 'gs') ? (
+              <>
+                {repsWeightState?.exercises?.map((exercise, index) => {
+                  return (
+                    <View key={index} style={justifyContentCenter}>
+                      <View style={[row, fill, regularVMargin]}>
+                        <Text
+                          regularTitle
+                          color="quinary"
+                          text={`${(index + 1 === 1 && 'a') ||
+                            (index + 1 === 2 && 'b') ||
+                            (index + 1 === 3 && 'c') ||
+                            (index + 1 === 4 && 'd')
+                            }. ${exercise?.name}`}
+                        />
+                      </View>
+                      <View style={center}>
+                        <Image
+                          source={{
+                            uri: exercise?.pictures[0]?.image_url,
+                          }}
+                          style={styles.modalImageStyle}
+                        />
+                      </View>
+                    </View>
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                <View style={[row, fill, regularVMargin]}>
+                  <Text
+                    regularTitle
+                    color="quinary"
+                    text={`1. ${exerciseObj?.exercise?.name}`}
+                  />
+                </View>
+                <View style={center}>
+                  <Image
+                    source={{
+                      uri: exerciseObj?.exercise?.pictures[0]?.image_url,
+                    }}
+                    style={styles.modalImageStyle}
+                  />
+                </View>
+              </>
+            )}
+            <View style={[fill, row, center, regularVMargin]}>
+              <View style={fillOnePoint5} />
+              <LinearGradient
+                start={startSocial}
+                end={endSocial}
+                colors={['#fa201b', '#fe5b06']}
+                style={[fill2x, punchBg, center, row, borderR10, height40, tiny2xHPadding]}
+              >
+                <Text
+                  large
+                  color="secondary"
+                  bold
+                  text="Got it"
+                  onPress={() => refModal.current.close()}
+                />
+              </LinearGradient>
+              <View style={fillOnePoint5} />
+            </View>
+          </ScrollView>
+        </View>
+      </BottomSheet>
     </SafeAreaView>
   );
 };
@@ -482,7 +777,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   getAllSessions: state.programReducer.getAllSessions,
-  repsWeight: state.programReducer.repsWeight,
+  repsWeightState: state.programReducer.repsWeight,
   loader: state.programReducer.loader,
   exerciseObj: state.programReducer.exerciseObj,
   selectedSession: state.programReducer.selectedSession,
@@ -495,7 +790,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: (data) => dispatch(getAllSessionRequest(data)),
-  repsWeightRequest: (id, data) => dispatch(repsWeightRequest(id, data)),
+  repsWeightRequest: (id, data, dd) => dispatch(repsWeightRequest(id, data, dd)),
   // pickSessionAction: (data) => dispatch(pickSession(data)),
   // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
   // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),
