@@ -1,4 +1,4 @@
-import { all } from 'redux-saga/effects'
+import {all} from 'redux-saga/effects'
 
 // sagas
 import SignIn from '../ScreenRedux/loginRedux'
@@ -10,5 +10,14 @@ import subscriptionSaga from '../ScreenRedux/subscriptionRedux'
 import programSaga from '../ScreenRedux/programServices'
 import profileSaga from '../ScreenRedux/profileRedux'
 export function* mainSaga() {
-  yield all([SignIn, SignUp, feedSaga, addPost, ViewPost, subscriptionSaga, programSaga, profileSaga]);
+  yield all([
+    SignIn,
+    SignUp,
+    feedSaga,
+    addPost,
+    ViewPost,
+    subscriptionSaga,
+    programSaga,
+    profileSaga,
+  ]);
 }

@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import * as Progress from 'react-native-progress';
 import Timer from '../Timer';
 
-const RestContainer = ({
-  onPress,
-  showBar,
-  loading,
-  isDisable,
-  increment
-}) => {
+const RestContainer = ({ onPress, showBar, loading, isDisable, increment }) => {
   const widthProgress = Dimensions.get('screen').width;
 
   return (

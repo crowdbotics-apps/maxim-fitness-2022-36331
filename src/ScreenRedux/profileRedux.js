@@ -1,10 +1,10 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {setUserDetail} from './loginRedux'
-import {showMessage} from 'react-native-flash-message';
+import { setUserDetail } from './loginRedux'
+import { showMessage } from 'react-native-flash-message';
 
 // config
-import {API_URL} from '../config/app'
+import { API_URL } from '../config/app'
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -22,7 +22,6 @@ const FOLLOW_USER = 'PROFILE_SCREEN/FOLLOW_USER';
 const UNFOLLOW_USER = 'PROFILE_SCREEN/UNFOLLOW_USER';
 
 const ROUTE_DATA = 'PROFILE_SCREEN/ROUTE_DATA';
-
 
 const initialState = {
   requesting: false,
@@ -43,37 +42,34 @@ export const getProfileSuccess = data => ({
 })
 
 export const editProfile = (data, id) => ({
-    type: EDIT_PROFILE,
-    data,
-    id
-  })
-  
-  export const editProfileSuccess = data => ({
-    type: EDIT_PROFILE_SUCCESS,
-    data
-  })
+  type: EDIT_PROFILE,
+  data,
+  id
+})
 
-export const resetProfile = ()=> ({
+export const editProfileSuccess = data => ({
+  type: EDIT_PROFILE_SUCCESS,
+  data
+})
+
+export const resetProfile = () => ({
   type: RESET_GET_PROFILE,
 })
 
-export const followUser = (data)=> ({
+export const followUser = data => ({
   type: FOLLOW_USER,
   data
 })
 
-export const unFollowUser = (data)=> ({
+export const unFollowUser = data => ({
   type: UNFOLLOW_USER,
   data
 })
 
-export const routeData = (data)=> ({
+export const routeData = data => ({
   type: ROUTE_DATA,
   data
 })
-
-
-
 
 //Reducers
 export const profileReducer = (state = initialState, action) => {
@@ -97,17 +93,16 @@ export const profileReducer = (state = initialState, action) => {
         editRequesting: false
       }
 
-      case ROUTE_DATA:
-        return {
-          ...state,
-          routeDetail: action.data
-        }
-        case EDIT_PROFILE:
-          return {
-            ...state,
-            editRequesting: true
-          }
-        
+    case ROUTE_DATA:
+      return {
+        ...state,
+        routeDetail: action.data
+      }
+    case EDIT_PROFILE:
+      return {
+        ...state,
+        editRequesting: true
+      }
 
     default:
       return state
@@ -129,13 +124,13 @@ async function getProfileAPI(data) {
   return XHR(URL, options)
 }
 
-function* getProfileData({data}) {
+function* getProfileData({ data }) {
   try {
     const response = yield call(getProfileAPI, data)
     console.log('get profile success response----', response);
     yield put(getProfileSuccess(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('get profile failure response0000', response);
   } finally {
     yield put(resetProfile())
@@ -157,13 +152,13 @@ async function followUserAPI(data) {
   return XHR(URL, options)
 }
 
-function* followuserData({data}) {
+function* followuserData({ data }) {
   try {
     const response = yield call(followUserAPI, data)
     console.log('follow user success response----', response);
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('follow user  failure response0000', response);
   }
 }
@@ -183,17 +178,16 @@ async function unfollowUserAPI(data) {
   return XHR(URL, options)
 }
 
-function* unfollowuserData({data}) {
+function* unfollowuserData({ data }) {
   try {
     const response = yield call(unfollowUserAPI, data)
     console.log('unfollow user success response----', response);
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('unfollow user  failure response0000', response);
   }
 }
-
 
 async function updateProfile(data, id) {
   const URL = `${API_URL}/update-profile/${id}/`
@@ -211,16 +205,15 @@ async function updateProfile(data, id) {
   return XHR(URL, options)
 }
 
-function* updateUserData({data, id}) {
+function* updateUserData({ data, id }) {
   try {
     const response = yield call(updateProfile, data, id)
     console.log('edit profile success response----', response);
     yield put(setUserDetail(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('edit profile failure response0000', response);
-  }
-  finally{
+  } finally {
     yield put(resetProfile())
   }
 }
@@ -230,5 +223,4 @@ export default all([
   takeLatest(FOLLOW_USER, followuserData),
   takeLatest(UNFOLLOW_USER, unfollowuserData),
   takeLatest(EDIT_PROFILE, updateUserData),
-
 ])

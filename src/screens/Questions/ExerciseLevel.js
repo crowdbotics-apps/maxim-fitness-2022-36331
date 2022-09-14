@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,42 +14,58 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import { Overlay } from 'react-native-elements';
+import { connect } from 'react-redux';
 
 //Components
-import {Text} from '../../components';
+import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
 
+//Actions
+import { updateAnswer } from './Redux';
+
 const ExerciseLevel = props => {
-  const {forwardIcon, otLogo} = Images;
+  const { forwardIcon, otLogo } = Images;
 
   const exerciseArray = [
-    {heading: 'Sedantry', description: 'No exercise experience'},
-    {heading: 'Intermediate', description: 'less than 2 years of training, off and on'},
-    {heading: 'Advanced', description: 'more than 2 years of dedicated training'},
+    { heading: 'Sedantry', description: 'No exercise experience' },
+    { heading: 'Intermediate', description: 'less than 2 years of training, off and on' },
+    { heading: 'Advanced', description: 'more than 2 years of dedicated training' },
   ];
 
   const {
-    navigation: {navigate},
+    navigation: { navigate },
   } = props;
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.exercise_level = exerciseLevel;
+    navigate('ActivityLevel');
+    props.updateAnswers(tempData);
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.exercise_level) {
+      setExerciseLevel(props.answers.exercise_level);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.18} />
 
-      <View style={{marginHorizontal: 40, marginTop: 30}}>
+      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
-          style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
+          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
           text={'What is level of your exercise?'}
         />
       </View>
 
-      <View style={{marginTop: 30}}>
+      <View style={{ marginTop: 30 }}>
         {exerciseArray.map(item => (
           <TouchableOpacity
             style={[
@@ -66,21 +82,21 @@ const ExerciseLevel = props => {
             ]}
             onPress={() => setExerciseLevel(item.heading)}
           >
-            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
               <View
                 style={{
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
                   {item.heading}
                 </Text>
-                <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text>
+                <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
               </View>
               <View>
                 <Image
                   source={forwardIcon}
-                  style={{height: 20, width: 10, marginTop: 10, marginRight: 10}}
+                  style={{ height: 20, width: 10, marginTop: 10, marginRight: 10 }}
                 />
               </View>
             </View>
@@ -88,7 +104,7 @@ const ExerciseLevel = props => {
         ))}
       </View>
 
-      <View style={{height: '41%', justifyContent: 'flex-end'}}>
+      <View style={{ height: '41%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -97,7 +113,7 @@ const ExerciseLevel = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('ActivityLevel');
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -131,4 +147,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExerciseLevel;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ExerciseLevel);

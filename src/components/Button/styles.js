@@ -1,7 +1,7 @@
-import {StyleSheet} from 'react-native'
+import { StyleSheet } from 'react-native'
 
 // styles
-import {Colors} from '../../theme'
+import { Colors } from '../../theme'
 
 export default StyleSheet.create({
   primary: {

@@ -9,7 +9,8 @@ import { postReducer } from '../ScreenRedux/viewPostRedux'
 import { feedsReducer } from '../ScreenRedux/feedRedux'
 import { subscriptionReducer } from '../ScreenRedux/subscriptionRedux'
 import { programReducer } from '../ScreenRedux/programServices'
-import {profileReducer} from '../ScreenRedux/profileRedux'
+import { profileReducer } from '../ScreenRedux/profileRedux'
+import { questionReducer } from '../screens/Questions/Redux'
 
 const appPersistConfig = {
   key: 'login',
@@ -25,5 +26,6 @@ export default {
   postReducer,
   subscriptionReducer,
   programReducer,
-  profileReducer
+  profileReducer,
+  questionReducer
 };

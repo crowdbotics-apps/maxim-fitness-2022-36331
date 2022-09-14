@@ -101,31 +101,28 @@ const Feeds = props => {
         <View style={styles.loaderStyle}>
           <ActivityIndicator size="large" color="green" />
         </View>
-      ) :
-        feedsState.length > 0
-          ? (
-            <FlatList
-              ref={flatList}
-              refreshControl={
-                <RefreshControl
-                  colors={['#9Bd35A', '#689F38']}
-                  refreshing={requesting}
-                  onRefresh={() => onPullToRefresh()}
-                  progressViewOffset={20}
-                />
-              }
-              data={feedsState}
-              renderItem={renderItem}
-              keyExtractor={item => item.id.toString()}
-              extraData={feedsState}
-              // onEndReached={onEnd}
-              windowSize={250}
-              // onViewableItemsChanged={onViewRef.current}
-              // viewabilityConfig={viewConfigRef.current}
-              keyboardShouldPersistTaps={'handled'}
+      ) : feedsState.length > 0 ? (
+        <FlatList
+          ref={flatList}
+          refreshControl={
+            <RefreshControl
+              colors={['#9Bd35A', '#689F38']}
+              refreshing={requesting}
+              onRefresh={() => onPullToRefresh()}
+              progressViewOffset={20}
             />
-          ) : null
-      }
+          }
+          data={feedsState}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          extraData={feedsState}
+          // onEndReached={onEnd}
+          windowSize={250}
+          // onViewableItemsChanged={onViewRef.current}
+          // viewabilityConfig={viewConfigRef.current}
+          keyboardShouldPersistTaps={'handled'}
+        />
+      ) : null}
     </SafeAreaView>
   )
 }

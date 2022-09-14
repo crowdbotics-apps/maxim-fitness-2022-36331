@@ -29,4 +29,3 @@ const ModalInput = props => {
 };
 
 export default ModalInput;
-

@@ -23,7 +23,7 @@ import HeaderTitle from './Components/headerTitle';
 //Themes
 import Images from '../../theme/Images';
 
-const FitnessGoal = props => {
+const NutritionUnderstanding = props => {
   const { forwardIcon, otLogo } = Images;
 
   const {
@@ -32,16 +32,16 @@ const FitnessGoal = props => {
 
   const exerciseArray = [
     {
-      heading: 'Fat loss',
-      description: 'weight loss, figure change, general wellness',
+      heading: 'Beginner',
+      description: 'No real understanding of nutrition',
     },
     {
-      heading: 'Strength and Hypertrophy',
-      description: 'powerlifting and bodybuilding',
+      heading: 'Intermediate',
+      description: 'I have tried diets before and had mediocre results',
     },
     {
-      heading: 'Maintenance',
-      description: 'maintain current weight/figure',
+      heading: 'Advanced',
+      description: 'I am educated in nutrition',
     },
   ];
 
@@ -49,12 +49,12 @@ const FitnessGoal = props => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.58} />
+      <HeaderTitle showBackButton={true} percentage={0.83} />
 
       <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
           style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What is your fitness goal?'}
+          text={'What is your level of understanding nutrition?'}
         />
       </View>
 
@@ -94,7 +94,7 @@ const FitnessGoal = props => {
         ))}
       </View>
 
-      <View style={{ height: '45%', justifyContent: 'flex-end' }}>
+      <View style={{ height: '39%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -103,7 +103,7 @@ const FitnessGoal = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('TrainingDays');
+            navigate('ThingsToKnow');
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -137,4 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FitnessGoal;
+export default NutritionUnderstanding;

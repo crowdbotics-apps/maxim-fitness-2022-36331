@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react'
+import { useState, useEffect, useCallback } from 'react'
 /**
  * Determines a value if it's an object
  *
@@ -63,13 +63,13 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
@@ -77,7 +77,7 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
     }
     setState(prevState => ({
       ...prevState,
-      [name]: {value, error},
+      [name]: { value, error },
     }))
   }
   const handlePhoneNumberChange = (name, value, countryCode, countryDialCode) => {
@@ -95,13 +95,13 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
@@ -109,14 +109,14 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
     }
     setState(prevState => ({
       ...prevState,
-      [name]: {value, error, countryCode, countryDialCode},
+      [name]: { value, error, countryCode, countryDialCode },
     }))
   }
   const handleOnSubmit = (name, value) => {
     setIsDirty(true)
     setState(prevState => ({
       ...prevState,
-      [name]: {value, error: ''},
+      [name]: { value, error: '' },
     }))
   }
   const validateOnBlur = (name, value) => {
@@ -133,13 +133,13 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
         }
         // Test your defined RegExp...
         if (value && !validationSchema[name].validator.regEx.test(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
       } else if (validationSchema[name].validator.compare) {
         if (value && validationSchema[name].validator.compare(value)) {
-          const {validator} = validationSchema[name]
+          const { validator } = validationSchema[name]
           // eslint-disable-next-line prefer-destructuring
           error = validator.error
         }
@@ -147,7 +147,7 @@ const useForm = (stateSchema = {}, validationSchema = {}, callback) => {
     }
     setState(prevState => ({
       ...prevState,
-      [name]: {value, error},
+      [name]: { value, error },
     }))
   }
   return {

@@ -15,11 +15,7 @@ import { getAllSessionRequest, pickSession } from '../../ScreenRedux/programServ
 import { connect } from 'react-redux';
 
 const ProgramScreen = props => {
-  const {
-    navigation,
-    getAllSessions,
-    loadingAllSession,
-  } = props;
+  const { navigation, getAllSessions, loadingAllSession } = props;
 
   console.log('getAllSessions: ', getAllSessions);
 
@@ -109,74 +105,69 @@ const ProgramScreen = props => {
           <View style={[styles.container, styles.horizontal]}>
             <ActivityIndicator size="large" color="#000" />
           </View>
-        )
-          :
-          getAllSessions?.query?.length < 1 ?
-            (
-              <View style={[fill, center, styles.noProgramWrapper]}>
-                <Text text="No Program Assigned!" style={styles.noProgramWrapperText} />
+        ) : getAllSessions?.query?.length < 1 ? (
+          <View style={[fill, center, styles.noProgramWrapper]}>
+            <Text text="No Program Assigned!" style={styles.noProgramWrapperText} />
+          </View>
+        ) : (
+          getAllSessions?.query?.map((item, index) => {
+            let currentD = moment(new Date()).format('YYYY-MM-DD');
+            let cardDate = moment(item.date_time).format('YYYY-MM-DD');
+
+            const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
+              workoutItem => !workoutItem.done
+            );
+            return (
+              <View key={index} style={fill}>
+                <View style={fill}>
+                  {show && currentD === cardDate && (
+                    <>
+                      {item.workouts.length > 0 ? (
+                        <View>
+                          <WorkoutComponent
+                            onPress={() => {
+                              // if (itemWorkoutUndone) {
+                              props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout);
+                              navigation.navigate('ExerciseScreen', {
+                                workouts: item.workouts,
+                                item: item,
+                              });
+                              // }
+                            }}
+                            // workoutDone={!itemWorkoutUndone}
+                            startWorkout={currentD === cardDate}
+                            item={item}
+                            navigation={navigation}
+                            activeIndex={activeIndex}
+                            setActiveIndex={setActiveIndex}
+                            isVisible={isVisible}
+                            setIsVisible={setIsVisible}
+                          />
+                        </View>
+                      ) : (
+                        <View style={[turtiaryBg, center, { height: 100 }]}>
+                          <Text text="No Workout for Today" bold />
+                        </View>
+                      )}
+                    </>
+                  )}
+                </View>
+                <View>
+                  <Card
+                    style={
+                      (show ? show === index + 1 : currentD === cardDate) && {
+                        backgroundColor: Colors.alto,
+                      }
+                    }
+                    onPress={() => setShow(show === index + 1 ? undefined : index + 1)}
+                    text={item.workouts.length > 0 ? item.name : 'No WorkOut'}
+                    item={item}
+                  />
+                </View>
               </View>
             )
-            :
-            getAllSessions?.query?.map((item, index) => {
-
-              let currentD = moment(new Date()).format('YYYY-MM-DD');
-              let cardDate = moment(item.date_time).format('YYYY-MM-DD');
-
-              const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(workoutItem => !workoutItem.done);
-              return (
-                <View key={index} style={fill}>
-                  <View style={fill}>
-                    {(show && currentD === cardDate) && (
-                      <>
-                        {item.workouts.length > 0 ? (
-                          <View>
-                            <WorkoutComponent
-                              onPress={() => {
-                                // if (itemWorkoutUndone) {
-                                props.pickSession(
-                                  itemWorkoutUndone,
-                                  item.workouts,
-                                  nextWorkout
-                                );
-                                navigation.navigate('ExerciseScreen', { workouts: item.workouts, item: item });
-                                // }
-                              }}
-                              // workoutDone={!itemWorkoutUndone}
-                              startWorkout={currentD === cardDate}
-                              item={item}
-                              navigation={navigation}
-                              activeIndex={activeIndex}
-                              setActiveIndex={setActiveIndex}
-                              isVisible={isVisible}
-                              setIsVisible={setIsVisible}
-                            />
-                          </View>
-                        ) : (
-                          <View style={[turtiaryBg, center, { height: 100 }]}>
-                            <Text text="No Workout for Today" bold />
-                          </View>
-                        )}
-                      </>
-                    )}
-                  </View>
-                  <View>
-                    <Card
-                      style={
-                        (show
-                          ? show === index + 1
-                          : currentD === cardDate) && {
-                          backgroundColor: Colors.alto,
-                        }
-                      }
-                      onPress={() => setShow(show === index + 1 ? undefined : index + 1)}
-                      text={item.workouts.length > 0 ? item.name : 'No WorkOut'}
-                      item={item}
-                    />
-                  </View>
-                </View>
-              )
-            })}
+          })
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -228,8 +219,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getAllSessionRequest: (data) => dispatch(getAllSessionRequest(data)),
-  pickSession: (exerciseObj, selectedSession, nextWorkout) => dispatch(pickSession(exerciseObj, selectedSession, nextWorkout))
+  getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
+  pickSession: (exerciseObj, selectedSession, nextWorkout) =>
+    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout))
   // pickSessionAction: (data) => dispatch(pickSession(data)),
   // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
   // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),
@@ -237,4 +229,3 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProgramScreen);
-

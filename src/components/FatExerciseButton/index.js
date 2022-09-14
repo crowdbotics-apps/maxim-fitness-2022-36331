@@ -17,20 +17,16 @@ const FatExerciseButton = ({
 }) => {
   return (
     <>
-      {reps ?
+      {reps ? (
         <TouchableOpacity style={styles.buttonContainer} onPress={onPress} disabled={disabled}>
           {loadingReps ? (
             <ActivityIndicator size="small" color="#000" style={{ height: 35 }} />
           ) : (
             <View style={styles.iconContainer}>
               <Text
-                style={[
-                  styles.styleButtonText,
-                  { color: repsColor ? 'black' : '#D3D3D3' },
-                ]}
+                style={[styles.styleButtonText, { color: repsColor ? 'black' : '#D3D3D3' }]}
                 text={text ? text : '0'}
               />
-
             </View>
           )}
           <View style={styles.separator} />
@@ -38,38 +34,36 @@ const FatExerciseButton = ({
             <Text style={styles.buttonLabelStyle}>{buttonLabel}</Text>
           </View>
         </TouchableOpacity>
-        : null}
-      {weight ?
+      ) : null}
+      {weight ? (
         <TouchableOpacity style={styles.buttonContainer} onPress={onPress} disabled={disabled}>
           {loadingWeight ? (
             <ActivityIndicator size="small" color="#000" style={{ height: 35 }} />
-          ) :
-            repsWeightState.weight !== '0' ?
-              (
-                <>
-                  <View style={styles.iconContainer}>
-                    <Text
-                      style={[
-                        styles.styleButtonText,
-                        {
-                          color: weightColor ? 'black' : '#D3D3D3',
-                        },
-                      ]}
-                      text={text ? text : '0'}
-                    />
-                  </View>
-                  <View style={styles.separator} />
-                  <View style={styles.buttonTextStyle}>
-                    <Text style={styles.buttonLabelStyle}>{buttonLabel}</Text>
-                  </View>
-                </>
-              ) : (
-                <View style={styles.iconContainer2}>
-                  <Text style={styles.styleButtonText2}>{'Enter Weight Used'}</Text>
-                </View>
-              )}
+          ) : repsWeightState.weight !== '0' ? (
+            <>
+              <View style={styles.iconContainer}>
+                <Text
+                  style={[
+                    styles.styleButtonText,
+                    {
+                      color: weightColor ? 'black' : '#D3D3D3',
+                    },
+                  ]}
+                  text={text ? text : '0'}
+                />
+              </View>
+              <View style={styles.separator} />
+              <View style={styles.buttonTextStyle}>
+                <Text style={styles.buttonLabelStyle}>{buttonLabel}</Text>
+              </View>
+            </>
+          ) : (
+            <View style={styles.iconContainer2}>
+              <Text style={styles.styleButtonText2}>{'Enter Weight Used'}</Text>
+            </View>
+          )}
         </TouchableOpacity>
-        : null}
+      ) : null}
     </>
   );
 };

@@ -1,9 +1,9 @@
 import React from 'react'
-import {Dimensions, StyleSheet, TextInput} from 'react-native'
-import {color} from 'src/utils'
-import {SafeAreaView} from 'react-native-safe-area-context'
+import { Dimensions, StyleSheet, TextInput } from 'react-native'
+import { color } from 'src/utils'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-const {width} = Dimensions.get('screen')
+const { width } = Dimensions.get('screen')
 
 const CommentField = () => {
   return (

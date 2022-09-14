@@ -38,7 +38,12 @@ const Card1 = ({ onPress, getPlans }) => {
         style={[fill, mediumHMargin, regularVPadding, regularTMargin, styles.gradientWrapper]}
       >
         <View style={[row, center, fill, mediumTMargin]}>
-          <Text text={`$ ${getPlans.length > 0 ? getPlans[1].amount : ''}`} regularTitle color="secondary" bold />
+          <Text
+            text={`$ ${getPlans.length > 0 ? getPlans[1].amount : ''}`}
+            regularTitle
+            color="secondary"
+            bold
+          />
           <Text text={' / month'} large color="secondary" />
         </View>
         <View style={[fill, justifyContentAround, mediumHMargin]}>

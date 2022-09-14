@@ -3,7 +3,7 @@ import { View, Image, StyleSheet } from 'react-native';
 import Text from '../Text';
 import { Images } from 'src/theme';
 
-const ProfileHeader = (props) => {
+const ProfileHeader = props => {
   const { source, userName, time, content } = props
   return (
     <View style={styles.cardHeader}>
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileHeader
+export default ProfileHeader;

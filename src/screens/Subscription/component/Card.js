@@ -39,7 +39,13 @@ const Card = props => {
         style={[fill, mediumHMargin, regularVPadding, regularTMargin, styles.gradientWrapper]}
       >
         <View style={[row, center, fill, mediumTMargin]}>
-          <Text text={`$ ${getPlans.length > 0 ? getPlans[0].amount : ''}`} regularTitle color="secondary" bold center />
+          <Text
+            text={`$ ${getPlans.length > 0 ? getPlans[0].amount : ''}`}
+            regularTitle
+            color="secondary"
+            bold
+            center
+          />
           <Text text={' / month'} large color="secondary" />
         </View>
         <View style={[fill, justifyContentAround, mediumHMargin]}>

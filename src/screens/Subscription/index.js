@@ -66,7 +66,7 @@ const SubscriptionScreen = props => {
         <Image source={Images.backArrow} style={styles.backArrowStyle} />
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
-      <Loader isLoading={props.requesting} />
+        <Loader isLoading={props.requesting} />
 
         <TouchableOpacity onPress={() => setCurentTab(0)} style={[center, alignItemsCenter, fill]}>
           <Text text="Diet" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />

@@ -103,25 +103,23 @@ const WorkoutComponent = ({
             <Text text={item?.name} color="secondary" medium numberOfLines={2} />
             <Text text={`${item.workouts[0]?.timer} minutes`} color="secondary" medium />
           </View>
-          {item.cardio === true && (
-            true && (
-              <View style={styles.cardWrapper2}>
-                <View style={[row, center]}>
-                  <Text text={'Cardio'} color="secondary" medium />
-                  <Icon
-                    type={'FontAwesome5'}
-                    name={'heart'}
-                    style={{ color: 'red', opacity: 0.8, marginLeft: 8, fontSize: 25 }}
-                  />
-                </View>
-                <Text
-                  text={`${item.cardio_length && item.cardio_length} minutes`}
-                  color="secondary"
-                  medium
+          {item.cardio === true && true && (
+            <View style={styles.cardWrapper2}>
+              <View style={[row, center]}>
+                <Text text={'Cardio'} color="secondary" medium />
+                <Icon
+                  type={'FontAwesome5'}
+                  name={'heart'}
+                  style={{ color: 'red', opacity: 0.8, marginLeft: 8, fontSize: 25 }}
                 />
               </View>
-            ))
-          }
+              <Text
+                text={`${item.cardio_length && item.cardio_length} minutes`}
+                color="secondary"
+                medium
+              />
+            </View>
+          )}
         </LinearGradient>
         <ScrollView
           horizontal
@@ -130,78 +128,76 @@ const WorkoutComponent = ({
         >
           {item.workouts.length > 0
             ? item.workouts.map((item, i) => {
-              return (
-                <TouchableOpacity
-                  key={i}
-                  onPress={() => {
-                    setIsVisible(true);
-                  }}
-                  style={[
-                    fill,
-                    border,
-                    borderR30,
-                    borderAlto,
-                    regularRMargin,
-                    secondaryBg,
-                    styles.cardWrapperInnerStyle,
-                  ]}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      text={item ? item.exercise.name : 'Barbell Bench Press'}
-                      style={{
-                        marginTop: 10,
-                        marginHorizontal: 20,
-                        lineHeight: 20,
-                        fontSize: 18,
-                        textAlign: 'center',
-                      }}
-                      bold
-                    />
-                  </View>
-                  <View style={{ flex: 3 }}>
-                    <Image
-                      source={{ uri: item?.exercise?.pictures[0]?.image_url }}
-                      style={{
-                        width: 220,
-                        height: 220,
-                        resizeMode: 'cover',
-                        overflow: 'hidden',
-                      }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              );
-            })
+                return (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => {
+                      setIsVisible(true);
+                    }}
+                    style={[
+                      fill,
+                      border,
+                      borderR30,
+                      borderAlto,
+                      regularRMargin,
+                      secondaryBg,
+                      styles.cardWrapperInnerStyle,
+                    ]}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        text={item ? item.exercise.name : 'Barbell Bench Press'}
+                        style={{
+                          marginTop: 10,
+                          marginHorizontal: 20,
+                          lineHeight: 20,
+                          fontSize: 18,
+                          textAlign: 'center',
+                        }}
+                        bold
+                      />
+                    </View>
+                    <View style={{ flex: 3 }}>
+                      <Image
+                        source={{ uri: item?.exercise?.pictures[0]?.image_url }}
+                        style={{
+                          width: 220,
+                          height: 220,
+                          resizeMode: 'cover',
+                          overflow: 'hidden',
+                        }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
             : null}
         </ScrollView>
         {startWorkout === false && <View style={{ marginTop: 30 }} />}
-        {
-          startWorkout && (
-            <View style={[fill, center]}>
-              <LinearGradient
-                start={start}
-                end={end}
-                colors={['#5BF547', '#32FC7D']}
-                style={[
-                  row,
-                  fill,
-                  center,
-                  tinyHMargin,
-                  regularVPadding,
-                  regularHPadding,
-                  regularVPadding,
-                  styles.linearGradient,
-                  styles.cardGradiantWrapper,
-                ]}
-              >
-                <TouchableOpacity onPress={onPress} disabled={workoutDone}>
-                  <Text style={styles.startWorkoutWrapper} text="Start Workout" />
-                </TouchableOpacity>
-              </LinearGradient>
-            </View>
-          )
-        }
+        {startWorkout && (
+          <View style={[fill, center]}>
+            <LinearGradient
+              start={start}
+              end={end}
+              colors={['#5BF547', '#32FC7D']}
+              style={[
+                row,
+                fill,
+                center,
+                tinyHMargin,
+                regularVPadding,
+                regularHPadding,
+                regularVPadding,
+                styles.linearGradient,
+                styles.cardGradiantWrapper,
+              ]}
+            >
+              <TouchableOpacity onPress={onPress} disabled={workoutDone}>
+                <Text style={styles.startWorkoutWrapper} text="Start Workout" />
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        )}
       </View>
       <Modal
         transparent={true}

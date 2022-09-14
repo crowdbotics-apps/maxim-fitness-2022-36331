@@ -2,7 +2,10 @@ import React from 'react';
 import { View, Image, Text, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import { Images } from 'src/theme';
 import Feeds from '../screens/Feeds';
 import ViewPost from '../screens/ViewPost';
@@ -165,7 +168,6 @@ const MainNavigator = () => (
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
     <mainStack.Screen name="EditProfile" component={EditProfile} />
     <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
-
   </mainStack.Navigator>
 )
 

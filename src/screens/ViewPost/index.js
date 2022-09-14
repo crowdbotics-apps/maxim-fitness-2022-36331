@@ -51,7 +51,6 @@ const ViewPost = props => {
     }
   }, [param?.id]);
 
-
   // useEffect(() => {
   //   if (newCommentData && !subCommentData) {
   //     let data = {
@@ -112,34 +111,32 @@ const ViewPost = props => {
   //   }
   // }, [subCommentData, postData?.comments, newCommentData]);
 
-
   useEffect(() => {
     if (postData && postData?.comments?.length) {
       let data = [
         postData &&
-        postData?.comments?.length &&
-        postData.comments.map(item => ({
-          image: Images.profile,
-          text: item.content,
-          userName: item.user.username,
-          id: item.id,
-          userId: item.user.id,
-          liked: item.liked,
-          likes: item.likes,
-          created_at: item.created,
-          subComment: item.sub_comment.length ? item.sub_comment : [],
-        })),
+          postData?.comments?.length &&
+          postData.comments.map(item => ({
+            image: Images.profile,
+            text: item.content,
+            userName: item.user.username,
+            id: item.id,
+            userId: item.user.id,
+            liked: item.liked,
+            likes: item.likes,
+            created_at: item.created,
+            subComment: item.sub_comment.length ? item.sub_comment : [],
+          })),
       ];
       setPostComments(data[0]);
     }
   }, [postData?.comments]);
 
-  const callBack =(status)=>{
-    if(status){
+  const callBack = status => {
+    if (status) {
       setCommentData(false);
     }
   }
-
 
   const addAComment = () => {
     if (showCancelOption) {
@@ -163,11 +160,11 @@ const ViewPost = props => {
   const replyCommentData = item => {
     inputRef.current.focus();
     setCancelOption(true)
-    postData.comments.map((v)=>{
-      if(item.id ===  v.id){
+    postData.comments.map(v => {
+      if (item.id === v.id) {
         setSubCommentData(item)
       }
-     })
+    })
     let apidata = {
       comment: item.id,
       user: item.userId,
@@ -221,8 +218,8 @@ const ViewPost = props => {
   const sharePost = async () => {
     const data = { message: 'hello' };
     await Share.open(data)
-      .then(res => { })
-      .catch(err => { });
+      .then(res => {})
+      .catch(err => {});
   };
 
   const likeSubComment = item => {
@@ -271,7 +268,11 @@ const ViewPost = props => {
         </TouchableOpacity>
         <View style={styles.profileStyle}>
           <ProfileHeader
-            source={postData?.user?.profile_picture === null ? Images.profile : postData?.user?.profile_picture}
+            source={
+              postData?.user?.profile_picture === null
+                ? Images.profile
+                : postData?.user?.profile_picture
+            }
             userName={postData?.user?.username}
             time={calculatePostTime(postData)}
             content={postData?.content}
@@ -279,7 +280,9 @@ const ViewPost = props => {
           <SliderBox
             images={
               param && (param?.post_image?.length && param?.post_video?.length) > 0
-                ? [...param.post_image, ...param.post_video].map(item => (item.image ? item.image : item.video))
+                ? [...param.post_image, ...param.post_video].map(item =>
+                    item.image ? item.image : item.video
+                  )
                 : param?.post_image?.length > 0
                 ? param.post_image.map(item => item.image)
                 : param?.post_video?.length > 0
@@ -300,7 +303,8 @@ const ViewPost = props => {
               <Text text={postComments?.length} style={styles.timeText} />
             </View>
             <Pressable style={styles.socialIcons} onPress={addLikeAction}>
-              <Image source={Images.heartIcon}
+              <Image
+                source={Images.heartIcon}
                 style={[styles.likeImageStyle, { tintColor: param.liked ? 'red' : 'black' }]}
                 tintColor={param.liked ? 'red' : 'black'}
               />
@@ -342,7 +346,10 @@ const ViewPost = props => {
                         <TouchableOpacity onPress={() => likeComment(comment)}>
                           <Image
                             source={Images.heartIcon}
-                            style={[styles.comImage, { tintColor: comment.liked ? 'red' : 'black' }]}
+                            style={[
+                              styles.comImage,
+                              { tintColor: comment.liked ? 'red' : 'black' },
+                            ]}
                             tintColor={comment.liked ? 'red' : 'black'}
                           />
                         </TouchableOpacity>
@@ -408,11 +415,20 @@ const ViewPost = props => {
           );
         })}
       </ScrollView>
-      {showCancelOption &&
-        <TouchableOpacity style={{ backgroundColor: 'white', paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }} onPress={() => setCancelOption(false)}>
+      {showCancelOption && (
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'white',
+            paddingHorizontal: 30,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+          onPress={() => setCancelOption(false)}
+        >
           <Text style={{ fontWeight: '700' }}>reply to {focusreply && focusreply.name}</Text>
           <Text style={{ fontWeight: '700' }}>Cancel</Text>
-        </TouchableOpacity>}
+        </TouchableOpacity>
+      )}
       <View style={{ flexDirection: 'row' }}>
         <TextInput
           placeholder="Write a comment"
@@ -421,7 +437,12 @@ const ViewPost = props => {
           style={{ paddingHorizontal: 20, width: '90%' }}
           ref={inputRef}
         />
-        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { commentData && addAComment() }}>
+        <TouchableOpacity
+          style={{ justifyContent: 'center' }}
+          onPress={() => {
+            commentData && addAComment();
+          }}
+        >
           <Image source={Images.sendMessage} style={{ height: 30, width: 30 }} />
         </TouchableOpacity>
       </View>
@@ -603,7 +624,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getPost: data => dispatch(getPost(data)),
   addComment: (data, postData, callBack) => dispatch(addComment(data, postData, callBack)),
-  replyComment: (data, subCommentData, callBack) => dispatch(replyComment(data, subCommentData, callBack)),
+  replyComment: (data, subCommentData, callBack) =>
+    dispatch(replyComment(data, subCommentData, callBack)),
   likeComment: data => dispatch(likeComment(data)),
   postLikeRequest: data => dispatch(postLikeRequest(data)),
 });

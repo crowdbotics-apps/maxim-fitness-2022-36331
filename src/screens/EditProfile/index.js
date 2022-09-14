@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,20 +10,20 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import {Text, BottomSheet, Button} from '../../components';
-import {Images} from 'src/theme';
-import {connect} from 'react-redux';
+import { Text, BottomSheet, Button } from '../../components';
+import { Images } from 'src/theme';
+import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
-import {editProfile} from '../../ScreenRedux/profileRedux';
+import { editProfile } from '../../ScreenRedux/profileRedux';
 
 //useForm
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
 
 const EditProfile = props => {
-  const {profileBackGround, cameraIcon, backArrow} = Images;
-  const {navigation, userDetail, editRequesting} = props;
-  const {width, height} = Dimensions.get('window');
+  const { profileBackGround, cameraIcon, backArrow } = Images;
+  const { navigation, userDetail, editRequesting } = props;
+  const { width, height } = Dimensions.get('window');
   console.log('userDetail----', userDetail);
   const stateSchema = {
     firstName: {
@@ -84,7 +84,7 @@ const EditProfile = props => {
     }
   }, [userDetail]);
 
-  const {state, handleOnChange, disable, setState} = useForm(stateSchema, validationStateSchema);
+  const { state, handleOnChange, disable, setState } = useForm(stateSchema, validationStateSchema);
 
   console.log('state-----', state);
 
@@ -143,22 +143,22 @@ const EditProfile = props => {
         }}
       >
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={backArrow} style={{height: 20, width: 30}} />
+          <Image source={backArrow} style={{ height: 20, width: 30 }} />
         </TouchableOpacity>
-        <Text style={{fontSize: 20, color: 'gray', fontWeight: 'bold'}} text="Edit Profile" />
-        <View></View>
+        <Text style={{ fontSize: 20, color: 'gray', fontWeight: 'bold' }} text="Edit Profile" />
+        <View />
       </View>
-      <ScrollView contentContainerStyle={{paddingBottom: 50}}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
         <View>
           <ImageBackground
             source={
               state?.backgroundImage?.value?.path
-                ? {uri: state.backgroundImage.value.path}
-                : state?.backgroundImage?.value ? 
-                {uri: state.backgroundImage.value}
+                ? { uri: state.backgroundImage.value.path }
+                : state?.backgroundImage?.value
+                ? { uri: state.backgroundImage.value }
                 : profileBackGround
             }
-            style={{height: (273 / 375) * width, width: '100%'}}
+            style={{ height: (273 / 375) * width, width: '100%' }}
           >
             <View
               style={{
@@ -168,9 +168,9 @@ const EditProfile = props => {
                 marginRight: 10,
               }}
             >
-              <View></View>
+              <View />
               <TouchableOpacity onPress={() => onChangebackgroundImage()}>
-                <Image source={cameraIcon} style={{height: 30, width: 30}} />
+                <Image source={cameraIcon} style={{ height: 30, width: 30 }} />
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -186,10 +186,11 @@ const EditProfile = props => {
             onPress={() => onChangeProfileImage()}
           >
             <Image
-              source={ state?.profileImage?.value?.path
-                  ? {uri: state.profileImage.value.path} :
-                  state?.profileImage?.value ? 
-                  {uri: state.profileImage.value}
+              source={
+                state?.profileImage?.value?.path
+                  ? { uri: state.profileImage.value.path }
+                  : state?.profileImage?.value
+                  ? { uri: state.profileImage.value }
                   : profileBackGround
               }
               style={{
@@ -200,44 +201,44 @@ const EditProfile = props => {
             />
             <Image
               source={cameraIcon}
-              style={{height: 30, width: 30, marginLeft: -25, marginTop: 60}}
+              style={{ height: 30, width: 30, marginLeft: -25, marginTop: 60 }}
             />
           </TouchableOpacity>
         </View>
-        <View style={{paddingHorizontal: 20, marginTop: 15}}>
-          <Text style={{fontSize: 14, color: 'gray', paddingLeft: 5}} text="First Name" />
+        <View style={{ paddingHorizontal: 20, marginTop: 15 }}>
+          <Text style={{ fontSize: 14, color: 'gray', paddingLeft: 5 }} text="First Name" />
           <TextInput
-            style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
+            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
             onChangeText={value => handleOnChange('firstName', value)}
             value={state.firstName.value}
             placeholder="First Name"
           />
-          <Text style={{color: 'red'}} text={state.firstName.error} />
+          <Text style={{ color: 'red' }} text={state.firstName.error} />
           <Text
-            style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
+            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
             text="Last Name"
           />
           <TextInput
-            style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
+            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
             onChangeText={value => handleOnChange('lastName', value)}
             value={state.lastName.value}
             placeholder="Last Name"
           />
-          <Text style={{color: 'red'}} text={state.lastName.error} />
+          <Text style={{ color: 'red' }} text={state.lastName.error} />
 
           <Text
-            style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
+            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
             text="User Name"
           />
           <TextInput
-            style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
+            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
             onChangeText={value => handleOnChange('userName', value)}
             value={state.userName.value}
             placeholder="User Name"
           />
-          <Text style={{color: 'red'}} text={state.userName.error} />
+          <Text style={{ color: 'red' }} text={state.userName.error} />
           <Text
-            style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
+            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
             text="Discription"
           />
           <TextInput
@@ -266,9 +267,9 @@ const EditProfile = props => {
             onChangeText={value => handleOnChange('discription', value)}
             value={state.discription.value}
           />
-          <Text style={{color: 'red'}} text={state.discription.error} />
+          <Text style={{ color: 'red' }} text={state.discription.error} />
         </View>
-        <View style={{justifyContent: 'center', flexDirection: 'row', marginTop: 20}}>
+        <View style={{ justifyContent: 'center', flexDirection: 'row', marginTop: 20 }}>
           <Button
             color="primary"
             text={'Save'}
@@ -304,8 +305,8 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     flexDirection: 'row',
   },
-  mainTextStyle: {fontSize: 20, fontWeight: 'bold'},
-  subTextStyle: {fontSize: 16, color: 'gray'},
+  mainTextStyle: { fontSize: 20, fontWeight: 'bold' },
+  subTextStyle: { fontSize: 16, color: 'gray' },
 });
 
 const mapStateToProps = state => ({

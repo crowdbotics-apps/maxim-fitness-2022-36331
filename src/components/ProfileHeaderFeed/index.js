@@ -1,7 +1,7 @@
 import React from 'react'
-import {View, Image, StyleSheet, TouchableWithoutFeedback} from 'react-native'
+import { View, Image, StyleSheet, TouchableWithoutFeedback } from 'react-native'
 
-const ProfileHeaderFeed = ({imageUrl, onAvatarChange, style}) => {
+const ProfileHeaderFeed = ({ imageUrl, onAvatarChange, style }) => {
   return (
     <View style={[styles.profileWrapper, style]}>
       <TouchableWithoutFeedback onPress={onAvatarChange}>

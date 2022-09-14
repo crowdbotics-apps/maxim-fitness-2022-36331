@@ -1,4 +1,4 @@
-import {YourAppModule} from './yourapp';
+import { YourAppModule } from './yourapp';
 
 const sortNavigators = (a, b) => {
   if (a.value.hasOwnProperty('navigator') && b.value.hasOwnProperty('navigator')) {
@@ -25,10 +25,10 @@ const addTitle = item => {
     return title
   }
 
-  let {name, value} = item;
+  let { name, value } = item;
 
   if (!(value && value.hasOwnProperty('title'))) {
-    Object.assign(item.value, {title: humanizeName(name)})
+    Object.assign(item.value, { title: humanizeName(name) })
   }
 
   return item

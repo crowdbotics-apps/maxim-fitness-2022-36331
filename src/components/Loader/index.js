@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {StyleSheet, View, Modal, Image, ActivityIndicator} from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, View, Modal, Image, ActivityIndicator } from 'react-native';
 class Loader extends Component {
   constructor(props) {
     super(props)
@@ -18,7 +18,7 @@ class Loader extends Component {
         transparent={true}
         animationType={'none'}
         visible={this.state.isLoading}
-        style={{zIndex: 1100}}
+        style={{ zIndex: 1100 }}
         onRequestClose={() => {}}
       >
         <View style={styles.modalBackground}>

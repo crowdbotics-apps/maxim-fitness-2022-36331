@@ -75,14 +75,9 @@ const Card = ({ onPress, text, style, item }) => {
               <Text style={styles.hideWrapperInner}>Cardio</Text>
             </View>
           </>
-
-        )
-        }
-        {
-          (item && item.cardio === false) || (!item.workouts.length > 0) && (
-            <View style={{ flex: 0.5 }} />
-          )
-        }
+        )}
+        {(item && item.cardio === false) ||
+          (!item.workouts.length > 0 && <View style={{ flex: 0.5 }} />)}
       </View>
     </TouchableOpacity>
   );

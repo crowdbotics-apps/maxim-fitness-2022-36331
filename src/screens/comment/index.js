@@ -1,8 +1,8 @@
-import React, {useCallback, useMemo, useRef} from 'react'
-import {Pressable, StyleSheet} from 'react-native'
+import React, { useCallback, useMemo, useRef } from 'react'
+import { Pressable, StyleSheet } from 'react-native'
 // import BottomSheet from '@gorhom/bottom-sheet';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import {color} from 'src/utils'
+import { color } from 'src/utils'
 
 import CommentField from './CommentField'
 

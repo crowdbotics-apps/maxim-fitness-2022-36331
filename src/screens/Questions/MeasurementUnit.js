@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,37 +14,37 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import { Overlay } from 'react-native-elements';
 
 //Components
-import {Text} from '../../components';
+import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
 
 const MeasurementUnit = props => {
-  const {forwardIcon, otLogo} = Images;
+  const { forwardIcon, otLogo } = Images;
 
   const exerciseArray = ['Feet/Pounds', 'Meters/Kilograms'];
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   const {
-    navigation: {navigate},
+    navigation: { navigate },
   } = props;
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.37} />
 
-      <View style={{marginHorizontal: 40, marginTop: 30}}>
+      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
-          style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
+          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
           text={'Choose units of measurement'}
         />
       </View>
 
-      <View style={{marginTop: 30}}>
+      <View style={{ marginTop: 30 }}>
         {exerciseArray.map(item => (
           <TouchableOpacity
             style={[
@@ -61,24 +61,24 @@ const MeasurementUnit = props => {
             ]}
             onPress={() => setExerciseLevel(item)}
           >
-            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
               <View
                 style={{
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>{item}</Text>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>{item}</Text>
                 {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
-              <View style={{justifyContent: 'center'}}>
-                <Image source={forwardIcon} style={{height: 20, width: 10, marginRight: 10}} />
+              <View style={{ justifyContent: 'center' }}>
+                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={{height: '56%', justifyContent: 'flex-end'}}>
+      <View style={{ height: '56%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,

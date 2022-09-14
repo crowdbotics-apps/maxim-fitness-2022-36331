@@ -1,10 +1,10 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {navigate} from '../navigation/NavigationService';
-import {showMessage} from 'react-native-flash-message';
+import { navigate } from '../navigation/NavigationService';
+import { showMessage } from 'react-native-flash-message';
 
 // config
-import {API_URL} from '../config/app';
+import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -112,7 +112,7 @@ function loginAPI(data) {
   return XHR(URL, options)
 }
 
-function* login({data}) {
+function* login({ data }) {
   try {
     const response = yield call(loginAPI, data)
     AsyncStorage.setItem('authToken', response.data.token)
@@ -128,9 +128,8 @@ function* login({data}) {
     //     type: 'success',
     //   })
     // }
-  } 
-  catch (e) {
-    const {response} = e
+  } catch (e) {
+    const { response } = e
     console.log('error response---', response);
     showMessage({
       message: 'Unable to log in with provided credentials.',
@@ -151,7 +150,7 @@ function facebookLoginAPI(data) {
   return XHR(URL, options)
 }
 
-function* facebookLogin({data}) {
+function* facebookLogin({ data }) {
   try {
     const res = yield call(facebookLoginAPI, data)
     console.log('facebook login success response0000', res);
@@ -163,7 +162,7 @@ function* facebookLogin({data}) {
       type: 'success',
     })
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('facebook login error response----', response);
     yield put(reset())
     showMessage({
@@ -184,7 +183,7 @@ function googleLoginAPI(data) {
   return XHR(URL, options)
 }
 
-function* googleLogin({data}) {
+function* googleLogin({ data }) {
   console.log('google data inn saga0000', data);
   try {
     const res = yield call(googleLoginAPI, data)
@@ -198,7 +197,7 @@ function* googleLogin({data}) {
       type: 'success',
     })
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('google login error response---', response);
   } finally {
     yield put(reset())

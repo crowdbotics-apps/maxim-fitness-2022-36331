@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,18 +15,18 @@ import {
 } from 'react-native';
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Images} from 'src/theme';
-import {connect} from 'react-redux';
+import { Images } from 'src/theme';
+import { connect } from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
 
 //action
-import {AddPostData} from '../../ScreenRedux/addPostRequest';
-import {useIsFocused} from '@react-navigation/native';
+import { AddPostData } from '../../ScreenRedux/addPostRequest';
+import { useIsFocused } from '@react-navigation/native';
 
-const {closeIcon, colorAddIcon, circleClose} = Images;
+const { closeIcon, colorAddIcon, circleClose } = Images;
 const AddPost = props => {
-  const {navigation, AddPostData} = props;
+  const { navigation, AddPostData } = props;
 
   const [showPost, setShowPost] = useState(false);
   const [imageData, setImageData] = useState([]);
@@ -44,15 +44,14 @@ const AddPost = props => {
   const aa = () => {
     let formData = new FormData();
     formData.append('content', content);
-     imageData.map((item, index) => {
-      if(item.mime === 'video/mp4'){
+    imageData.map((item, index) => {
+      if (item.mime === 'video/mp4') {
         formData.append('video', {
           uri: item.path,
           type: item.mime,
           name: item.path,
         });
-      }
-      else{
+      } else {
         formData.append('image', {
           uri: item.path,
           type: item.mime,
@@ -83,7 +82,7 @@ const AddPost = props => {
     });
   };
 
-  const {width} = Dimensions.get('window');
+  const { width } = Dimensions.get('window');
 
   const filterData = item => {
     let filterData = imageData.filter(v => v.path !== item.path);
@@ -91,9 +90,9 @@ const AddPost = props => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1, paddingBottom: 60}}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
         <View
@@ -106,7 +105,7 @@ const AddPost = props => {
           }}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={closeIcon} style={{height: 14, width: 14}} />
+            <Image source={closeIcon} style={{ height: 14, width: 14 }} />
           </TouchableOpacity>
           <Text
             style={{
@@ -123,14 +122,14 @@ const AddPost = props => {
           <TextInput
             onChangeText={value => setContent(value)}
             autoFocus={true}
-            style={{color: 'black', paddingHorizontal: 30}}
+            style={{ color: 'black', paddingHorizontal: 30 }}
           />
         ) : (
           <TouchableOpacity
-            style={{marginTop: 30, alignItems: 'center'}}
+            style={{ marginTop: 30, alignItems: 'center' }}
             onPress={() => setShowPost(true)}
           >
-            <Text style={{fontSize: 16, color: 'gray'}}>Tap to Create a Post</Text>
+            <Text style={{ fontSize: 16, color: 'gray' }}>Tap to Create a Post</Text>
           </TouchableOpacity>
         )}
 
@@ -139,22 +138,22 @@ const AddPost = props => {
           numColumns="2"
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <>
-              <View style={{marginTop: 20, alignItems: 'center', width: '50%'}}>
+              <View style={{ marginTop: 20, alignItems: 'center', width: '50%' }}>
                 <Image
                   style={{
                     height: (173 / 375) * width,
                     width: (145 / 375) * width,
                     borderRadius: 15,
                   }}
-                  source={{uri: item.path}}
+                  source={{ uri: item.path }}
                 />
                 <TouchableOpacity
                   onPress={() => filterData(item)}
-                  style={{position: 'absolute', right: 30, top: 8}}
+                  style={{ position: 'absolute', right: 30, top: 8 }}
                 >
-                  <Image style={{height: 20, width: 20}} source={circleClose} />
+                  <Image style={{ height: 20, width: 20 }} source={circleClose} />
                 </TouchableOpacity>
               </View>
             </>
@@ -173,7 +172,7 @@ const AddPost = props => {
         }}
       >
         <TouchableOpacity onPress={() => onChangePostImage()}>
-          <Image source={colorAddIcon} style={{height: 31, width: 31}} />
+          <Image source={colorAddIcon} style={{ height: 31, width: 31 }} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => content && imageData.length && addData()}

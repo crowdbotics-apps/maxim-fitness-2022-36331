@@ -90,11 +90,11 @@ const ExerciseTabHeader = ({
             index={index}
             goToPage={goToPage}
             activeTab={activeTab}
-          // pickSessionAction={pickSessionAction}
-          // selectedSession={selectedSession}
-          // individualSetsDetails={individualSetsDetails}
-          // setStartRest={setStartRest}
-          // setShowBar={setShowBar}
+            // pickSessionAction={pickSessionAction}
+            // selectedSession={selectedSession}
+            // individualSetsDetails={individualSetsDetails}
+            // setStartRest={setStartRest}
+            // setShowBar={setShowBar}
           />
         ))}
       </ScrollView>

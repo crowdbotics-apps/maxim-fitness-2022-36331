@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -13,24 +13,24 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 
 //Components
-import {Text} from '../../components';
+import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 const FeetHeight = props => {
   const {
-    navigation: {navigate},
+    navigation: { navigate },
   } = props;
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.47} showBackButton={true} />
 
-      <View style={{marginHorizontal: 40, marginTop: 30}}>
+      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
-          style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
+          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
           text={'What is your height?'}
         />
-        {/* 
+        {/*
         <Text style={{marginTop: 18}}>
           This answer has influence on how your program is designed
         </Text> */}
@@ -48,7 +48,7 @@ const FeetHeight = props => {
           },
         ]}
       >
-        <TextInput style={{fontSize: 24}} placeholder={'Feet'} />
+        <TextInput style={{ fontSize: 24 }} placeholder={'Feet'} />
       </View>
 
       <View
@@ -63,11 +63,11 @@ const FeetHeight = props => {
           },
         ]}
       >
-        <TextInput style={{fontSize: 24}} placeholder={'Inches'} />
+        <TextInput style={{ fontSize: 24 }} placeholder={'Inches'} />
       </View>
-      <View style={{height: '59%', justifyContent: 'flex-end'}}>
+      <View style={{ height: '59%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
-          style={{marginHorizontal: 40, marginBottom: 25}}
+          style={{ marginHorizontal: 40, marginBottom: 25 }}
           onPress={() => navigate('WeightPounds')}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>

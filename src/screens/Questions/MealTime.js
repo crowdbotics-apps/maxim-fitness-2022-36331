@@ -23,57 +23,54 @@ import HeaderTitle from './Components/headerTitle';
 //Themes
 import Images from '../../theme/Images';
 
-const FitnessGoal = props => {
-  const { forwardIcon, otLogo } = Images;
+const MealTime = props => {
+  const { forwardIcon, downIcon } = Images;
 
   const {
     navigation: { navigate },
+    route: { params },
   } = props;
 
-  const exerciseArray = [
-    {
-      heading: 'Fat loss',
-      description: 'weight loss, figure change, general wellness',
-    },
-    {
-      heading: 'Strength and Hypertrophy',
-      description: 'powerlifting and bodybuilding',
-    },
-    {
-      heading: 'Maintenance',
-      description: 'maintain current weight/figure',
-    },
-  ];
+  const { numberOfMeals } = params;
+
+  const fourMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4'];
+  const fiveMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4', 'Meal 5'];
+  const sixMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4', 'Meal 5', 'Meal 6'];
+
+  const mapMeals =
+    (numberOfMeals === '4 Meals' && fourMeals) ||
+    (numberOfMeals === '5 Meals' && fiveMeals) ||
+    (numberOfMeals === '6 Meals' && sixMeals);
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.58} />
+      <HeaderTitle showBackButton={true} percentage={0.75} />
 
       <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
           style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What is your fitness goal?'}
+          text={'What times do you want to eat?'}
         />
       </View>
 
       <View style={{ marginTop: 30 }}>
-        {exerciseArray.map(item => (
+        {mapMeals.map(item => (
           <TouchableOpacity
             style={[
               {
                 // height: 65,
                 //   marginTop: 15,
                 marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item.heading ? 1 : null,
-                paddingVertical: 11,
+                borderBottomWidth: exerciseLevel !== item ? 1 : null,
+                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
+                borderWidth: exerciseLevel === item ? 1 : null,
+                paddingVertical: 18,
                 borderColor: '#a5c2d0',
               },
             ]}
-            onPress={() => setExerciseLevel(item.heading)}
+            onPress={() => setExerciseLevel(item)}
           >
             <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
               <View
@@ -81,20 +78,18 @@ const FitnessGoal = props => {
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
-                  {item.heading}
-                </Text>
-                <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>{item}</Text>
+                {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
               <View style={{ justifyContent: 'center' }}>
-                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
+                <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={{ height: '45%', justifyContent: 'flex-end' }}>
+      <View style={{ height: '18.8%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -103,7 +98,7 @@ const FitnessGoal = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('TrainingDays');
+            navigate('NutritionUnderstanding');
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -137,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FitnessGoal;
+export default MealTime;

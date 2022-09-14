@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,16 +9,16 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import {Text, BottomSheet, Loader} from '../../components';
-import {Images} from 'src/theme';
-import {connect} from 'react-redux';
-import {useIsFocused} from '@react-navigation/native';
+import { Text, BottomSheet, Loader } from '../../components';
+import { Images } from 'src/theme';
+import { connect } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
 //action
-import {getProfile, routeData, followUser, unFollowUser} from '../../ScreenRedux/profileRedux';
+import { getProfile, routeData, followUser, unFollowUser } from '../../ScreenRedux/profileRedux';
 
 const ProfileScreen = props => {
-  const {navigation, route, profileData, userDetail, routeData, routeDetail} = props;
+  const { navigation, route, profileData, userDetail, routeData, routeDetail } = props;
   const [follow, setFollow] = useState(profileData?.follow);
   const {
     profileBackGround,
@@ -56,11 +56,17 @@ const ProfileScreen = props => {
     userDetail?.id === routeDetail?.user?.id || !routeDetail
       ? navigation.navigate('EditProfile')
       : follow
-      ?  [setFollow(!follow), props.unFollowUser({id: routeDetail ? routeDetail?.user?.id : userDetail.id})]
-      : [setFollow(!follow) , props.followUser({id: routeDetail ? routeDetail?.user?.id : userDetail.id})]
+      ? [
+          setFollow(!follow),
+          props.unFollowUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
+        ]
+      : [
+          setFollow(!follow),
+          props.followUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
+        ]
   };
 
-  const {width, height} = Dimensions.get('window');
+  const { width, height } = Dimensions.get('window');
   const refRBSheet = useRef();
   return (
     <SafeAreaView>
@@ -69,7 +75,7 @@ const ProfileScreen = props => {
         <View>
           <ImageBackground
             source={profileBackGround}
-            style={{height: (273 / 375) * width, width: '100%'}}
+            style={{ height: (273 / 375) * width, width: '100%' }}
           >
             <View style={styles.backgroundStyle}>
               <TouchableOpacity
@@ -77,10 +83,13 @@ const ProfileScreen = props => {
                   navigation.goBack(), props.routeData(false);
                 }}
               >
-                <Image source={whiteBackArrow} style={{height: 15, width: 20}} />
+                <Image source={whiteBackArrow} style={{ height: 15, width: 20 }} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                <Image source={whiteDots} style={{height: 15, width: 25, resizeMode: 'contain'}} />
+                <Image
+                  source={whiteDots}
+                  style={{ height: 15, width: 25, resizeMode: 'contain' }}
+                />
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -97,10 +106,10 @@ const ProfileScreen = props => {
             />
           </View>
         </View>
-        <View style={{paddingHorizontal: 40, flexDirection: 'row'}}>
-          <View style={{width: 150}}>
+        <View style={{ paddingHorizontal: 40, flexDirection: 'row' }}>
+          <View style={{ width: 150 }}>
             <Text
-              style={[styles.mainTextStyle, {marginTop: 60}]}
+              style={[styles.mainTextStyle, { marginTop: 60 }]}
               text={profileData?.user_detail?.username}
             />
             <Text style={styles.subTextStyle} text={profileData?.user_detail?.email} />
@@ -114,7 +123,7 @@ const ProfileScreen = props => {
                   ? followingButton
                   : followButton
               }
-              style={{height: 60, width: 120, marginTop: 10, marginLeft: 40}}
+              style={{ height: 60, width: 120, marginTop: 10, marginLeft: 40 }}
             />
           </TouchableOpacity>
         </View>
@@ -136,35 +145,35 @@ const ProfileScreen = props => {
             justifyContent: 'space-between',
           }}
         >
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Text style={styles.mainTextStyle} text={profileData?.follower?.toString()} />
             <Text style={styles.subTextStyle} text="Followers" />
           </View>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Text style={styles.mainTextStyle} text="150K" />
             <Text style={styles.subTextStyle} text="Likes" />
           </View>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Text style={styles.mainTextStyle} text={profileData?.post?.toString()} />
             <Text style={styles.subTextStyle} text="Posts" />
           </View>
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
-          <Text style={{fontSize: 20, fontWeight: 'bold', color: '#635eff'}} text="Pictures" />
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#635eff' }} text="Pictures" />
           <Text
-            style={{fontSize: 20, fontWeight: 'bold', paddingLeft: 40, color: 'gray'}}
+            style={{ fontSize: 20, fontWeight: 'bold', paddingLeft: 40, color: 'gray' }}
             text="Videos"
           />
         </View>
-        <View style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 10}}>
+        <View style={{ flexDirection: 'row', marginTop: 20, marginHorizontal: 10 }}>
           <Image
             source={profileBackGround}
-            style={{height: (300 / 375) * width, width: (175 / 375) * width, borderRadius: 20}}
+            style={{ height: (300 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
           />
-          <View style={{marginLeft: 10}}>
+          <View style={{ marginLeft: 10 }}>
             <Image
               source={profileBackGround}
-              style={{height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20}}
+              style={{ height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
             />
             <Image
               source={profileBackGround}
@@ -177,11 +186,11 @@ const ProfileScreen = props => {
             />
           </View>
         </View>
-        <View style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 10}}>
+        <View style={{ flexDirection: 'row', marginTop: 20, marginHorizontal: 10 }}>
           <View style={{}}>
             <Image
               source={profileBackGround}
-              style={{height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20}}
+              style={{ height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
             />
             <Image
               source={profileBackGround}
@@ -205,14 +214,14 @@ const ProfileScreen = props => {
         </View>
       </ScrollView>
       <BottomSheet reff={refRBSheet} h={200}>
-        <View style={{marginTop: 30, paddingHorizontal: 40}}>
-          <View style={{flexDirection: 'row'}}>
-            <Image source={flagIcon} style={{height: 40, width: 30, resizeMode: 'contain'}} />
-            <Text style={[styles.mainTextStyle, {marginLeft: 30}]} text={'Report User'} />
+        <View style={{ marginTop: 30, paddingHorizontal: 40 }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Image source={flagIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
+            <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Report User'} />
           </View>
-          <View style={{flexDirection: 'row', marginTop: 20}}>
-            <Image source={blockIcon} style={{height: 40, width: 30, resizeMode: 'contain'}} />
-            <Text style={[styles.mainTextStyle, {marginLeft: 30}]} text={'Block User'} />
+          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+            <Image source={blockIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
+            <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Block User'} />
           </View>
         </View>
       </BottomSheet>
@@ -240,8 +249,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  mainTextStyle: {fontSize: 20, fontWeight: 'bold'},
-  subTextStyle: {fontSize: 16, color: 'gray'},
+  mainTextStyle: { fontSize: 20, fontWeight: 'bold' },
+  subTextStyle: { fontSize: 16, color: 'gray' },
 });
 
 const mapStateToProps = state => ({

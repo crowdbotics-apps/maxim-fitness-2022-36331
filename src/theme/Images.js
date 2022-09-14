@@ -60,5 +60,6 @@ export default {
   cameraIcon: require('src/assets/images/cameraIcon.png'),
   followingButton: require('src/assets/images/followingButton.png'),
   editProfileButton: require('src/assets/images/editProfileButton.png'),
-  otLogo: require('src/assets/images/otLogo.png')
+  otLogo: require('src/assets/images/otLogo.png'),
+  downIcon: require('src/assets/images/downIcon.png')
 };

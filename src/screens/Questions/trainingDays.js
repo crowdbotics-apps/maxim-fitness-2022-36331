@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,51 +14,38 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import { Overlay } from 'react-native-elements';
 
 //Components
-import {Text} from '../../components';
+import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
 
 const TrainingDays = props => {
-  const {forwardIcon, otLogo} = Images;
+  const { forwardIcon, otLogo } = Images;
 
   const {
-    navigation: {navigate},
+    navigation: { navigate },
   } = props;
 
-  const exerciseArray = [
-    {
-      heading: 'Fat loss',
-      description: 'weight loss, figure change, general wellness',
-    },
-    {
-      heading: 'Strength and Hypertrophy',
-      description: 'powerlifting and bodybuilding',
-    },
-    {
-      heading: 'Maintenance',
-      description: 'maintain current weight/figure',
-    },
-  ];
+  const exerciseArray = ['3 Days', '4 Days', '5 Days'];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.58} />
+      <HeaderTitle showBackButton={true} percentage={0.62} />
 
-      <View style={{marginHorizontal: 40, marginTop: 30}}>
+      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
-          style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
-          text={'What is your fitness goal?'}
+          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+          text={'How many days a week do you want to train?'}
         />
       </View>
 
-      <View style={{marginTop: 30}}>
+      <View style={{ marginTop: 30 }}>
         {exerciseArray.map(item => (
           <TouchableOpacity
             style={[
@@ -66,35 +53,33 @@ const TrainingDays = props => {
                 // height: 65,
                 //   marginTop: 15,
                 marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item.heading ? 1 : null,
-                paddingVertical: 11,
+                borderBottomWidth: exerciseLevel !== item ? 1 : null,
+                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
+                borderWidth: exerciseLevel === item ? 1 : null,
+                paddingVertical: 15,
                 borderColor: '#a5c2d0',
               },
             ]}
-            onPress={() => setExerciseLevel(item.heading)}
+            onPress={() => setExerciseLevel(item)}
           >
-            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
               <View
                 style={{
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>
-                  {item.heading}
-                </Text>
-                <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>{item}</Text>
+                {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
-              <View style={{justifyContent: 'center'}}>
-                <Image source={forwardIcon} style={{height: 20, width: 10, marginRight: 10}} />
+              <View style={{ justifyContent: 'center' }}>
+                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={{height: '45%', justifyContent: 'flex-end'}}>
+      <View style={{ height: '47.8%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -103,7 +88,7 @@ const TrainingDays = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('MeasurementUnit');
+            navigate('MealPreference');
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>

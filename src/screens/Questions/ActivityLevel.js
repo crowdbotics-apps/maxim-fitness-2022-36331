@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,20 +14,23 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import { connect } from 'react-redux';
 
 //Components
-import {Text} from '../../components';
+import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
 
+//Actions
+import { updateAnswer } from './Redux';
+
 const ActivityLevel = props => {
-  const {forwardIcon, otLogo} = Images;
+  const { forwardIcon, otLogo } = Images;
 
   const {
-    navigation: {navigate},
+    navigation: { navigate },
   } = props;
 
   const exerciseArray = [
@@ -53,18 +56,30 @@ const ActivityLevel = props => {
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.activity_level = exerciseLevel;
+    navigate('MeasurementUnit');
+    props.updateAnswers(tempData);
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.activity_level) {
+      setExerciseLevel(props.answers.activity_level);
+    }
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.33} />
 
-      <View style={{marginHorizontal: 40, marginTop: 30}}>
+      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
         <Text
-          style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
-          text={'What is level of your exercise?'}
+          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+          text={'What is level of your Activity?'}
         />
       </View>
 
-      <View style={{marginTop: 30}}>
+      <View style={{ marginTop: 30 }}>
         {exerciseArray.map(item => (
           <TouchableOpacity
             style={[
@@ -81,26 +96,26 @@ const ActivityLevel = props => {
             ]}
             onPress={() => setExerciseLevel(item.heading)}
           >
-            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
               <View
                 style={{
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
                   {item.heading}
                 </Text>
-                <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text>
+                <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
               </View>
-              <View style={{justifyContent: 'center'}}>
-                <Image source={forwardIcon} style={{height: 20, width: 10, marginRight: 10}} />
+              <View style={{ justifyContent: 'center' }}>
+                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={{height: '19%', justifyContent: 'flex-end'}}>
+      <View style={{ height: '22%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -109,7 +124,7 @@ const ActivityLevel = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('MeasurementUnit');
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -143,4 +158,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ActivityLevel;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ActivityLevel);
