@@ -28,7 +28,7 @@ from home.api.v1.viewsets import (
     ProductUnitViewSet,
     CheckUserViewSet,
     ReportAPostViewSet,
-    BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet
+    BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile
 )
 
 from rest_framework import permissions
@@ -54,6 +54,7 @@ router = DefaultRouter()
 router.register('signup', SignupViewSet, basename='signup')
 router.register('login', LoginViewSet, basename='login')
 router.register('profile', ProfileViewSet, basename='profile')
+router.register('update-profile', UpdateProfile, basename='update_profile')
 router.register('products', ProductViewSet, basename='products')
 router.register('food', FoodViewSet, basename='food')
 router.register('meal', MealViewSet, basename='meal')
