@@ -14,7 +14,7 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import {connect} from 'react-redux';
 
 //Components
 import {Text} from '../../components';
@@ -22,6 +22,9 @@ import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const Gender = props => {
   const {forwardIcon, otLogo} = Images;
@@ -34,6 +37,19 @@ const Gender = props => {
 
   const [gender, setGender] = useState(false);
   const [welcomeModal, setWelcomeModal] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['gender'] = gender;
+
+    props.updateAnswers(tempData);
+    setWelcomeModal(true);
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.gender) {
+      setGender(props.answers.gender);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,9 +95,7 @@ const Gender = props => {
         <TouchableOpacity
           style={{marginHorizontal: 40, marginBottom: 25, opacity: gender !== false ? 1 : 0.7}}
           disabled={!gender}
-          onPress={() => {
-            setWelcomeModal(true);
-          }}
+          onPress={() => onNext()}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -157,4 +171,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Gender;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Gender);

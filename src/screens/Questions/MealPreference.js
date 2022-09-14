@@ -14,7 +14,7 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {connect} from 'react-redux';
+import {Overlay} from 'react-native-elements';
 
 //Components
 import {Text} from '../../components';
@@ -23,59 +23,25 @@ import HeaderTitle from './Components/headerTitle';
 //Themes
 import Images from '../../theme/Images';
 
-//Actions
-import {updateAnswer} from './Redux';
-
-const ActivityLevel = props => {
+const MealPreference = props => {
   const {forwardIcon, otLogo} = Images;
 
   const {
     navigation: {navigate},
   } = props;
 
-  const exerciseArray = [
-    {
-      heading: 'Sedantry',
-      description:
-        'Office job, watches TV for extended periods, video gaming, minimal movement on daily basis',
-    },
-    {
-      heading: 'Low Activity',
-      description:
-        '30-60 minutes per day of moderate intensity physical activity(210-240 minutes per week)',
-    },
-    {
-      heading: 'Active',
-      description: 'Atleast 60 minutes per day of moderate intensity physical activity',
-    },
-    {
-      heading: 'Very Active',
-      description: '120 minutes per day of vigorous physical activity',
-    },
-  ];
+  const exerciseArray = ['4 Meals', '5 Meals', '6 Meals'];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
-  const onNext = () => {
-    const tempData = props.answers;
-    tempData['activity_level'] = exerciseLevel;
-    navigate('MeasurementUnit');
-    props.updateAnswers(tempData);
-  };
-  useEffect(() => {
-    if (props.answers && props.answers.activity_level) {
-      setExerciseLevel(props.answers.activity_level);
-    }
-  }, []);
-
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.33} />
+      <HeaderTitle showBackButton={true} percentage={0.68} />
 
       <View style={{marginHorizontal: 40, marginTop: 30}}>
         <Text
           style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
-          text={'What is level of your Activity?'}
+          text={'How many meals do you prefer to eat in one day?'}
         />
       </View>
 
@@ -87,14 +53,14 @@ const ActivityLevel = props => {
                 // height: 65,
                 //   marginTop: 15,
                 marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item.heading ? 1 : null,
-                paddingVertical: 11,
+                borderBottomWidth: exerciseLevel !== item ? 1 : null,
+                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
+                borderWidth: exerciseLevel === item ? 1 : null,
+                paddingVertical: 18,
                 borderColor: '#a5c2d0',
               },
             ]}
-            onPress={() => setExerciseLevel(item.heading)}
+            onPress={() => setExerciseLevel(item)}
           >
             <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <View
@@ -102,10 +68,8 @@ const ActivityLevel = props => {
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>
-                  {item.heading}
-                </Text>
-                <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text>
+                <Text style={{fontSize: 20, color: '#6f6f6f', fontWeight: '600'}}>{item}</Text>
+                {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
               <View style={{justifyContent: 'center'}}>
                 <Image source={forwardIcon} style={{height: 20, width: 10, marginRight: 10}} />
@@ -115,7 +79,7 @@ const ActivityLevel = props => {
         ))}
       </View>
 
-      <View style={{height: '22%', justifyContent: 'flex-end'}}>
+      <View style={{height: '45.8%', justifyContent: 'flex-end'}}>
         <TouchableOpacity
           style={{
             marginHorizontal: 40,
@@ -124,7 +88,7 @@ const ActivityLevel = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            onNext();
+            navigate('MealTime', {numberOfMeals: exerciseLevel});
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -158,11 +122,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = state => ({
-  answers: state.questionReducer.answers,
-});
-
-const mapDispatchToProps = dispatch => ({
-  updateAnswers: data => dispatch(updateAnswer(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(ActivityLevel);
+export default MealPreference;

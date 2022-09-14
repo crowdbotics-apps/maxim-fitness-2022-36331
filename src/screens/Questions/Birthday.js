@@ -6,20 +6,35 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  Modal,
   TouchableOpacity,
 } from 'react-native';
-
-import LinearGradient from 'react-native-linear-gradient';
 
 //Components
 import {Text} from '../../components';
 import HeaderTitle from './Components/headerTitle';
+
+//Libraries
+import DatePicker from 'react-native-date-picker';
+import LinearGradient from 'react-native-linear-gradient';
+import {connect} from 'react-redux';
+import moment from 'moment';
+import {updateAnswer} from './Redux';
 
 const Birthday = props => {
   const {
     navigation: {navigate},
   } = props;
 
+  const [dateModal, setDateModal] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [navState, setNavState] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['dob'] = navState;
+    navigate('Gender');
+  };
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.02} showBackButton={false} />
@@ -35,7 +50,7 @@ const Birthday = props => {
         </Text> */}
       </View>
 
-      <View
+      <TouchableOpacity
         style={[
           {
             height: 65,
@@ -46,19 +61,53 @@ const Birthday = props => {
             borderBottomColor: '#808080',
           },
         ]}
+        onPress={() => setDateModal(true)}
       >
-        <Text style={{fontSize: 24, color: '#d3d3d3', fontWeight: '500'}}>Birthday</Text>
-      </View>
+        <Text style={{fontSize: 24, color: '#d3d3d3', fontWeight: '500'}}>
+          {navState ? navState : 'Birthday'}
+        </Text>
+      </TouchableOpacity>
       <View style={{height: '68%', justifyContent: 'flex-end'}}>
         <TouchableOpacity
           style={{marginHorizontal: 40, marginBottom: 25}}
-          onPress={() => navigate('Gender')}
+          onPress={() => onNext()}
+          disabled={!navState}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={dateModal} style={{flex: 1}} animationType="slide" transparent={true}>
+        <View style={[{backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1}, styles.centeredView]}>
+          <DatePicker
+            date={date}
+            onDateChange={val => {
+              const dob = moment(val).format('YYYY-MM-DD');
+              setNavState(dob);
+            }}
+            androidVariant="iosClone"
+            style={{backgroundColor: '#fff'}}
+            mode="date"
+          />
+
+          <TouchableOpacity
+            style={{width: '80%', marginVertical: 25}}
+            onPress={() => setDateModal(false)}
+          >
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Select Date of Birth</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{width: '80%'}} onPress={() => setDateModal(false)}>
+            <LinearGradient style={[styles.logInButton]} colors={['#e52b39', '#ef3d49', '#fb5a60']}>
+              <Text style={styles.loginText}>Cancel</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -85,4 +134,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Birthday;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Birthday);
