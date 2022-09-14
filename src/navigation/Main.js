@@ -26,7 +26,7 @@ const Tab = createBottomTabNavigator()
 const BottomNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="ProgramScreen"
+      initialRouteName="Home2"
       screenOptions={{
         tabBarStyle: {
           shadowColor: '#000',
