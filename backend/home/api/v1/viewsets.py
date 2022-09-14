@@ -25,7 +25,8 @@ from rest_auth.registration.views import SocialLoginView
 from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
-from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike
+from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike, \
+    PostVideo
 from users.models import Settings
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -115,7 +116,7 @@ class LoginViewSet(ViewSet):
 
 class ProfileViewSet(ModelViewSet):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, ProfilePermission]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
@@ -261,44 +262,26 @@ class ProfileViewSet(ModelViewSet):
     def get_follower(self, request, pk):
         # instance = self.get_object()
         instance = User.objects.filter(id=pk).first()
+        post_ids = []
         follower = UserSerializer(Follow.objects.followers(instance), context={"request": request}, many=True)
         following = UserSerializer(Follow.objects.following(instance), context={'request': request}, many=True)
-        post = PostSerializer(Post.objects.filter(user=instance, hide=False).order_by('-id'), context={"request": request}, many=True)
+        # post = PostSerializer(Post.objects.filter(user=instance, hide=False).order_by('-id'), context={"request": request}, many=True)
+        post = Post.objects.filter(user=instance, hide=False).order_by('-id')
+        for i in post:
+            post_ids.append(i.id)
+        post_image = PostImageSerializer(PostImage.objects.filter(post_id__in=post_ids), many=True, context={"request": request})
+        post_video = PostVideoSerializer(PostVideo.objects.filter(post_id__in=post_ids), many=True, context={"request": request})
+        user_detail = UserSerializer(instance, context={"request": request})
         followers = len(follower.data)
         followings = len(following.data)
-        posts = len(post.data)
+        posts = post.count()
         f = False
         if len(follower.data) > 0:
             for d_index in follower.data:
                 if self.request.user.id == d_index['id']:
                     f = True
         return Response({"follower": followers, "post": posts, "following": followings, 'follow': f,
-                         'post_detail': post.data})
-
-    @action(methods=['post'], detail=False)
-    def set_profile_picture(self, request, pk=None):
-        # image = request.data['profile_picture']
-        image = request.data['image']
-        format, imgstr = image.split(';base64,')
-        ext = format.split('/')[-1]
-        image = ContentFile(base64.b64decode(imgstr))
-        file_name = f'{request.user.username}.{ext}'
-        # file_name = f'{request.user.username}'
-        request.user.set_profile_picture(image, file_name)
-        user = User.objects.get(pk=request.user.pk)
-        serializer = UserSerializer(user, context={'request': request})
-        return Response(serializer.data)
-
-    @action(methods=['post'], detail=False)
-    def set_background_picture(self, request, pk=None):
-        image = request.data['image']
-        format, imgstr = image.split(';base64,')
-        ext = format.split('/')[-1]
-        image = ContentFile(base64.b64decode(imgstr))
-        file_name = f'{request.user.username}.{ext}'
-        request.user.set_background_picture(image, file_name)
-        serializer = UserSerializer(request.user, context={'request': request})
-        return Response(serializer.data)
+                         "user_detail": user_detail.data, "post_image": post_image.data, "post_video": post_video.data})
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, RecipePermission])
     def get_fav_recipes(self, request, pk=None):
@@ -306,6 +289,15 @@ class ProfileViewSet(ModelViewSet):
         recipes = [recipe.recipe for recipe in recipes]
         serializer = RecipeSerializer(recipes, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class UpdateProfile(ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = User.objects.filter(pk=self.request.user.pk)
+        return queryset
 
 
 class ProductViewSet(ModelViewSet):
@@ -434,7 +426,7 @@ class MealViewSet(ModelViewSet):
 
     """
     serializer_class = MealSerializer
-    permission_classes = [IsAuthenticated, DietPermission]
+    permission_classes = [IsAuthenticated]
     queryset = Meal.objects.all()
 
     def get_serializer_class(self):
@@ -530,7 +522,7 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.get_queryset().order_by('id')
     http_method_names = ['get']
-    permission_classes = [IsAuthenticated, RecipePermission]
+    permission_classes = [IsAuthenticated]
     paginate_by = 25
 
     @action(detail=False, methods=['get'])
@@ -584,7 +576,7 @@ class ExerciseViewSet(ModelViewSet):
 
 class SessionViewSet(ModelViewSet):
     serializer_class = SessionSerializer
-    permission_classes = [IsAuthenticated, ProgramPermission]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Session.objects.filter(user=self.request.user).order_by('date_time')
@@ -784,16 +776,10 @@ class ReportViewSet(ModelViewSet):
         return Response(final_data)
 
 
-def modify_input_for_multiple_files(post, image):
-    dict = {}
-    dict['post'] = post
-    dict['image'] = image
-    return dict
-
 class PostViewSet(ModelViewSet):
     serializer_class = PostSerializer
     # queryset = Post.objects.filter(hide=False).select_related('user').order_by('-id')
-    permission_classes = [IsAuthenticated, SocialPermission]
+    permission_classes = [IsAuthenticated]
     pagination_class = PostPagination
 
     def get_queryset(self):
@@ -895,22 +881,6 @@ class PostImageVideoViewSet(ModelViewSet):
         post_id = self.request.query_params.get("post_id")
         queryset = PostImage.objects.filter(post_id=post_id)
         return queryset
-
-    def create(self, request, *args, **kwargs):
-
-        post_image = []
-
-        image = request.data["image"]
-        post_id = request.data["post_id"]
-        for i in image:
-            data = {'post': post_id, 'image': i}
-            post_image.append(data)
-
-        serializer = PostImageVideoSerializer(data=post_image, many=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FollowViewSet(ViewSet):
@@ -1131,6 +1101,9 @@ class CaloriesRequiredViewSet(ModelViewSet):
 
     def get_queryset(self):
         return CaloriesRequired.objects.filter(user=self.request.user).order_by('-id')
+
+    def create(self, request, *args, **kwargs):
+        data = self.request.data
 
 
 class ConsumeCaloriesViewSet(ModelViewSet):

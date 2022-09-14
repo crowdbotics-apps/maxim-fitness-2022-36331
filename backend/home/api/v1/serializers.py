@@ -194,7 +194,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', "profile_url", "profile_picture",
-                  "background_picture",
+                  "background_picture", "description",
 
                   "gender", 'dob', "height", "weight", "unit",
                   "exercise_level", "activity_level",
@@ -305,7 +305,6 @@ class RecipeItemSerializer(serializers.ModelSerializer):
     fat = serializers.ReadOnlyField()
     calories = serializers.ReadOnlyField()
 
-
     class Meta:
         model = RecipeItem
         fields = '__all__'
@@ -324,13 +323,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ExerciseTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExerciseType
         fields = '__all__'
-
 
 
 class ExerciseImagesSerializer(serializers.ModelSerializer):
