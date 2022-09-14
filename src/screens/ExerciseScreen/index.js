@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   Dimensions,
+  Alert,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -28,7 +29,7 @@ import {
 } from '../../components';
 import { Layout, Global, Gutters, Images, Colors } from '../../theme';
 import LinearGradient from 'react-native-linear-gradient';
-import { getAllSessionRequest, repsWeightRequest } from '../../ScreenRedux/programServices';
+import { getAllSessionRequest, repsWeightRequest, setDoneRequest } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
 const ExerciseScreen = props => {
@@ -112,7 +113,7 @@ const ExerciseScreen = props => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      const [findIndex] = nextWorkout.sets.map(set => set)
+      const [findIndex] = exerciseObj?.sets?.map(set => set)
       setActiveSet(findIndex)
       props.repsWeightRequest(findIndex.id, null, null)
     });
@@ -124,9 +125,6 @@ const ExerciseScreen = props => {
       setParms(route.params)
     }
   }, [route])
-
-  console.log('repsWeightState: ', repsWeightState);
-  console.log('activeSet: ', activeSet);
 
   const {
     row,
@@ -178,10 +176,8 @@ const ExerciseScreen = props => {
     setRepsColor(true)
     refReps.current.close();
     const id = repsWeightState.id
-    const reps = `${repsState}${showModalRepsTwo ? '/' : ''}${
-      showModalRepsThree ? '/' : ''
-    }${repsTwo}${showModalRepsThree ? '/' : ''}${repsThree}`
-    console.log('id, reps', id, typeof reps);
+    const reps = `${repsState}${showModalRepsTwo ? '/' : ''}${showModalRepsThree ? '/' : ''
+      }${repsTwo}${showModalRepsThree ? '/' : ''}${repsThree}`
     const dd = 'reps'
     props.repsWeightRequest(id, reps, dd);
     setReps('');
@@ -193,10 +189,8 @@ const ExerciseScreen = props => {
     setWeightColor(true)
     refWeight.current.close();
     const id = repsWeightState.id
-    const weight = `${weightState}${showModalWeightTwo ? '/' : ''}${
-      showModalWeightThree ? '/' : ''
-    }${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`
-    console.log('id, weight', id, typeof weight);
+    const weight = `${weightState}${showModalWeightTwo ? '/' : ''}${showModalWeightThree ? '/' : ''
+      }${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`
     const dd = 'weight'
     props.repsWeightRequest(id, weight, dd);
     setWeight('');
@@ -230,6 +224,16 @@ const ExerciseScreen = props => {
     setRepsColor(false)
     setWeightColor(false)
   }
+
+  const submitData = (dd) => {
+    // console.log('dd.sets.length', dd)
+    // props.repsWeightRequest(activeSet?.id, true, true);
+    // if (repsWeightState.id === dd?.sets?.id) {
+    // props.setDoneRequest(dd.id, true)
+    // }
+    Alert.alert('Sorry App is in Progress')
+  }
+
   return (
     <SafeAreaView style={[fill, { backgroundColor: '#F2F2F2' }]}>
       <View style={[row, alignItemsCenter, justifyContentCenter, smallVMargin, regularHMargin]}>
@@ -253,7 +257,7 @@ const ExerciseScreen = props => {
           automaticallyAdjustContentInsets={false}
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
-            {params?.workouts?.map((item, i) => {
+            {selectedSession && selectedSession?.map((item, i) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -304,7 +308,7 @@ const ExerciseScreen = props => {
           </View>
         </ScrollView>
       </View>
-      {params?.workouts?.map((item, index) => {
+      {selectedSession && selectedSession?.map((item, index) => {
         if (active === index) {
           return (
             <View style={[fill]}>
@@ -337,7 +341,6 @@ const ExerciseScreen = props => {
                 )
               ) : (
                 <>
-                  {console.log('modal------------: ', modal)}
                   {repsWeightState?.set_type?.toLowerCase() === modal ? (
                     modal && props.loader ? (
                       <View style={[secondaryBg, { height: 50, justifyContent: 'center' }]}>
@@ -371,7 +374,8 @@ const ExerciseScreen = props => {
                           index={i}
                           onPress={() => setsData(set)}
                           mainContainer={{ marginHorizontal: 5 }}
-                          bg={repsWeightState?.id === set?.id && '#A9A9A9'}
+                          bg={repsWeightState?.id === set?.id && !set?.done && '#A9A9A9'}
+                          repsWeightState={repsWeightState}
                         />
                       ))}
                     </ScrollView>
@@ -431,16 +435,18 @@ const ExerciseScreen = props => {
                       buttonIcon={Images.iconSwap}
                     />
                     <FatGradientIconButton
-                      buttonText={true ? 'Done' : 'Done, Start Rest'}
+                      buttonText={false ? 'Done' : 'Done, Start Rest'}
                       buttonIcon={Images.iconDoneStartRest}
                       colorsGradient={['#3180BD', '#6EC2FA']}
                       colorsGradientDisable={['#d3d3d3', '#838383']}
+                      // disabled={true}
+                      onPress={() => submitData(item)}
                     />
                   </View>
                   <RestContainer
                     upNext={'next'}
                     showBar={false}
-                    // onPress={() => setStartTimer(false)}
+                  // onPress={() => setStartTimer(false)}
                   />
                 </ScrollView>
               </View>
@@ -656,12 +662,11 @@ const ExerciseScreen = props => {
                         <Text
                           regularTitle
                           color="quinary"
-                          text={`${
-                            (index + 1 === 1 && 'a') ||
+                          text={`${(index + 1 === 1 && 'a') ||
                             (index + 1 === 2 && 'b') ||
                             (index + 1 === 3 && 'c') ||
                             (index + 1 === 4 && 'd')
-                          }. ${exercise?.name}`}
+                            }. ${exercise?.name}`}
                         />
                       </View>
                       <View style={center}>
@@ -769,19 +774,14 @@ const mapStateToProps = state => ({
   exerciseObj: state.programReducer.exerciseObj,
   selectedSession: state.programReducer.selectedSession,
   nextWorkout: state.programReducer.nextWorkout,
-  // exerciseSwapped: state.sessions && state.sessions.exerciseSwapped,
-  // loadingAllSession: state.sessions && state.sessions.loadingAllSession,
-  // saveSwipeState: state.sessions && state.sessions.saveSwipeState,
-  // resetSwipeAction: state.sessions && state.sessions.resetSwipeAction,
+
+  setDone: state.programReducer.setDone
 });
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   repsWeightRequest: (id, data, dd) => dispatch(repsWeightRequest(id, data, dd)),
-  // pickSessionAction: (data) => dispatch(pickSession(data)),
-  // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
-  // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),
-  // getAllSwapExercise: () => dispatch(allSwapExercise()),
+  setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen);

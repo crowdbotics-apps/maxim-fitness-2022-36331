@@ -12,6 +12,10 @@ const ALL_SESSIONS_SUCCESS = 'ProgramScreen/ALL_SESSIONS_SUCCESS';
 const REPS_WEIGHT_REQUEST = 'ProgramScreen/REPS_WEIGHT_REQUEST';
 const REPS_WEIGHT_SUCCESS = 'ProgramScreen/REPS_WEIGHT_SUCCESS';
 const PICK_SESSION = 'ProgramScreen/PICK_SESSION';
+const SETS_DONE_REQUEST = 'ProgramScreen/SETS_DONE_REQUEST';
+const SETS_DONE_SUCCESS = 'ProgramScreen/SETS_DONE_SUCCESS';
+const EXERCISE_DONE_REQUEST = 'ProgramScreen/EXERCISE_DONE_REQUEST';
+const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -42,6 +46,27 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   nextWorkout
 })
 
+export const setDoneRequest = (id, data) => ({
+  type: SETS_DONE_REQUEST,
+  id,
+  data
+});
+
+export const setDoneSuccess = (data) => ({
+  type: SETS_DONE_SUCCESS,
+  data,
+});
+
+export const exerciseDoneRequest = (data) => ({
+  type: EXERCISE_DONE_REQUEST,
+  data
+});
+
+export const exerciseDoneSuccess = (data) => ({
+  type: EXERCISE_DONE_SUCCESS,
+  data,
+});
+
 const initialState = {
   requesting: false,
   getAllSessions: false,
@@ -50,7 +75,12 @@ const initialState = {
 
   exerciseObj: false,
   selectedSession: false,
-  nextWorkout: false
+  nextWorkout: false,
+
+  setLoading: false,
+  setDone: false,
+  exeLoading: false,
+  exerciseDone: false,
 };
 
 export const programReducer = (state = initialState, action) => {
@@ -89,6 +119,32 @@ export const programReducer = (state = initialState, action) => {
         nextWorkout: action.nextWorkout,
       };
     }
+
+    case SETS_DONE_REQUEST:
+      return {
+        ...state,
+        setLoading: true,
+      };
+
+    case SETS_DONE_SUCCESS:
+      return {
+        ...state,
+        setDone: action.data,
+        setLoading: false,
+      };
+
+    case EXERCISE_DONE_REQUEST:
+      return {
+        ...state,
+        exeLoading: true,
+      };
+
+    case EXERCISE_DONE_SUCCESS:
+      return {
+        ...state,
+        exerciseDone: action.data,
+        exeLoading: false,
+      };
 
     default:
       return state;
@@ -148,6 +204,20 @@ async function updateWeightAPI(id, data) {
   return XHR(URL, options);
 }
 
+async function updateSetDoneAPI(id, data) {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/set/${id}/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'PATCH',
+    data: { done: data }
+  };
+  return XHR(URL, options);
+}
+
 async function updateRepsWeightAPI(id) {
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/set/${id}/`;
@@ -165,24 +235,54 @@ function* updateRepsWeight({ id, data, dd }) {
   try {
     if (dd === 'reps') {
       const response = yield call(updateRepsAPI, id, data);
-      console.log('reps weight response: ', response);
+      console.log('reps response: ', response);
       yield put(repsWeightSuccess(response.data));
     } else if (dd === 'weight') {
       const response = yield call(updateWeightAPI, id, data);
-      console.log('reps weight response: ', response);
+      console.log('weight response: ', response);
+      yield put(repsWeightSuccess(response.data));
+    } else if (dd === true) {
+      const response = yield call(updateSetDoneAPI, id, data);
+      console.log('done response: ', response);
       yield put(repsWeightSuccess(response.data));
     } else {
       const response = yield call(updateRepsWeightAPI, id);
-      console.log('reps weight response: ', response);
+      console.log('response: ', response);
       yield put(repsWeightSuccess(response.data));
     }
   } catch (e) {
-    console.log('reps weight error:', e);
+    console.log(' error:', e);
     yield put(repsWeightSuccess(false));
+  }
+}
+
+async function setDoneAPI(id, data) {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/exercise/${id}/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'PATCH',
+    data: { done: data }
+  };
+  return XHR(URL, options);
+}
+
+function* setDoneAction({ id, data }) {
+  try {
+    const response = yield call(setDoneAPI, id, data);
+    console.log('Set Done res: ', response);
+    yield put(setDoneSuccess(response.data));
+  } catch (e) {
+    console.log('Set Done error:', e);
+    yield put(setDoneSuccess(false));
   }
 }
 
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
+  takeLatest(SETS_DONE_REQUEST, setDoneAction),
 ]);

@@ -6,7 +6,7 @@ import { Images } from '../../theme';
 const FatGradientIconButton = ({
   buttonIcon,
   buttonText,
-  onClick,
+  onPress,
   colorsGradient,
   colorsGradientDisable,
   buttonContainerStyleProp,
@@ -18,7 +18,7 @@ const FatGradientIconButton = ({
     colors={!disabled ? colorsGradient : colorsGradientDisable}
     style={[styles.buttonContainer, buttonContainerStyleProp]}
   >
-    <TouchableOpacity style={styles.buttonContainer} onPress={onClick} disabled={disabled}>
+    <TouchableOpacity style={styles.buttonContainer} onPress={onPress} disabled={disabled}>
       <View style={styles.iconContainer}>
         <Image source={buttonIcon || Images.iconDone} style={styles.iconStyle} />
       </View>
