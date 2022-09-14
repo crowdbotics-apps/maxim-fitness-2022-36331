@@ -13,10 +13,123 @@ import {
 import {Text, BottomSheet, Button} from '../../components';
 import {Images} from 'src/theme';
 import {connect} from 'react-redux';
+import ImagePicker from 'react-native-image-crop-picker';
+import {editProfile} from '../../ScreenRedux/profileRedux';
 
-const EditProfile = ({navigation}) => {
+//useForm
+import useForm from '../../utils/useForm';
+import validator from '../../utils/validation';
+
+const EditProfile = props => {
   const {profileBackGround, cameraIcon, backArrow} = Images;
+  const {navigation, userDetail, editRequesting} = props;
   const {width, height} = Dimensions.get('window');
+  console.log('userDetail----', userDetail);
+  const stateSchema = {
+    firstName: {
+      value: '',
+      error: '',
+    },
+    lastName: {
+      value: '',
+      error: '',
+    },
+    userName: {
+      value: '',
+      error: '',
+    },
+    discription: {
+      value: '',
+      error: '',
+    },
+    profileImage: {
+      value: '',
+      error: '',
+    },
+    backgroundImage: {
+      value: '',
+      error: '',
+    },
+  };
+
+  const validationStateSchema = {
+    firstName: {
+      required: true,
+    },
+    lastName: {
+      required: true,
+    },
+    userName: {
+      required: true,
+    },
+    discription: {
+      required: true,
+    },
+    profileImage: {
+      required: false,
+    },
+    backgroundImage: {
+      required: false,
+    },
+  };
+
+  useEffect(() => {
+    if (userDetail) {
+      handleOnChange('firstName', userDetail.first_name);
+      handleOnChange('lastName', userDetail.last_name);
+      handleOnChange('userName', userDetail.username);
+      handleOnChange('discription', userDetail.description);
+      handleOnChange('profileImage', userDetail.profile_picture);
+      handleOnChange('backgroundImage', userDetail.background_picture);
+    }
+  }, [userDetail]);
+
+  const {state, handleOnChange, disable, setState} = useForm(stateSchema, validationStateSchema);
+
+  console.log('state-----', state);
+
+  const editProfileData = () => {
+    let formData = new FormData();
+    formData.append('first_name', state.firstName.value);
+    formData.append('last_name', state.lastName.value);
+    formData.append('user_name', state.userName.value);
+    formData.append('description', state.discription.value);
+    if (state?.profileImage?.value) {
+      formData.append('profile_picture', {
+        uri: state.profileImage.value.path,
+        type: state.profileImage.value.mime,
+        name: state.profileImage.value.path,
+      });
+    }
+    if (state?.backgroundImage?.value) {
+      formData.append('background_picture', {
+        uri: state.backgroundImage.value.path,
+        type: state.backgroundImage.value.mime,
+        name: state.backgroundImage.value.path,
+      });
+    }
+    props.editProfile(formData, userDetail.id);
+  };
+
+  const onChangeProfileImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      handleOnChange('profileImage', image);
+    });
+  };
+
+  const onChangebackgroundImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      handleOnChange('backgroundImage', image);
+    });
+  };
   const refRBSheet = useRef();
   return (
     <SafeAreaView style={styles.container}>
@@ -29,8 +142,8 @@ const EditProfile = ({navigation}) => {
           paddingHorizontal: 20,
         }}
       >
-        <TouchableOpacity onPress={()=> navigation.goBack()}>
-        <Image source={backArrow} style={{height: 20, width: 30}} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image source={backArrow} style={{height: 20, width: 30}} />
         </TouchableOpacity>
         <Text style={{fontSize: 20, color: 'gray', fontWeight: 'bold'}} text="Edit Profile" />
         <View></View>
@@ -38,7 +151,13 @@ const EditProfile = ({navigation}) => {
       <ScrollView contentContainerStyle={{paddingBottom: 50}}>
         <View>
           <ImageBackground
-            source={profileBackGround}
+            source={
+              state?.backgroundImage?.value?.path
+                ? {uri: state.backgroundImage.value.path}
+                : state?.backgroundImage?.value ? 
+                {uri: state.backgroundImage.value}
+                : profileBackGround
+            }
             style={{height: (273 / 375) * width, width: '100%'}}
           >
             <View
@@ -50,10 +169,12 @@ const EditProfile = ({navigation}) => {
               }}
             >
               <View></View>
-              <Image source={cameraIcon} style={{height: 30, width: 30}} />
+              <TouchableOpacity onPress={() => onChangebackgroundImage()}>
+                <Image source={cameraIcon} style={{height: 30, width: 30}} />
+              </TouchableOpacity>
             </View>
           </ImageBackground>
-          <View
+          <TouchableOpacity
             style={{
               position: 'absolute',
               bottom: 15,
@@ -62,9 +183,15 @@ const EditProfile = ({navigation}) => {
               alignItems: 'center',
               flexDirection: 'row',
             }}
+            onPress={() => onChangeProfileImage()}
           >
             <Image
-              source={profileBackGround}
+              source={ state?.profileImage?.value?.path
+                  ? {uri: state.profileImage.value.path} :
+                  state?.profileImage?.value ? 
+                  {uri: state.profileImage.value}
+                  : profileBackGround
+              }
               style={{
                 height: 100,
                 width: 100,
@@ -75,23 +202,28 @@ const EditProfile = ({navigation}) => {
               source={cameraIcon}
               style={{height: 30, width: 30, marginLeft: -25, marginTop: 60}}
             />
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={{paddingHorizontal: 20, marginTop: 15}}>
           <Text style={{fontSize: 14, color: 'gray', paddingLeft: 5}} text="First Name" />
           <TextInput
             style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
-            //   onChangeText={value => handleOnChange('email', value)}
+            onChangeText={value => handleOnChange('firstName', value)}
+            value={state.firstName.value}
             placeholder="First Name"
           />
+          <Text style={{color: 'red'}} text={state.firstName.error} />
           <Text
             style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
             text="Last Name"
           />
           <TextInput
             style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
+            onChangeText={value => handleOnChange('lastName', value)}
+            value={state.lastName.value}
             placeholder="Last Name"
           />
+          <Text style={{color: 'red'}} text={state.lastName.error} />
 
           <Text
             style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
@@ -99,8 +231,11 @@ const EditProfile = ({navigation}) => {
           />
           <TextInput
             style={{borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0}}
+            onChangeText={value => handleOnChange('userName', value)}
+            value={state.userName.value}
             placeholder="User Name"
           />
+          <Text style={{color: 'red'}} text={state.userName.error} />
           <Text
             style={{fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20}}
             text="Discription"
@@ -128,29 +263,30 @@ const EditProfile = ({navigation}) => {
             multiline
             numberOfLines={10}
             placeholder="Type here..."
-            // onChangeText={e => {
-            //   setValue(e), showError && setShowError(false);
-            // }}
+            onChangeText={value => handleOnChange('discription', value)}
+            value={state.discription.value}
           />
-         
+          <Text style={{color: 'red'}} text={state.discription.error} />
         </View>
-        <View style={{justifyContent: 'center',flexDirection: 'row',marginTop: 20}}>
-            <Button
-              color="primary"
-              text={'Save'}
-              style={[
-                {
-                  height: 40,
-                  width: 150,
-                  borderRadius: 40,
-                  backgroundColor: '#635eff',
-                  borderColor: 'white',
-                  justifyContent: 'center',
-                  alignItems:'center',
-                },
-              ]}
-            />
-          </View>
+        <View style={{justifyContent: 'center', flexDirection: 'row', marginTop: 20}}>
+          <Button
+            color="primary"
+            text={'Save'}
+            style={[
+              {
+                height: 40,
+                width: 150,
+                borderRadius: 40,
+                backgroundColor: '#635eff',
+                borderColor: 'white',
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}
+            loading={editRequesting}
+            onPress={() => editProfileData()}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -173,10 +309,11 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  //   requesting: state.feedsReducer.requesting,
+  userDetail: state.login.userDetail,
+  editRequesting: state.profileReducer.editRequesting,
 });
 
 const mapDispatchToProps = dispatch => ({
-  //   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
+  editProfile: (data, id) => dispatch(editProfile(data, id)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);

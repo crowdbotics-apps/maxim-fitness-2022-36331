@@ -8,6 +8,7 @@ import feedSaga from '../ScreenRedux/feedRedux'
 import ViewPost from '../ScreenRedux/viewPostRedux'
 import subscriptionSaga from '../ScreenRedux/subscriptionRedux'
 import programSaga from '../ScreenRedux/programServices'
+import profileSaga from '../ScreenRedux/profileRedux'
 export function* mainSaga() {
-  yield all([SignIn, SignUp, feedSaga, addPost, ViewPost, subscriptionSaga, programSaga]);
+  yield all([SignIn, SignUp, feedSaga, addPost, ViewPost, subscriptionSaga, programSaga, profileSaga]);
 }

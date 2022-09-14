@@ -164,6 +164,8 @@ const MainNavigator = () => (
     <mainStack.Screen name="Feeds" component={Feeds} />
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
     <mainStack.Screen name="EditProfile" component={EditProfile} />
+    <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
+
   </mainStack.Navigator>
 )
 
