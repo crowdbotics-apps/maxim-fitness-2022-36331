@@ -1,7 +1,7 @@
 import React from 'react';
 import CountDown from 'react-native-countdown-component';
 
-const Timer = ({ until, running }) => {
+const Timer = ({ until, running, onFinish }) => {
   return (
     <CountDown
       until={until}
@@ -16,6 +16,7 @@ const Timer = ({ until, running }) => {
       timeLabels={{ m: null, s: null }}
       running={{ running }}
       showSeparator
+      onFinish={onFinish}
     />
   );
 };

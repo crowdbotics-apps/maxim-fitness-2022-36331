@@ -6,6 +6,9 @@ import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
+import moment from 'moment'
+
+import { sortSessionBySets } from '../utils/common';
 
 const ALL_SESSIONS_REQUEST = 'ProgramScreen/ALL_SESSIONS_REQUEST';
 const ALL_SESSIONS_SUCCESS = 'ProgramScreen/ALL_SESSIONS_SUCCESS';
@@ -46,10 +49,9 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   nextWorkout
 })
 
-export const setDoneRequest = (id, data) => ({
+export const setDoneRequest = (id) => ({
   type: SETS_DONE_REQUEST,
   id,
-  data
 });
 
 export const setDoneSuccess = (data) => ({
@@ -168,7 +170,8 @@ function* getAllSessions({ data }) {
   try {
     const response = yield call(getAllSessionAPI, data);
     console.log('response allsession: ', response);
-    yield put(getAllSessionSuccess(response.data));
+    const query = sortSessionBySets(response?.data?.query);
+    yield put(getAllSessionSuccess({ ...response?.data, query }));
   } catch (e) {
     console.log('eee:', e);
     yield put(getAllSessionSuccess(false));
@@ -245,6 +248,8 @@ function* updateRepsWeight({ id, data, dd }) {
       const response = yield call(updateSetDoneAPI, id, data);
       console.log('done response: ', response);
       yield put(repsWeightSuccess(response.data));
+      const newDate = moment(new Date()).format('YYYY-MM-DD');
+      yield put(getAllSessionRequest(newDate));
     } else {
       const response = yield call(updateRepsWeightAPI, id);
       console.log('response: ', response);
@@ -256,25 +261,27 @@ function* updateRepsWeight({ id, data, dd }) {
   }
 }
 
-async function setDoneAPI(id, data) {
+async function setDoneAPI(id) {
   const token = await AsyncStorage.getItem('authToken')
-  const URL = `${API_URL}/exercise/${id}/`;
+  const URL = `${API_URL}/session/mark_workout_done/`;
   const options = {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Token ${token}`,
     },
-    method: 'PATCH',
-    data: { done: data }
+    method: 'POST',
+    data: { id: id }
   };
   return XHR(URL, options);
 }
 
-function* setDoneAction({ id, data }) {
+function* setDoneAction({ id }) {
   try {
-    const response = yield call(setDoneAPI, id, data);
+    const response = yield call(setDoneAPI, id);
     console.log('Set Done res: ', response);
     yield put(setDoneSuccess(response.data));
+    const newDate = moment(new Date()).format('YYYY-MM-DD');
+    yield put(getAllSessionRequest(newDate));
   } catch (e) {
     console.log('Set Done error:', e);
     yield put(setDoneSuccess(false));

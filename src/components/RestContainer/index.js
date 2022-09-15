@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,17 +10,28 @@ import {
 import * as Progress from 'react-native-progress';
 import Timer from '../Timer';
 
-const RestContainer = ({ onPress, showBar, loading, isDisable, increment }) => {
+const RestContainer = ({ onPress, startRest, loading, isDisable, onFinish }) => {
   const widthProgress = Dimensions.get('screen').width;
+  const [increment, setIncrement] = useState(0);
+
+  useEffect(() => {
+    if (startRest) {
+      setTimeout(() => {
+        setIncrement(increment + 1 / 90);
+      }, 1000);
+    } else {
+      setIncrement(0);
+    }
+  }, [increment, startRest]);
 
   return (
     <View style={styles.mainContainer}>
-      {showBar && (
+      {startRest && (
         <View style={styles.showBarContainer}>
           <View style={styles.showBarText}>
             <Text style={styles.showBarTextStyle}>Rest:</Text>
             <View>
-              <Timer until={90} />
+              <Timer until={90} onFinish={onFinish} />
             </View>
           </View>
           <Progress.Bar

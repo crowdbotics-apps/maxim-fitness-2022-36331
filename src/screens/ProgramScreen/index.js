@@ -29,6 +29,24 @@ const ProgramScreen = props => {
   const { secondaryBg, turtiaryBg } = Global;
 
   useEffect(() => {
+    if (getAllSessions) {
+      getAllSessions?.query?.map((item) => {
+        let currentD = moment(new Date()).format('YYYY-MM-DD');
+        let cardDate = moment(item.date_time).format('YYYY-MM-DD');
+
+        const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
+          workoutItem => !workoutItem.done
+        );
+
+        if (currentD === cardDate && item.workouts.length > 0) {
+          props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
+        }
+
+      })
+    }
+  }, [getAllSessions])
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const newDate = moment(new Date()).format('YYYY-MM-DD');
       props.getAllSessionRequest(newDate);

@@ -16,6 +16,7 @@ import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile'
+import ProfileContainer from '../screens/ProfileContainer'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
 const MainNavigator = () => (
   <mainStack.Navigator
     screenOptions={{ headerShown: false, animationEnabled: false }}
-    initialRouteName="BottomBar"
+    initialRouteName="ProfileContainer"
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
     <mainStack.Screen name="AddPost" component={AddPost} />
@@ -168,6 +169,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
     <mainStack.Screen name="EditProfile" component={EditProfile} />
     <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
+    <mainStack.Screen name="ProfileContainer" component={ProfileContainer} />
   </mainStack.Navigator>
 )
 

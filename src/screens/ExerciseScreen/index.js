@@ -33,7 +33,7 @@ import { getAllSessionRequest, repsWeightRequest, setDoneRequest } from '../../S
 import { connect } from 'react-redux';
 
 const ExerciseScreen = props => {
-  const { navigation, route, repsWeightState, exerciseObj, selectedSession, nextWorkout } = props;
+  const { navigation, route, repsWeightState, exerciseObj, selectedSession } = props;
 
   let refDescription = useRef('');
   let refWeight = useRef('');
@@ -44,6 +44,7 @@ const ExerciseScreen = props => {
   const [active, setActive] = useState(0);
   const [params, setParms] = useState({});
   const [startTimer, setStartTimer] = useState(false);
+  const [timmer, setTimmer] = useState(false);
   // Reps state
   const [repsState, setReps] = useState('');
   const [repsTwo, setRepsTwo] = useState('');
@@ -60,39 +61,45 @@ const ExerciseScreen = props => {
   // change color state
   const [repsColor, setRepsColor] = useState(false)
   const [weightColor, setWeightColor] = useState(false)
+  const [increment, setIncrement] = useState(1)
 
-  const [activeSet, setActiveSet] = useState({})
+  const [activeSet, setActiveSet] = useState(0)
   const [modal, setModal] = useState(false)
+
+
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const [hours, setHours] = useState(0);
 
   let deviceHeight = Dimensions.get('window').height;
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
-        setModal('ss')
-        refModal.current.open()
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === 'gs') {
-        setModal('gs')
-        refModal.current.open()
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === 'ds') {
-        setModal('ds')
-        refModal.current.open()
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === 'tds') {
-        setModal('tds')
-        refModal.current.open()
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === 'ct') {
-        setModal('ct')
-        refModal.current.open()
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === 'r') {
-        setModal(null)
-      }
-    }, 500);
-  }, [repsWeightState]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
+  //       setModal('ss')
+  //       refModal.current.open()
+  //     }
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'gs') {
+  //       setModal('gs')
+  //       refModal.current.open()
+  //     }
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'ds') {
+  //       setModal('ds')
+  //       refModal.current.open()
+  //     }
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'tds') {
+  //       setModal('tds')
+  //       refModal.current.open()
+  //     }
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'ct') {
+  //       setModal('ct')
+  //       refModal.current.open()
+  //     }
+  //     if (repsWeightState?.set_type?.toLowerCase() === 'r') {
+  //       setModal(null)
+  //     }
+  //   }, 500);
+  // }, [repsWeightState]);
 
   const checkModalType = param => {
     switch (param) {
@@ -113,9 +120,12 @@ const ExerciseScreen = props => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      const [findIndex] = exerciseObj?.sets?.map(set => set)
-      setActiveSet(findIndex)
-      props.repsWeightRequest(findIndex.id, null, null)
+      // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
+      // if (findFirstNotDoneSet !== undefined) {
+      const setId = selectedSession[0]?.sets[0]?.id
+      console.log('setId: ', setId);
+      props.repsWeightRequest(setId, null, null)
+      // }
     });
     return unsubscribe;
   }, [navigation]);
@@ -215,8 +225,8 @@ const ExerciseScreen = props => {
     );
   };
 
-  const setsData = set => {
-    setActiveSet(set)
+  const setsData = (set, i) => {
+    setActiveSet(i)
     const id = set.id
     const individual = null
     const dd = null
@@ -226,12 +236,46 @@ const ExerciseScreen = props => {
   }
 
   const submitData = (dd) => {
-    // console.log('dd.sets.length', dd)
-    // props.repsWeightRequest(activeSet?.id, true, true);
-    // if (repsWeightState.id === dd?.sets?.id) {
-    // props.setDoneRequest(dd.id, true)
-    // }
-    Alert.alert('Sorry App is in Progress')
+    const [findFirstNotDoneSet] = exerciseObj.sets.filter(item => !item.done);
+    const arrayHowManyDone = dd.sets.filter(countSetsDone => countSetsDone.done);
+    const countHowManyDone = arrayHowManyDone.length;
+    setIncrement(countHowManyDone + 1)
+
+    if (countHowManyDone === exerciseObj.sets.length - 1) {
+      props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
+      props.setDoneRequest(dd.id)
+    } else {
+      props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
+    }
+  }
+
+  const selectExercise = (item, i) => {
+    setActive(i)
+    props.repsWeightRequest(item?.sets[0]?.id, null, null)
+    setTimmer(false)
+    if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
+      setModal('ss')
+      refModal.current.open()
+    }
+    if (repsWeightState?.set_type?.toLowerCase() === 'gs') {
+      setModal('gs')
+      refModal.current.open()
+    }
+    if (repsWeightState?.set_type?.toLowerCase() === 'ds') {
+      setModal('ds')
+      refModal.current.open()
+    }
+    if (repsWeightState?.set_type?.toLowerCase() === 'tds') {
+      setModal('tds')
+      refModal.current.open()
+    }
+    if (repsWeightState?.set_type?.toLowerCase() === 'ct') {
+      setModal('ct')
+      refModal.current.open()
+    }
+    if (repsWeightState?.set_type?.toLowerCase() === 'r') {
+      setModal(null)
+    }
   }
 
   return (
@@ -241,7 +285,15 @@ const ExerciseScreen = props => {
           <Image style={styles.leftImageStyle} source={Images.backArrow} />
         </TouchableOpacity>
         <View style={[row, alignItemsEnd, styles.timerStyle]}>
-          <StaticTimer startTimer={true} />
+          <StaticTimer
+            startTimer={startTimer}
+            minutes={minutes}
+            setMinutes={setMinutes}
+            seconds={seconds}
+            setSeconds={setSeconds}
+            hours={hours}
+            setHours={setHours}
+          />
         </View>
         <View />
       </View>
@@ -260,10 +312,7 @@ const ExerciseScreen = props => {
             {selectedSession && selectedSession?.map((item, i) => {
               return (
                 <TouchableOpacity
-                  onPress={() => {
-                    setActive(i)
-                    props.repsWeightRequest(item?.sets[0]?.id, null, null)
-                  }}
+                  onPress={() => selectExercise(item, i)}
                   style={[
                     row,
                     center,
@@ -372,9 +421,9 @@ const ExerciseScreen = props => {
                           key={i}
                           item={set}
                           index={i}
-                          onPress={() => setsData(set)}
+                          onPress={() => setsData(set, i)}
                           mainContainer={{ marginHorizontal: 5 }}
-                          bg={repsWeightState?.id === set?.id && !set?.done && '#A9A9A9'}
+                          bg={repsWeightState?.id === set?.id && increment && '#d3d3d3'}
                           repsWeightState={repsWeightState}
                         />
                       ))}
@@ -435,18 +484,35 @@ const ExerciseScreen = props => {
                       buttonIcon={Images.iconSwap}
                     />
                     <FatGradientIconButton
-                      buttonText={false ? 'Done' : 'Done, Start Rest'}
+                      buttonText={
+                        repsWeightState?.set_type?.toLowerCase() === 'cr' ?
+                          'Complete'
+                          :
+                          item.sets[item.sets.length - 1].id && item.sets[item.sets.length - 1].done ? 'Done' : 'Done, Start Rest'}
                       buttonIcon={Images.iconDoneStartRest}
                       colorsGradient={['#3180BD', '#6EC2FA']}
                       colorsGradientDisable={['#d3d3d3', '#838383']}
-                      // disabled={true}
-                      onPress={() => submitData(item)}
+                      disabled={timmer || item.sets[item.sets.length - 1].id && item.sets[item.sets.length - 1].done}
+                      onPress={() => {
+                        if (item.sets[activeSet].done) {
+                          setTimmer(true)
+                        } else {
+                          setTimmer(false)
+                        }
+                        submitData(item)
+                      }}
                     />
                   </View>
                   <RestContainer
                     upNext={'next'}
-                    showBar={false}
-                  // onPress={() => setStartTimer(false)}
+                    startRest={timmer}
+                    activeSet={activeSet}
+                    onPress={() => {
+                      setStartTimer(false)
+                      setTimmer(false)
+                      Alert.alert("App is in Working please hold!");
+                    }}
+                    onFinish={() => setTimmer(false)}
                   />
                 </ScrollView>
               </View>
@@ -493,13 +559,22 @@ const ExerciseScreen = props => {
             />
           )}
           {showModalRepsThree && (
-            <ModalInput
-              text="Round Three"
-              value={repsThree}
-              onChangeText={val => setRepsThree(val)}
-              placeholder="Enter Reps"
-              keyboardType="numeric"
-            />
+            <>
+              <ModalInput
+                text="Round Two"
+                value={repsTwo}
+                onChangeText={val => setRepsTwo(val)}
+                placeholder="Enter Reps"
+                keyboardType="numeric"
+              />
+              <ModalInput
+                text="Round Three"
+                value={repsThree}
+                onChangeText={val => setRepsThree(val)}
+                placeholder="Enter Reps"
+                keyboardType="numeric"
+              />
+            </>
           )}
         </View>
         <View style={[row, regularVMargin]}>
@@ -540,13 +615,22 @@ const ExerciseScreen = props => {
             />
           )}
           {showModalWeightThree && (
-            <ModalInput
-              text="Round Three"
-              value={weightThree}
-              onChangeText={val => setWeightThree(val)}
-              placeholder="Enter Weight"
-              keyboardType="numeric"
-            />
+            <>
+              <ModalInput
+                text="Round Two"
+                value={weightTwo}
+                onChangeText={val => setWeightTwo(val)}
+                placeholder="Enter Weight"
+                keyboardType="numeric"
+              />
+              <ModalInput
+                text="Round Three"
+                value={weightThree}
+                onChangeText={val => setWeightThree(val)}
+                placeholder="Enter Weight"
+                keyboardType="numeric"
+              />
+            </>
           )}
         </View>
         <View style={[row, regularVMargin]}>
@@ -781,7 +865,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   repsWeightRequest: (id, data, dd) => dispatch(repsWeightRequest(id, data, dd)),
-  setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
+  setDoneRequest: (id) => dispatch(setDoneRequest(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen);
