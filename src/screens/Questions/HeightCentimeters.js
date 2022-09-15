@@ -10,7 +10,12 @@ import {
   TextInput,
 } from 'react-native';
 
+//Libraries
 import LinearGradient from 'react-native-linear-gradient';
+import { connect } from 'react-redux';
+
+//Actions
+import { updateAnswer } from './Redux';
 
 //Components
 import { Text } from '../../components';
@@ -20,6 +25,22 @@ const HeightCentimeters = props => {
   const {
     navigation: { navigate },
   } = props;
+
+  const [height, setHeight] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.height = height;
+    props.updateAnswers(tempData);
+    navigate('WeightKg');
+  };
+  // useEffect(() => {
+  //   if (props.answers && props.answers.unit) {
+  //     setExerciseLevel(props.answers.unit);
+  //   }
+  // }, []);
+
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,13 +69,18 @@ const HeightCentimeters = props => {
           },
         ]}
       >
-        <TextInput style={{ fontSize: 24 }} placeholder={'Centimeters'} />
+        <TextInput
+          style={{ fontSize: 24 }}
+          placeholder={'Centimeters'}
+          keyboardType="number-pad"
+          onChangeText={val => setHeight(val)}
+        />
       </View>
 
       <View style={{ height: '69%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => navigate('WeightKg')}
+          onPress={() => onNext()}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -87,4 +113,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HeightCentimeters;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(HeightCentimeters);

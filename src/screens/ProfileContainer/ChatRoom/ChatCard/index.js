@@ -1,11 +1,11 @@
 import React from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 import styles from './styles';
 
 const ChatCard = props => {
-  const {userName} = props.chat.secondaryUser;
-  const {message, messageType, unReadMessagesCount} = props.chat;
+  const { userName } = props.chat.secondaryUser;
+  const { message, messageType, unReadMessagesCount } = props.chat;
   let isImage = messageType === 'image';
 
   return (

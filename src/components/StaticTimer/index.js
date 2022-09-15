@@ -2,16 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Text from '../Text';
 import { View } from 'react-native';
 
-const StaticTimer = ({
-  startTimer,
-  minutes,
-  setMinutes,
-  seconds,
-  setSeconds,
-  hours,
-  setHours
-}) => {
-
+const StaticTimer = ({ startTimer, minutes, setMinutes, seconds, setSeconds, hours, setHours }) => {
   useEffect(() => {
     if (!startTimer) {
       const myInterval = setInterval(() => {
@@ -44,8 +35,9 @@ const StaticTimer = ({
     <View>
       <Text
         color="quinary"
-        text={`${hours < 10 ? '0' + hours : hours} : ${minutes < 10 ? '0' + minutes : minutes} : ${seconds < 10 ? '0' + seconds : seconds
-          }`}
+        text={`${hours < 10 ? '0' + hours : hours} : ${minutes < 10 ? '0' + minutes : minutes} : ${
+          seconds < 10 ? '0' + seconds : seconds
+        }`}
         medium
         bold
       />

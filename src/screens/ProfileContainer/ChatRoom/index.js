@@ -1,10 +1,10 @@
-import {useState, useEffect} from 'react';
-import {connect} from 'react-redux';
-import {unReadMsgAction} from '@/redux/modules/nutritionReducer';
+import { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import { unReadMsgAction } from '@/redux/modules/nutritionReducer';
 import Database from './database';
 
 const ChatRoom = props => {
-  const {user, profile} = props;
+  const { user, profile } = props;
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalUnReadChatsCount, setTotalUnReadChatsCount] = useState(0);

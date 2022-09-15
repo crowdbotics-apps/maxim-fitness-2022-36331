@@ -10,7 +10,12 @@ import {
   TextInput,
 } from 'react-native';
 
+//Libraries
 import LinearGradient from 'react-native-linear-gradient';
+import { connect } from 'react-redux';
+
+//Actions
+import { updateAnswer } from './Redux';
 
 //Components
 import { Text } from '../../components';
@@ -21,6 +26,16 @@ const WeightKg = props => {
     navigation: { navigate },
   } = props;
 
+  const [kilograms, setKilograms] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.weight = kilograms;
+    props.updateAnswers(tempData);
+    navigate('FitnessGoal');
+  };
+
+  console.log('tes', props.answers);
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.52} showBackButton={true} />
@@ -48,13 +63,19 @@ const WeightKg = props => {
           },
         ]}
       >
-        <TextInput style={{ fontSize: 24 }} placeholder={'Kilograms'} />
+        <TextInput
+          style={{ fontSize: 24 }}
+          placeholder={'Kilograms'}
+          keyboardType="number-pad"
+          onChangeText={val => setKilograms(val)}
+          maxLength={3}
+        />
       </View>
 
       <View style={{ height: '69%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => navigate('FitnessGoal')}
+          onPress={() => onNext()}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -87,4 +108,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WeightKg;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(WeightKg);

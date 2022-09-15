@@ -3,7 +3,7 @@ import moment from 'moment';
 const store = firestore();
 
 export default class Database {
-  static database = null;
+  static database = null
 
   static shared() {
     if (Database.database == null) {
@@ -14,7 +14,7 @@ export default class Database {
 
   init = userID => {
     this.userID = userID;
-  };
+  }
 
   dbRef() {
     return store.collection(`users/${this.userID}/chats`);
@@ -50,7 +50,7 @@ export default class Database {
 
   subscribe = callback => {
     this.unSub = this.dbRef().onSnapshot(() => callback());
-  };
+  }
 
   off() {
     this.unSub();

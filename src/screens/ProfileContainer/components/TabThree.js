@@ -69,7 +69,7 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
       <View style={[center, regularHMargin, regularVMargin]}>
         <View style={positionR}>
           <Progress.Circle
-            progress={.75}
+            progress={0.75}
             size={200}
             color={'#ea3465'}
             unfilledColor={'#fae0e0'}
@@ -90,10 +90,7 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
             }}
             bold
           />
-          <Text
-            text={`Goal ${100}`}
-            style={fontSize15TextCenter}
-          />
+          <Text text={`Goal ${100}`} style={fontSize15TextCenter} />
         </View>
       </View>
       <View
@@ -109,20 +106,13 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
         <View style={alignItemsStart}>
           <Text text="Protein" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
-            <Text
-              text={`${10} /`}
-              style={fontSize15TextCenter}
-              bold
-            />
-            <Text
-              text={`${30} g`}
-              style={fontSize15TextCenter}
-            />
+            <Text text={`${10} /`} style={fontSize15TextCenter} bold />
+            <Text text={`${30} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
           <Progress.Bar
-            progress={.25}
+            progress={0.25}
             width={Dimensions.get('window').width - 200}
             height={22}
             color={'#45a1f8'}
@@ -147,10 +137,7 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           <Text text="Carbohydrates" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
             <Text text={`${15} /`} style={fontSize15TextCenter} bold />
-            <Text
-              text={`${30} g`}
-              style={fontSize15TextCenter}
-            />
+            <Text text={`${30} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
@@ -180,10 +167,7 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           <Text text="Fats" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
             <Text text={`${20} /`} style={fontSize15TextCenter} bold />
-            <Text
-              text={`${30} g`}
-              style={fontSize15TextCenter}
-            />
+            <Text text={`${30} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
@@ -215,11 +199,7 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           { flex: 1, flexDirection: 'row', justifyContent: 'space-between' },
         ]}
       >
-        <Text
-          text={`${6} meals`}
-          style={[regularVPadding, fontSize15TextCenter]}
-          color="nonary"
-        />
+        <Text text={`${6} meals`} style={[regularVPadding, fontSize15TextCenter]} color="nonary" />
         <Text
           text="Add more"
           style={[regularVPadding, fontSize15TextCenter]}

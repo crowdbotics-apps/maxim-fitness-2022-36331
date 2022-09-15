@@ -18,13 +18,7 @@ import {
 import Modal from 'react-native-modal';
 import HorizontalScrollView from '../../components/HorizontalScrollView';
 import { useDispatch } from 'react-redux';
-import {
-  Text,
-  Button,
-  RuningCard,
-  RuningWorkout,
-  ProfileHeaderFeed,
-} from '../../components';
+import { Text, Button, RuningCard, RuningWorkout, ProfileHeaderFeed } from '../../components';
 // import {launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 
@@ -352,7 +346,7 @@ const ProfileContainer = props => {
           <ProfileHeaderFeed
             imageUrl={
               // profile?.profile_picture_url === null
-              //   ? 
+              //   ?
               Images.profile
               // : profile
               //   ? { uri: imageUrl }
@@ -390,7 +384,7 @@ const ProfileContainer = props => {
                   ? { borderBottomWidth: 2, borderBottomColor: Colors.azureradiance }
                   : { borderBottomWidth: 2, borderBottomColor: 'white' },
               ]}
-            // onPress={() => [setCurrentTab(1), props.userInfoReducer(id)]}
+              // onPress={() => [setCurrentTab(1), props.userInfoReducer(id)]}
             >
               <Text
                 style={[
@@ -410,26 +404,17 @@ const ProfileContainer = props => {
             >
               <Icon type="FontAwesome5" name="bell" />
               {true && (
-                <View
-                  style={
-                    true
-                      ? styles.notificationStyle
-                      : ''
-                  }
-                >
-                  <Text
-                    text={'notify'}
-                    style={styles.notificationStyleText}
-                  />
+                <View style={true ? styles.notificationStyle : ''}>
+                  <Text text={'notify'} style={styles.notificationStyleText} />
                 </View>
               )}
             </TouchableOpacity>
             <TouchableOpacity
               style={regularLMargin}
-            // onPress={() => {
-            //   props.unReadMsgResetAction();
-            //   navigation.navigate('ChatRoom');
-            // }}
+              // onPress={() => {
+              //   props.unReadMsgResetAction();
+              //   navigation.navigate('ChatRoom');
+              // }}
             >
               <Icon type="FontAwesome5" name="comment-alt" />
               {true && (
@@ -476,10 +461,10 @@ const ProfileContainer = props => {
                 <TabOne
                   showModal={showModal}
                   setShowModal={setShowModal}
-                // profileData={profile}
-                // signOut={signOut}
-                // navigation={navigation}
-                // connectAlexa={connectAlexa}
+                  // profileData={profile}
+                  // signOut={signOut}
+                  // navigation={navigation}
+                  // connectAlexa={connectAlexa}
                 />
               </>
             )}
@@ -626,7 +611,6 @@ const ProfileContainer = props => {
             )}
           </Content>
         </>
-
       </SafeAreaView>
       <Modal
         animationIn="slideInUp"
@@ -678,40 +662,36 @@ const ProfileContainer = props => {
             showsVerticalScrollIndicator={false}
           >
             <View>
-              {true ? (
-                [1, 2, 3].map((item, i) => {
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                    // onPress={() => {
-                    //   if (item.message === 'Comment Post' || 'Like Post') {
-                    //     navigation.navigate('PostDetail', { item: item });
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    //   if (item.message === 'Started following you') {
-                    //     navigation.navigate('ProfileView', item);
-                    //   }
-                    //   if (item.message === 'Message') {
-                    //     navigation.navigate('ChatRoom');
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    // }}
-                    >
-                      <RuningCard
-                        item={item}
-                        Notification={item.message}
-                        Time={calculatePostTime(item)}
-                      />
-                    </TouchableOpacity>
-                  );
-                })
-              ) :
-                (
-                  null
-
-                )}
+              {true
+                ? [1, 2, 3].map((item, i) => {
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        // onPress={() => {
+                        //   if (item.message === 'Comment Post' || 'Like Post') {
+                        //     navigation.navigate('PostDetail', { item: item });
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        //   if (item.message === 'Started following you') {
+                        //     navigation.navigate('ProfileView', item);
+                        //   }
+                        //   if (item.message === 'Message') {
+                        //     navigation.navigate('ChatRoom');
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        // }}
+                      >
+                        <RuningCard
+                          item={item}
+                          Notification={item.message}
+                          Time={calculatePostTime(item)}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })
+                : null}
             </View>
           </ScrollView>
         </View>

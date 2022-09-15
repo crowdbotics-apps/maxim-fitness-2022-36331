@@ -30,7 +30,7 @@ const ProgramScreen = props => {
 
   useEffect(() => {
     if (getAllSessions) {
-      getAllSessions?.query?.map((item) => {
+      getAllSessions?.query?.map(item => {
         let currentD = moment(new Date()).format('YYYY-MM-DD');
         let cardDate = moment(item.date_time).format('YYYY-MM-DD');
 
@@ -41,7 +41,6 @@ const ProgramScreen = props => {
         if (currentD === cardDate && item.workouts.length > 0) {
           props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
         }
-
       })
     }
   }, [getAllSessions])

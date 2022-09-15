@@ -10,16 +10,38 @@ import {
   TextInput,
 } from 'react-native';
 
+//Libraries
 import LinearGradient from 'react-native-linear-gradient';
+import { connect } from 'react-redux';
 
 //Components
 import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
+//Actions
+import { updateAnswer } from './Redux';
+
 const FeetHeight = props => {
   const {
     navigation: { navigate },
   } = props;
+
+  const [feet, setFeet] = useState('');
+  const [inches, setInches] = useState('');
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.height = `${feet}'${inches}`;
+    props.updateAnswers(tempData);
+    navigate('WeightPounds');
+  };
+  // useEffect(() => {
+  //   if (props.answers && props.answers.unit) {
+  //     setExerciseLevel(props.answers.unit);
+  //   }
+  // }, []);
+
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,7 +70,12 @@ const FeetHeight = props => {
           },
         ]}
       >
-        <TextInput style={{ fontSize: 24 }} placeholder={'Feet'} />
+        <TextInput
+          style={{ fontSize: 24 }}
+          placeholder={'Feet'}
+          onChangeText={val => setFeet(val)}
+          keyboardType="numeric"
+        />
       </View>
 
       <View
@@ -63,12 +90,17 @@ const FeetHeight = props => {
           },
         ]}
       >
-        <TextInput style={{ fontSize: 24 }} placeholder={'Inches'} />
+        <TextInput
+          style={{ fontSize: 24 }}
+          placeholder={'Inches'}
+          onChangeText={val => setInches(val)}
+          keyboardType="numeric"
+        />
       </View>
       <View style={{ height: '59%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => navigate('WeightPounds')}
+          onPress={() => onNext()}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -101,4 +133,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FeetHeight;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(FeetHeight);

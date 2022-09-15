@@ -49,22 +49,22 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   nextWorkout
 })
 
-export const setDoneRequest = (id) => ({
+export const setDoneRequest = id => ({
   type: SETS_DONE_REQUEST,
   id,
 });
 
-export const setDoneSuccess = (data) => ({
+export const setDoneSuccess = data => ({
   type: SETS_DONE_SUCCESS,
   data,
 });
 
-export const exerciseDoneRequest = (data) => ({
+export const exerciseDoneRequest = data => ({
   type: EXERCISE_DONE_REQUEST,
   data
 });
 
-export const exerciseDoneSuccess = (data) => ({
+export const exerciseDoneSuccess = data => ({
   type: EXERCISE_DONE_SUCCESS,
   data,
 });
