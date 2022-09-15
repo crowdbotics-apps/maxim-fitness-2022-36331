@@ -103,8 +103,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="Home3"
-        component={Feeds}
+        name="ProfileContainer"
+        component={ProfileContainer}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
 const MainNavigator = () => (
   <mainStack.Navigator
     screenOptions={{ headerShown: false, animationEnabled: false }}
-    initialRouteName="ProfileContainer"
+    initialRouteName="BottomBar"
   >
     <mainStack.Screen name="BottomBar" component={BottomNavigator} />
     <mainStack.Screen name="AddPost" component={AddPost} />

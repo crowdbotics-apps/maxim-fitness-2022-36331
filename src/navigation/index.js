@@ -29,14 +29,14 @@ const Navigation = props => {
         {props.accessToken ? (
           <authStack.Screen name="MainStack" component={MainNavigator} />
         ) : (
-          // <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
-          <questionStack.Screen name="MainStack" component={QuestionStackScreen} />
+          <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
         )}
       </authStack.Navigator>
     </NavigationContainer>
   );
 };
 
+{/* <questionStack.Screen name="MainStack" component={QuestionStackScreen} /> */ }
 const mapStateToProps = state => ({
   accessToken: state.login.accessToken,
 });
