@@ -10,16 +10,37 @@ import {
   TextInput,
 } from 'react-native';
 
-import LinearGradient from 'react-native-linear-gradient';
-
 //Components
 import {Text} from '../../components';
 import HeaderTitle from './Components/headerTitle';
+
+//Libraires
+import {connect} from 'react-redux';
+import LinearGradient from 'react-native-linear-gradient';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const WeightPounds = props => {
   const {
     navigation: {navigate},
   } = props;
+
+  const [pound, setPounds] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['weight'] = pound;
+    props.updateAnswers(tempData);
+    navigate('FitnessGoal');
+  };
+  // useEffect(() => {
+  //   if (props.answers && props.answers.unit) {
+  //     setExerciseLevel(props.answers.unit);
+  //   }
+  // }, []);
+
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,13 +69,19 @@ const WeightPounds = props => {
           },
         ]}
       >
-        <TextInput style={{fontSize: 24}} placeholder={'Pounds'} />
+        <TextInput
+          style={{fontSize: 24}}
+          placeholder={'Pounds'}
+          keyboardType="numeric"
+          onChangeText={val => setPounds(val)}
+        />
       </View>
 
       <View style={{height: '69%', justifyContent: 'flex-end'}}>
         <TouchableOpacity
           style={{marginHorizontal: 40, marginBottom: 25}}
-          onPress={() => navigate('FitnessGoal')}
+          onPress={() => onNext()}
+          disabled={!pound}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>
@@ -87,4 +114,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WeightPounds;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(WeightPounds);

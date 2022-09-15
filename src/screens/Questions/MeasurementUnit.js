@@ -14,14 +14,16 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
-
+import {connect} from 'react-redux';
 //Components
 import {Text} from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const MeasurementUnit = props => {
   const {forwardIcon, otLogo} = Images;
@@ -33,24 +35,34 @@ const MeasurementUnit = props => {
     navigation: {navigate},
   } = props;
 
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['unit'] = exerciseLevel;
+    exerciseLevel === 'Feet/Pounds' && navigate('FeetHeight');
+    exerciseLevel === 'Meters/Kilograms' && navigate('HeightCentimeters');
+    props.updateAnswers(tempData);
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.unit) {
+      setExerciseLevel(props.answers.unit);
+    }
+  }, []);
+
+  console.log('answersss', props.answers);
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.37} />
-
       <View style={{marginHorizontal: 40, marginTop: 30}}>
         <Text
           style={{fontSize: 24, color: '#6f6f6f', fontWeight: '500'}}
           text={'Choose units of measurement'}
         />
       </View>
-
       <View style={{marginTop: 30}}>
         {exerciseArray.map(item => (
           <TouchableOpacity
             style={[
               {
-                // height: 65,
-                //   marginTop: 15,
                 marginHorizontal: 40,
                 borderBottomWidth: exerciseLevel !== item ? 1 : null,
                 borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
@@ -87,8 +99,7 @@ const MeasurementUnit = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            exerciseLevel === 'Feet/Pounds' && navigate('FeetHeight');
-            exerciseLevel === 'Meters/Kilograms' && navigate('HeightCentimeters');
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -122,4 +133,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MeasurementUnit;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(MeasurementUnit);

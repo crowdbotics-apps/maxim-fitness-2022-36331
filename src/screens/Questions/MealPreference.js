@@ -14,14 +14,16 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
-
+import {connect} from 'react-redux';
 //Components
 import {Text} from '../../components';
 import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const MealPreference = props => {
   const {forwardIcon, otLogo} = Images;
@@ -33,6 +35,20 @@ const MealPreference = props => {
   const exerciseArray = ['4 Meals', '5 Meals', '6 Meals'];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['number_of_meal'] = exerciseLevel;
+    props.updateAnswers(tempData);
+    navigate('MealTime', {numberOfMeals: exerciseLevel});
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.number_of_meal) {
+      setExerciseLevel(props.answers.number_of_meal);
+    }
+  }, []);
+
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,7 +104,7 @@ const MealPreference = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('MealTime', {numberOfMeals: exerciseLevel});
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -122,4 +138,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MealPreference;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(MealPreference);

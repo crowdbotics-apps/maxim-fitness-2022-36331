@@ -13,8 +13,10 @@ import {
 } from 'react-native';
 
 //Libraires
+import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import {connect} from 'react-redux';
+import moment from 'moment';
 
 //Components
 import {Text} from '../../components';
@@ -22,6 +24,9 @@ import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const MealTime = props => {
   const {forwardIcon, downIcon} = Images;
@@ -33,16 +38,32 @@ const MealTime = props => {
 
   const {numberOfMeals} = params;
 
-  const fourMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4'];
-  const fiveMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4', 'Meal 5'];
-  const sixMeals = ['Meal 1 ', 'Meal 2', 'Meal 3', 'Meal 4', 'Meal 5', 'Meal 6'];
+  const fourMeals = [{Meal1: ''}, {Meal2: ''}, {Meal3: ''}, {Meal4: ''}];
+  const fiveMeals = [{Meal1: ''}, {Meal2: ''}, {Meal3: ''}, {Meal4: ''}, {Meal5: ''}];
+  const sixMeals = [{Meal1: ''}, {Meal2: ''}, {Meal3: ''}, {Meal4: ''}, {Meal5: ''}, {Meal6: ''}];
 
-  const mapMeals =
+  const meal4 = ['Meal1', 'Meal2', 'Meal3', 'Meal4'];
+  const meal5 = ['Meal1', 'Meal2', 'Meal3', 'Meal4', 'Meal5'];
+  const meal6 = ['Meal1', 'Meal2', 'Meal3', 'Meal4', 'Meal5', 'Meal6'];
+
+  let currentMeals =
     (numberOfMeals === '4 Meals' && fourMeals) ||
     (numberOfMeals === '5 Meals' && fiveMeals) ||
     (numberOfMeals === '6 Meals' && sixMeals);
 
+  const mapMeals =
+    (numberOfMeals === '4 Meals' && meal4) ||
+    (numberOfMeals === '5 Meals' && meal5) ||
+    (numberOfMeals === '6 Meals' && meal6);
+
   const [exerciseLevel, setExerciseLevel] = useState(false);
+
+  const [timeModal, setTimeModal] = useState(false);
+  const [time, setTime] = useState(new Date());
+
+  const [selectedMeal, setSelectedMeal] = useState({});
+
+  console.log('testtttt-----------', currentMeals);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,12 +77,10 @@ const MealTime = props => {
       </View>
 
       <View style={{marginTop: 30}}>
-        {mapMeals.map(item => (
+        {mapMeals.map((item, i) => (
           <TouchableOpacity
             style={[
               {
-                // height: 65,
-                //   marginTop: 15,
                 marginHorizontal: 40,
                 borderBottomWidth: exerciseLevel !== item ? 1 : null,
                 borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
@@ -70,7 +89,10 @@ const MealTime = props => {
                 borderColor: '#a5c2d0',
               },
             ]}
-            onPress={() => setExerciseLevel(item)}
+            onPress={() => {
+              setSelectedMeal(i);
+              setTimeModal(true);
+            }}
           >
             <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <View
@@ -106,6 +128,39 @@ const MealTime = props => {
           </LinearGradient>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={timeModal} style={{flex: 1}} animationType="slide" transparent={true}>
+        <View style={[{backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1}, styles.centeredView]}>
+          <DatePicker
+            date={new Date()}
+            onDateChange={val => {
+              const timee = moment(val).format('YYYY-MM-DD');
+
+              currentMeals[selectedMeal] = {Meal1: timee};
+
+              // setNavState(dob);
+            }}
+            androidVariant="iosClone"
+            style={{backgroundColor: '#fff'}}
+            mode="time"
+          />
+
+          <TouchableOpacity
+            style={{width: '80%', marginVertical: 25}}
+            onPress={() => setTimeModal(false)}
+          >
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Select Time</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{width: '80%'}} onPress={() => setTimeModal(false)}>
+            <LinearGradient style={[styles.logInButton]} colors={['#e52b39', '#ef3d49', '#fb5a60']}>
+              <Text style={styles.loginText}>Cancel</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -132,4 +187,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MealTime;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(MealTime);

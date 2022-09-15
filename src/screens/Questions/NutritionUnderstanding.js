@@ -14,7 +14,7 @@ import {
 
 //Libraires
 import LinearGradient from 'react-native-linear-gradient';
-import {Overlay} from 'react-native-elements';
+import {connect} from 'react-redux';
 
 //Components
 import {Text} from '../../components';
@@ -22,6 +22,9 @@ import HeaderTitle from './Components/headerTitle';
 
 //Themes
 import Images from '../../theme/Images';
+
+//Actions
+import {updateAnswer} from './Redux';
 
 const NutritionUnderstanding = props => {
   const {forwardIcon, otLogo} = Images;
@@ -46,6 +49,20 @@ const NutritionUnderstanding = props => {
   ];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData['understanding_level'] = exerciseLevel;
+    props.updateAnswers(tempData);
+    navigate('ThingsToKnow');
+  };
+  useEffect(() => {
+    if (props.answers && props.answers.understanding_level) {
+      setExerciseLevel(props.answers.understanding_level);
+    }
+  }, []);
+
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -103,7 +120,7 @@ const NutritionUnderstanding = props => {
           }}
           disabled={!exerciseLevel}
           onPress={() => {
-            navigate('ThingsToKnow');
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -137,4 +154,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NutritionUnderstanding;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(NutritionUnderstanding);
