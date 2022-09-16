@@ -20,14 +20,13 @@ import ThingsToKnow from '../screens/Questions/ThingsToKnow';
 const questionStack = createStackNavigator();
 
 const QuestionStackScreen = () => (
-  <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Birthday">
+  <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="MealPreference">
     <questionStack.Screen
       name="Birthday"
       component={Birthday}
-      animationEnabled={false}
       options={{ animationEnabled: false }}
     />
-    <questionStack.Screen name="Gender" component={Gender} />
+    <questionStack.Screen name="Gender" component={Gender} options={{ animationEnabled: false }} />
     <questionStack.Screen
       name="ExerciseLevel"
       component={ExerciseLevel}

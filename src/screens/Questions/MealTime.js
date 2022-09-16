@@ -38,39 +38,45 @@ const MealTime = props => {
 
   const { numberOfMeals } = params;
 
-  const fourMeals = [{ Meal1: '' }, { Meal2: '' }, { Meal3: '' }, { Meal4: '' }];
-  const fiveMeals = [{ Meal1: '' }, { Meal2: '' }, { Meal3: '' }, { Meal4: '' }, { Meal5: '' }];
-  const sixMeals = [
-    { Meal1: '' },
-    { Meal2: '' },
-    { Meal3: '' },
-    { Meal4: '' },
-    { Meal5: '' },
-    { Meal6: '' },
+  console.log('numberOfMeals', numberOfMeals);
+
+  const fourMeals = [
+    { meal: 'Meal 1', time: '' },
+    { meal: 'Meal 2', time: '' },
+    { meal: 'Meal 3', time: '' },
+    { meal: 'Meal 4', time: '' },
   ];
 
-  const meal4 = ['Meal1', 'Meal2', 'Meal3', 'Meal4'];
-  const meal5 = ['Meal1', 'Meal2', 'Meal3', 'Meal4', 'Meal5'];
-  const meal6 = ['Meal1', 'Meal2', 'Meal3', 'Meal4', 'Meal5', 'Meal6'];
+  // const fiveMeals = [
+  //   { meal: 'Meal 1', time: '' },
+  //   { meal: 'Meal 2', time: '' },
+  //   { meal: 'Meal 3', time: '' },
+  //   { meal: 'Meal 4', time: '' },
+  //   { meal: 'Meal 5', time: '' },
+  // ];
 
-  let currentMeals =
-    (numberOfMeals === '4 Meals' && fourMeals) ||
-    (numberOfMeals === '5 Meals' && fiveMeals) ||
-    (numberOfMeals === '6 Meals' && sixMeals);
+  // const sixMeals = [
+  //   { meal: 'Meal 1', time: '' },
+  //   { meal: 'Meal 2', time: '' },
+  //   { meal: 'Meal 3', time: '' },
+  //   { meal: 'Meal 4', time: '' },
+  //   { meal: 'Meal 5', time: '' },
+  //   { meal: 'Meal 6', time: '' },
+  // ];
 
-  const mapMeals =
-    (numberOfMeals === '4 Meals' && meal4) ||
-    (numberOfMeals === '5 Meals' && meal5) ||
-    (numberOfMeals === '6 Meals' && meal6);
+  // const currentMeals =
+  //   (numberOfMeals === '4 Meals' && fourMeals) ||
+  //   (numberOfMeals === '5 Meals' && fiveMeals) ||
+  //   (numberOfMeals === '6 Meals' && sixMeals);
+
+  // const [mealsArray, setMealsArray] = useState(currentMeals);
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   const [timeModal, setTimeModal] = useState(false);
   const [time, setTime] = useState(new Date());
 
-  const [selectedMeal, setSelectedMeal] = useState({});
-
-  console.log('testtttt-----------', currentMeals);
+  const [selectedMeal, setSelectedMeal] = useState('');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,7 +90,7 @@ const MealTime = props => {
       </View>
 
       <View style={{ marginTop: 30 }}>
-        {mapMeals.map((item, i) => (
+        {fourMeals.map((item, i) => (
           <TouchableOpacity
             style={[
               {
@@ -107,7 +113,9 @@ const MealTime = props => {
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>{item}</Text>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>
+                  {item.meal}
+                </Text>
                 {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
               <View style={{ justifyContent: 'center' }}>
@@ -139,13 +147,12 @@ const MealTime = props => {
       <Modal visible={timeModal} style={{ flex: 1 }} animationType="slide" transparent={true}>
         <View style={[{ backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1 }, styles.centeredView]}>
           <DatePicker
-            date={new Date()}
+            date={time}
             onDateChange={val => {
-              const timee = moment(val).format('YYYY-MM-DD');
+              setTime(val);
+              const timee = moment(val, ['h:mm A']).format('HH:mm');
 
-              currentMeals[selectedMeal] = { Meal1: timee };
-
-              // setNavState(dob);
+              // setMealsArray(prevData => [...prevData, (prevData[selectedMeal].time = timee)]);
             }}
             androidVariant="iosClone"
             style={{ backgroundColor: '#fff' }}
