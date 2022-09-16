@@ -35,7 +35,6 @@ const WeightKg = props => {
     navigate('FitnessGoal');
   };
 
-  console.log('tes', props.answers);
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.52} showBackButton={true} />
@@ -76,6 +75,7 @@ const WeightKg = props => {
         <TouchableOpacity
           style={{ marginHorizontal: 40, marginBottom: 25 }}
           onPress={() => onNext()}
+          disabled={!kilograms}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>

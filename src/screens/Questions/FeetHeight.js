@@ -41,8 +41,6 @@ const FeetHeight = props => {
   //   }
   // }, []);
 
-  console.log('answersss', props.answers);
-
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.47} showBackButton={true} />
@@ -101,6 +99,7 @@ const FeetHeight = props => {
         <TouchableOpacity
           style={{ marginHorizontal: 40, marginBottom: 25 }}
           onPress={() => onNext()}
+          disabled={!feet || !inches}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
             <Text style={styles.loginText}>Next</Text>

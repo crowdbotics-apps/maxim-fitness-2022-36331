@@ -52,8 +52,6 @@ const MealPreference = props => {
     }
   }, []);
 
-  console.log('answersss', props.answers);
-
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.68} />

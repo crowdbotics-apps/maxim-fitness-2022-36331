@@ -37,36 +37,53 @@ const MealTime = props => {
   } = props;
 
   const { numberOfMeals } = params;
-  const [meals, setMeals] = useState([])
+  const [meals, setMeals] = useState([]);
 
   useEffect(() => {
-    totalMeals() && setMeals(totalMeals())
-  }, [])
+    totalMeals() && setMeals(totalMeals());
+  }, []);
 
-const totalMeals = () => {
-  return Array(numberOfMeals).fill().map((item, index) => {
-    return {
-      meal: `Meal ${index + 1}`, time: ''
-    }
-  })
-}
+  const totalMeals = () => {
+    return Array(numberOfMeals)
+      .fill()
+      .map((item, index) => {
+        return {
+          meal: `Meal ${index + 1}`,
+          time: '',
+        };
+      });
+  };
 
-const onSelectMeal = (index) => {
-  const data = [...meals]
-  data[index].time = '1:00'
-  setMeals(data)
-}
+  const onSelectMeal = (index, time) => {
+    const data = [...meals];
+    data[index].time = time;
+    setMeals(data);
+  };
 
-  console.log('numberOfMeals', numberOfMeals);
-  console.log('totalMeals', totalMeals());
-
-  
   const [exerciseLevel, setExerciseLevel] = useState(false);
-
   const [timeModal, setTimeModal] = useState(false);
   const [time, setTime] = useState(new Date());
-
   const [selectedMeal, setSelectedMeal] = useState('');
+
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.mealTimes = meals;
+    props.updateAnswers(tempData);
+    navigate('NutritionUnderstanding');
+  };
+
+  useEffect(() => {
+    if (props.answers && props.answers.mealTimes) {
+      setMeals(props.answers.mealTimes);
+    }
+  }, []);
+
+  const buttonDiabled = () => {
+    return meals.map(item => {
+      return item.time;
+    });
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,47 +97,45 @@ const onSelectMeal = (index) => {
       </View>
 
       <View style={{ marginTop: 30 }}>
-        {meals && meals.map((item, i) => (
-          <TouchableOpacity
-            style={[
-              {
-                marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item ? 1 : null,
-                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item ? 1 : null,
-                paddingVertical: 18,
-                borderColor: '#a5c2d0',
-              },
-            ]}
-            onPress={() => {
-              onSelectMeal(i)
-              setSelectedMeal(i);
-              setTimeModal(true);
-            }}
-          >
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-              <View
-                style={{
-                  paddingHorizontal: 11,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>
-                  {item.meal}
-                </Text>
-                {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
+        {meals &&
+          meals.map((item, i) => (
+            <TouchableOpacity
+              style={[
+                {
+                  marginHorizontal: 40,
+                  borderBottomWidth: exerciseLevel !== item ? 1 : null,
+                  borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
+                  borderWidth: exerciseLevel === item ? 1 : null,
+                  paddingVertical: 18,
+                  borderColor: '#a5c2d0',
+                },
+              ]}
+              onPress={() => {
+                setSelectedMeal(i);
+                setTimeModal(true);
+              }}
+            >
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                <View
+                  style={{
+                    paddingHorizontal: 11,
+                  }}
+                >
+                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>
+                    {item.meal}
+                  </Text>
+                  {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
+                </View>
+                <View style={{ justifyContent: 'center' }}>
+                  {item.time ? (
+                    <Text>{item.time}</Text>
+                  ) : (
+                    <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
+                  )}
+                </View>
               </View>
-              <View style={{ justifyContent: 'center' }}>
-                {item.time ? (
-                  <Text>{item.time}</Text>
-                ) : (
-                  <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
-                )}
-                
-                
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
       </View>
 
       <View style={{ height: '18.8%', justifyContent: 'flex-end' }}>
@@ -128,11 +143,11 @@ const onSelectMeal = (index) => {
           style={{
             marginHorizontal: 40,
             marginBottom: 25,
-            opacity: exerciseLevel !== false ? 1 : 0.7,
+            opacity: Boolean(buttonDiabled().includes('')) ? 0.7 : 1,
           }}
-          disabled={!exerciseLevel}
+          disabled={Boolean(buttonDiabled().includes('')) ? true : false}
           onPress={() => {
-            navigate('NutritionUnderstanding');
+            onNext();
           }}
         >
           <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
@@ -148,6 +163,7 @@ const onSelectMeal = (index) => {
             onDateChange={val => {
               setTime(val);
               const timee = moment(val, ['h:mm A']).format('HH:mm');
+              onSelectMeal(selectedMeal, timee);
 
               // setMealsArray(prevData => [...prevData, (prevData[selectedMeal].time = timee)]);
             }}

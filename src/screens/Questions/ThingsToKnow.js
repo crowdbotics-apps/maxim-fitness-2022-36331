@@ -13,8 +13,7 @@ import {
 } from 'react-native';
 
 //Libraires
-import LinearGradient from 'react-native-linear-gradient';
-import { Overlay } from 'react-native-elements';
+import { connect } from 'react-redux';
 
 //Components
 import { Text } from '../../components';
@@ -24,6 +23,12 @@ import HeaderTitle from './Components/headerTitle';
 import Images from '../../theme/Images';
 
 const ThingsToKnow = props => {
+
+  const {
+    navigation: { navigate },
+  } = props;
+
+
   const { forwardIcon, otLogo } = Images;
 
   const thingsArray = [
@@ -47,9 +52,6 @@ const ThingsToKnow = props => {
     },
   ];
 
-  const {
-    navigation: { navigate },
-  } = props;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.9} />
@@ -139,4 +141,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ThingsToKnow;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+});
+
+const mapDispatchToProps = dispatch => ({
+  // updateAnswers: data => dispatch(updateAnswer(data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ThingsToKnow);
