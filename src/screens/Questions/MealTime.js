@@ -37,40 +37,30 @@ const MealTime = props => {
   } = props;
 
   const { numberOfMeals } = params;
+  const [meals, setMeals] = useState([])
+
+  useEffect(() => {
+    totalMeals() && setMeals(totalMeals())
+  }, [])
+
+const totalMeals = () => {
+  return Array(numberOfMeals).fill().map((item, index) => {
+    return {
+      meal: `Meal ${index + 1}`, time: ''
+    }
+  })
+}
+
+const onSelectMeal = (index) => {
+  const data = [...meals]
+  data[index].time = '1:00'
+  setMeals(data)
+}
 
   console.log('numberOfMeals', numberOfMeals);
+  console.log('totalMeals', totalMeals());
 
-  const fourMeals = [
-    { meal: 'Meal 1', time: '' },
-    { meal: 'Meal 2', time: '' },
-    { meal: 'Meal 3', time: '' },
-    { meal: 'Meal 4', time: '' },
-  ];
-
-  // const fiveMeals = [
-  //   { meal: 'Meal 1', time: '' },
-  //   { meal: 'Meal 2', time: '' },
-  //   { meal: 'Meal 3', time: '' },
-  //   { meal: 'Meal 4', time: '' },
-  //   { meal: 'Meal 5', time: '' },
-  // ];
-
-  // const sixMeals = [
-  //   { meal: 'Meal 1', time: '' },
-  //   { meal: 'Meal 2', time: '' },
-  //   { meal: 'Meal 3', time: '' },
-  //   { meal: 'Meal 4', time: '' },
-  //   { meal: 'Meal 5', time: '' },
-  //   { meal: 'Meal 6', time: '' },
-  // ];
-
-  // const currentMeals =
-  //   (numberOfMeals === '4 Meals' && fourMeals) ||
-  //   (numberOfMeals === '5 Meals' && fiveMeals) ||
-  //   (numberOfMeals === '6 Meals' && sixMeals);
-
-  // const [mealsArray, setMealsArray] = useState(currentMeals);
-
+  
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   const [timeModal, setTimeModal] = useState(false);
@@ -90,7 +80,7 @@ const MealTime = props => {
       </View>
 
       <View style={{ marginTop: 30 }}>
-        {fourMeals.map((item, i) => (
+        {meals && meals.map((item, i) => (
           <TouchableOpacity
             style={[
               {
@@ -103,6 +93,7 @@ const MealTime = props => {
               },
             ]}
             onPress={() => {
+              onSelectMeal(i)
               setSelectedMeal(i);
               setTimeModal(true);
             }}
@@ -119,7 +110,13 @@ const MealTime = props => {
                 {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
               <View style={{ justifyContent: 'center' }}>
-                <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
+                {item.time ? (
+                  <Text>{item.time}</Text>
+                ) : (
+                  <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
+                )}
+                
+                
               </View>
             </View>
           </TouchableOpacity>
