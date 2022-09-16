@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Modal,
+  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 
@@ -38,47 +39,47 @@ const Birthday = props => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.02} showBackButton={false} />
-
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'When were you born?'}
-        />
-        {/*
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+          <Text
+            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            text={'When were you born?'}
+          />
+          {/*
         <Text style={{marginTop: 18}}>
           This answer has influence on how your program is designed
         </Text> */}
-      </View>
+        </View>
 
-      <TouchableOpacity
-        style={[
-          {
-            height: 65,
-            marginTop: 20,
-            marginHorizontal: 40,
-            justifyContent: 'center',
-            borderBottomWidth: 1,
-            borderBottomColor: '#808080',
-          },
-        ]}
-        onPress={() => setDateModal(true)}
-      >
-        <Text style={{ fontSize: 24, color: '#d3d3d3', fontWeight: '500' }}>
-          {navState ? navState : 'Birthday'}
-        </Text>
-      </TouchableOpacity>
-      <View style={{ height: '68%', justifyContent: 'flex-end' }}>
         <TouchableOpacity
-          style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => onNext()}
-          disabled={!navState}
+          style={[
+            {
+              height: 65,
+              marginTop: 20,
+              marginHorizontal: 40,
+              justifyContent: 'center',
+              borderBottomWidth: 1,
+              borderBottomColor: '#808080',
+            },
+          ]}
+          onPress={() => setDateModal(true)}
         >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
+          <Text style={{ fontSize: 24, color: '#d3d3d3', fontWeight: '500' }}>
+            {navState ? navState : 'Birthday'}
+          </Text>
         </TouchableOpacity>
-      </View>
-
+        <View style={{ height: '68%', justifyContent: 'flex-end' }}>
+          <TouchableOpacity
+            style={{ marginHorizontal: 40, marginBottom: 25 }}
+            onPress={() => onNext()}
+            disabled={!navState}
+          >
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Next</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <Modal visible={dateModal} style={{ flex: 1 }} animationType="slide" transparent={true}>
         <View style={[{ backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1 }, styles.centeredView]}>
           <DatePicker

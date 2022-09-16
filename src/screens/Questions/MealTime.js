@@ -88,74 +88,74 @@ const MealTime = props => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.75} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ marginHorizontal: 40, marginTop: 20 }}>
+          <Text
+            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            text={'What times do you want to eat?'}
+          />
+        </View>
 
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What times do you want to eat?'}
-        />
-      </View>
-
-      <View style={{ marginTop: 30 }}>
-        {meals &&
-          meals.map((item, i) => (
-            <TouchableOpacity
-              style={[
-                {
-                  marginHorizontal: 40,
-                  borderBottomWidth: exerciseLevel !== item ? 1 : null,
-                  borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
-                  borderWidth: exerciseLevel === item ? 1 : null,
-                  paddingVertical: 18,
-                  borderColor: '#a5c2d0',
-                },
-              ]}
-              onPress={() => {
-                setSelectedMeal(i);
-                setTimeModal(true);
-              }}
-            >
-              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                <View
-                  style={{
-                    paddingHorizontal: 11,
-                  }}
-                >
-                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>
-                    {item.meal}
-                  </Text>
-                  {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
+        <View style={{ marginTop: 10, flex: 1 }}>
+          {meals &&
+            meals.map((item, i) => (
+              <TouchableOpacity
+                style={[
+                  {
+                    marginHorizontal: 40,
+                    borderBottomWidth: exerciseLevel !== item ? 1 : null,
+                    borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
+                    borderWidth: exerciseLevel === item ? 1 : null,
+                    paddingVertical: 25,
+                    borderColor: '#a5c2d0',
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedMeal(i);
+                  setTimeModal(true);
+                }}
+              >
+                <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                  <View
+                    style={{
+                      paddingHorizontal: 11,
+                    }}
+                  >
+                    <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '700' }}>
+                      {item.meal}
+                    </Text>
+                    {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
+                  </View>
+                  <View style={{ justifyContent: 'center' }}>
+                    {item.time ? (
+                      <Text>{item.time}</Text>
+                    ) : (
+                      <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
+                    )}
+                  </View>
                 </View>
-                <View style={{ justifyContent: 'center' }}>
-                  {item.time ? (
-                    <Text>{item.time}</Text>
-                  ) : (
-                    <Image source={downIcon} style={{ height: 10, width: 20, marginRight: 10 }} />
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-      </View>
+              </TouchableOpacity>
+            ))}
+        </View>
 
-      <View style={{ height: '18.8%', justifyContent: 'flex-end' }}>
-        <TouchableOpacity
-          style={{
-            marginHorizontal: 40,
-            marginBottom: 25,
-            opacity: Boolean(buttonDiabled().includes('')) ? 0.7 : 1,
-          }}
-          disabled={Boolean(buttonDiabled().includes('')) ? true : false}
-          onPress={() => {
-            onNext();
-          }}
-        >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
+        <View style={{ justifyContent: 'flex-end' }}>
+          <TouchableOpacity
+            style={{
+              marginHorizontal: 40,
+              marginBottom: 25,
+              opacity: Boolean(buttonDiabled().includes('')) ? 0.7 : 1,
+            }}
+            disabled={Boolean(buttonDiabled().includes('')) ? true : false}
+            onPress={() => {
+              onNext();
+            }}
+          >
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Next</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <Modal visible={timeModal} style={{ flex: 1 }} animationType="slide" transparent={true}>
         <View style={[{ backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1 }, styles.centeredView]}>
           <DatePicker

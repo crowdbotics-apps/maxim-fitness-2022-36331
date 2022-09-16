@@ -67,67 +67,68 @@ const FitnessGoal = props => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.58} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+          <Text
+            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            text={'What is your fitness goal?'}
+          />
+        </View>
 
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What is your fitness goal?'}
-        />
-      </View>
+        <View style={{ marginTop: 30, flex: 1 }}>
+          {exerciseArray.map(item => (
+            <TouchableOpacity
+              style={[
+                {
+                  // height: 65,
+                  //   marginTop: 15,
+                  marginHorizontal: 40,
+                  borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
+                  borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
+                  borderWidth: exerciseLevel === item.heading ? 1 : null,
+                  paddingVertical: 11,
+                  borderColor: '#a5c2d0',
+                },
+              ]}
+              onPress={() => setExerciseLevel(item.heading)}
+            >
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                <View
+                  style={{
+                    paddingHorizontal: 11,
+                  }}
+                >
+                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
+                    {item.heading}
+                  </Text>
+                  <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
+                </View>
+                <View style={{ justifyContent: 'center' }}>
+                  <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <View style={{ marginTop: 30 }}>
-        {exerciseArray.map(item => (
+        <View style={{ justifyContent: 'flex-end' }}>
           <TouchableOpacity
-            style={[
-              {
-                // height: 65,
-                //   marginTop: 15,
-                marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item.heading ? 1 : null,
-                paddingVertical: 11,
-                borderColor: '#a5c2d0',
-              },
-            ]}
-            onPress={() => setExerciseLevel(item.heading)}
+            style={{
+              marginHorizontal: 40,
+              marginBottom: 25,
+              opacity: exerciseLevel !== false ? 1 : 0.7,
+            }}
+            disabled={!exerciseLevel}
+            onPress={() => {
+              onNext();
+            }}
           >
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-              <View
-                style={{
-                  paddingHorizontal: 11,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
-                  {item.heading}
-                </Text>
-                <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
-              </View>
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
-              </View>
-            </View>
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Next</Text>
+            </LinearGradient>
           </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={{ height: '45%', justifyContent: 'flex-end' }}>
-        <TouchableOpacity
-          style={{
-            marginHorizontal: 40,
-            marginBottom: 25,
-            opacity: exerciseLevel !== false ? 1 : 0.7,
-          }}
-          disabled={!exerciseLevel}
-          onPress={() => {
-            onNext();
-          }}
-        >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
