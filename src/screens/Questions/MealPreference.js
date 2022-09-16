@@ -32,7 +32,11 @@ const MealPreference = props => {
     navigation: { navigate },
   } = props;
 
-  const exerciseArray = ['4 Meals', '5 Meals', '6 Meals'];
+  const exerciseArray = [
+    { name: '4 Meals', value: 4 },
+    { name: '5 Meals', value: 5 },
+    { name: '6 Meals', value: 6 },
+  ];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
@@ -40,15 +44,13 @@ const MealPreference = props => {
     const tempData = props.answers;
     tempData.number_of_meal = exerciseLevel;
     props.updateAnswers(tempData);
-    navigate('MealTime', { numberOfMeals: exerciseLevel });
+    navigate('MealTime', { numberOfMeals: exerciseLevel.value });
   };
   useEffect(() => {
     if (props.answers && props.answers.number_of_meal) {
       setExerciseLevel(props.answers.number_of_meal);
     }
   }, []);
-
-  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,9 +71,9 @@ const MealPreference = props => {
                 // height: 65,
                 //   marginTop: 15,
                 marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item ? 1 : null,
-                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item ? 1 : null,
+                borderBottomWidth: exerciseLevel.name !== item.name ? 1 : null,
+                borderBottomColor: exerciseLevel.name !== item.name ? '#e1e1e1' : '#a5c2d0',
+                borderWidth: exerciseLevel.name === item.name ? 1 : null,
                 paddingVertical: 18,
                 borderColor: '#a5c2d0',
               },
@@ -84,7 +86,9 @@ const MealPreference = props => {
                   paddingHorizontal: 11,
                 }}
               >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>{item}</Text>
+                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
+                  {item.name}
+                </Text>
                 {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
               </View>
               <View style={{ justifyContent: 'center' }}>

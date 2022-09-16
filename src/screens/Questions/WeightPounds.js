@@ -34,13 +34,7 @@ const WeightPounds = props => {
     props.updateAnswers(tempData);
     navigate('FitnessGoal');
   };
-  // useEffect(() => {
-  //   if (props.answers && props.answers.unit) {
-  //     setExerciseLevel(props.answers.unit);
-  //   }
-  // }, []);
 
-  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
