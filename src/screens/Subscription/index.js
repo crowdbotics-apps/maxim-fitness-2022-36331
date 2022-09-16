@@ -23,8 +23,6 @@ const SubscriptionScreen = props => {
   const [isVisible, setIsVisible] = useState(false);
   const [active, setActive] = useState(true);
 
-  console.log('getPlans: ', getPlans);
-
   useEffect(() => {
     props.getPlanRequest();
     props.getCustomerIdRequest();
