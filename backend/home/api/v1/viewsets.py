@@ -1102,9 +1102,6 @@ class CaloriesRequiredViewSet(ModelViewSet):
     def get_queryset(self):
         return CaloriesRequired.objects.filter(user=self.request.user).order_by('-id')
 
-    def create(self, request, *args, **kwargs):
-        data = self.request.data
-
 
 class ConsumeCaloriesViewSet(ModelViewSet):
     serializer_class = ConsumeCaloriesSerializer
