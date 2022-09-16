@@ -4,13 +4,8 @@ import * as Progress from 'react-native-progress';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 
-const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileData }) => {
-  // useEffect(() => {
-  //   calculateCalories(consumeCalories);
-  //   calculateProtein(consumeCalories);
-  //   calculateCarbs(consumeCalories);
-  //   calculateFat(consumeCalories);
-  // }, []);
+const TabThree = ({ setShowModalHistory }) => {
+
   const {
     row,
     fill,
@@ -34,31 +29,6 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
     mediumTMargin,
   } = Gutters;
   const fontSize15TextCenter = { fontSize: 15, textAlign: 'center' };
-
-  // const calculateCalories = conCal => {
-  //   const value = conCal[0]?.calories;
-  //   const value2 = conCal[0]?.goals_values?.calories;
-  //   const data = value / value2;
-  //   return data;
-  // };
-  // const calculateProtein = conCal => {
-  //   const value = conCal[0]?.protein;
-  //   const value2 = conCal[0]?.goals_values?.protein;
-  //   const data = value / value2;
-  //   return data;
-  // };
-  // const calculateCarbs = conCal => {
-  //   const value = conCal[0]?.carbs;
-  //   const value2 = conCal[0]?.goals_values?.carbs;
-  //   const data = value / value2;
-  //   return data;
-  // };
-  // const calculateFat = conCal => {
-  //   const value = conCal[0]?.fat;
-  //   const value2 = conCal[0]?.goals_values?.fat;
-  //   const data = value / value2;
-  //   return data;
-  // };
 
   return (
     <>
@@ -98,7 +68,6 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           row,
           regularBMargin,
           regularHMargin,
-          regularHPadding,
           justifyContentBetween,
           alignItemsCenter,
         ]}
@@ -128,7 +97,6 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           row,
           regularHMargin,
           regularBMargin,
-          regularHPadding,
           justifyContentBetween,
           alignItemsCenter,
         ]}
@@ -158,7 +126,6 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           row,
           regularHMargin,
           regularBMargin,
-          regularHPadding,
           justifyContentBetween,
           alignItemsCenter,
         ]}
@@ -183,29 +150,23 @@ const TabThree = ({ setMealModal, consumeCalories, setShowModalHistory, profileD
           />
         </View>
       </View>
-      <View style={[fill, mediumTMargin, alignItemsStart, regularHMargin, justifyContentStart]}>
-        <Text text="Diet Type" style={fontSize15TextCenter} bold />
-        <Text
-          text="Standard 40:40:20"
-          color="nonary"
-          style={[regularVPadding, fontSize15TextCenter]}
-        />
-        <Text text="Meal per Day" style={fontSize15TextCenter} bold />
-      </View>
-      <View
-        style={[
-          regularHMargin,
-          mediumBMargin,
-          { flex: 1, flexDirection: 'row', justifyContent: 'space-between' },
-        ]}
-      >
-        <Text text={`${6} meals`} style={[regularVPadding, fontSize15TextCenter]} color="nonary" />
-        <Text
-          text="Add more"
-          style={[regularVPadding, fontSize15TextCenter]}
-          // onPress={() => navigation.navigate('SurveyScreenMeal', { mealValue })}
-          onPress={setMealModal}
-        />
+      <View style={[fill, regularHPadding, styles.cardStyle]}>
+        <View>
+          <Text text="Diet Type" style={[{ fontSize: 20, opacity: 0.7 }]} bold />
+          <Text
+            text="Standard 40:40:20"
+            color="nonary"
+            style={smallVPadding}
+          />
+        </View>
+        <View style={[fill, row, justifyContentBetween, alignItemsCenter, regularVMargin]}>
+          <Text text="Meal per Day" style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: 'black' }} bold />
+          <Text
+            text="Edit"
+            color="nonary"
+          />
+        </View>
+        <Text text={`${6} meals`} color="nonary" />
       </View>
     </>
   );
@@ -226,6 +187,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
   },
+  cardStyle: {
+    backgroundColor: 'white',
+    marginHorizontal: 15,
+    paddingVertical: 15,
+    marginBottom: 20,
+    borderRadius: 20,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 0.27,
+
+    elevation: 15,
+  }
 });
 
 export default TabThree;

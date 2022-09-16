@@ -11,6 +11,7 @@ import { subscriptionReducer } from '../ScreenRedux/subscriptionRedux'
 import { programReducer } from '../ScreenRedux/programServices'
 import { profileReducer } from '../ScreenRedux/profileRedux'
 import { questionReducer } from '../screens/Questions/Redux'
+import { customCalReducer } from '../ScreenRedux/customCalRedux'
 
 const appPersistConfig = {
   key: 'login',
@@ -27,5 +28,6 @@ export default {
   subscriptionReducer,
   programReducer,
   profileReducer,
-  questionReducer
+  questionReducer,
+  customCalReducer
 };

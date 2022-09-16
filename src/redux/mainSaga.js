@@ -9,6 +9,7 @@ import ViewPost from '../ScreenRedux/viewPostRedux'
 import subscriptionSaga from '../ScreenRedux/subscriptionRedux'
 import programSaga from '../ScreenRedux/programServices'
 import profileSaga from '../ScreenRedux/profileRedux'
+import customCalRedux from '../ScreenRedux/customCalRedux'
 export function* mainSaga() {
   yield all([
     SignIn,
@@ -19,5 +20,6 @@ export function* mainSaga() {
     subscriptionSaga,
     programSaga,
     profileSaga,
+    customCalRedux
   ]);
 }

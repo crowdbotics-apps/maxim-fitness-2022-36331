@@ -18,6 +18,9 @@ import ProfileHeader from './ProfileHeader'
 import RNModal from './RNModal'
 import InputField from './InputField'
 import ModalInput from './ModalInput'
+import RuningWorkout from './RuningWorkout'
+import ProfileComponent from './ProfileComponent';
+import DashboardCard from './DashboardCard'
 
 export {
   Text,
@@ -39,5 +42,8 @@ export {
   ProfileHeader,
   RNModal,
   InputField,
-  ModalInput
+  ModalInput,
+  RuningWorkout,
+  ProfileComponent,
+  DashboardCard
 };
