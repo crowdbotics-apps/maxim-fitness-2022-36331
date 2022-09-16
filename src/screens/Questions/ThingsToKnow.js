@@ -13,17 +13,25 @@ import {
 } from 'react-native';
 
 //Libraires
-import LinearGradient from 'react-native-linear-gradient';
-import { Overlay } from 'react-native-elements';
+import { connect } from 'react-redux';
 
 //Components
 import { Text } from '../../components';
 import HeaderTitle from './Components/headerTitle';
+import { submitQuestionRequest } from './Redux';
 
 //Themes
 import Images from '../../theme/Images';
 
 const ThingsToKnow = props => {
+
+  const {
+    navigation: { navigate },
+    answers,
+    profile
+  } = props;
+
+  console.log('answers: ', answers);
   const { forwardIcon, otLogo } = Images;
 
   const thingsArray = [
@@ -47,28 +55,25 @@ const ThingsToKnow = props => {
     },
   ];
 
-  const {
-    navigation: { navigate },
-  } = props;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.9} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            marginHorizontal: 40,
-            marginTop: 20,
-          }}
-        >
-          <View />
-          <Text style={{ fontSize: 16, color: '#377eb5' }}>Cancel</Text>
-        </View>
+      <TouchableOpacity
+        style={{
+          justifyContent: 'flex-end',
+          flexDirection: 'row',
+          marginHorizontal: 40,
+          marginTop: 20,
+        }}
+        onPress={() => props.submitQuestionRequest(profile, answers)}
+      >
+        <Text style={{ fontSize: 16, color: '#377eb5' }} >Cancel</Text>
+      </TouchableOpacity>
 
-        <View style={{ marginTop: 20, marginHorizontal: 40 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700' }}>Three Things You Should Know</Text>
-        </View>
+      <View style={{ marginTop: 10, marginHorizontal: 40 }}>
+        <Text style={{ fontSize: 24, fontWeight: '700' }}>Three Things You Should Know</Text>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
 
         <View>
           {thingsArray.map(item => (
@@ -139,4 +144,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ThingsToKnow;
+const mapStateToProps = state => ({
+  answers: state.questionReducer.answers,
+  profile: state.login.userDetail
+});
+
+const mapDispatchToProps = dispatch => ({
+  submitQuestionRequest: (profile, data) => dispatch(submitQuestionRequest(profile, data)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ThingsToKnow);

@@ -32,7 +32,11 @@ const MealPreference = props => {
     navigation: { navigate },
   } = props;
 
-  const exerciseArray = ['4 Meals', '5 Meals', '6 Meals'];
+  const exerciseArray = [
+    { name: '4 Meals', value: 4 },
+    { name: '5 Meals', value: 5 },
+    { name: '6 Meals', value: 6 },
+  ];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
@@ -40,7 +44,7 @@ const MealPreference = props => {
     const tempData = props.answers;
     tempData.number_of_meal = exerciseLevel;
     props.updateAnswers(tempData);
-    navigate('MealTime', { numberOfMeals: exerciseLevel });
+    navigate('MealTime', { numberOfMeals: exerciseLevel.value });
   };
   useEffect(() => {
     if (props.answers && props.answers.number_of_meal) {
@@ -48,70 +52,70 @@ const MealPreference = props => {
     }
   }, []);
 
-  console.log('answersss', props.answers);
-
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle showBackButton={true} percentage={0.68} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'How many meals do you prefer to eat in one day?'}
-        />
-      </View>
+        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+          <Text
+            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            text={'How many meals do you prefer to eat in one day?'}
+          />
+        </View>
 
-      <View style={{ marginTop: 30 }}>
-        {exerciseArray.map(item => (
+        <View style={{ marginTop: 30, flex: 1 }}>
+          {exerciseArray.map(item => (
+            <TouchableOpacity
+              style={[
+                {
+                  marginHorizontal: 40,
+                  borderBottomWidth: exerciseLevel.name !== item.name ? 1 : null,
+                  borderBottomColor: exerciseLevel.name !== item.name ? '#e1e1e1' : '#a5c2d0',
+                  borderWidth: exerciseLevel.name === item.name ? 1 : null,
+                  paddingVertical: 18,
+                  borderColor: '#a5c2d0',
+                },
+              ]}
+              onPress={() => setExerciseLevel(item)}
+            >
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                <View
+                  style={{
+                    paddingHorizontal: 11,
+                  }}
+                >
+                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
+                    {item.name}
+                  </Text>
+                  {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
+                </View>
+                <View style={{ justifyContent: 'center' }}>
+                  <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={{ justifyContent: 'flex-end' }}>
           <TouchableOpacity
-            style={[
-              {
-                // height: 65,
-                //   marginTop: 15,
-                marginHorizontal: 40,
-                borderBottomWidth: exerciseLevel !== item ? 1 : null,
-                borderBottomColor: exerciseLevel !== item ? '#e1e1e1' : '#a5c2d0',
-                borderWidth: exerciseLevel === item ? 1 : null,
-                paddingVertical: 18,
-                borderColor: '#a5c2d0',
-              },
-            ]}
-            onPress={() => setExerciseLevel(item)}
+            style={{
+              marginHorizontal: 40,
+              marginBottom: 25,
+              opacity: exerciseLevel !== false ? 1 : 0.7,
+            }}
+            disabled={!exerciseLevel}
+            onPress={() => {
+              onNext();
+            }}
           >
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-              <View
-                style={{
-                  paddingHorizontal: 11,
-                }}
-              >
-                <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>{item}</Text>
-                {/* <Text style={{color: '#7d7d7d', marginTop: 5}}>{item.description}</Text> */}
-              </View>
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
-              </View>
-            </View>
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Next</Text>
+            </LinearGradient>
           </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={{ height: '45.8%', justifyContent: 'flex-end' }}>
-        <TouchableOpacity
-          style={{
-            marginHorizontal: 40,
-            marginBottom: 25,
-            opacity: exerciseLevel !== false ? 1 : 0.7,
-          }}
-          disabled={!exerciseLevel}
-          onPress={() => {
-            onNext();
-          }}
-        >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

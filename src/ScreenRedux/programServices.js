@@ -179,7 +179,6 @@ function* getAllSessions({ data }) {
 }
 
 async function updateRepsAPI(id, data) {
-  console.log('id, data, dd: ', id, data);
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/set/${id}/`;
   const options = {

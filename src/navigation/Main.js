@@ -16,7 +16,7 @@ import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile'
-import ProfileContainer from '../screens/ProfileContainer'
+import CustormCalories from '../screens/CustormCalories'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
@@ -103,8 +103,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="ProfileContainer"
-        component={ProfileContainer}
+        name="CustormCalories"
+        component={CustormCalories}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -169,7 +169,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
     <mainStack.Screen name="EditProfile" component={EditProfile} />
     <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
-    <mainStack.Screen name="ProfileContainer" component={ProfileContainer} />
+    <mainStack.Screen name="CustormCalories" component={CustormCalories} />
   </mainStack.Navigator>
 )
 

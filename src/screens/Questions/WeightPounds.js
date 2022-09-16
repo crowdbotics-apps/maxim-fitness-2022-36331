@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   TextInput,
+  ScrollView
 } from 'react-native';
 
 //Components
@@ -34,60 +35,53 @@ const WeightPounds = props => {
     props.updateAnswers(tempData);
     navigate('FitnessGoal');
   };
-  // useEffect(() => {
-  //   if (props.answers && props.answers.unit) {
-  //     setExerciseLevel(props.answers.unit);
-  //   }
-  // }, []);
 
-  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.52} showBackButton={true} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1 }}>
+          <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+            <Text
+              style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+              text={'What is your Weight?'}
+            />
+          </View>
 
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What is your Weight?'}
-        />
-        {/*
-        <Text style={{marginTop: 18}}>
-          This answer has influence on how your program is designed
-        </Text> */}
-      </View>
+          <View
+            style={[
+              {
+                height: 65,
+                marginTop: 20,
+                marginHorizontal: 40,
+                justifyContent: 'center',
+                borderBottomWidth: 1,
+                borderBottomColor: '#808080',
+              },
+            ]}
+          >
+            <TextInput
+              style={{ fontSize: 24 }}
+              placeholder={'Pounds'}
+              keyboardType="numeric"
+              onChangeText={val => setPounds(val)}
+            />
+          </View>
+        </View>
 
-      <View
-        style={[
-          {
-            height: 65,
-            marginTop: 20,
-            marginHorizontal: 40,
-            justifyContent: 'center',
-            borderBottomWidth: 1,
-            borderBottomColor: '#808080',
-          },
-        ]}
-      >
-        <TextInput
-          style={{ fontSize: 24 }}
-          placeholder={'Pounds'}
-          keyboardType="numeric"
-          onChangeText={val => setPounds(val)}
-        />
-      </View>
-
-      <View style={{ height: '69%', justifyContent: 'flex-end' }}>
-        <TouchableOpacity
-          style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => onNext()}
-          disabled={!pound}
-        >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        <View style={{ justifyContent: 'flex-end' }}>
+          <TouchableOpacity
+            style={{ marginHorizontal: 40, marginBottom: 25 }}
+            onPress={() => onNext()}
+            disabled={!pound}
+          >
+            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <Text style={styles.loginText}>Next</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

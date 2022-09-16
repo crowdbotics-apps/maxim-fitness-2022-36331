@@ -24,10 +24,9 @@ const QuestionStackScreen = () => (
     <questionStack.Screen
       name="Birthday"
       component={Birthday}
-      animationEnabled={false}
       options={{ animationEnabled: false }}
     />
-    <questionStack.Screen name="Gender" component={Gender} />
+    <questionStack.Screen name="Gender" component={Gender} options={{ animationEnabled: false }} />
     <questionStack.Screen
       name="ExerciseLevel"
       component={ExerciseLevel}

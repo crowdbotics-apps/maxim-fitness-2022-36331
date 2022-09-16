@@ -141,7 +141,6 @@ function* login({ data }) {
 }
 
 function facebookLoginAPI(data) {
-  console.log('fb data in saga--', data);
   const URL = `${API_URL}/login/facebook/`
   const options = {
     method: 'POST',
