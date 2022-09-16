@@ -21,6 +21,9 @@ const EDIT_PROFILE_SUCCESS = 'PROFILE_SCREEN/EDIT_PROFILE_SUCCESS';
 const FOLLOW_USER = 'PROFILE_SCREEN/FOLLOW_USER';
 const UNFOLLOW_USER = 'PROFILE_SCREEN/UNFOLLOW_USER';
 
+const REPORT_USER = 'PROFILE_SCREEN/REPORT_USER';
+const BLOCK_USER = 'PROFILE_SCREEN/BLOCK_USER';
+
 const ROUTE_DATA = 'PROFILE_SCREEN/ROUTE_DATA';
 
 const initialState = {
@@ -68,6 +71,16 @@ export const unFollowUser = data => ({
 
 export const routeData = data => ({
   type: ROUTE_DATA,
+  data
+})
+
+export const blockUser = data => ({
+  type: BLOCK_USER,
+  data
+})
+
+export const reportUser = data => ({
+  type: REPORT_USER,
   data
 })
 
@@ -208,13 +221,70 @@ async function updateProfile(data, id) {
 function* updateUserData({ data, id }) {
   try {
     const response = yield call(updateProfile, data, id)
-    console.log('edit profile success response----', response);
+    showMessage({message: 'profile Updated successfully', type: 'success'})
     yield put(setUserDetail(response.data))
   } catch (e) {
     const { response } = e
-    console.log('edit profile failure response0000', response);
+    showMessage({message: 'Something went wrong', type: 'danger'})
   } finally {
     yield put(resetProfile())
+  }
+}
+
+
+async function blockUserAPI(data) {
+  const URL = `${API_URL}/block-user/`
+  const token = await AsyncStorage.getItem('authToken')
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token  ${token}`
+    },
+    data
+  }
+
+  return XHR(URL, options)
+}
+
+function* blockUserData({ data }) {
+  try {
+    const response = yield call(blockUserAPI, data)
+    showMessage({
+      message: "Blocked user Successfully",
+      type: 'success',
+    })
+  } catch (e) {
+    const { response } = e
+    console.log('block user  failure response0000', response);
+  }
+}
+
+async function reportUserAPI(data) {
+  const URL = `${API_URL}/report-user/`
+  const token = await AsyncStorage.getItem('authToken')
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token  ${token}`
+    },
+    data
+  }
+
+  return XHR(URL, options)
+}
+
+function* reportUserData({ data }) {
+  try {
+    const response = yield call(reportUserAPI, data)
+    showMessage({
+      message: "Report user Successfully",
+      type: 'success',
+    })
+  } catch (e) {
+    const { response } = e
+    console.log('Report user  failure response0000', response);
   }
 }
 
@@ -223,4 +293,7 @@ export default all([
   takeLatest(FOLLOW_USER, followuserData),
   takeLatest(UNFOLLOW_USER, unfollowuserData),
   takeLatest(EDIT_PROFILE, updateUserData),
+  takeLatest(BLOCK_USER, blockUserData),
+  takeLatest(REPORT_USER, reportUserData),
+
 ])

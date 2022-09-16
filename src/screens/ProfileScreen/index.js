@@ -8,18 +8,28 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { Text, BottomSheet, Loader } from '../../components';
 import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
+import Video from 'react-native-video';
 
 //action
-import { getProfile, routeData, followUser, unFollowUser } from '../../ScreenRedux/profileRedux';
+import {
+  getProfile,
+  routeData,
+  followUser,
+  unFollowUser,
+  blockUser,
+  reportUser,
+} from '../../ScreenRedux/profileRedux';
 
 const ProfileScreen = props => {
   const { navigation, route, profileData, userDetail, routeData, routeDetail } = props;
   const [follow, setFollow] = useState(profileData?.follow);
+  const [showVideo, setShowVideo] = useState(false);
   const {
     profileBackGround,
     whiteBackArrow,
@@ -63,14 +73,69 @@ const ProfileScreen = props => {
       : [
           setFollow(!follow),
           props.followUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
-        ]
+        ];
+  };
+
+  const blockRequestedUser = () => {
+    let apiData = {
+      requested_user: userDetail.id,
+      blocked_user: routeDetail?.user?.id,
+    };
+    props.blockUser(apiData);
+  };
+
+  const reportUserRequest = () => {
+    let apiData = {
+      reporter_user: userDetail.id,
+      Banned_user: routeDetail?.user?.id,
+    };
+    props.reportUser(apiData);
+  };
+
+  const calculatedData = () => {
+    let imagesData = [];
+    if (showVideo) {
+      if (profileData?.post_video?.length) {
+        const chunkSize = 3;
+        for (let i = 0; i < profileData?.post_video?.length; i += chunkSize) {
+          let chunk = profileData?.post_video?.slice(i, i + chunkSize);
+          imagesData.push(chunk);
+        }
+        return imagesData;
+      }
+    } else if (profileData?.post_image?.length) {
+      const chunkSize = 3;
+      for (let i = 0; i < profileData?.post_image?.length; i += chunkSize) {
+        let chunk = profileData?.post_image?.slice(i, i + chunkSize);
+        imagesData.push(chunk);
+      }
+      return imagesData;
+    }
+  };
+
+  const onPullToRefresh = () => {
+    if (routeDetail) {
+      props.getProfile(routeDetail?.user?.id);
+    } else {
+      props.getProfile(props?.userDetail?.id);
+    }
   };
 
   const { width, height } = Dimensions.get('window');
   const refRBSheet = useRef();
   return (
     <SafeAreaView>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            colors={['#9Bd35A', '#689F38']}
+            refreshing={props.requesting}
+            onRefresh={() => onPullToRefresh()}
+            progressViewOffset={20}
+          />
+        }
+      >
         <Loader isLoading={props.requesting} />
         <View>
           <ImageBackground
@@ -85,12 +150,14 @@ const ProfileScreen = props => {
               >
                 <Image source={whiteBackArrow} style={{ height: 15, width: 20 }} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                <Image
-                  source={whiteDots}
-                  style={{ height: 15, width: 25, resizeMode: 'contain' }}
-                />
-              </TouchableOpacity>
+              {!(userDetail?.id === routeDetail?.user?.id || !routeDetail) && (
+                <TouchableOpacity onPress={() => refRBSheet.current.open()}>
+                  <Image
+                    source={whiteDots}
+                    style={{ height: 15, width: 25, resizeMode: 'contain' }}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
           </ImageBackground>
           <View style={styles.profileImage}>
@@ -135,7 +202,7 @@ const ProfileScreen = props => {
             marginTop: 20,
             textAlign: 'center',
           }}
-          text="is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book"
+          text={profileData?.user_detail?.description}
         />
         <View
           style={{
@@ -159,70 +226,129 @@ const ProfileScreen = props => {
           </View>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#635eff' }} text="Pictures" />
-          <Text
-            style={{ fontSize: 20, fontWeight: 'bold', paddingLeft: 40, color: 'gray' }}
-            text="Videos"
-          />
-        </View>
-        <View style={{ flexDirection: 'row', marginTop: 20, marginHorizontal: 10 }}>
-          <Image
-            source={profileBackGround}
-            style={{ height: (300 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
-          />
-          <View style={{ marginLeft: 10 }}>
-            <Image
-              source={profileBackGround}
-              style={{ height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
+          <TouchableOpacity onPress={() => setShowVideo(false)}>
+            <Text
+              style={{ fontSize: 20, fontWeight: 'bold', color: showVideo ? 'gray' : '#635eff' }}
+              text="Pictures"
             />
-            <Image
-              source={profileBackGround}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowVideo(true)}>
+            <Text
               style={{
-                height: (145 / 375) * width,
-                width: (175 / 375) * width,
-                borderRadius: 20,
-                marginTop: 10,
+                fontSize: 20,
+                fontWeight: 'bold',
+                paddingLeft: 40,
+                color: showVideo ? '#635eff' : 'gray',
               }}
+              text="Videos"
             />
-          </View>
+          </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'row', marginTop: 20, marginHorizontal: 10 }}>
-          <View style={{}}>
-            <Image
-              source={profileBackGround}
-              style={{ height: (145 / 375) * width, width: (175 / 375) * width, borderRadius: 20 }}
-            />
-            <Image
-              source={profileBackGround}
-              style={{
-                height: (145 / 375) * width,
-                width: (175 / 375) * width,
-                borderRadius: 20,
-                marginTop: 10,
-              }}
-            />
-          </View>
-          <Image
-            source={profileBackGround}
-            style={{
-              height: (300 / 375) * width,
-              width: (175 / 375) * width,
-              borderRadius: 20,
-              marginLeft: 10,
-            }}
-          />
-        </View>
+        {calculatedData()?.length &&
+          calculatedData().map((item, i) => {
+            return (
+              <View
+                style={{
+                  flexDirection: i % 2 === 0 ? 'row' : 'row-reverse',
+                  marginTop: 20,
+                  marginHorizontal: 10,
+                }}
+              >
+                {showVideo && item[0]?.video ? (
+                  <Video
+                    source={{
+                      uri: item[0]?.video,
+                    }}
+                    style={{
+                      height: (300 / 375) * width,
+                      width: (175 / 375) * width,
+                      borderRadius: 20,
+                    }}
+                    resizeMode="cover"
+                    posterResizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: item[0]?.image }}
+                    style={{
+                      height: (300 / 375) * width,
+                      width: (175 / 375) * width,
+                      borderRadius: 20,
+                    }}
+                  />
+                )}
+                <View
+                  style={{ marginLeft: i % 2 === 0 ? 10 : 0, marginRight: i % 2 === 0 ? 0 : 10 }}
+                >
+                  {showVideo ? (
+                    <Video
+                      source={{
+                        uri: item[1]?.video,
+                      }}
+                      style={{
+                        height: (145 / 375) * width,
+                        width: (175 / 375) * width,
+                        borderRadius: 20,
+                      }}
+                      resizeMode="cover"
+                      posterResizeMode="cover"
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: item[1]?.image }}
+                      style={{
+                        height: (145 / 375) * width,
+                        width: (175 / 375) * width,
+                        borderRadius: 20,
+                      }}
+                    />
+                  )}
+                  {showVideo ? (
+                    <Video
+                      source={{
+                        uri: item[1]?.video,
+                      }}
+                      style={{
+                        height: (145 / 375) * width,
+                        width: (175 / 375) * width,
+                        borderRadius: 20,
+                        marginTop: 10,
+                      }}
+                      resizeMode="cover"
+                      posterResizeMode="cover"
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: item[1]?.image }}
+                      style={{
+                        height: (145 / 375) * width,
+                        width: (175 / 375) * width,
+                        borderRadius: 20,
+                        marginTop: 10,
+                      }}
+                    />
+                  )}
+                </View>
+              </View>
+            );
+          })}
       </ScrollView>
       <BottomSheet reff={refRBSheet} h={200}>
         <View style={{ marginTop: 30, paddingHorizontal: 40 }}>
-          <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ flexDirection: 'row' }}
+            onPress={() => [reportUserRequest(), refRBSheet.current.close()]}
+          >
             <Image source={flagIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
             <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Report User'} />
-          </View>
-          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flexDirection: 'row', marginTop: 20 }}
+            onPress={() => [blockRequestedUser(), refRBSheet.current.close()]}
+          >
             <Image source={blockIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
             <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Block User'} />
-          </View>
+          </TouchableOpacity>
         </View>
       </BottomSheet>
     </SafeAreaView>
@@ -265,5 +391,7 @@ const mapDispatchToProps = dispatch => ({
   routeData: data => dispatch(routeData(data)),
   followUser: data => dispatch(followUser(data)),
   unFollowUser: data => dispatch(unFollowUser(data)),
+  blockUser: data => dispatch(blockUser(data)),
+  reportUser: data => dispatch(reportUser(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);

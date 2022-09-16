@@ -86,8 +86,6 @@ const EditProfile = props => {
 
   const { state, handleOnChange, disable, setState } = useForm(stateSchema, validationStateSchema);
 
-  console.log('state-----', state);
-
   const editProfileData = () => {
     let formData = new FormData();
     formData.append('first_name', state.firstName.value);
