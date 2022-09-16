@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
-const BottomSheet = ({ children, reff, h }) => {
+const BottomSheet = ({ children, reff, h , Iconbg,bg}) => {
   return (
     <RBSheet
       ref={reff}
@@ -9,12 +9,12 @@ const BottomSheet = ({ children, reff, h }) => {
       closeOnPressMask={true}
       customStyles={{
         draggableIcon: {
-          backgroundColor: 'lightgrey',
+          backgroundColor:Iconbg ?Iconbg :'lightgrey',
         },
         container: {
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
-          backgroundColor: '#F3F5F6',
+          backgroundColor: bg ?bg:'#F3F5F6',
         },
       }}
       height={h ? h : 250}
