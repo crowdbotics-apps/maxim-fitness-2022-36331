@@ -540,6 +540,18 @@ class ReportAPost(models.Model):
         return str(self.user)
 
 
+class ReportAUser(models.Model):
+    reporter_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reporter_user")
+    Banned_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="banned_user")
+    reason = models.CharField(max_length=300, null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.reporter_user)
+
+
 class BlockUser(models.Model):
     requested_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="request_user")
     blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="block_user")

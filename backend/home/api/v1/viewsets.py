@@ -26,7 +26,7 @@ from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike, \
-    PostVideo
+    PostVideo, ReportAUser
 from users.models import Settings
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -52,7 +52,7 @@ from home.api.v1.serializers import (
     CaloriesRequiredSerializer,
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
-    PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer
+    PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -1198,6 +1198,15 @@ class ReportAPostViewSet(ModelViewSet):
         return queryset
 
 
+class ReportAUserViewSet(ModelViewSet):
+    serializer_class = ReportAUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ReportAUser.objects.filter(reporter_user=self.request.user)
+        return queryset
+
+
 class BlockedUserViewSet(ModelViewSet):
     serializer_class = BlockedUserSerializer
     permission_classes = [IsAuthenticated]
@@ -1205,6 +1214,17 @@ class BlockedUserViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = BlockUser.objects.filter(blocked_user=self.request.user)
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        already_block = BlockUser.objects.filter(requested_user=request.data.get("requested_user"),
+                                                 blocked_user=request.data.get("blocked_user"))
+        if already_block:
+            already_block.delete()
+            return Response("unblock successfully")
+        serializer = BlockedUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class FoodItemViewSet(ModelViewSet):

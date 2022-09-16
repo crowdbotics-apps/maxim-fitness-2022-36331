@@ -28,7 +28,8 @@ from home.api.v1.viewsets import (
     ProductUnitViewSet,
     CheckUserViewSet,
     ReportAPostViewSet,
-    BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile
+    BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
+    ReportAUserViewSet
 )
 
 from rest_framework import permissions
@@ -83,6 +84,7 @@ router.register(r'device/fcm', GCMDeviceAuthorizedViewSet)
 
 router.register('check-user', CheckUserViewSet, basename='check_user')
 router.register('report-post', ReportAPostViewSet, basename='report_post')
+router.register('report-user', ReportAUserViewSet, basename='report_user')
 router.register('block-user', BlockedUserViewSet, basename='block_user')
 router.register("chat", ChatViewSet, basename="chat")
 
