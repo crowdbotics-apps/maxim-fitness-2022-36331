@@ -15,7 +15,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
-    PostCommentReply, PostCommentLike, PostVideo
+    PostCommentReply, PostCommentLike, PostVideo, ReportAUser
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings
@@ -514,6 +514,13 @@ class ReportAPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportAPost
+        fields = "__all__"
+
+
+class ReportAUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReportAUser
         fields = "__all__"
 
 
