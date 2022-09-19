@@ -61,5 +61,9 @@ export default {
   followingButton: require('src/assets/images/followingButton.png'),
   editProfileButton: require('src/assets/images/editProfileButton.png'),
   otLogo: require('src/assets/images/otLogo.png'),
-  downIcon: require('src/assets/images/downIcon.png')
+  downIcon: require('src/assets/images/downIcon.png'),
+  redBin: require('src/assets/images/redBin.png'),
+  radioBlue: require('src/assets/images/radioBlue.png'),
+  doneImg: require('src/assets/images/doneImg.png'),
+  greyNext: require('src/assets/images/greyNext.png'),
 };
