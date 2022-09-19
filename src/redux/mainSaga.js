@@ -11,6 +11,7 @@ import programSaga from '../ScreenRedux/programServices'
 import profileSaga from '../ScreenRedux/profileRedux'
 import customCalRedux from '../ScreenRedux/customCalRedux'
 import questionRedux from '../screens/Questions/Redux'
+import searchProfileRedux from '../ScreenRedux/searchProfileRedux'
 export function* mainSaga() {
   yield all([
     SignIn,
@@ -22,6 +23,7 @@ export function* mainSaga() {
     programSaga,
     profileSaga,
     customCalRedux,
-    questionRedux
+    questionRedux,
+    searchProfileRedux
   ]);
 }

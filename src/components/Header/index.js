@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native'
 import { Images } from 'src/theme'
 
-const Header = ({ imageUrl, onAvatarChange, onPressPlus }) => {
+const Header = ({ imageUrl, onAvatarChange, onPressPlus, onPressSearch }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.currentTabStyle}>
@@ -11,7 +11,7 @@ const Header = ({ imageUrl, onAvatarChange, onPressPlus }) => {
         </TouchableWithoutFeedback>
       </View>
       <View style={styles.currentTab}>
-        <TouchableOpacity style={styles.iconStyle}>
+        <TouchableOpacity style={styles.iconStyle} onPress={onPressSearch}>
           <Image source={Images.searchIcon} style={styles.searchImage} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconStyle} onPress={onPressPlus}>

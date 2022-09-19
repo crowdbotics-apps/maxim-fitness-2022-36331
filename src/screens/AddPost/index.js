@@ -19,6 +19,7 @@ import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
+// import { createThumbnail } from "react-native-create-thumbnail";
 
 //action
 import { AddPostData } from '../../ScreenRedux/addPostRequest';
@@ -40,6 +41,23 @@ const AddPost = props => {
       setContent(false);
     }
   }, [isFocused]);
+
+  console.log('imageData---', imageData);
+
+  // const thumbNailData = ()=>{
+  //   if(imageData.length){
+  //     imageData.map((item)=>{
+  //       if(item.mime === 'video/mp4'){
+  //         createThumbnail({
+  //           url: item.path,
+  //         })
+  //           .then(response => setVideoThumbNail(response))
+  //           .catch(err => console.log({err}));
+  //       }})
+  //   }
+  // }
+
+  // console.log('thumbNailData---', thumbNailData());
 
   const aa = () => {
     let formData = new FormData();
