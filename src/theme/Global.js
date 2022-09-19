@@ -10,6 +10,9 @@ export default StyleSheet.create({
   transparentBg: {
     backgroundColor: 'transparent'
   },
+  halfTransparentBg: {
+    backgroundColor: 'rgba(0, 0, 0, 0.85)'
+  },
   primary: {
     color: Colors.white,
   },
@@ -35,7 +38,13 @@ export default StyleSheet.create({
     backgroundColor: 'rgb(214,214,214)'
   },
   halfOpacityBg: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5);'
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  blackOpacityBorder: {
+    borderColor: 'rgb(214,214,214)'
+  },
+  opacityBg75: {
+    backgroundColor: 'rgba(0, 0, 0, 0.9)'
   },
   border: {
     borderWidth: 1,
@@ -61,11 +70,15 @@ export default StyleSheet.create({
   borderNobel: {
     borderColor: Colors.nobel,
   },
+  borderNewCol: {
+    borderColor: Colors.newCol,
+  },
   topLRBorderRadius20: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
-  height40: {
-    height: 40,
-  },
+  // heights
+  height40: { height: 40 },
+  height60: { height: 60 },
+  height65: { height: 65 },
 });

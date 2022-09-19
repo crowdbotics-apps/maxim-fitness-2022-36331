@@ -1,27 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  StyleSheet,
-  SafeAreaView,
   Modal,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
   Image,
-  TouchableOpacity,
+  StyleSheet,
   ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
-
-//Libraires
-import LinearGradient from 'react-native-linear-gradient';
 import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import Images from '../../theme/Images';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -39,14 +33,17 @@ const NutritionUnderstanding = props => {
 
   const exerciseArray = [
     {
+      value: 1,
       heading: 'Beginner',
       description: 'No real understanding of nutrition',
     },
     {
+      value: 2,
       heading: 'Intermediate',
       description: 'I have tried diets before and had mediocre results',
     },
     {
+      value: 3,
       heading: 'Advanced',
       description: 'I am educated in nutrition',
     },
@@ -56,68 +53,61 @@ const NutritionUnderstanding = props => {
   const onNext = () => {
     const tempData = props.answers;
     tempData.understanding_level = exerciseLevel;
-    props.updateAnswers(tempData);
+    tempData.request_type = 'question',
+
+      props.updateAnswers(tempData);
     navigate('ThingsToKnow');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.83} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-
-        <View style={{ marginHorizontal: 40, marginTop: 20 }}>
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
+      <HeaderTitle percentage={0.83} showBackButton={true} />
+      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+        <View style={Gutters.mediumTMargin}>
           <Text
-            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            color="commonCol"
+            style={Fonts.titleRegular}
             text={'What is your level of understanding nutrition?'}
           />
         </View>
-
-        <View style={{ marginTop: 20, flex: 1 }}>
-          {exerciseArray.map(item => (
+        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+          {exerciseArray.map((item, i) => (
             <TouchableOpacity
+              key={i}
               style={[
-                {
-                  marginHorizontal: 40,
-                  borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                  borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                  borderWidth: exerciseLevel === item.heading ? 1 : null,
-                  paddingVertical: 15,
-                  borderColor: '#a5c2d0',
-                },
+                Layout.row,
+                Gutters.smallHPadding,
+                Gutters.regularVPadding,
+                Layout.alignItemsCenter,
+                Layout.justifyContentBetween,
+                exerciseLevel === item.value ? Global.border : Global.borderB,
+                exerciseLevel !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
-              onPress={() => setExerciseLevel(item.heading)}
+              onPress={() => setExerciseLevel(item.value)}
             >
-              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                <View style={{ paddingHorizontal: 11 }}>
-                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>
-                    {item.heading}
-                  </Text>
-                  <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
-                </View>
-                <View style={{ justifyContent: 'center' }}>
-                  <Image source={forwardIcon} style={{ height: 20, width: 10, marginRight: 10 }} />
-                </View>
+              <View style={[Layout.justifyContentBetween]}>
+                <Text
+                  text={item.heading}
+                  style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}
+                />
+                <Text
+                  style={{ color: '#7d7d7d', marginTop: 5 }}
+                  text={item.description}
+                />
               </View>
+              <Image source={Images.forwardIcon} style={styles.rightArrow} />
             </TouchableOpacity>
           ))}
         </View>
-
-        <View style={{ justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{
-              marginHorizontal: 40,
-              marginBottom: 25,
-              opacity: exerciseLevel !== false ? 1 : 0.7,
-            }}
+        <View style={Layout.justifyContentEnd}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
             disabled={!exerciseLevel}
-            onPress={() => {
-              onNext();
-            }}
-          >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            style={Gutters.regularBMargin}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -125,25 +115,7 @@ const NutritionUnderstanding = props => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
-    height: 53,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain' }
 });
 
 const mapStateToProps = state => ({

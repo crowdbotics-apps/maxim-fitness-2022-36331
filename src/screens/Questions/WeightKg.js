@@ -19,7 +19,7 @@ import { updateAnswer } from './Redux';
 
 //Components
 import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import HeaderTitle from './Components/HeaderTitle';
 
 const WeightKg = props => {
   const {

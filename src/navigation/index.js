@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 // import { createDrawerNavigator } from "@react-navigation/drawer"
@@ -15,6 +15,8 @@ const questionStack = createStackNavigator();
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
+  console.log('props.profile.is_survey ', props.profile);
+  useEffect(() => { }, [props.profile])
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -26,12 +28,15 @@ const Navigation = props => {
       }}
     >
       <authStack.Navigator screenOptions={{ headerShown: false }}>
-        {!props.accessToken ? (
-          <authStack.Screen name="MainStack" component={MainNavigator} />
-        ) : (
-          <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
-          //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
-        )}
+        {props.accessToken ?
+          props?.profile?.is_survey ? (
+            <mainStack.Screen name="MainStack" component={MainNavigator} />
+          ) : (
+            <questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
+          ) : (
+            <authStack.Screen name="AuthStack" component={AuthStackScreen} />
+            //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
+          )}
       </authStack.Navigator>
     </NavigationContainer>
   );
@@ -39,6 +44,7 @@ const Navigation = props => {
 
 const mapStateToProps = state => ({
   accessToken: state.login.accessToken,
+  profile: state.login.profile
 });
 
 export default connect(mapStateToProps, null)(Navigation);
