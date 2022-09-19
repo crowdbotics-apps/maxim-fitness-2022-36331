@@ -2,7 +2,7 @@ import base64
 import json
 from collections import OrderedDict
 
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Exists, OuterRef
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -186,7 +186,7 @@ class ProfileViewSet(ModelViewSet):
             obj.number_of_training_days = self.request.data["number_of_training_days"]
             obj.fitness_goal = self.request.data["fitness_goal"]
             obj.is_survey = True
-            obj.consultations = self.request.data["consultations"]
+            # obj.consultations = self.request.data["consultations"]
             no_meal = obj.number_of_meal
             total_meal = self.request.data["number_of_meal"]
             obj.number_of_meal = total_meal
@@ -298,6 +298,30 @@ class UpdateProfile(ModelViewSet):
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
         return queryset
+
+
+class UserSearchViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = User.objects.filter(username__icontains=search)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = []
+        f = False
+        for i in queryset:
+            a = Follow.objects.followers(i)
+            if a:
+                f = True
+            serializer = UserSerializer(i, context={"request": request})
+            data_dic = {"user_detail": serializer.data, "follow": f}
+            data.append(data_dic)
+        return Response(data)
 
 
 class ProductViewSet(ModelViewSet):
