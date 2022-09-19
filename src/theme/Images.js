@@ -69,6 +69,9 @@ export default {
   workout3: require('src/assets/images/workout3.png'),
   threeLine: require('src/assets/images/threeLine.png'),
   circle: require('src/assets/images/circle.png'),
+  back2: require('src/assets/images/back2.png'),
+  iconI:require('src/assets/images/iconI.png'),
+
 
 
 
