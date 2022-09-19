@@ -94,6 +94,7 @@ const Feeds = props => {
             : { uri: profile?.profile_picture }
         }
         onPressPlus={() => navigation.navigate('AddPost')}
+        onPressSearch={()=> navigation.navigate('SearchProfile')}
       />
       <Text style={styles.content} text="Latest" />
 
