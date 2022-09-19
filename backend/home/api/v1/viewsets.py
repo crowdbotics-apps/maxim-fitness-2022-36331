@@ -320,6 +320,7 @@ class UserSearchViewSet(ModelViewSet):
                 f = True
             serializer = UserSerializer(i, context={"request": request})
             data_dic = {"user_detail": serializer.data, "follow": f}
+            f = False
             data.append(data_dic)
         return Response(data)
 
