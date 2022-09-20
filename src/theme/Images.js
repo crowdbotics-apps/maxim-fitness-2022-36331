@@ -70,5 +70,17 @@ export default {
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
   greyNext: require('src/assets/images/greyNext.png'),
-  animatedLoader: require('src/assets/images/survey-loader.png')
+  animatedLoader: require('src/assets/images/survey-loader.png'),
+  findbtn: require('src/assets/images/findbtn.png'),
+  workoutbtn: require('src/assets/images/workoutbtn.png'),
+  workout1: require('src/assets/images/workout1.png'),
+  workout2: require('src/assets/images/workout2.png'),
+  workout3: require('src/assets/images/workout3.png'),
+  threeLine: require('src/assets/images/threeLine.png'),
+  circle: require('src/assets/images/circle.png'),
+  back2: require('src/assets/images/back2.png'),
+  iconI: require('src/assets/images/iconI.png'),
+  duplicateIcon: require('src/assets/images/duplicateIcon.png'),
+
+
 };
