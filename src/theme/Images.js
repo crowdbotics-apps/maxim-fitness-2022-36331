@@ -44,7 +44,7 @@ export default {
   profileTab: require('src/assets/images/profileTab.png'),
   fillheart: require('src/assets/images/filledHeart.png'),
   check: require('src/assets/images/check.png'),
-  sendMessage: require('src/assets/images/icon_arrow.png'),
+  sendMessage1: require('src/assets/images/icon_arrow.png'),
   iconDoneProgram: require('src/assets/images/icon_program_done.png'),
   iconSwap: require('src/assets/images/icon_swap.png'),
   iconDoneStartRest: require('src/assets/images/icon_done_start_rest.png'),
@@ -70,6 +70,7 @@ export default {
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
   greyNext: require('src/assets/images/greyNext.png'),
+<<<<<<< HEAD
   animatedLoader: require('src/assets/images/survey-loader.png'),
   findbtn: require('src/assets/images/findbtn.png'),
   workoutbtn: require('src/assets/images/workoutbtn.png'),
@@ -81,6 +82,10 @@ export default {
   back2: require('src/assets/images/back2.png'),
   iconI: require('src/assets/images/iconI.png'),
   duplicateIcon: require('src/assets/images/duplicateIcon.png'),
+=======
+  sendMessage: require('src/assets/images/sendMessage.png'),
+  uploadMedia: require('src/assets/images/uploadMedia.png'),
+>>>>>>> 45de4d943695e596ed4d2cef537d05a2bf7fdee2
 
 
 };
