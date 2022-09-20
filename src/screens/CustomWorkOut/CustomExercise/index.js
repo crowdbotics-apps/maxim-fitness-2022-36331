@@ -53,6 +53,7 @@ const CustomExercise = props => {
   const [dualSetState, setDualSetState] = useState(1);
 
   const [currentIndex, setCurrentIndex] = useState(false);
+  const [dualReps, setDualReps] = useState({ state1: '', state2: '' });
 
   const numberOfExercise = 2;
 
@@ -75,6 +76,19 @@ const CustomExercise = props => {
     setReps('');
     setMinutes(0);
     setSeconds(0);
+  };
+
+  const updateDualReps = val => {
+    if (dualSetState === 1) {
+      const tempObj = { ...dualReps };
+      tempObj.state1 = val;
+
+      setDualReps(tempObj);
+    } else {
+      const tempObj = { ...dualReps };
+      tempObj.state2 = val;
+      setDualReps(tempObj);
+    }
   };
 
   return (
@@ -221,105 +235,106 @@ const CustomExercise = props => {
                   </Text>
                 </TouchableOpacity>
               ))}
-            {numberOfExercise === 2 && (
-              <View style={styles.dualSets}>
-                <Text
-                  style={{
-                    marginLeft: 20,
-                    color: '#636363',
-                    fontSize: 17,
-                    fontWeight: '700',
-                    marginTop: 5,
-                  }}
-                >
-                  1
-                </Text>
-
-                <View style={styles.dualSetsSecondView}>
+            {numberOfExercise === 2 &&
+              dualSets.map((item, i) => (
+                <View style={styles.dualSets}>
                   <Text
                     style={{
+                      marginLeft: 20,
                       color: '#636363',
-                      fontSize: 13,
+                      fontSize: 17,
                       fontWeight: '700',
                       marginTop: 5,
-                      width: 80,
-                      marginLeft: -10,
                     }}
                   >
-                    a. Barbell bench press
+                    {i + 1}
                   </Text>
 
-                  <Text
-                    style={{
-                      color: '#636363',
-                      fontSize: 13,
-                      fontWeight: '700',
-                      marginTop: 5,
-                      width: 50,
-                      marginHorizontal: 40,
-                      marginLeft: 10,
-                    }}
-                  >
-                    12
-                  </Text>
+                  <View style={styles.dualSetsSecondView}>
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 80,
+                        marginLeft: -10,
+                      }}
+                    >
+                      {item.exerciseA.name}
+                    </Text>
 
-                  <Text
-                    style={{
-                      color: '#636363',
-                      fontSize: 13,
-                      fontWeight: '700',
-                      marginTop: 5,
-                      width: 50,
-                      marginRight: -30,
-                    }}
-                  >
-                    60
-                  </Text>
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 50,
+                        marginHorizontal: 40,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {item.exerciseA.reps}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 50,
+                        marginRight: -30,
+                      }}
+                    >
+                      {item.exerciseA.rest === 0 ? '-' : item.exerciseB.rest}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.dualSetsSecondView1]}>
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 80,
+                        marginLeft: -10,
+                      }}
+                    >
+                      {item.exerciseB.name}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 50,
+                        marginHorizontal: 40,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {item.exerciseB.reps}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: '#636363',
+                        fontSize: 13,
+                        fontWeight: '700',
+                        marginTop: 5,
+                        width: 50,
+                        marginRight: -30,
+                      }}
+                    >
+                      {item.exerciseB.rest === 0 ? '-' : item.exerciseB.rest}
+                    </Text>
+                  </View>
                 </View>
-
-                <View style={[styles.dualSetsSecondView1]}>
-                  <Text
-                    style={{
-                      color: '#636363',
-                      fontSize: 13,
-                      fontWeight: '700',
-                      marginTop: 5,
-                      width: 80,
-                      marginLeft: -10,
-                    }}
-                  >
-                    a. Barbell bench press
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: '#636363',
-                      fontSize: 13,
-                      fontWeight: '700',
-                      marginTop: 5,
-                      width: 50,
-                      marginHorizontal: 40,
-                      marginLeft: 10,
-                    }}
-                  >
-                    12
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: '#636363',
-                      fontSize: 13,
-                      fontWeight: '700',
-                      marginTop: 5,
-                      width: 50,
-                      marginRight: -30,
-                    }}
-                  >
-                    60
-                  </Text>
-                </View>
-              </View>
-            )}
+              ))}
           </View>
 
           <View style={{ marginHorizontal: 38 }}>
@@ -557,7 +572,9 @@ const CustomExercise = props => {
                   <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Enter Reps</Text>
                   <TextInput
                     style={{ fontSize: 24, fontWeight: '700', color: '#5e5e5e', marginTop: 5 }}
-                    onChangeText={val => setReps(val)}
+                    onChangeText={val => {
+                      updateDualReps(val);
+                    }}
                   />
                 </View>
 
@@ -650,13 +667,34 @@ const CustomExercise = props => {
                 onPress={() => {
                   if (dualSetState === 1) {
                     setDualSetState(2);
+                    resetValues();
                   } else {
                     refRBSheetDual.current.close();
                     setDualSetState(1);
                     setReps('');
+                    setDualSets(prevValues => [
+                      ...prevValues,
+                      {
+                        exerciseA: { reps: dualReps.state1, rest: 0, name: 'ExerciseA' },
+                        exerciseB: {
+                          reps: dualReps.state2,
+                          rest: minutes * 60 + parseFloat(seconds),
+                          name: 'ExerciseB',
+                        },
+                      },
+                    ]);
+                    resetValues();
                   }
                 }}
-                disabled={reps !== '' ? false : true}
+                disabled={
+                  dualSetState === 1
+                    ? dualReps.state1 !== ''
+                      ? false
+                      : true
+                    : dualReps.state2 !== '' && minutes !== 0
+                    ? false
+                    : true
+                }
               >
                 <Image
                   source={dualSetState === 1 ? greyNext : doneImg}
@@ -769,6 +807,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 38,
     borderRadius: 6,
     height: 140,
+    marginBottom: 10,
   },
   dualSetsSecondView: {
     flexDirection: 'row',

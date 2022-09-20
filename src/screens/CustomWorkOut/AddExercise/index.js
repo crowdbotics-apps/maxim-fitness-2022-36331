@@ -17,6 +17,7 @@ import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
 import { connect } from 'react-redux';
 
 import { TextInput } from 'react-native-gesture-handler';
+import { navigate } from '../../../navigation/NavigationService';
 
 const data = [
   { item: 'Super Set' },
@@ -125,7 +126,13 @@ const AddExercies = props => {
 
         <View style={{ marginBottom: 20 }}>
           {testArray.map((item, i) => (
-            <View style={[styles.cardView, { backgroundColor: '#e5e5e5' }]}>
+            <TouchableOpacity
+              style={[
+                styles.cardView,
+                { backgroundColor: selectedExercise === i ? '#74ccff' : '#e5e5e5' },
+              ]}
+              onPress={() => setSelectedExercise(i)}
+            >
               <View style={[row, justifyContentBetween, { position: 'relative' }]}>
                 <View style={[center, styles.cardImg]}>
                   <Image source={foodImage} style={{ width: 80, height: 40 }} />
@@ -137,7 +144,7 @@ const AddExercies = props => {
                   <Image source={iconI} style={{ width: 20, height: 20, marginRight: 5 }} />
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -146,7 +153,7 @@ const AddExercies = props => {
           text={'Add Exercies'}
           textStyle={[{ color: 'white' }]}
           style={styles.btn}
-          onPress={() => refDescription.current.open()}
+          onPress={() => navigate('CustomExercise')}
         />
       </View>
       <View style={[row, { alignSelf: 'center', marginTop: 20, marginBottom: 10 }]}>
