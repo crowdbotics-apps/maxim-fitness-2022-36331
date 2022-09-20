@@ -23,7 +23,7 @@ import { getCustomCalRequest } from '../../ScreenRedux/customCalRedux';
 
 const CustormCalories = (props) => {
   let refWeight = useRef('');
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(2);
   const [value, setValue] = useState(false);
   const [currentTab, setCurrentTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -92,6 +92,7 @@ const CustormCalories = (props) => {
       <ProfileComponent
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
+        onPressSocial={() => props.navigation.navigate('ProfileScreen')}
       />
       <View style={[row, justifyContentBetween, regularHPadding, styles.currentTabStyleMap]}>
         {data.map((item, i) => {

@@ -88,7 +88,7 @@ const FatLoseProgram = props => {
               <Text
                 text={`Calendar`}
                 style={[tinyLMargin, styles.CalenderText]}
-                // onPress={() => setOpen(true)}
+              // onPress={() => setOpen(true)}
               />
               <Icon
                 type="FontAwesome5"
@@ -107,7 +107,7 @@ const FatLoseProgram = props => {
               datesBlacklist={datesBlacklistFunc}
               style={{ height: 80, width: 410 }}
               markedDates={markedDatesArray}
-              // scrollable
+            // scrollable
             />
           </View>
           <Text text={`Today's Workout`} style={styles.headind2} />
