@@ -21,7 +21,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const FitnessGoal = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
 
   const exerciseArray = [
     {
@@ -60,13 +62,15 @@ const FitnessGoal = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.57} showBackButton={true} />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'What is your fitness goal?'}
-          />
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your fitness goal?'} />
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           {exerciseArray.map((item, i) => (
@@ -88,10 +92,7 @@ const FitnessGoal = props => {
                   text={item.heading}
                   style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}
                 />
-                <Text
-                  style={{ color: '#7d7d7d', marginTop: 5 }}
-                  text={item.description}
-                />
+                <Text style={{ color: '#7d7d7d', marginTop: 5 }} text={item.description} />
               </View>
               <Image source={Images.forwardIcon} style={styles.rightArrow} />
             </TouchableOpacity>

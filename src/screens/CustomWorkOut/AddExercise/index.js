@@ -79,7 +79,7 @@ const AddExercies = props => {
                   width: 180,
                   fontSize: 25,
                 }}
-              ></View>
+              />
             </View>
           </View>
           <View style={[{ marginTop: 20 }, row]}>
@@ -157,7 +157,7 @@ const AddExercies = props => {
         />
       </View>
       <View style={[row, { alignSelf: 'center', marginTop: 20, marginBottom: 10 }]}>
-        <Text text="Watch This" style={[styles.heading1, { color: Colors.brightturquoise }]}></Text>
+        <Text text="Watch This" style={[styles.heading1, { color: Colors.brightturquoise }]} />
         <Text text=" to create your workout" style={[styles.heading1]} />
       </View>
 
@@ -187,7 +187,7 @@ const AddExercies = props => {
               style={[
                 { fontSize: 20, lineHeight: 25, color: 'black', fontWeight: 'bold', marginTop: 10 },
               ]}
-            ></Text>
+            />
           </View>
           <View
             style={[
@@ -260,7 +260,7 @@ const AddExercies = props => {
                             fontWeight: 'bold',
                           },
                         ]}
-                      ></Text>
+                      />
                     </View>
                   </View>
                   <View style={{ justifyContent: 'center', marginLeft: 30, marginHorizontal: 40 }}>

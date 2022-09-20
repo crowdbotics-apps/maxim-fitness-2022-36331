@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Image, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -20,7 +13,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const MealPreference = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   useEffect(() => {
@@ -45,7 +40,13 @@ const MealPreference = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.68} showBackButton />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
           <Text
             color="commonCol"
@@ -64,7 +65,9 @@ const MealPreference = props => {
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
                 exerciseLevel.value === item.value ? Global.border : Global.borderB,
-                exerciseLevel.value !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
+                exerciseLevel.value !== item.value
+                  ? Global.borderAlto
+                  : { borderColor: Colors.primary },
               ]}
               onPress={() => setExerciseLevel(item)}
             >

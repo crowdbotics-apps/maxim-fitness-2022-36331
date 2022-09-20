@@ -139,6 +139,7 @@ function* getMeals() {
   }
 }
 
-
-
-export default all([takeLatest(GET_CALORIES_REQUEST, getCustomCal), takeLatest(GET_MEALS_REQUEST, getMeals)])
+export default all([
+  takeLatest(GET_CALORIES_REQUEST, getCustomCal),
+  takeLatest(GET_MEALS_REQUEST, getMeals),
+])

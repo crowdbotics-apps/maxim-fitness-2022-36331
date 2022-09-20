@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  SafeAreaView,
-} from 'react-native';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -17,7 +13,9 @@ import { Global, Layout, Gutters, Fonts } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const FeetHeight = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const [feet, setFeet] = useState('');
   const [inches, setInches] = useState('');
 
@@ -31,14 +29,15 @@ const FeetHeight = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.47} showBackButton />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'What is your height?'}
-          />
-
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your height?'} />
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           <View
@@ -54,10 +53,10 @@ const FeetHeight = props => {
             <InputField
               inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
               value={feet}
-              onChangeText={(val) => setFeet(val)}
-              placeholder='Feet'
+              onChangeText={val => setFeet(val)}
+              placeholder="Feet"
               autoCapitalize="none"
-              keyboardType='numeric'
+              keyboardType="numeric"
             />
           </View>
           <View
@@ -73,10 +72,10 @@ const FeetHeight = props => {
             <InputField
               inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
               value={inches}
-              onChangeText={(val) => setInches(val)}
-              placeholder='Inches'
+              onChangeText={val => setInches(val)}
+              placeholder="Inches"
               autoCapitalize="none"
-              keyboardType='numeric'
+              keyboardType="numeric"
             />
           </View>
         </View>

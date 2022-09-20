@@ -66,11 +66,11 @@ const ProfileScreen = props => {
     userDetail?.id === routeDetail?.user?.id || !routeDetail
       ? navigation.navigate('EditProfile')
       : follow
-        ? [
+      ? [
           setFollow(!follow),
           props.unFollowUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
         ]
-        : [
+      : [
           setFollow(!follow),
           props.followUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
         ];
@@ -187,8 +187,8 @@ const ProfileScreen = props => {
                 userDetail?.id === routeDetail?.user?.id || !routeDetail
                   ? editProfileButton
                   : follow
-                    ? followingButton
-                    : followButton
+                  ? followingButton
+                  : followButton
               }
               style={{ height: 60, width: 120, marginTop: 10, marginLeft: 40 }}
             />

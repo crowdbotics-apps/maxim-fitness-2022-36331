@@ -5,7 +5,6 @@ import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 
 const TabThree = ({ setShowModalHistory, navigation }) => {
-
   const {
     row,
     fill,
@@ -63,15 +62,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
           <Text text={`Goal ${100}`} style={fontSize15TextCenter} />
         </View>
       </View>
-      <View
-        style={[
-          row,
-          regularBMargin,
-          regularHMargin,
-          justifyContentBetween,
-          alignItemsCenter,
-        ]}
-      >
+      <View style={[row, regularBMargin, regularHMargin, justifyContentBetween, alignItemsCenter]}>
         <View style={alignItemsStart}>
           <Text text="Protein" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
@@ -92,15 +83,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
           />
         </View>
       </View>
-      <View
-        style={[
-          row,
-          regularHMargin,
-          regularBMargin,
-          justifyContentBetween,
-          alignItemsCenter,
-        ]}
-      >
+      <View style={[row, regularHMargin, regularBMargin, justifyContentBetween, alignItemsCenter]}>
         <View style={alignItemsStart}>
           <Text text="Carbohydrates" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
@@ -121,15 +104,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
           />
         </View>
       </View>
-      <View
-        style={[
-          row,
-          regularHMargin,
-          regularBMargin,
-          justifyContentBetween,
-          alignItemsCenter,
-        ]}
-      >
+      <View style={[row, regularHMargin, regularBMargin, justifyContentBetween, alignItemsCenter]}>
         <View style={alignItemsStart}>
           <Text text="Fats" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
@@ -153,19 +128,15 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
       <View style={[fill, regularHPadding, styles.cardStyle]}>
         <View>
           <Text text="Diet Type" style={[{ fontSize: 20, opacity: 0.7 }]} bold />
-          <Text
-            text="Standard 40:40:20"
-            color="nonary"
-            style={smallVPadding}
-          />
+          <Text text="Standard 40:40:20" color="nonary" style={smallVPadding} />
         </View>
         <View style={[fill, row, justifyContentBetween, alignItemsCenter, regularVMargin]}>
-          <Text text="Meal per Day" style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: 'black' }} bold />
           <Text
-            text="Edit"
-            color="nonary"
-            onPress={() => navigation.navigate('EditCustomCal')}
+            text="Meal per Day"
+            style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: 'black' }}
+            bold
           />
+          <Text text="Edit" color="nonary" onPress={() => navigation.navigate('EditCustomCal')} />
         </View>
         <Text text={`${6} meals`} color="nonary" />
       </View>

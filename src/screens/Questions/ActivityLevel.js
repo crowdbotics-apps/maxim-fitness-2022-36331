@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Image, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -20,7 +13,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const ActivityLevel = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
   useEffect(() => {
@@ -61,20 +56,24 @@ const ActivityLevel = props => {
     },
   ];
 
-
   console.log('answers', props.answers);
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.33} showBackButton />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
           <Text
             color="commonCol"
             style={Fonts.titleRegular}
             text={'What is level of your Activity?'}
           />
-
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           {exerciseArray.map((item, i) => (
@@ -92,12 +91,7 @@ const ActivityLevel = props => {
               onPress={() => setExerciseLevel(item.value)}
             >
               <View style={[Layout.justifyContentBetween, Gutters.regularVMargin, Layout.fill4x]}>
-                <Text
-                  text={item.heading}
-                  color="commonCol"
-                  style={Fonts.titleSmall}
-                  bold
-                />
+                <Text text={item.heading} color="commonCol" style={Fonts.titleSmall} bold />
                 <Text
                   color="commonCol"
                   style={[Fonts.textMedium, Gutters.tinyTMargin]}

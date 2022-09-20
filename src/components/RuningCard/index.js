@@ -46,7 +46,9 @@ const RuningCard = props => {
         <View style={styles.imageWrapperParent}>
           <Image
             source={
-              item?.send?.profile_picture_url ? { uri: item?.send?.profile_picture_url } : Images.profile
+              item?.send?.profile_picture_url
+                ? { uri: item?.send?.profile_picture_url }
+                : Images.profile
             }
             style={styles.imageWrapper}
           />

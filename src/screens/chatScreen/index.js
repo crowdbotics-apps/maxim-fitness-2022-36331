@@ -16,26 +16,24 @@ import {
 import { Images } from 'src/theme';
 import { Text, Header } from '../../components'
 
-
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images;
 const ChatScreen = props => {
   const { navigation, profileUserData, requesting } = props;
   const { width } = Dimensions.get('window');
   const [followUser, setFollowUser] = useState([]);
 
-  let scrollOffsetY = useRef(new Animated.Value(100)).current; 
+  let scrollOffsetY = useRef(new Animated.Value(100)).current;
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} >
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }}
-          showsVerticalScrollIndicator={false}   
+          showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollOffsetY}}}],
-            {useNativeDriver: false}
-          )}       
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+            useNativeDriver: false,
+          })}
         >
           <View style={{ paddingHorizontal: 20, flexDirection: 'row', marginTop: 20 }}>
             <TouchableOpacity
@@ -165,27 +163,42 @@ const ChatScreen = props => {
           </View>
         </ScrollView>
       </SafeAreaView>
-      <View style={{ backgroundColor: 'white', paddingBottom: 15, paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          paddingBottom: 15,
+          paddingHorizontal: 10,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
         <TextInput
-          style={{ borderWidth: 1, width: '70%', borderRadius: 20, borderColor: 'gray', paddingLeft: 30, height: 40 }}
+          style={{
+            borderWidth: 1,
+            width: '70%',
+            borderRadius: 20,
+            borderColor: 'gray',
+            paddingLeft: 30,
+            height: 40,
+          }}
           placeholder="Write Message"
         />
-        <View style={{flexDirection: 'row',flex: 1, justifyContent: 'space-between'}}>
-        <Image
-          source={uploadMedia}
-          style={{
-            height: (35 / 375) * width,
-            width: (35 / 375) * width,
-            marginLeft: 10
-          }}
-        />
-        <Image
-          source={sendMessage}
-          style={{
-            height: (35 / 375) * width,
-            width: (35 / 375) * width,
-          }}
-        />
+        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
+          <Image
+            source={uploadMedia}
+            style={{
+              height: (35 / 375) * width,
+              width: (35 / 375) * width,
+              marginLeft: 10
+            }}
+          />
+          <Image
+            source={sendMessage}
+            style={{
+              height: (35 / 375) * width,
+              width: (35 / 375) * width,
+            }}
+          />
         </View>
       </View>
     </>

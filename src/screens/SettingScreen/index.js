@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import { Text, Button } from '../../components';
 import Modal from 'react-native-modal';
 
-const { backImage } =  Images;
+const { backImage } = Images;
 const SettingScreen = props => {
   const { navigation, profileUserData, requesting } = props;
   const [showModal, setShowModal] = useState(false)
@@ -41,16 +41,16 @@ const SettingScreen = props => {
           </View>
         </View>
         <View style={[styles.mainHeading]}>
-        <Text text="SubScription Plan" style={styles.mainText} bold  />
-        <Image source={Images.forwordIcon} style={styles.IconStyles} />
+          <Text text="SubScription Plan" style={styles.mainText} bold />
+          <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </View>
         <View style={[styles.mainHeading]}>
-        <Text text="Payment Plan" style={styles.mainText} bold  />
-        <Image source={Images.forwordIcon} style={styles.IconStyles} />
+          <Text text="Payment Plan" style={styles.mainText} bold />
+          <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </View>
-        <TouchableOpacity style={[styles.mainHeading]} onPress={()=> setShowModal(true)}>
-        <Text text="Delete Account" style={styles.mainText} bold  />
-        <Image source={Images.forwordIcon} style={styles.IconStyles} />
+        <TouchableOpacity style={[styles.mainHeading]} onPress={() => setShowModal(true)}>
+          <Text text="Delete Account" style={styles.mainText} bold />
+          <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </TouchableOpacity>
       </ScrollView>
       <Modal
@@ -79,7 +79,7 @@ const SettingScreen = props => {
             >
               <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
             </TouchableOpacity>
-            <View style={{ marginHorizontal: 20 }}></View>
+            <View style={{ marginHorizontal: 20 }} />
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#F3F1F4' }]}
               onPress={() => setShowModal(!showModal)}
@@ -93,7 +93,7 @@ const SettingScreen = props => {
   );
 };
 const styles = StyleSheet.create({
-    delBtnStyles: {
+  delBtnStyles: {
     width: 100,
     height: 50,
     backgroundColor: 'red',
@@ -101,7 +101,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  mainHeading: {marginHorizontal: 20, borderBottomColor: 'gray', borderBottomWidth: 1, marginTop: 30, flexDirection: 'row', justifyContent: 'space-between'},
+  mainHeading: {
+    marginHorizontal: 20,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+    marginTop: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   mainText: { fontSize: 18, color: '#0D5565', paddingBottom: 15 },
   IconStyles: { height: 20, width: 10, marginRight: 10 }
 });
