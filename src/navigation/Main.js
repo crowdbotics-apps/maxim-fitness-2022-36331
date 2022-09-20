@@ -20,6 +20,7 @@ import CustormCalories from '../screens/CustormCalories';
 import SearchProfile from '../screens/SearchProfile';
 import MessageScreen from '../screens/MessageScreen'
 import ChatScreen from '../screens/chatScreen';
+import SettingScreen from '../screens/SettingScreen'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
@@ -176,6 +177,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="SearchProfile" component={SearchProfile} />
     <mainStack.Screen name="MessageScreen" component={MessageScreen} />
     <mainStack.Screen name="ChatScreen" component={ChatScreen} />
+    <mainStack.Screen name="SettingScreen" component={SettingScreen} />
   </mainStack.Navigator>
 )
 

@@ -73,7 +73,7 @@ const SearchProfile = props => {
           >
             <Image source={backImage} style={{ height: 20, width: 30 }} />
           </TouchableOpacity>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1.5 }}>
             <Text text="People" style={{ fontSize: 22 }} bold />
           </View>
         </View>
