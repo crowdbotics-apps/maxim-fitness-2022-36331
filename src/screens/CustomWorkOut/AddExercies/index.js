@@ -17,6 +17,7 @@ import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
 import { connect } from 'react-redux';
 
 import { TextInput } from 'react-native-gesture-handler';
+import { navigate } from '../../../navigation/NavigationService';
 
 const data = [
   { item: 'Super Set' },
@@ -141,14 +142,17 @@ const AddExercies = props => {
           ))}
         </View>
       </ScrollView>
-      <View style={{ alignSelf: 'center' }}>
+      <TouchableOpacity
+        style={{ alignSelf: 'center' }}
+        //  onPress={() => navigate('CustomExercise')}
+      >
         <Button
           text={'Add Exercies'}
           textStyle={[{ color: 'white' }]}
           style={styles.btn}
           onPress={() => refDescription.current.open()}
         />
-      </View>
+      </TouchableOpacity>
       <View style={[row, { alignSelf: 'center', marginTop: 20, marginBottom: 10 }]}>
         <Text text="Watch This" style={[styles.heading1, { color: Colors.brightturquoise }]}></Text>
         <Text text=" to create your workout" style={[styles.heading1]} />
