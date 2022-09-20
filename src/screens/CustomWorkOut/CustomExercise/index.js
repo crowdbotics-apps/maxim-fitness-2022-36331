@@ -13,10 +13,7 @@ import {
 import { connect } from 'react-redux';
 
 //Components
-import { Text, BottomSheet, Button } from '../../components';
-
-//Screens
-import { editProfile } from '../../ScreenRedux/profileRedux';
+import { Text, BottomSheet, Button } from '../../../components';
 
 //Libraries
 import Modal from 'react-native-modal';

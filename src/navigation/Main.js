@@ -20,6 +20,10 @@ import CustormCalories from '../screens/CustormCalories';
 import SearchProfile from '../screens/SearchProfile';
 import MessageScreen from '../screens/MessageScreen'
 import ChatScreen from '../screens/chatScreen';
+// Custom exercise screens
+import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
+import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
+import AddExercise from '../screens/CustomWorkOut/AddExercise'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
@@ -125,8 +129,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="ProgramScreen"
-        component={ProgramScreen}
+        name="FatLoseProgram"
+        component={FatLoseProgram}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -176,6 +180,9 @@ const MainNavigator = () => (
     <mainStack.Screen name="SearchProfile" component={SearchProfile} />
     <mainStack.Screen name="MessageScreen" component={MessageScreen} />
     <mainStack.Screen name="ChatScreen" component={ChatScreen} />
+    <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} />
+    <mainStack.Screen name="CustomExercise" component={CustomExercise} />
+    <mainStack.Screen name="AddExercise" component={AddExercise} />
   </mainStack.Navigator>
 )
 
