@@ -15,13 +15,11 @@ import {
 import { Images } from 'src/theme';
 import { Text } from '../../components';
 
-const { backImage, searchImage, profile, followingButton, messageImage } =
-  Images;
+const { backImage, searchImage, profile, followingButton, messageImage } = Images;
 const MessageScreen = props => {
   const { navigation, profileUserData, requesting } = props;
   const { width } = Dimensions.get('window');
   const [followUser, setFollowUser] = useState([]);
-
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -29,15 +27,24 @@ const MessageScreen = props => {
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingHorizontal: 20, flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            marginTop: 20,
+            justifyContent: 'space-between',
+          }}
+        >
           <TouchableOpacity
             style={{ justifyContent: 'center' }}
             onPress={() => navigation.goBack()}
           >
             <Image source={backImage} style={{ height: 20, width: 30 }} />
           </TouchableOpacity>
-            <Text text="Messages" style={{ fontSize: 22 }} bold />
+          <Text text="Messages" style={{ fontSize: 22 }} bold />
+          <TouchableOpacity onPress={() => navigation.navigate('ChatScreen')}>
             <Image source={messageImage} style={{ height: 30, width: 30 }} />
+          </TouchableOpacity>
         </View>
         <View style={{ paddingHorizontal: 20, marginTop: 30, flexDirection: 'row' }}>
           <TextInput
@@ -65,32 +72,32 @@ const MessageScreen = props => {
             <Image source={searchImage} style={{ height: 30, width: 30 }} />
           </View>
         </View>
-            <View
+        <View
+          style={{
+            marginTop: 25,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ flexDirection: 'row' }}>
+            <Image
+              source={profile}
               style={{
-                marginTop: 25,
-                paddingHorizontal: 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
+                height: (61 / 375) * width,
+                width: (61 / 375) * width,
+                borderRadius: (31 / 375) * width,
               }}
-            >
-              <View style={{ flexDirection: 'row' }}>
-                <Image
-                  source={profile}
-                  style={{
-                    height: (61 / 375) * width,
-                    width: (61 / 375) * width,
-                    borderRadius: (31 / 375) * width,
-                  }}
-                />
-                <View style={{ justifyContent: 'center', marginLeft: 15 }}>
-                  <Text text="Test User" bold style={{ fontSize: 12 }} />
-                  <Text text="THE ROCK" style={{ color: '#D3D3D3', fontSize: 12 }} />
-                </View>
-              </View>
-              <View style={{justifyContent: 'center'}}>
-              <Text text="2 days" style={{ color: '#D3D3D3', fontSize: 12}} />
-              </View>
+            />
+            <View style={{ justifyContent: 'center', marginLeft: 15 }}>
+              <Text text="Test User" bold style={{ fontSize: 12 }} />
+              <Text text="THE ROCK" style={{ color: '#D3D3D3', fontSize: 12 }} />
             </View>
+          </View>
+          <View style={{ justifyContent: 'center' }}>
+            <Text text="2 days" style={{ color: '#D3D3D3', fontSize: 12 }} />
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -104,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MessageScreen
+export default MessageScreen;

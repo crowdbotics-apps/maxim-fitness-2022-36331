@@ -70,4 +70,8 @@ export default {
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
   greyNext: require('src/assets/images/greyNext.png'),
+  sendMessage: require('src/assets/images/sendMessage.png'),
+  uploadMedia: require('src/assets/images/uploadMedia.png'),
+
+
 };

@@ -92,14 +92,14 @@ const EditProfile = props => {
     formData.append('last_name', state.lastName.value);
     formData.append('user_name', state.userName.value);
     formData.append('description', state.discription.value);
-    if (state?.profileImage?.value) {
+    if (state?.profileImage?.value?.path) {
       formData.append('profile_picture', {
         uri: state.profileImage.value.path,
         type: state.profileImage.value.mime,
         name: state.profileImage.value.path,
       });
     }
-    if (state?.backgroundImage?.value) {
+    if (state?.backgroundImage?.value?.path) {
       formData.append('background_picture', {
         uri: state.backgroundImage.value.path,
         type: state.backgroundImage.value.mime,
