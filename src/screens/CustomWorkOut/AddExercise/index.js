@@ -126,7 +126,13 @@ const AddExercies = props => {
 
         <View style={{ marginBottom: 20 }}>
           {testArray.map((item, i) => (
-            <View style={[styles.cardView, { backgroundColor: '#e5e5e5' }]}>
+            <TouchableOpacity
+              style={[
+                styles.cardView,
+                { backgroundColor: selectedExercise === i ? '#74ccff' : '#e5e5e5' },
+              ]}
+              onPress={() => setSelectedExercise(i)}
+            >
               <View style={[row, justifyContentBetween, { position: 'relative' }]}>
                 <View style={[center, styles.cardImg]}>
                   <Image source={foodImage} style={{ width: 80, height: 40 }} />
@@ -138,21 +144,18 @@ const AddExercies = props => {
                   <Image source={iconI} style={{ width: 20, height: 20, marginRight: 5 }} />
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-      <TouchableOpacity
-        style={{ alignSelf: 'center' }}
-        //  onPress={() => navigate('CustomExercise')}
-      >
+      <View style={{ alignSelf: 'center' }}>
         <Button
           text={'Add Exercies'}
           textStyle={[{ color: 'white' }]}
           style={styles.btn}
-          onPress={() => refDescription.current.open()}
+          onPress={() => navigate('CustomExercise')}
         />
-      </TouchableOpacity>
+      </View>
       <View style={[row, { alignSelf: 'center', marginTop: 20, marginBottom: 10 }]}>
         <Text text="Watch This" style={[styles.heading1, { color: Colors.brightturquoise }]}></Text>
         <Text text=" to create your workout" style={[styles.heading1]} />

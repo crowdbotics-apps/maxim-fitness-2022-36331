@@ -192,7 +192,7 @@ const FatLoseProgram = props => {
                 text={`Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput`}
                 style={styles.praText}
               />
-              <TouchableOpacity onPress={() => navigate('AddExercies')}>
+              <TouchableOpacity onPress={() => navigate('AddExercise')}>
                 <Image source={workoutbtn} style={styles.btn2} />
               </TouchableOpacity>
             </View>

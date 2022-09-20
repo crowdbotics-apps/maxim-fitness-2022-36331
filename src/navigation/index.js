@@ -8,7 +8,7 @@ import { navigationRef } from './NavigationService';
 import AuthStackScreen from './AuthScreens';
 import MainNavigator from './Main';
 import QuestionStackScreen from './QuestionScreens';
-import { getProfile } from '../ScreenRedux/profileRedux'
+import { getProfile } from '../ScreenRedux/profileRedux';
 
 const authStack = createStackNavigator();
 const mainStack = createStackNavigator();
@@ -16,11 +16,11 @@ const questionStack = createStackNavigator();
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
-  const { renderTab, getProfile, profile, accessToken } = props
+  const { renderTab, getProfile, profile, accessToken } = props;
 
   useEffect(() => {
-    renderTab && getProfile()
-  }, [renderTab])
+    renderTab && getProfile();
+  }, [renderTab]);
 
   return (
     <NavigationContainer
@@ -33,15 +33,16 @@ const Navigation = props => {
       }}
     >
       <authStack.Navigator screenOptions={{ headerShown: false }}>
-        {accessToken ?
-          profile?.is_survey ? (
+        {accessToken ? (
+          true ? (
             <mainStack.Screen name="MainStack" component={MainNavigator} />
           ) : (
             <questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
-          ) : (
-            <authStack.Screen name="AuthStack" component={AuthStackScreen} />
-            //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
-          )}
+          )
+        ) : (
+          <authStack.Screen name="AuthStack" component={AuthStackScreen} />
+          //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
+        )}
       </authStack.Navigator>
     </NavigationContainer>
   );
@@ -50,7 +51,7 @@ const Navigation = props => {
 const mapStateToProps = state => ({
   accessToken: state.login.accessToken,
   profile: state.login.userDetail,
-  renderTab: state.questionReducer.renderTab
+  renderTab: state.questionReducer.renderTab,
 });
 
 const mapDispatchToProps = dispatch => ({
