@@ -15,7 +15,7 @@ import { Text, Button } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Images, Global, Layout, Gutters, Fonts } from '../../theme';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -33,6 +33,7 @@ const Gender = props => {
     props.updateAnswers(tempData);
     setWelcomeModal(true);
   };
+
   useEffect(() => {
     if (props.answers && props.answers.gender) {
       setGender(props.answers.gender);
@@ -66,7 +67,7 @@ const Gender = props => {
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
                 gender === item ? Global.border : Global.borderB,
-                gender !== item ? Global.borderAlto : '#a5c2d0',
+                gender !== item ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
               onPress={() => setGender(item)}
             >

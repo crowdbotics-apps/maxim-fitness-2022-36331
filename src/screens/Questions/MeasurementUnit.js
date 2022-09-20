@@ -14,7 +14,7 @@ import { Text, Button } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Images, Global, Layout, Gutters, Fonts } from '../../theme';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -58,12 +58,12 @@ const MeasurementUnit = props => {
               key={i}
               style={[
                 Layout.row,
-                Global.height65,
                 Gutters.smallHPadding,
+                Gutters.regularVPadding,
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
                 exerciseLevel === item ? Global.border : Global.borderB,
-                exerciseLevel !== item ? Global.borderAlto : '#a5c2d0',
+                exerciseLevel !== item ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
               onPress={() => setExerciseLevel(item)}
             >

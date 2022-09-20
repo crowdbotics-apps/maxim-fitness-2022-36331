@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 // import { createDrawerNavigator } from "@react-navigation/drawer"
@@ -8,6 +8,7 @@ import { navigationRef } from './NavigationService';
 import AuthStackScreen from './AuthScreens';
 import MainNavigator from './Main';
 import QuestionStackScreen from './QuestionScreens';
+import { getProfile } from '../ScreenRedux/profileRedux'
 
 const authStack = createStackNavigator();
 const mainStack = createStackNavigator();
@@ -15,8 +16,12 @@ const questionStack = createStackNavigator();
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
-  console.log('props.profile.is_survey ', props.profile);
-  useEffect(() => { }, [props.profile])
+  const { renderTab, getProfile, profile, accessToken } = props
+
+  useEffect(() => {
+    renderTab && getProfile()
+  }, [renderTab])
+
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -28,8 +33,8 @@ const Navigation = props => {
       }}
     >
       <authStack.Navigator screenOptions={{ headerShown: false }}>
-        {props.accessToken ?
-          props?.profile?.is_survey ? (
+        {accessToken ?
+          profile?.is_survey ? (
             <mainStack.Screen name="MainStack" component={MainNavigator} />
           ) : (
             <questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
@@ -44,7 +49,12 @@ const Navigation = props => {
 
 const mapStateToProps = state => ({
   accessToken: state.login.accessToken,
-  profile: state.login.profile
+  profile: state.login.userDetail,
+  renderTab: state.questionReducer.renderTab
 });
 
-export default connect(mapStateToProps, null)(Navigation);
+const mapDispatchToProps = dispatch => ({
+  getProfile: () => dispatch(getProfile()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

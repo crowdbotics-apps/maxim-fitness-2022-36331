@@ -221,11 +221,11 @@ async function updateProfile(data, id) {
 function* updateUserData({ data, id }) {
   try {
     const response = yield call(updateProfile, data, id)
-    showMessage({message: 'profile Updated successfully', type: 'success'})
+    showMessage({ message: 'profile Updated successfully', type: 'success' })
     yield put(setUserDetail(response.data))
   } catch (e) {
     const { response } = e
-    showMessage({message: 'Something went wrong', type: 'danger'})
+    showMessage({ message: 'Something went wrong', type: 'danger' })
   } finally {
     yield put(resetProfile())
   }

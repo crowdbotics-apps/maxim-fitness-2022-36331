@@ -1,31 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
+  ScrollView,
   SafeAreaView,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
 } from 'react-native';
-
-//Libraries
-import LinearGradient from 'react-native-linear-gradient';
 import { connect } from 'react-redux';
+
+//Components
+import { Text, Button, InputField } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
+
+//Themes
+import { Global, Layout, Gutters, Fonts } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
 
-//Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/HeaderTitle';
-
 const WeightKg = props => {
-  const {
-    navigation: { navigate },
-  } = props;
-
+  const { navigation: { navigate } } = props;
   const [kilograms, setKilograms] = useState(false);
 
   const onNext = () => {
@@ -39,49 +32,47 @@ const WeightKg = props => {
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.52} showBackButton={true} />
 
-      <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-        <Text
-          style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-          text={'What is your Weight?'}
-        />
-        {/*
-        <Text style={{marginTop: 18}}>
-          This answer has influence on how your program is designed
-        </Text> */}
-      </View>
+      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+        <View style={Gutters.mediumTMargin}>
+          <Text
+            color="commonCol"
+            style={Fonts.titleRegular}
+            text={'What is your Weight?'}
+          />
 
-      <View
-        style={[
-          {
-            height: 65,
-            marginTop: 20,
-            marginHorizontal: 40,
-            justifyContent: 'center',
-            borderBottomWidth: 1,
-            borderBottomColor: '#808080',
-          },
-        ]}
-      >
-        <TextInput
-          style={{ fontSize: 24 }}
-          placeholder={'Kilograms'}
-          keyboardType="number-pad"
-          onChangeText={val => setKilograms(val)}
-          maxLength={3}
-        />
-      </View>
-
-      <View style={{ height: '69%', justifyContent: 'flex-end' }}>
-        <TouchableOpacity
-          style={{ marginHorizontal: 40, marginBottom: 25 }}
-          onPress={() => onNext()}
-          disabled={!kilograms}
-        >
-          <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-            <Text style={styles.loginText}>Next</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        </View>
+        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+          <View
+            style={[
+              Layout.row,
+              Global.height65,
+              Layout.alignItemsCenter,
+              Layout.justifyContentBetween,
+              Global.borderB,
+              Global.borderAlto
+            ]}
+          >
+            <InputField
+              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              value={kilograms}
+              onChangeText={(val) => setKilograms(val)}
+              placeholder='Kilograms'
+              autoCapitalize="none"
+              keyboardType='numeric'
+            />
+          </View>
+        </View>
+        <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
+            disabled={!kilograms}
+            style={Gutters.regularBMargin}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

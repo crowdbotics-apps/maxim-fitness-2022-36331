@@ -14,7 +14,7 @@ import { Text, Button } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Images, Global, Layout, Gutters, Fonts } from '../../theme';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -87,7 +87,7 @@ const ActivityLevel = props => {
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
                 exerciseLevel === item.value ? Global.border : Global.borderB,
-                exerciseLevel !== item.value ? Global.borderAlto : '#a5c2d0',
+                exerciseLevel !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
               onPress={() => setExerciseLevel(item.value)}
             >
@@ -104,7 +104,7 @@ const ActivityLevel = props => {
                   text={item.description}
                 />
               </View>
-              <View style={Layout.fillHalf}>
+              <View style={[Layout.fillHalf, Layout.alignItemsEnd]}>
                 <Image source={Images.forwardIcon} style={styles.rightArrow} />
               </View>
             </TouchableOpacity>

@@ -70,4 +70,5 @@ export default {
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
   greyNext: require('src/assets/images/greyNext.png'),
+  animatedLoader: require('src/assets/images/survey-loader.png')
 };
