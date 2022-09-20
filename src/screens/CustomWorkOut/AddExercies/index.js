@@ -10,11 +10,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
-import {
-  Text,
-  BottomSheet,
- Button,
-} from '../../../components';
+import { Text, BottomSheet, Button } from '../../../components';
 
 import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
 
@@ -29,26 +25,13 @@ const data = [
   { item: 'Triple Set' },
 ];
 const AddExercies = props => {
-const {
-  navigation: { goBack }
-}  = props;
+  const {
+    navigation: { goBack },
+  } = props;
 
-  const {
-    row,
-    fill,
-    center,
-    alignItemsCenter,
-    justifyContentBetween,
-  } = Layout;
+  const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
   let refDescription = useRef('');
-  const {
-    workout1,
-    workout2,
-    workout3,
-    foodImage,
-    iconI,
-    circleClose,
-  } = Images;
+  const { workout1, workout2, workout3, foodImage, iconI, circleClose } = Images;
   const Workout = [
     { Img: workout1 },
     { Img: workout2 },
@@ -74,6 +57,10 @@ const {
       text: 'Add the approite weight for the given rep range',
     },
   ];
+
+  const testArray = [1, 1, 1, 1];
+
+  const [selectedExercise, setSelectedExercise] = useState(false);
   return (
     <SafeAreaView style={[fill, { backgroundColor: 'white' }]}>
       <ScrollView>
@@ -83,7 +70,7 @@ const {
               <Image source={Images.back2} style={{ width: 30, height: 25 }} />
             </TouchableOpacity>
             <View style={[center, fill, {}]}>
-              <TextInput style={[center, { padding: 0 }]} placeholder="search,,," />
+              <TextInput style={[center, { padding: 0 }]} placeholder="Search" />
               <View
                 style={{
                   borderBottomWidth: 1,
@@ -119,7 +106,7 @@ const {
             <Text text="Poupular Exercies" style={styles.heading} />
           </View>
         </View>
-        <View style={styles.cardView}>
+        {/* <View style={styles.cardView}>
           <View style={[row, justifyContentBetween, { position: 'relative' }]}>
             <View style={[center, styles.cardImg]}>
               <Image source={foodImage} style={{ width: 80, height: 40 }} />
@@ -134,19 +121,24 @@ const {
               <Text style={styles.circleText} text={'1'} />
             </View>
           </View>
-        </View>
-        <View style={[styles.cardView, { backgroundColor: '#e5e5e5' }]}>
-          <View style={[row, justifyContentBetween, { position: 'relative' }]}>
-            <View style={[center, styles.cardImg]}>
-              <Image source={foodImage} style={{ width: 80, height: 40 }} />
+        </View> */}
+
+        <View style={{ marginBottom: 20 }}>
+          {testArray.map((item, i) => (
+            <View style={[styles.cardView, { backgroundColor: '#e5e5e5' }]}>
+              <View style={[row, justifyContentBetween, { position: 'relative' }]}>
+                <View style={[center, styles.cardImg]}>
+                  <Image source={foodImage} style={{ width: 80, height: 40 }} />
+                </View>
+                <View style={[center, { marginRight: 50 }]}>
+                  <Text text="Poupular Exercies" style={styles.heading1} />
+                </View>
+                <View style={[center, {}]}>
+                  <Image source={iconI} style={{ width: 20, height: 20, marginRight: 5 }} />
+                </View>
+              </View>
             </View>
-            <View style={[center, { marginRight: 50 }]}>
-              <Text text="Poupular Exercies" style={styles.heading1} />
-            </View>
-            <View style={[center, {}]}>
-              <Image source={iconI} style={{ width: 20, height: 20, marginRight: 5 }} />
-            </View>
-          </View>
+          ))}
         </View>
       </ScrollView>
       <View style={{ alignSelf: 'center' }}>
@@ -303,11 +295,13 @@ const {
   );
 };
 const styles = StyleSheet.create({
-  btn:{ backgroundColor: Colors.brightturquoise,
+  btn: {
+    backgroundColor: Colors.brightturquoise,
     borderRadius: 40,
     paddingHorizontal: 30,
     height: 45,
-    marginTop: 10,},
+    marginTop: 10,
+  },
   heading: {
     fontSize: 30,
     fontWeight: 'bold',
@@ -369,9 +363,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   cardImg: { backgroundColor: 'white', width: 90, height: 60, borderRadius: 10 },
- 
-  
-  
-
 });
 export default AddExercies;

@@ -69,7 +69,7 @@ export default {
   redBin: require('src/assets/images/redBin.png'),
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
-  greyNext: require('src/assets/images/greyNext.png'),,
+  greyNext: require('src/assets/images/greyNext.png'),
   findbtn: require('src/assets/images/findbtn.png'),
   workoutbtn: require('src/assets/images/workoutbtn.png'),
   workout1: require('src/assets/images/workout1.png'),
@@ -79,8 +79,7 @@ export default {
   circle: require('src/assets/images/circle.png'),
   back2: require('src/assets/images/back2.png'),
   iconI:require('src/assets/images/iconI.png'),
-
-
+  duplicateIcon:require('src/assets/images/duplicateIcon.png'),
 
 
 };

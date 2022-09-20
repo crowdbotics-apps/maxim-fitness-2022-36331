@@ -10,23 +10,42 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import { Text, BottomSheet, Button } from '../../components';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import { Images } from 'src/theme';
 import { connect } from 'react-redux';
-import ImagePicker from 'react-native-image-crop-picker';
+
+//Components
+import { Text, BottomSheet, Button } from '../../components';
+
+//Screens
 import { editProfile } from '../../ScreenRedux/profileRedux';
 
+//Libraries
+import Modal from 'react-native-modal';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import ImagePicker from 'react-native-image-crop-picker';
+
+//Themes
+import { Images } from 'src/theme';
+
 const CustomExercise = props => {
-  const { backArrow, profileBackGround, redBin, circleClose, radioBlue, doneImg, greyNext } =
-    Images;
+  const {
+    backArrow,
+    profileBackGround,
+    redBin,
+    circleClose,
+    radioBlue,
+    doneImg,
+    greyNext,
+    duplicateIcon,
+  } = Images;
   const { navigation } = props;
   const { width, height } = Dimensions.get('window');
 
   const [secondView, setSecondView] = useState(false);
   const [reps, setReps] = useState('');
-  const [minutes, setMinutes] = useState('');
-  const [seconds, setSeconds] = useState('');
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+
+  const [deleteModal, setDeleteModal] = useState(false);
 
   //BottomSheetRefs
   const refRBSheet = useRef();
@@ -36,10 +55,30 @@ const CustomExercise = props => {
   const [dualSets, setDualSets] = useState([]);
   const [dualSetState, setDualSetState] = useState(1);
 
+  const [currentIndex, setCurrentIndex] = useState(false);
+
   const numberOfExercise = 2;
 
   const ex1 = 'Exercise 1';
   const ex2 = 'Exercise 2';
+
+  const duplicateSet = () => {
+    const newArray = [...sets, sets[currentIndex]];
+    setSets(newArray);
+  };
+
+  const deleteSet = () => {
+    const newArray = [...sets];
+    newArray.splice(currentIndex, 1);
+    setSets(newArray);
+    setDeleteModal(false);
+  };
+
+  const resetValues = () => {
+    setReps('');
+    setMinutes(0);
+    setSeconds(0);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -73,7 +112,11 @@ const CustomExercise = props => {
             borderBottomColor: '#e9e9e9',
           }}
         >
-          <Text style={{ color: '#929292', fontSize: 20, fontWeight: '600' }}>Workout Title</Text>
+          <TextInput
+            placeholderTextColor={'#929292'}
+            placeholder="Workout Title"
+            style={{ fontSize: 20, fontWeight: '600' }}
+          />
         </View>
 
         <View style={styles.tableView}>
@@ -159,12 +202,13 @@ const CustomExercise = props => {
           <View style={{ marginTop: 7 }}>
             {numberOfExercise === 1 &&
               sets.map((item, i) => (
-                <View
+                <TouchableOpacity
+                  onPress={() => setCurrentIndex(i)}
                   style={{
                     marginHorizontal: 38,
                     flexDirection: 'row',
                     justifyContent: 'space-around',
-                    backgroundColor: '#9cdaff',
+                    backgroundColor: currentIndex === i ? '#9cdaff' : '#f3f1f4',
                     marginTop: 5,
                     height: 35,
                     borderRadius: 6,
@@ -178,7 +222,7 @@ const CustomExercise = props => {
                   <Text style={{ color: '#5e5e5e', fontWeight: '700' }}>
                     {!item.rest ? '-' : item.rest}
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))}
             {numberOfExercise === 2 && (
               <View style={styles.dualSets}>
@@ -300,8 +344,29 @@ const CustomExercise = props => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ marginHorizontal: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
-            <Image source={redBin} style={{ height: 22, width: 20 }} />
+          <View
+            style={{
+              marginHorizontal: 10,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 20,
+            }}
+          >
+            <TouchableOpacity
+              style={{ flexDirection: 'row' }}
+              onPress={() => duplicateSet()}
+              disabled={currentIndex ? false : true}
+            >
+              <Image source={duplicateIcon} style={{ height: 22, width: 20 }} />
+              <Text style={{ fontWeight: '500', color: '#7e7e7e', marginLeft: 10 }}>Duplicate</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setDeleteModal(true)}
+              disabled={currentIndex ? false : true}
+            >
+              <Image source={redBin} style={{ height: 22, width: 20 }} />
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -437,6 +502,7 @@ const CustomExercise = props => {
                     { reps: reps, rest: minutes * 60 + parseFloat(seconds) },
                   ]);
                   refRBSheet.current.close();
+                  resetValues();
                 }}
                 disabled={reps !== '' ? false : true}
               >
@@ -604,6 +670,44 @@ const CustomExercise = props => {
           </ScrollView>
         </View>
       </RBSheet>
+
+      <Modal
+        isVisible={deleteModal}
+        animationIn="zoomIn"
+        animationOut={'zoomOut'}
+        onBackdropPress={() => setDeleteModal(false)}
+      >
+        <View
+          style={{
+            height: 250,
+            marginHorizontal: 20,
+            backgroundColor: '#fff',
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 24, fontWeight: '700', textAlign: 'center' }}>
+            Are you sure you want to delete this set?
+          </Text>
+
+          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+            <TouchableOpacity
+              style={[styles.delBtnStyles, { backgroundColor: '#74ccff' }]}
+              onPress={() => deleteSet()}
+            >
+              <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
+            </TouchableOpacity>
+            <View style={{ marginHorizontal: 20 }}></View>
+            <TouchableOpacity
+              style={[styles.delBtnStyles, { backgroundColor: '#f3f1f4' }]}
+              onPress={() => setDeleteModal(false)}
+            >
+              <Text style={{ fontWeight: '700', color: '#000' }}>No</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -684,6 +788,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     // paddingBottom: 10,
     justifyContent: 'space-around',
+  },
+  delBtnStyles: {
+    width: 80,
+    height: 50,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
