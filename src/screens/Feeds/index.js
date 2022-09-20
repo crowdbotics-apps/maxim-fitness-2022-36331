@@ -95,6 +95,7 @@ const Feeds = props => {
         }
         onPressPlus={() => navigation.navigate('AddPost')}
         onPressSearch={()=> navigation.navigate('SearchProfile')}
+        onAvatarChange={()=> navigation.navigate('SettingScreen')}
       />
       <Text style={styles.content} text="Latest" />
 

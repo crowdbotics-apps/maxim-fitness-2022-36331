@@ -19,7 +19,7 @@ import { Content, Icon } from 'native-base';
 import { Layout, Global, Gutters, Colors, Images } from '../../theme';
 import { calculatePostTime } from '../../utils/functions';
 import { TabOne, TabThree } from './components';
-import { getCustomCalRequest } from '../../ScreenRedux/customCalRedux';
+import { getCustomCalRequest, getMealsRequest } from '../../ScreenRedux/customCalRedux';
 
 const CustormCalories = (props) => {
   let refWeight = useRef('');
@@ -30,10 +30,12 @@ const CustormCalories = (props) => {
   const [showModalHistory, setShowModalHistory] = useState(false);
 
   console.log('getCalories: ', props.getCalories)
+  console.log('meals: ', props.meals);
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       props.getCustomCalRequest()
+      props.getMealsRequest()
     });
     return unsubscribe;
   }, [props.navigation]);
@@ -69,7 +71,7 @@ const CustormCalories = (props) => {
     smallHMargin,
   } = Gutters;
 
-  const data = ['Home', 'Exercise', 'Nutrition', 'Health'];
+  const data = ['Home', 'Exercise', 'Nutrition'];
 
   const myHealthData = [
     'Disease',
@@ -138,7 +140,7 @@ const CustormCalories = (props) => {
           </Content>
         )}
         {tab === 2 && (
-          <TabThree />
+          <TabThree navigation={props.navigation} />
         )}
         {tab === 3 && (
           <>
@@ -291,6 +293,7 @@ const CustormCalories = (props) => {
             color="primary"
             text="Update"
             style={[regularHMargin, fill, center]}
+            onPress={() => refWeight.current.close()}
           />
         </View>
       </BottomSheet>
@@ -486,9 +489,12 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   getCalories: state.customCalReducer.getCalories,
+  meals: state.customCalReducer.meals
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCustomCalRequest: () => dispatch(getCustomCalRequest())
+  getCustomCalRequest: () => dispatch(getCustomCalRequest()),
+  getMealsRequest: () => dispatch(getMealsRequest()),
+
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustormCalories);

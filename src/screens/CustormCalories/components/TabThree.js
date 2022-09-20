@@ -4,7 +4,7 @@ import * as Progress from 'react-native-progress';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 
-const TabThree = ({ setShowModalHistory }) => {
+const TabThree = ({ setShowModalHistory, navigation }) => {
 
   const {
     row,
@@ -164,6 +164,7 @@ const TabThree = ({ setShowModalHistory }) => {
           <Text
             text="Edit"
             color="nonary"
+            onPress={() => navigation.navigate('EditCustomCal')}
           />
         </View>
         <Text text={`${6} meals`} color="nonary" />
