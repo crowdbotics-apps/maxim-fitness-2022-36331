@@ -29,6 +29,7 @@
     "native-base": "^2.15.2",
     "react": "17.0.1",
     "react-native": "0.64.2",
+    "react-native-calendar-strip": "^2.2.6",
     "react-native-countdown-component": "^2.7.1",
     "react-native-date-picker": "^4.2.5",
     "react-native-dotenv": "^2.5.3",

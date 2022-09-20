@@ -60,7 +60,7 @@ export default {
   cameraIcon: require('src/assets/images/cameraIcon.png'),
   followingButton: require('src/assets/images/followingButton.png'),
   editProfileButton: require('src/assets/images/editProfileButton.png'),
-  otLogo: require('src/assets/images/otLogo.png'),
+  otLogo: require('src/assets/images/otLogo.png'),   
   downIcon: require('src/assets/images/downIcon.png'),
   backImage: require('src/assets/images/backImage.png'),
   searchImage: require('src/assets/images/searchImage.png'),
@@ -69,5 +69,18 @@ export default {
   redBin: require('src/assets/images/redBin.png'),
   radioBlue: require('src/assets/images/radioBlue.png'),
   doneImg: require('src/assets/images/doneImg.png'),
-  greyNext: require('src/assets/images/greyNext.png'),
+  greyNext: require('src/assets/images/greyNext.png'),,
+  findbtn: require('src/assets/images/findbtn.png'),
+  workoutbtn: require('src/assets/images/workoutbtn.png'),
+  workout1: require('src/assets/images/workout1.png'),
+  workout2: require('src/assets/images/workout2.png'),
+  workout3: require('src/assets/images/workout3.png'),
+  threeLine: require('src/assets/images/threeLine.png'),
+  circle: require('src/assets/images/circle.png'),
+  back2: require('src/assets/images/back2.png'),
+  iconI:require('src/assets/images/iconI.png'),
+
+
+
+
 };
