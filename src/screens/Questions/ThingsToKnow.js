@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Image,
+  Dimensions,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -17,11 +18,14 @@ import { connect } from 'react-redux';
 
 //Components
 import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import HeaderTitle from './Components/HeaderTitle';
 import { submitQuestionRequest } from './Redux';
 
 //Themes
 import Images from '../../theme/Images';
+import Slider from 'react-native-slide-to-unlock';
+import LinearGradient from 'react-native-linear-gradient';
+import { Icon } from 'native-base';
 
 const ThingsToKnow = props => {
 
@@ -32,7 +36,23 @@ const ThingsToKnow = props => {
   } = props;
 
   console.log('answers: ', answers);
-  const { forwardIcon, otLogo } = Images;
+  const deviceWidth = Dimensions.get('window').width
+
+  const data = {
+    gender: answers?.gender,
+    dob: answers?.dob,
+    weight: answers?.weight,
+    height: answers?.height,
+    unit: answers?.unit,
+    exercise_level: answers?.exercise_level,
+    activity_level: answers?.activity_level,
+    understanding_level: answers?.understanding_level,
+    number_of_meal: answers?.number_of_meal.value,
+    number_of_training_days: answers?.number_of_training_days,
+    fitness_goal: answers?.fitness_goal,
+    date_time: answers?.mealTimes,
+    request_type: 'question',
+  };
 
   const thingsArray = [
     {
@@ -65,7 +85,7 @@ const ThingsToKnow = props => {
           marginHorizontal: 40,
           marginTop: 20,
         }}
-        onPress={() => props.submitQuestionRequest(profile, answers)}
+        onPress={() => props.submitQuestionRequest(profile, data)}
       >
         <Text style={{ fontSize: 16, color: '#377eb5' }} >Cancel</Text>
       </TouchableOpacity>
@@ -76,16 +96,15 @@ const ThingsToKnow = props => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
 
         <View>
-          {thingsArray.map(item => (
+          {thingsArray.map((item, i) => (
             <View
+              key={i}
               style={{
                 marginHorizontal: 40,
                 backgroundColor: '#d3d3d3',
                 borderRadius: 18,
                 paddingBottom: 20,
                 marginVertical: 10,
-
-                // height: 100  ,
               }}
             >
               <View
@@ -116,6 +135,43 @@ const ThingsToKnow = props => {
               <Text style={{ marginHorizontal: 10, marginTop: 8 }}>{item.description}</Text>
             </View>
           ))}
+        </View>
+        <View style={{ marginVertical: 10, justifyContent: 'center', alignItems: 'center' }}>
+          <Slider
+            childrenContainer={{}}
+            onEndReached={() => props.submitQuestionRequest(profile, data)}
+            containerStyle={{
+              margin: 8,
+              width: deviceWidth - 80,
+              borderRadius: 10,
+              overflow: 'hidden',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#d3d3d3',
+            }}
+            sliderElement={
+              <LinearGradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                colors={['#6EC2FA', '#3180BD']}
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 10,
+                }}
+              >
+                <View style={{ width: 50, height: 50, margin: 5, borderRadius: 10 }}>
+                  <Icon
+                    type="FontAwesome5"
+                    name="arrow-right"
+                    style={{ color: 'white', alignSelf: 'center', marginTop: 10 }}
+                  />
+                </View>
+              </LinearGradient>
+            }
+          >
+            <Text style={{ fontWeight: 'bold', color: 'black' }}>{'Slide to Accept'}</Text>
+          </Slider>
         </View>
       </ScrollView>
     </SafeAreaView>

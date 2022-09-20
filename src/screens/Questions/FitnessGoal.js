@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
+  Modal,
   Image,
   StyleSheet,
   ScrollView,
@@ -14,47 +15,58 @@ import { Text, Button } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Images, Global, Layout, Gutters, Fonts } from '../../theme';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
 
-const ExerciseLevel = props => {
+const FitnessGoal = props => {
   const { navigation: { navigate } } = props;
-  const [exerciseLevel, setExerciseLevel] = useState(false);
-
-  useEffect(() => {
-    if (props.answers && props.answers.exercise_level) {
-      setExerciseLevel(props.answers.exercise_level);
-    }
-  }, []);
 
   const exerciseArray = [
-    { heading: 'Sedantry', description: 'No exercise experience', value: 1 },
-    { heading: 'Intermediate', description: 'less than 2 years of training, off and on', value: 2 },
-    { heading: 'Advanced', description: 'more than 2 years of dedicated training', value: 3 },
+    {
+      value: 1,
+      heading: 'Fat loss',
+      description: 'weight loss, figure change, general wellness',
+    },
+    {
+      value: 2,
+      heading: 'Strength and Hypertrophy',
+      description: 'powerlifting and bodybuilding',
+    },
+    {
+      value: 3,
+      heading: 'Maintenance',
+      description: 'maintain current weight/figure',
+    },
   ];
+
+  const [exerciseLevel, setExerciseLevel] = useState(false);
 
   const onNext = () => {
     const tempData = props.answers;
-    tempData.exercise_level = exerciseLevel;
+    tempData.fitness_goal = exerciseLevel;
     props.updateAnswers(tempData);
-    navigate('ActivityLevel');
+    navigate('TrainingDays');
   };
+  useEffect(() => {
+    if (props.answers && props.answers.fitness_goal) {
+      setExerciseLevel(props.answers.fitness_goal);
+    }
+  }, []);
 
-  console.log('answers', props.answers);
+  console.log('answersss', props.answers);
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
-      <HeaderTitle percentage={0.18} showBackButton />
+      <HeaderTitle percentage={0.57} showBackButton={true} />
       <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
         <View style={Gutters.mediumTMargin}>
           <Text
             color="commonCol"
             style={Fonts.titleRegular}
-            text={'What is level of your exercise?'}
+            text={'What is your fitness goal?'}
           />
-
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           {exerciseArray.map((item, i) => (
@@ -62,25 +74,22 @@ const ExerciseLevel = props => {
               key={i}
               style={[
                 Layout.row,
-                Global.height65,
                 Gutters.smallHPadding,
+                Gutters.regularVPadding,
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
                 exerciseLevel === item.value ? Global.border : Global.borderB,
-                exerciseLevel !== item.value ? Global.borderAlto : '#a5c2d0',
+                exerciseLevel !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
               onPress={() => setExerciseLevel(item.value)}
             >
               <View style={[Layout.justifyContentBetween]}>
                 <Text
                   text={item.heading}
-                  color="commonCol"
-                  style={Fonts.titleSmall}
-                  bold
+                  style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}
                 />
                 <Text
-                  color="commonCol"
-                  style={[Fonts.textMedium, Gutters.tinyTMargin]}
+                  style={{ color: '#7d7d7d', marginTop: 5 }}
                   text={item.description}
                 />
               </View>
@@ -114,4 +123,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   updateAnswers: data => dispatch(updateAnswer(data)),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(ExerciseLevel);
+export default connect(mapStateToProps, mapDispatchToProps)(FitnessGoal);

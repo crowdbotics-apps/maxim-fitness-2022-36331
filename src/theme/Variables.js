@@ -12,7 +12,7 @@ export const Colors = {
   transparent: 'rgba(0,0,0,0)',
   white: '#ffffff',
   black: '#000000',
-  primary: '#07808F',
+  primary: '#048ECC',
   secondary: '#ffffff',
   deepsapphire: '#093766',
   cinnamon: '#795401',
@@ -25,6 +25,8 @@ export const Colors = {
   athensgraySecond: '#F3F1F4',
   nobel: '#B4B1B1',
   azureradiance: '#019EF3',
+  commonCol: '#6f6f6f',
+  newCol: '#808080',
 
   // new added color
   punch: '#db3b26',

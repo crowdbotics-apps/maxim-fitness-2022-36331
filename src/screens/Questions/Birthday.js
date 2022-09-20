@@ -1,31 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
   Modal,
+  StyleSheet,
+  Dimensions,
   ScrollView,
+  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import moment from 'moment';
+import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
+import { Global, Layout, Gutters, Fonts } from '../../theme';
 
 //Libraries
 import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
-import { connect } from 'react-redux';
-import moment from 'moment';
 import { updateAnswer } from './Redux';
 
 const Birthday = props => {
-  const {
-    navigation: { navigate },
-  } = props;
+  const { navigation: { navigate } } = props;
+  const deviceWidth = Dimensions.get('window').width
 
   const [dateModal, setDateModal] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -36,74 +34,72 @@ const Birthday = props => {
     tempData.dob = navState;
     navigate('Gender');
   };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.02} showBackButton={false} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+        <View style={Gutters.mediumTMargin}>
           <Text
-            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            color="commonCol"
+            style={Fonts.titleRegular}
             text={'When were you born?'}
           />
-          {/*
-        <Text style={{marginTop: 18}}>
-          This answer has influence on how your program is designed
-        </Text> */}
-        </View>
-
-        <TouchableOpacity
-          style={[
-            {
-              height: 65,
-              marginTop: 20,
-              marginHorizontal: 40,
-              justifyContent: 'center',
-              borderBottomWidth: 1,
-              borderBottomColor: '#808080',
-            },
-          ]}
-          onPress={() => setDateModal(true)}
-        >
-          <Text style={{ fontSize: 24, color: '#d3d3d3', fontWeight: '500' }}>
-            {navState ? navState : 'Birthday'}
-          </Text>
-        </TouchableOpacity>
-        <View style={{ height: '68%', justifyContent: 'flex-end' }}>
           <TouchableOpacity
-            style={{ marginHorizontal: 40, marginBottom: 25 }}
-            onPress={() => onNext()}
-            disabled={!navState}
+            style={[
+              Global.borderB,
+              Global.height60,
+              Global.borderNewCol,
+              Gutters.regularTMargin,
+              Layout.justifyContentCenter,
+            ]}
+            onPress={() => setDateModal(true)}
           >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
+            <Text
+              style={Fonts.titleRegular}
+              color={navState ? "quinary" : "altoCol"}
+              text={navState ? navState : 'Birthday'}
+            />
           </TouchableOpacity>
         </View>
+        <View style={Layout.justifyContentEnd}>
+          <Button
+            text={'Next'}
+            color="primary"
+            style={Gutters.regularBMargin}
+            onPress={onNext}
+            block
+            disabled={!navState}
+          />
+        </View>
       </ScrollView>
-      <Modal visible={dateModal} style={{ flex: 1 }} animationType="slide" transparent={true}>
-        <View style={[{ backgroundColor: 'rgba(0, 0, 0, 0.85);', flex: 1 }, styles.centeredView]}>
+      <Modal visible={dateModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <View style={[Global.halfTransparentBg, Layout.fill, Layout.alignItemsCenter, Layout.justifyContentCenter]}>
           <DatePicker
             date={date}
+            mode="date"
             onDateChange={val => {
               const dob = moment(val).format('YYYY-MM-DD');
               setNavState(dob);
             }}
             androidVariant="iosClone"
-            style={{ backgroundColor: '#fff' }}
-            mode="date"
+            style={Global.secondaryBg}
           />
 
           <TouchableOpacity
-            style={{ width: '80%', marginVertical: 25 }}
+            style={[Gutters.small2xVMargin, { width: deviceWidth - 100 }]}
             onPress={() => setDateModal(false)}
           >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
+            <LinearGradient style={styles.gradientStyle} colors={['#048ECC', '#0460BB', '#0480C6']}>
               <Text style={styles.loginText}>Select Date of Birth</Text>
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ width: '80%' }} onPress={() => setDateModal(false)}>
-            <LinearGradient style={[styles.logInButton]} colors={['#e52b39', '#ef3d49', '#fb5a60']}>
+          <TouchableOpacity
+            style={{ width: deviceWidth - 100 }}
+            onPress={() => setDateModal(false)}
+          >
+            <LinearGradient style={styles.gradientStyle} colors={['#e52b39', '#ef3d49', '#fb5a60']}>
               <Text style={styles.loginText}>Cancel</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -114,22 +110,14 @@ const Birthday = props => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
+  gradientStyle: {
     height: 53,
-    borderRadius: 12,
+    borderRadius: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loginText: {
-    fontSize: 16,
+    fontSize: 20,
     color: 'white',
     fontWeight: '700',
   },

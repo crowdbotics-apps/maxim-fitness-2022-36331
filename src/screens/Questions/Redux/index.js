@@ -5,6 +5,7 @@ import { API_URL } from '../../../config/app';
 
 //XHR
 import XHR from '../../../utils/XHR';
+import { getProfile } from '../../../ScreenRedux/profileRedux'
 
 const UPDATE_ANSWERS = 'Questions/redux/UPDATE_ANSWERS';
 
@@ -111,6 +112,7 @@ function* submitQuestion({ profile, data }) {
     const res = yield call(profileDataAPI, profile, data);
     if (res) {
       yield call(submitQuestionAPI, data);
+      yield call(getProfile())
     }
     yield put(submitQuestionSuccess(true));
   } catch (error) {

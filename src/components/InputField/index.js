@@ -28,7 +28,7 @@ const InputField = ({
 
 const styles = StyleSheet.create({
   textInput: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '400',
     color: Colors.black,
     borderColor: Colors.steel,

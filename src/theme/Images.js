@@ -65,4 +65,9 @@ export default {
   backImage: require('src/assets/images/backImage.png'),
   searchImage: require('src/assets/images/searchImage.png'),
   messageImage: require('src/assets/images/messageIcon.png'),
+  downIcon: require('src/assets/images/downIcon.png'),
+  redBin: require('src/assets/images/redBin.png'),
+  radioBlue: require('src/assets/images/radioBlue.png'),
+  doneImg: require('src/assets/images/doneImg.png'),
+  greyNext: require('src/assets/images/greyNext.png'),
 };

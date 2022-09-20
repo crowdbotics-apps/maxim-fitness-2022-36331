@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { Colors } from 'src/theme'
+import { Colors } from '../../theme'
 
 export default StyleSheet.create({
   boldFont: { fontWeight: 'bold' },
@@ -12,4 +12,6 @@ export default StyleSheet.create({
   septenary: { color: Colors.nobel },
   octonary: { color: Colors.brightturquoisesecond },
   nonary: { color: Colors.azureradiance },
+  commonCol: { color: Colors.commonCol },
+  altoCol: { color: Colors.alto }
 });
