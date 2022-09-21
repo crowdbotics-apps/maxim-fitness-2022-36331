@@ -15,6 +15,8 @@ import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 import Video from 'react-native-video';
+import ImageView from 'react-native-image-viewing';
+import Modal from 'react-native-modal';
 
 //action
 import {
@@ -30,6 +32,10 @@ const ProfileScreen = props => {
   const { navigation, route, profileData, userDetail, routeData, routeDetail } = props;
   const [follow, setFollow] = useState(profileData?.follow);
   const [showVideo, setShowVideo] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [visible, setIsVisible] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   const {
     profileBackGround,
     whiteBackArrow,
@@ -75,6 +81,15 @@ const ProfileScreen = props => {
           props.followUser({ id: routeDetail ? routeDetail?.user?.id : userDetail.id }),
         ];
   };
+  let imagesArray = [];
+  const renderImages = () => {
+    if (profileData?.post_image?.length) {
+      profileData?.post_image.map(item => {
+        imagesArray.push({ uri: item.image });
+      });
+      return imagesArray;
+    }
+  };
 
   const blockRequestedUser = () => {
     let apiData = {
@@ -114,6 +129,10 @@ const ProfileScreen = props => {
   };
 
   const onPullToRefresh = () => {
+    setShowLoader(true);
+    setTimeout(() => {
+      setShowLoader(false);
+    }, 10);
     if (routeDetail) {
       props.getProfile(routeDetail?.user?.id);
     } else {
@@ -124,234 +143,283 @@ const ProfileScreen = props => {
   const { width, height } = Dimensions.get('window');
   const refRBSheet = useRef();
   return (
-    <SafeAreaView>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        refreshControl={
-          <RefreshControl
-            colors={['#9Bd35A', '#689F38']}
-            refreshing={props.requesting}
-            onRefresh={() => onPullToRefresh()}
-            progressViewOffset={20}
-          />
-        }
-      >
-        <Loader isLoading={props.requesting} />
-        <View>
-          <ImageBackground
-            source={profileBackGround}
-            style={{ height: (273 / 375) * width, width: '100%' }}
-          >
-            <View style={styles.backgroundStyle}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.goBack(), props.routeData(false);
-                }}
-              >
-                <Image source={whiteBackArrow} style={{ height: 15, width: 20 }} />
-              </TouchableOpacity>
-              {!(userDetail?.id === routeDetail?.user?.id || !routeDetail) && (
-                <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                  <Image
-                    source={whiteDots}
-                    style={{ height: 15, width: 25, resizeMode: 'contain' }}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </ImageBackground>
-          <View style={styles.profileImage}>
-            <Image
+    <>
+      <SafeAreaView>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              colors={['#9Bd35A', '#689F38']}
+              refreshing={showLoader}
+              onRefresh={() => onPullToRefresh()}
+              progressViewOffset={20}
+            />
+          }
+        >
+          <Loader isLoading={props.requesting} />
+          <View>
+            <ImageBackground
               source={profileBackGround}
-              style={{
-                height: 100,
-                width: 100,
-                borderRadius: 50,
-                borderWidth: 2,
-                borderColor: 'white',
-              }}
-            />
+              style={{ height: (273 / 375) * width, width: '100%' }}
+            >
+              <View style={styles.backgroundStyle}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.goBack(), props.routeData(false);
+                  }}
+                >
+                  <Image source={whiteBackArrow} style={{ height: 15, width: 20 }} />
+                </TouchableOpacity>
+                {!(userDetail?.id === routeDetail?.user?.id || !routeDetail) && (
+                  <TouchableOpacity onPress={() => refRBSheet.current.open()}>
+                    <Image
+                      source={whiteDots}
+                      style={{ height: 15, width: 25, resizeMode: 'contain' }}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </ImageBackground>
+            <View style={styles.profileImage}>
+              <Image
+                source={profileBackGround}
+                style={{
+                  height: 100,
+                  width: 100,
+                  borderRadius: 50,
+                  borderWidth: 2,
+                  borderColor: 'white',
+                }}
+              />
+            </View>
           </View>
-        </View>
-        <View style={{ paddingHorizontal: 40, flexDirection: 'row' }}>
-          <View style={{ width: 150 }}>
-            <Text
-              style={[styles.mainTextStyle, { marginTop: 60 }]}
-              text={profileData?.user_detail?.username}
-            />
-            <Text style={styles.subTextStyle} text={profileData?.user_detail?.email} />
+          <View style={{ paddingHorizontal: 40, flexDirection: 'row' }}>
+            <View style={{ width: 150 }}>
+              <Text
+                style={[styles.mainTextStyle, { marginTop: 60 }]}
+                text={profileData?.user_detail?.username}
+              />
+              <Text style={styles.subTextStyle} text={profileData?.user_detail?.email} />
+            </View>
+            <TouchableOpacity onPress={() => renderData()}>
+              <Image
+                source={
+                  userDetail?.id === routeDetail?.user?.id || !routeDetail
+                    ? editProfileButton
+                    : follow
+                    ? followingButton
+                    : followButton
+                }
+                style={{ height: 60, width: 120, marginTop: 10, marginLeft: 40 }}
+              />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => renderData()}>
-            <Image
-              source={
-                userDetail?.id === routeDetail?.user?.id || !routeDetail
-                  ? editProfileButton
-                  : follow
-                  ? followingButton
-                  : followButton
-              }
-              style={{ height: 60, width: 120, marginTop: 10, marginLeft: 40 }}
-            />
-          </TouchableOpacity>
-        </View>
-        <Text
-          style={{
-            fontSize: 14,
-            color: 'gray',
-            paddingHorizontal: 30,
-            marginTop: 20,
-            textAlign: 'center',
-          }}
-          text={profileData?.user_detail?.description}
+          <Text
+            style={{
+              fontSize: 14,
+              color: 'gray',
+              paddingHorizontal: 30,
+              marginTop: 20,
+              textAlign: 'center',
+            }}
+            text={profileData?.user_detail?.description}
+          />
+          <View
+            style={{
+              paddingHorizontal: 50,
+              marginTop: 20,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <Text style={styles.mainTextStyle} text={profileData?.follower?.toString()} />
+              <Text style={styles.subTextStyle} text="Followers" />
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={styles.mainTextStyle} text="150K" />
+              <Text style={styles.subTextStyle} text="Likes" />
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={styles.mainTextStyle} text={profileData?.post?.toString()} />
+              <Text style={styles.subTextStyle} text="Posts" />
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
+            <TouchableOpacity onPress={() => setShowVideo(false)}>
+              <Text
+                style={{ fontSize: 20, fontWeight: 'bold', color: showVideo ? 'gray' : '#635eff' }}
+                text="Pictures"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowVideo(true)}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  paddingLeft: 40,
+                  color: showVideo ? '#635eff' : 'gray',
+                }}
+                text="Videos"
+              />
+            </TouchableOpacity>
+          </View>
+          {calculatedData()?.length &&
+            calculatedData().map((item, i) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: i % 2 === 0 ? 'row' : 'row-reverse',
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                  }}
+                >
+                  {showVideo && item[0]?.video ? (
+                    <TouchableOpacity onPress={() => setShowModal(item[0]?.video)}>
+                      <Video
+                        source={{
+                          uri: item[0]?.video,
+                        }}
+                        style={{
+                          height: (300 / 375) * width,
+                          width: (175 / 375) * width,
+                          borderRadius: 20,
+                          borderWidth: 1,
+                        }}
+                        resizeMode="cover"
+                        posterResizeMode="cover"
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={() => setIsVisible(true)}>
+                      <Image
+                        source={{ uri: item[0]?.image }}
+                        style={{
+                          height: (300 / 375) * width,
+                          width: (175 / 375) * width,
+                          borderRadius: 20,
+                        }}
+                      />
+                    </TouchableOpacity>
+                  )}
+                  <View
+                    style={{ marginLeft: i % 2 === 0 ? 10 : 0, marginRight: i % 2 === 0 ? 0 : 10 }}
+                  >
+                    {showVideo ? (
+                      <Video
+                        source={{
+                          uri: item[1]?.video,
+                        }}
+                        style={{
+                          height: (145 / 375) * width,
+                          width: (175 / 375) * width,
+                          borderRadius: 20,
+                        }}
+                        resizeMode="cover"
+                        posterResizeMode="cover"
+                      />
+                    ) : (
+                      <TouchableOpacity onPress={() => setIsVisible(true)}>
+                        <Image
+                          source={{ uri: item[1]?.image }}
+                          style={{
+                            height: (145 / 375) * width,
+                            width: (175 / 375) * width,
+                            borderRadius: 20,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {showVideo ? (
+                      <Video
+                        source={{
+                          uri: item[1]?.video,
+                        }}
+                        style={{
+                          height: (145 / 375) * width,
+                          width: (175 / 375) * width,
+                          borderRadius: 20,
+                          marginTop: 10,
+                        }}
+                        resizeMode="cover"
+                        posterResizeMode="cover"
+                      />
+                    ) : (
+                      <TouchableOpacity onPress={() => setIsVisible(true)}>
+                        <Image
+                          source={{ uri: item[1]?.image }}
+                          style={{
+                            height: (145 / 375) * width,
+                            width: (175 / 375) * width,
+                            borderRadius: 20,
+                            marginTop: 10,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
+        </ScrollView>
+        <BottomSheet reff={refRBSheet} h={200}>
+          <View style={{ marginTop: 30, paddingHorizontal: 40 }}>
+            <TouchableOpacity
+              style={{ flexDirection: 'row' }}
+              onPress={() => [reportUserRequest(), refRBSheet.current.close()]}
+            >
+              <Image source={flagIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
+              <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Report User'} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ flexDirection: 'row', marginTop: 20 }}
+              onPress={() => [blockRequestedUser(), refRBSheet.current.close()]}
+            >
+              <Image source={blockIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
+              <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Block User'} />
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+        <ImageView
+          images={renderImages()}
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
         />
+      </SafeAreaView>
+      <Modal
+        isVisible={showModal}
+        onBackdropPress={() => setShowModal(false)}
+        style={{ flex: 1, margin: 0 }}
+      >
         <View
           style={{
-            paddingHorizontal: 50,
-            marginTop: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            backgroundColor: 'white',
+            paddingHorizontal: 20,
+            flex: 1,
           }}
         >
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.mainTextStyle} text={profileData?.follower?.toString()} />
-            <Text style={styles.subTextStyle} text="Followers" />
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.mainTextStyle} text="150K" />
-            <Text style={styles.subTextStyle} text="Likes" />
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.mainTextStyle} text={profileData?.post?.toString()} />
-            <Text style={styles.subTextStyle} text="Posts" />
-          </View>
+          <Video
+            source={{
+              uri: showModal,
+            }}
+            style={{ height: 300, width: '100%' }}
+            muted={false}
+            repeat={true}
+            // onEnd={() => setStart(false)}
+            resizeMode="cover"
+            rate={1}
+            posterResizeMode="cover"
+            playInBackground={true}
+            playWhenInactive={true}
+            ignoreSilentSwitch="ignore"
+            disableFocus={true}
+            mixWithOthers={'mix'}
+            controls={true}
+          />
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-          <TouchableOpacity onPress={() => setShowVideo(false)}>
-            <Text
-              style={{ fontSize: 20, fontWeight: 'bold', color: showVideo ? 'gray' : '#635eff' }}
-              text="Pictures"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowVideo(true)}>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                paddingLeft: 40,
-                color: showVideo ? '#635eff' : 'gray',
-              }}
-              text="Videos"
-            />
-          </TouchableOpacity>
-        </View>
-        {calculatedData()?.length &&
-          calculatedData().map((item, i) => {
-            return (
-              <View
-                style={{
-                  flexDirection: i % 2 === 0 ? 'row' : 'row-reverse',
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                }}
-              >
-                {showVideo && item[0]?.video ? (
-                  <Video
-                    source={{
-                      uri: item[0]?.video,
-                    }}
-                    style={{
-                      height: (300 / 375) * width,
-                      width: (175 / 375) * width,
-                      borderRadius: 20,
-                    }}
-                    resizeMode="cover"
-                    posterResizeMode="cover"
-                  />
-                ) : (
-                  <Image
-                    source={{ uri: item[0]?.image }}
-                    style={{
-                      height: (300 / 375) * width,
-                      width: (175 / 375) * width,
-                      borderRadius: 20,
-                    }}
-                  />
-                )}
-                <View
-                  style={{ marginLeft: i % 2 === 0 ? 10 : 0, marginRight: i % 2 === 0 ? 0 : 10 }}
-                >
-                  {showVideo ? (
-                    <Video
-                      source={{
-                        uri: item[1]?.video,
-                      }}
-                      style={{
-                        height: (145 / 375) * width,
-                        width: (175 / 375) * width,
-                        borderRadius: 20,
-                      }}
-                      resizeMode="cover"
-                      posterResizeMode="cover"
-                    />
-                  ) : (
-                    <Image
-                      source={{ uri: item[1]?.image }}
-                      style={{
-                        height: (145 / 375) * width,
-                        width: (175 / 375) * width,
-                        borderRadius: 20,
-                      }}
-                    />
-                  )}
-                  {showVideo ? (
-                    <Video
-                      source={{
-                        uri: item[1]?.video,
-                      }}
-                      style={{
-                        height: (145 / 375) * width,
-                        width: (175 / 375) * width,
-                        borderRadius: 20,
-                        marginTop: 10,
-                      }}
-                      resizeMode="cover"
-                      posterResizeMode="cover"
-                    />
-                  ) : (
-                    <Image
-                      source={{ uri: item[1]?.image }}
-                      style={{
-                        height: (145 / 375) * width,
-                        width: (175 / 375) * width,
-                        borderRadius: 20,
-                        marginTop: 10,
-                      }}
-                    />
-                  )}
-                </View>
-              </View>
-            );
-          })}
-      </ScrollView>
-      <BottomSheet reff={refRBSheet} h={200}>
-        <View style={{ marginTop: 30, paddingHorizontal: 40 }}>
-          <TouchableOpacity
-            style={{ flexDirection: 'row' }}
-            onPress={() => [reportUserRequest(), refRBSheet.current.close()]}
-          >
-            <Image source={flagIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
-            <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Report User'} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ flexDirection: 'row', marginTop: 20 }}
-            onPress={() => [blockRequestedUser(), refRBSheet.current.close()]}
-          >
-            <Image source={blockIcon} style={{ height: 40, width: 30, resizeMode: 'contain' }} />
-            <Text style={[styles.mainTextStyle, { marginLeft: 30 }]} text={'Block User'} />
-          </TouchableOpacity>
-        </View>
-      </BottomSheet>
-    </SafeAreaView>
+      </Modal>
+    </>
   );
 };
 
