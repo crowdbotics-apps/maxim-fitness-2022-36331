@@ -6,6 +6,9 @@ import { API_URL } from '../../../config/app';
 //XHR
 import XHR from '../../../utils/XHR';
 
+// Action
+import { profileData } from '../../../ScreenRedux/profileRedux'
+
 const UPDATE_ANSWERS = 'Questions/redux/UPDATE_ANSWERS';
 const RENDER_DATA = 'Questions/redux/RENDER_DATA';
 
@@ -52,7 +55,7 @@ export const questionReducer = (state = initialState, action) => {
     case RENDER_DATA:
       return {
         ...state,
-        answers: true,
+        renderTab: true,
       };
 
     case UPDATE_ANSWERS:
@@ -87,7 +90,6 @@ export const questionReducer = (state = initialState, action) => {
 };
 
 async function profileDataAPI(profile, data) {
-  console.log('profile, data: -----------', profile, data);
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/profile/${profile.id}/`;
   const options = {
@@ -102,7 +104,6 @@ async function profileDataAPI(profile, data) {
 }
 
 async function submitQuestionAPI(data) {
-  console.log('data----------------form:', data);
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/form/set_program/`;
   const options = {
@@ -117,14 +118,18 @@ async function submitQuestionAPI(data) {
 }
 
 function* submitQuestion({ profile, data }) {
-  console.log('profile, data: ', profile, data);
   try {
     const res = yield call(profileDataAPI, profile, data);
+    console.log('Questions data res: ', res);
     if (res) {
-      yield call(submitQuestionAPI, data);
+      const response = yield call(submitQuestionAPI, data);
+      if (response.status === 200) {
+        yield put(profileData())
+      }
     }
     yield put(submitQuestionSuccess(true));
   } catch (error) {
+    console.log('Questions data error: ', error);
     yield put(submitQuestionSuccess(false));
   }
 }

@@ -26,10 +26,7 @@ import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
 
 const MealTime = props => {
-  const {
-    navigation: { navigate },
-    route: { params },
-  } = props;
+  const { navigation: { navigate }, route: { params } } = props;
   const deviceWidth = Dimensions.get('window').width
   const { numberOfMeals } = params;
   const [meals, setMeals] = useState([]);
@@ -37,8 +34,6 @@ const MealTime = props => {
   const [timeModal, setTimeModal] = useState(false);
   const [time, setTime] = useState(new Date());
   const [selectedMeal, setSelectedMeal] = useState('');
-
-  console.log('numberOfMeals: ', numberOfMeals);
 
   const totalMeals = () => {
     return Array(numberOfMeals)

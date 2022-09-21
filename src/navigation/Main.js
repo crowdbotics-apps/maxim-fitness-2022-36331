@@ -27,6 +27,7 @@ import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
 import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
 import AddExercise from '../screens/CustomWorkOut/AddExercise'
 import SettingScreen from '../screens/SettingScreen'
+import HomeScreen from '../screens/HomeScreen'
 const { home, profileTab, feed, nutrition, exercise } = Images
 
 const mainStack = createStackNavigator()
@@ -56,7 +57,7 @@ const BottomNavigator = () => {
     >
       <Tab.Screen
         name="HomeScreen"
-        component={Feeds}
+        component={HomeScreen}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -188,6 +189,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="SettingScreen" component={SettingScreen} />
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
+    <mainStack.Screen name='HomeScreen' component={HomeScreen} />
   </mainStack.Navigator>
 )
 

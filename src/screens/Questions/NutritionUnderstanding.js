@@ -54,7 +54,7 @@ const NutritionUnderstanding = props => {
   const onNext = () => {
     const tempData = props.answers;
     tempData.understanding_level = exerciseLevel
-    ;(tempData.request_type = 'question'), props.updateAnswers(tempData);
+      ; (tempData.request_type = 'question'), props.updateAnswers(tempData);
     navigate('ThingsToKnow');
   };
 
@@ -117,7 +117,7 @@ const NutritionUnderstanding = props => {
 };
 
 const styles = StyleSheet.create({
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain' }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

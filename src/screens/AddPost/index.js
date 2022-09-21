@@ -42,8 +42,6 @@ const AddPost = props => {
     }
   }, [isFocused]);
 
-  console.log('imageData---', imageData);
-
   // const thumbNailData = ()=>{
   //   if(imageData.length){
   //     imageData.map((item)=>{
@@ -56,8 +54,6 @@ const AddPost = props => {
   //       }})
   //   }
   // }
-
-  // console.log('thumbNailData---', thumbNailData());
 
   const aa = () => {
     let formData = new FormData();

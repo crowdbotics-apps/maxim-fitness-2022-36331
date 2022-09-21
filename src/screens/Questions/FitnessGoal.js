@@ -57,8 +57,6 @@ const FitnessGoal = props => {
     }
   }, []);
 
-  console.log('answersss', props.answers);
-
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.57} showBackButton={true} />
@@ -114,7 +112,7 @@ const FitnessGoal = props => {
 };
 
 const styles = StyleSheet.create({
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain' }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

@@ -25,12 +25,8 @@ import HeaderTitle from './Components/HeaderTitle';
 import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 const ThingsToKnow = props => {
-  const {
-    navigation: { navigate },
-    answers,
-    profile,
-  } = props;
-  console.log('answers: ', answers);
+  const { answers, profile } = props;
+
   const deviceWidth = Dimensions.get('window').width
   const [welcomeModal, setWelcomeModal] = useState(false);
   const [isExcercise, setIsExcercise] = useState(false);
