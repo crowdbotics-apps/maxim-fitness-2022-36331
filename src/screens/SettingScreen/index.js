@@ -16,12 +16,31 @@ import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import { Text, Button } from '../../components';
 import Modal from 'react-native-modal';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import {deleteAccount} from '../../ScreenRedux/settingScreenRedux'
+import {setAccessToken} from '../../ScreenRedux/loginRedux'
 
 const { backImage } = Images;
 const SettingScreen = props => {
   const { navigation, profileUserData, requesting } = props;
   const [showModal, setShowModal] = useState(false)
   const { width } = Dimensions.get('window');
+
+  const logOut = async () => {
+    if (await GoogleSignin.isSignedIn()) {
+      try {
+        await GoogleSignin.signOut();
+        await AsyncStorage.clear();
+        props.setAccessToken(false)
+      } catch (e) {
+        navigation.goBack();
+      }
+    } else {
+      await AsyncStorage.clear()
+      props.setAccessToken(false)
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -52,6 +71,11 @@ const SettingScreen = props => {
           <Text text="Delete Account" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.mainHeading]} onPress={() => logOut()}>
+          <Text text="Log Out" style={styles.mainText} bold />
+          <Image source={Images.forwordIcon} style={styles.IconStyles} />
+        </TouchableOpacity>
       </ScrollView>
       <Modal
         isVisible={showModal}
@@ -75,7 +99,7 @@ const SettingScreen = props => {
           <View style={{ flexDirection: 'row', marginTop: 20 }}>
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#74CCFF' }]}
-              onPress={() => setShowModal(!showModal)}
+              onPress={() => [setShowModal(!showModal), props.deleteAccount(props.userDetail.id), logOut()]}
             >
               <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
             </TouchableOpacity>
@@ -114,13 +138,13 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  requesting: state.userProfileReducer.requesting,
-  profileUserData: state.userProfileReducer.profileUserData,
+  // requesting: state.userProfileReducer.requesting,
+  userDetail: state.login.userDetail,
+
 });
 
 const mapDispatchToProps = dispatch => ({
-  getUserProfile: data => dispatch(getUserProfile(data)),
-  followUser: data => dispatch(followUser(data)),
-  unFollowUser: data => dispatch(unFollowUser(data)),
+  deleteAccount: data => dispatch(deleteAccount(data)),
+  setAccessToken: data => dispatch(setAccessToken(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SettingScreen);
