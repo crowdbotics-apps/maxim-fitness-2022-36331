@@ -54,28 +54,42 @@ const CustomExercise = props => {
 
   const [currentIndex, setCurrentIndex] = useState(false);
   const [dualReps, setDualReps] = useState({ state1: '', state2: '' });
+  const [temporaryReps, setTemporaryReps] = useState(false);
 
-  const numberOfExercise = 2;
+  const numberOfExercise = 1;
 
   const ex1 = 'Exercise 1';
   const ex2 = 'Exercise 2';
 
   const duplicateSet = () => {
-    const newArray = [...sets, sets[currentIndex]];
-    setSets(newArray);
+    if (numberOfExercise === 1) {
+      const newArray = [...sets, sets[currentIndex]];
+      setSets(newArray);
+    } else {
+      const newArray = [...dualSets, dualSets[currentIndex]];
+      setDualSets(newArray);
+    }
   };
 
   const deleteSet = () => {
-    const newArray = [...sets];
-    newArray.splice(currentIndex, 1);
-    setSets(newArray);
-    setDeleteModal(false);
+    if (numberOfExercise === 1) {
+      const newArray = [...sets];
+      newArray.splice(currentIndex, 1);
+      setSets(newArray);
+      setDeleteModal(false);
+    } else {
+      const newArray = [...dualSets];
+      newArray.splice(currentIndex, 1);
+      setDualSets(newArray);
+      setDeleteModal(false);
+    }
   };
 
   const resetValues = () => {
     setReps('');
     setMinutes(0);
     setSeconds(0);
+    setDualReps;
   };
 
   const updateDualReps = val => {
@@ -237,7 +251,15 @@ const CustomExercise = props => {
               ))}
             {numberOfExercise === 2 &&
               dualSets.map((item, i) => (
-                <View style={styles.dualSets}>
+                <TouchableOpacity
+                  style={[
+                    styles.dualSets,
+                    {
+                      backgroundColor: i === currentIndex ? '#74ccff' : '#f1f1f1',
+                    },
+                  ]}
+                  onPress={() => setCurrentIndex(i)}
+                >
                   <Text
                     style={{
                       marginLeft: 20,
@@ -333,7 +355,7 @@ const CustomExercise = props => {
                       {item.exerciseB.rest === 0 ? '-' : item.exerciseB.rest}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
           </View>
 
@@ -367,7 +389,7 @@ const CustomExercise = props => {
             <TouchableOpacity
               style={{ flexDirection: 'row' }}
               onPress={() => duplicateSet()}
-              disabled={currentIndex ? false : true}
+              disabled={currentIndex || currentIndex === 0 ? false : true}
             >
               <Image source={duplicateIcon} style={{ height: 22, width: 20 }} />
               <Text style={{ fontWeight: '500', color: '#7e7e7e', marginLeft: 10 }}>Duplicate</Text>
@@ -375,7 +397,7 @@ const CustomExercise = props => {
 
             <TouchableOpacity
               onPress={() => setDeleteModal(true)}
-              disabled={currentIndex ? false : true}
+              disabled={currentIndex || currentIndex === 0 ? false : true}
             >
               <Image source={redBin} style={{ height: 22, width: 20 }} />
             </TouchableOpacity>
@@ -572,8 +594,10 @@ const CustomExercise = props => {
                   <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Enter Reps</Text>
                   <TextInput
                     style={{ fontSize: 24, fontWeight: '700', color: '#5e5e5e', marginTop: 5 }}
+                    value={temporaryReps}
                     onChangeText={val => {
                       updateDualReps(val);
+                      setTemporaryReps(val);
                     }}
                   />
                 </View>
@@ -668,6 +692,7 @@ const CustomExercise = props => {
                   if (dualSetState === 1) {
                     setDualSetState(2);
                     resetValues();
+                    setTemporaryReps('');
                   } else {
                     refRBSheetDual.current.close();
                     setDualSetState(1);
@@ -803,7 +828,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   dualSets: {
-    backgroundColor: '#f1f1f1',
     marginHorizontal: 38,
     borderRadius: 6,
     height: 140,
