@@ -231,7 +231,6 @@ function* updateUserData({ data, id }) {
   }
 }
 
-
 async function blockUserAPI(data) {
   const URL = `${API_URL}/block-user/`
   const token = await AsyncStorage.getItem('authToken')
@@ -251,7 +250,7 @@ function* blockUserData({ data }) {
   try {
     const response = yield call(blockUserAPI, data)
     showMessage({
-      message: "Blocked user Successfully",
+      message: 'Blocked user Successfully',
       type: 'success',
     })
   } catch (e) {
@@ -279,7 +278,7 @@ function* reportUserData({ data }) {
   try {
     const response = yield call(reportUserAPI, data)
     showMessage({
-      message: "Report user Successfully",
+      message: 'Report user Successfully',
       type: 'success',
     })
   } catch (e) {
@@ -295,5 +294,4 @@ export default all([
   takeLatest(EDIT_PROFILE, updateUserData),
   takeLatest(BLOCK_USER, blockUserData),
   takeLatest(REPORT_USER, reportUserData),
-
 ])

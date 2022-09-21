@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Image,
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 //Libraries
 import ProgressBar from 'react-native-progress/Bar';
@@ -24,10 +18,7 @@ const HeaderTitle = props => {
           Layout.row,
           Gutters.small2xHMargin,
           Layout.alignItemsCenter,
-          !showBackButton ?
-            Layout.justifyContentCenter
-            :
-            Layout.justifyContentBetween
+          !showBackButton ? Layout.justifyContentCenter : Layout.justifyContentBetween
         ]}
       >
         {showBackButton ? (

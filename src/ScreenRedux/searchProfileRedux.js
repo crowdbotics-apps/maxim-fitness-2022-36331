@@ -89,6 +89,4 @@ function* getProfileData({ data }) {
   }
 }
 
-export default all([
-  takeLatest(GET_USER, getProfileData),
-])
+export default all([takeLatest(GET_USER, getProfileData)])

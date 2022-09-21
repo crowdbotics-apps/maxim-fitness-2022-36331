@@ -115,18 +115,18 @@ const ViewPost = props => {
     if (postData && postData?.comments?.length) {
       let data = [
         postData &&
-        postData?.comments?.length &&
-        postData.comments.map(item => ({
-          image: Images.profile,
-          text: item.content,
-          userName: item.user.username,
-          id: item.id,
-          userId: item.user.id,
-          liked: item.liked,
-          likes: item.likes,
-          created_at: item.created,
-          subComment: item.sub_comment.length ? item.sub_comment : [],
-        })),
+          postData?.comments?.length &&
+          postData.comments.map(item => ({
+            image: Images.profile,
+            text: item.content,
+            userName: item.user.username,
+            id: item.id,
+            userId: item.user.id,
+            liked: item.liked,
+            likes: item.likes,
+            created_at: item.created,
+            subComment: item.sub_comment.length ? item.sub_comment : [],
+          })),
       ];
       setPostComments(data[0]);
     }
@@ -218,8 +218,8 @@ const ViewPost = props => {
   const sharePost = async () => {
     const data = { message: 'hello' };
     await Share.open(data)
-      .then(res => { })
-      .catch(err => { });
+      .then(res => {})
+      .catch(err => {});
   };
 
   const likeSubComment = item => {
@@ -281,13 +281,13 @@ const ViewPost = props => {
             images={
               param && (param?.post_image?.length && param?.post_video?.length) > 0
                 ? [...param.post_image, ...param.post_video].map(item =>
-                  item.image ? item.image : item.video
-                )
+                    item.image ? item.image : item.video
+                  )
                 : param?.post_image?.length > 0
-                  ? param.post_image.map(item => item.image)
-                  : param?.post_video?.length > 0
-                    ? param.post_image.map(item => item.video)
-                    : []
+                ? param.post_image.map(item => item.image)
+                : param?.post_video?.length > 0
+                ? param.post_image.map(item => item.video)
+                : []
             }
             style={styles.foodImageStyle}
             sliderBoxHeight={260}

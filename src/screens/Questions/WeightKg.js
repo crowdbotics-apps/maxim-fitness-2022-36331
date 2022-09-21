@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -18,7 +13,9 @@ import { Global, Layout, Gutters, Fonts } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const WeightKg = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const [kilograms, setKilograms] = useState(false);
 
   const onNext = () => {
@@ -32,14 +29,15 @@ const WeightKg = props => {
     <SafeAreaView style={styles.container}>
       <HeaderTitle percentage={0.52} showBackButton={true} />
 
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'What is your Weight?'}
-          />
-
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your Weight?'} />
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           <View
@@ -55,10 +53,10 @@ const WeightKg = props => {
             <InputField
               inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
               value={kilograms}
-              onChangeText={(val) => setKilograms(val)}
-              placeholder='Kilograms'
+              onChangeText={val => setKilograms(val)}
+              placeholder="Kilograms"
               autoCapitalize="none"
-              keyboardType='numeric'
+              keyboardType="numeric"
             />
           </View>
         </View>

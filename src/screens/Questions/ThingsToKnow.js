@@ -17,7 +17,6 @@ import {
 import { submitQuestionRequest, renderTabs } from './Redux';
 import { connect } from 'react-redux';
 
-
 //Components
 import { Text } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
@@ -25,9 +24,12 @@ import HeaderTitle from './Components/HeaderTitle';
 //Themes
 import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
-
 const ThingsToKnow = props => {
-  const { navigation: { navigate }, answers, profile } = props;
+  const {
+    navigation: { navigate },
+    answers,
+    profile,
+  } = props;
   console.log('answers: ', answers);
   const deviceWidth = Dimensions.get('window').width
   const [welcomeModal, setWelcomeModal] = useState(false);
@@ -51,7 +53,7 @@ const ThingsToKnow = props => {
     }, 2000);
   };
 
-  const submitFormData = (state) => {
+  const submitFormData = state => {
     const data = {
       gender: answers?.gender,
       dob: answers?.dob,
@@ -123,14 +125,18 @@ const ThingsToKnow = props => {
         }}
         onPress={() => submitFormData(false)}
       >
-        <Text style={{ fontSize: 16, marginTop: 5, color: '#377eb5' }} >Cancel</Text>
+        <Text style={{ fontSize: 16, marginTop: 5, color: '#377eb5' }}>Cancel</Text>
       </TouchableOpacity>
 
       <View style={{ marginHorizontal: 20 }}>
-        <Text style={{ fontSize: 24, lineHeight: 24, fontWeight: '700' }}>Three Things You Should Know</Text>
+        <Text style={{ fontSize: 24, lineHeight: 24, fontWeight: '700' }}>
+          Three Things You Should Know
+        </Text>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, marginTop: 10, paddingBottom: 30 }}>
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1, marginTop: 10, paddingBottom: 30 }}
+      >
         <View>
           {thingsArray.map((item, i) => (
             <View
@@ -209,13 +215,14 @@ const ThingsToKnow = props => {
           </Slider>
         </View>
       </ScrollView>
-      <Modal
-        visible={welcomeModal}
-        style={Layout.fill}
-        animationType="slide"
-        transparent={true}
-      >
-        <ScrollView contentContainerStyle={[Layout.fillGrow, Global.opacityBg75, Layout.justifyContentBetween]}>
+      <Modal visible={welcomeModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <ScrollView
+          contentContainerStyle={[
+            Layout.fillGrow,
+            Global.opacityBg75,
+            Layout.justifyContentBetween,
+          ]}
+        >
           <View style={[Layout.fill, Layout.center]}>
             <Text style={styles.title}>Thanks {'userName'}!</Text>
             <Text style={[styles.subTitle, { marginBottom: 25 }]}>
@@ -311,7 +318,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitQuestionRequest: (profile, data, setWelcomeModal, showProgress) => dispatch(submitQuestionRequest(profile, data, setWelcomeModal, showProgress)),
+  submitQuestionRequest: (profile, data, setWelcomeModal, showProgress) =>
+    dispatch(submitQuestionRequest(profile, data, setWelcomeModal, showProgress)),
   renderTabs: () => dispatch(renderTabs()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ThingsToKnow);

@@ -21,7 +21,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const TrainingDays = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const exerciseArray = [
     { value: 1, text: '3 Days' },
     { value: 2, text: '4 Days' },
@@ -48,7 +50,13 @@ const TrainingDays = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.62} showBackButton={true} />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
           <Text
             color="commonCol"
@@ -92,27 +100,29 @@ const TrainingDays = props => {
           />
         </View>
       </ScrollView>
-      <Modal
-        visible={welcomeModal}
-        style={Layout.fill}
-        animationType="slide"
-        transparent={true}
-      >
-        <ScrollView contentContainerStyle={[Layout.fillGrow, Global.opacityBg75, Layout.justifyContentBetween]}>
+      <Modal visible={welcomeModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <ScrollView
+          contentContainerStyle={[
+            Layout.fillGrow,
+            Global.opacityBg75,
+            Layout.justifyContentBetween,
+          ]}
+        >
           <View style={[Layout.fill, Layout.justifyContentCenter]}>
             <View style={[Layout.center, { zIndex: 1 }]}>
               <Image source={Images.otLogo} style={styles.logoStyle} />
             </View>
 
             <View style={[Layout.center, Gutters.small2xTMargin]}>
-              <Text
-                text="Almost Done!"
-                color="secondary"
-                style={Fonts.titleMedium}
-              />
+              <Text text="Almost Done!" color="secondary" style={Fonts.titleMedium} />
               <Text
                 color="secondary"
-                style={[Fonts.textLarge, Fonts.textLeft, Gutters.small2xTMargin, Gutters.mediumHMargin]}
+                style={[
+                  Fonts.textLarge,
+                  Fonts.textLeft,
+                  Gutters.small2xTMargin,
+                  Gutters.mediumHMargin,
+                ]}
                 text="Let's talk about your food and nutrition preferences."
               />
             </View>

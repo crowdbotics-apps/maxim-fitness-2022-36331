@@ -22,7 +22,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import { updateAnswer } from './Redux';
 
 const Birthday = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const deviceWidth = Dimensions.get('window').width
 
   const [dateModal, setDateModal] = useState(false);
@@ -38,13 +40,15 @@ const Birthday = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.02} showBackButton={false} />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'When were you born?'}
-          />
+          <Text color="commonCol" style={Fonts.titleRegular} text={'When were you born?'} />
           <TouchableOpacity
             style={[
               Global.borderB,
@@ -57,7 +61,7 @@ const Birthday = props => {
           >
             <Text
               style={Fonts.titleRegular}
-              color={navState ? "quinary" : "altoCol"}
+              color={navState ? 'quinary' : 'altoCol'}
               text={navState ? navState : 'Birthday'}
             />
           </TouchableOpacity>
@@ -74,7 +78,14 @@ const Birthday = props => {
         </View>
       </ScrollView>
       <Modal visible={dateModal} style={Layout.fill} animationType="slide" transparent={true}>
-        <View style={[Global.halfTransparentBg, Layout.fill, Layout.alignItemsCenter, Layout.justifyContentCenter]}>
+        <View
+          style={[
+            Global.halfTransparentBg,
+            Layout.fill,
+            Layout.alignItemsCenter,
+            Layout.justifyContentCenter,
+          ]}
+        >
           <DatePicker
             date={date}
             mode="date"

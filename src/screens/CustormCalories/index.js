@@ -14,14 +14,22 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { Text, Button, RuningCard, RuningWorkout, ProfileComponent, BottomSheet, ModalInput } from '../../components';
+import {
+  Text,
+  Button,
+  RuningCard,
+  RuningWorkout,
+  ProfileComponent,
+  BottomSheet,
+  ModalInput,
+} from '../../components';
 import { Content, Icon } from 'native-base';
 import { Layout, Global, Gutters, Colors, Images } from '../../theme';
 import { calculatePostTime } from '../../utils/functions';
 import { TabOne, TabThree } from './components';
-import { getCustomCalRequest } from '../../ScreenRedux/customCalRedux';
+import { getCustomCalRequest, getMealsRequest } from '../../ScreenRedux/customCalRedux';
 
-const CustormCalories = (props) => {
+const CustormCalories = props => {
   let refWeight = useRef('');
   const [tab, setTab] = useState(2);
   const [value, setValue] = useState(false);
@@ -30,10 +38,12 @@ const CustormCalories = (props) => {
   const [showModalHistory, setShowModalHistory] = useState(false);
 
   console.log('getCalories: ', props.getCalories)
+  console.log('meals: ', props.meals);
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       props.getCustomCalRequest()
+      props.getMealsRequest()
     });
     return unsubscribe;
   }, [props.navigation]);
@@ -69,7 +79,7 @@ const CustormCalories = (props) => {
     smallHMargin,
   } = Gutters;
 
-  const data = ['Home', 'Exercise', 'Nutrition', 'Health'];
+  const data = ['Home', 'Exercise', 'Nutrition'];
 
   const myHealthData = [
     'Disease',
@@ -81,7 +91,6 @@ const CustormCalories = (props) => {
     'Respiratory',
     'Vitals',
   ];
-
 
   const tabSettings = i => {
     setTab(i);
@@ -100,9 +109,7 @@ const CustormCalories = (props) => {
             <TouchableOpacity key={i} style={[fill, center]} onPress={() => tabSettings(i)}>
               <Text
                 style={[
-                  tab === i
-                    ? { color: Colors.black, fontWeight: 'bold' }
-                    : { color: Colors.alto },
+                  tab === i ? { color: Colors.black, fontWeight: 'bold' } : { color: Colors.alto },
                   styles.currentTabText,
                 ]}
                 text={item}
@@ -114,32 +121,25 @@ const CustormCalories = (props) => {
         })}
       </View>
       <Content showsVerticalScrollIndicator={false} contentContainerStyle={fillGrow}>
-        {tab === 0 && (
-          <TabOne
-            setShowModal={() => refWeight.current.open()}
-          />
-        )}
+        {tab === 0 && <TabOne setShowModal={() => refWeight.current.open()} />}
         {tab === 1 && (
           <Content contentContainerStyle={fillGrow}>
-            <View style={[row, justifyContentBetween, alignItemsCenter, small2xHMargin, smallVPadding]}>
+            <View
+              style={[row, justifyContentBetween, alignItemsCenter, small2xHMargin, smallVPadding]}
+            >
               <Text style={styles.comingSoonWork} text="Workouts" />
             </View>
             <TouchableOpacity>
               <RuningWorkout />
             </TouchableOpacity>
-            {false &&
+            {false && (
               <View style={[fill, center]}>
-                <Text
-                  text="No workout available."
-                  style={{ color: 'black', fontSize: 22 }}
-                />
+                <Text text="No workout available." style={{ color: 'black', fontSize: 22 }} />
               </View>
-            }
+            )}
           </Content>
         )}
-        {tab === 2 && (
-          <TabThree />
-        )}
+        {tab === 2 && <TabThree navigation={props.navigation} />}
         {tab === 3 && (
           <>
             <View style={[row, alignItemsCenter, regularHMargin]}>
@@ -147,13 +147,7 @@ const CustormCalories = (props) => {
               <Image source={Images.iconMyFav} style={[regularLMargin, styles.myFavImage]} />
             </View>
             <View
-              style={[
-                border,
-                borderAlto,
-                regularHMargin,
-                regularVMargin,
-                styles.myHealthParent,
-              ]}
+              style={[border, borderAlto, regularHMargin, regularVMargin, styles.myHealthParent]}
             >
               <View
                 style={[
@@ -176,11 +170,7 @@ const CustormCalories = (props) => {
                     myHealthData.length - 1 === i && { borderBottomWidth: 0 },
                   ]}
                 >
-                  <Text
-                    bold
-                    text={item}
-                    style={[borderAlto, regularVPadding, regularHPadding]}
-                  />
+                  <Text bold text={item} style={[borderAlto, regularVPadding, regularHPadding]} />
                 </View>
               ))}
             </View>
@@ -242,33 +232,33 @@ const CustormCalories = (props) => {
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                    // onPress={() => {
-                    //   if (item.message === 'Comment Post' || 'Like Post') {
-                    //     navigation.navigate('PostDetail', { item: item });
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    //   if (item.message === 'Started following you') {
-                    //     navigation.navigate('ProfileView', item);
-                    //   }
-                    //   if (item.message === 'Message') {
-                    //     navigation.navigate('ChatRoom');
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    // }}
-                    >
-                      <RuningCard
-                        item={item}
-                        Notification={item.message}
-                        Time={calculatePostTime(item)}
-                      />
-                    </TouchableOpacity>
-                  );
-                })
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        // onPress={() => {
+                        //   if (item.message === 'Comment Post' || 'Like Post') {
+                        //     navigation.navigate('PostDetail', { item: item });
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        //   if (item.message === 'Started following you') {
+                        //     navigation.navigate('ProfileView', item);
+                        //   }
+                        //   if (item.message === 'Message') {
+                        //     navigation.navigate('ChatRoom');
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        // }}
+                      >
+                        <RuningCard
+                          item={item}
+                          Notification={item.message}
+                          Time={calculatePostTime(item)}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })
                 : null}
             </View>
           </ScrollView>
@@ -291,6 +281,7 @@ const CustormCalories = (props) => {
             color="primary"
             text="Update"
             style={[regularHMargin, fill, center]}
+            onPress={() => refWeight.current.close()}
           />
         </View>
       </BottomSheet>
@@ -319,9 +310,7 @@ const CustormCalories = (props) => {
       </Modal>
 
       {/* Modals area ends */}
-
     </SafeAreaView>
-
   );
 };
 
@@ -486,9 +475,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   getCalories: state.customCalReducer.getCalories,
+  meals: state.customCalReducer.meals
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCustomCalRequest: () => dispatch(getCustomCalRequest())
+  getCustomCalRequest: () => dispatch(getCustomCalRequest()),
+  getMealsRequest: () => dispatch(getMealsRequest()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustormCalories);

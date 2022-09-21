@@ -83,6 +83,5 @@ export default {
   duplicateIcon: require('src/assets/images/duplicateIcon.png'),
   sendMessage: require('src/assets/images/sendMessage.png'),
   uploadMedia: require('src/assets/images/uploadMedia.png'),
-
-
+  forwordIcon: require('src/assets/images/forwardIcon.png')
 };

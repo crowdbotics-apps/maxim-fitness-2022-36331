@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Image, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -20,7 +13,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const MeasurementUnit = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const exerciseArray = ['Feet/Pounds', 'Meters/Kilograms'];
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
@@ -43,14 +38,15 @@ const MeasurementUnit = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.37} showBackButton />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'Choose units of measurement'}
-          />
-
+          <Text color="commonCol" style={Fonts.titleRegular} text={'Choose units of measurement'} />
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           {exerciseArray.map((item, i) => (
@@ -67,11 +63,7 @@ const MeasurementUnit = props => {
               ]}
               onPress={() => setExerciseLevel(item)}
             >
-              <Text
-                text={item}
-                color="commonCol"
-                style={Fonts.titleSmall}
-              />
+              <Text text={item} color="commonCol" style={Fonts.titleSmall} />
               <Image source={Images.forwardIcon} style={styles.rightArrow} />
             </TouchableOpacity>
           ))}

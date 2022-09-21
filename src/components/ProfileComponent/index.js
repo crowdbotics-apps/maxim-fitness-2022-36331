@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import Text from '../Text'
 import { Icon } from 'native-base';
 import { Layout, Gutters, Colors, Images } from '../../theme';
@@ -28,11 +23,7 @@ const ProfileComponent = ({
     justifyContentStart,
     justifyContentBetween,
   } = Layout;
-  const {
-    regularLMargin,
-    smallVPadding,
-    regularHMargin,
-  } = Gutters;
+  const { regularLMargin, smallVPadding, regularHMargin } = Gutters;
 
   return (
     <View style={[row, smallVPadding, regularHMargin, alignItemsCenter, justifyContentBetween]}>

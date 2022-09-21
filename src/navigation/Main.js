@@ -17,6 +17,8 @@ import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile'
 import CustormCalories from '../screens/CustormCalories';
+import EditCustomCal from '../screens/CustormCalories/childScreens/EditCustomCal';
+import EditCaloriesManually from '../screens/CustormCalories/childScreens/EditCaloriesManually';
 import SearchProfile from '../screens/SearchProfile';
 import MessageScreen from '../screens/MessageScreen'
 import ChatScreen from '../screens/chatScreen';
@@ -24,7 +26,7 @@ import ChatScreen from '../screens/chatScreen';
 import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
 import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
 import AddExercise from '../screens/CustomWorkOut/AddExercise'
-
+import SettingScreen from '../screens/SettingScreen'
 const { home, profileTab, feed, nutrition, exercise } = Images
 
 const mainStack = createStackNavigator()
@@ -183,6 +185,9 @@ const MainNavigator = () => (
     <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} />
     <mainStack.Screen name="CustomExercise" component={CustomExercise} />
     <mainStack.Screen name="AddExercise" component={AddExercise} />
+    <mainStack.Screen name="SettingScreen" component={SettingScreen} />
+    <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
+    <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
   </mainStack.Navigator>
 )
 

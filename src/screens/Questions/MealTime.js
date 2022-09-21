@@ -26,7 +26,10 @@ import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
 
 const MealTime = props => {
-  const { navigation: { navigate }, route: { params } } = props;
+  const {
+    navigation: { navigate },
+    route: { params },
+  } = props;
   const deviceWidth = Dimensions.get('window').width
   const { numberOfMeals } = params;
   const [meals, setMeals] = useState([]);
@@ -73,7 +76,6 @@ const MealTime = props => {
       return orig.indexOf(item, i + 1) === -1;
     });
 
-
     if (meals.length === duplicateArray.length) {
       const tempData = props.answers;
       tempData.mealTimes = meals;
@@ -82,7 +84,6 @@ const MealTime = props => {
     } else {
       Alert.alert('Please choose different time');
     }
-
   };
 
   const buttonDiabled = () => {
@@ -91,11 +92,16 @@ const MealTime = props => {
     });
   };
 
-
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle showBackButton={true} percentage={0.75} />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
           <Text
             color="commonCol"
@@ -104,40 +110,32 @@ const MealTime = props => {
           />
         </View>
         <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
-          {meals && meals.map((item, i) => (
-            <TouchableOpacity
-              key={i}
-              style={[
-                Layout.row,
-                Global.height65,
-                Gutters.smallHPadding,
-                Layout.alignItemsCenter,
-                Layout.justifyContentBetween,
-                exerciseLevel === item ? Global.border : Global.borderB,
-                exerciseLevel !== item ? Global.borderAlto : '#a5c2d0',
-              ]}
-              onPress={() => {
-                setSelectedMeal(i);
-                setTimeModal(true);
-              }}
-            >
-              <Text
-                text={item.meal}
-                color="commonCol"
-                style={Fonts.titleRegular}
-              />
-              {item.time ? (
-                <Text
-                  text={item.time}
-                  color="commonCol"
-                  style={Fonts.titleRegular}
-                />
-              ) : (
-                <Image source={Images.downIcon} style={styles.rightArrow} />
-              )}
-
-            </TouchableOpacity>
-          ))}
+          {meals &&
+            meals.map((item, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[
+                  Layout.row,
+                  Global.height65,
+                  Gutters.smallHPadding,
+                  Layout.alignItemsCenter,
+                  Layout.justifyContentBetween,
+                  exerciseLevel === item ? Global.border : Global.borderB,
+                  exerciseLevel !== item ? Global.borderAlto : '#a5c2d0',
+                ]}
+                onPress={() => {
+                  setSelectedMeal(i);
+                  setTimeModal(true);
+                }}
+              >
+                <Text text={item.meal} color="commonCol" style={Fonts.titleRegular} />
+                {item.time ? (
+                  <Text text={item.time} color="commonCol" style={Fonts.titleRegular} />
+                ) : (
+                  <Image source={Images.downIcon} style={styles.rightArrow} />
+                )}
+              </TouchableOpacity>
+            ))}
         </View>
         <View style={Layout.justifyContentEnd}>
           <Button
@@ -145,19 +143,20 @@ const MealTime = props => {
             text={'Next'}
             color="primary"
             onPress={onNext}
-            disabled={Boolean(buttonDiabled().includes('')) ? true : false}
+            disabled={buttonDiabled().includes('') ? true : false}
             style={Gutters.regularBMargin}
           />
         </View>
       </ScrollView>
 
-      <Modal
-        visible={timeModal}
-        style={Layout.fill}
-        animationType="slide"
-        transparent={true}
-      >
-        <ScrollView contentContainerStyle={[Layout.fillGrow, Global.opacityBg75, Layout.justifyContentBetween]}>
+      <Modal visible={timeModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <ScrollView
+          contentContainerStyle={[
+            Layout.fillGrow,
+            Global.opacityBg75,
+            Layout.justifyContentBetween,
+          ]}
+        >
           <View style={[Layout.fill, Layout.center]}>
             <DatePicker
               date={time}
@@ -174,7 +173,10 @@ const MealTime = props => {
               style={[Gutters.small2xVMargin, { width: deviceWidth - 175 }]}
               onPress={() => setTimeModal(false)}
             >
-              <LinearGradient style={styles.gradientStyle} colors={['#048ECC', '#0460BB', '#0480C6']}>
+              <LinearGradient
+                style={styles.gradientStyle}
+                colors={['#048ECC', '#0460BB', '#0480C6']}
+              >
                 <Text style={styles.loginText}>Select Time</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -183,7 +185,10 @@ const MealTime = props => {
               style={{ width: deviceWidth - 175 }}
               onPress={() => setTimeModal(false)}
             >
-              <LinearGradient style={styles.gradientStyle} colors={['#e52b39', '#ef3d49', '#fb5a60']}>
+              <LinearGradient
+                style={styles.gradientStyle}
+                colors={['#e52b39', '#ef3d49', '#fb5a60']}
+              >
                 <Text style={styles.loginText}>Cancel</Text>
               </LinearGradient>
             </TouchableOpacity>

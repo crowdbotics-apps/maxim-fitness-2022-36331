@@ -101,7 +101,6 @@ async function profileDataAPI(profile, data) {
   return XHR(URL, options);
 }
 
-
 async function submitQuestionAPI(data) {
   console.log('data----------------form:', data);
   const token = await AsyncStorage.getItem('authToken')

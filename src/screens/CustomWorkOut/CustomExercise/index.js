@@ -758,7 +758,7 @@ const CustomExercise = props => {
             >
               <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
             </TouchableOpacity>
-            <View style={{ marginHorizontal: 20 }}></View>
+            <View style={{ marginHorizontal: 20 }} />
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#f3f1f4' }]}
               onPress={() => setDeleteModal(false)}

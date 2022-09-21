@@ -12,7 +12,7 @@ import { programReducer } from '../ScreenRedux/programServices'
 import { profileReducer } from '../ScreenRedux/profileRedux'
 import { questionReducer } from '../screens/Questions/Redux'
 import { customCalReducer } from '../ScreenRedux/customCalRedux'
-import {userProfileReducer} from '../ScreenRedux/searchProfileRedux'
+import { userProfileReducer } from '../ScreenRedux/searchProfileRedux'
 
 const appPersistConfig = {
   key: 'login',

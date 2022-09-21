@@ -21,7 +21,9 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 import { updateAnswer } from './Redux';
 
 const Gender = props => {
-  const { navigation: { navigate } } = props;
+  const {
+    navigation: { navigate },
+  } = props;
   const genderArray = ['Male', 'Female', 'Prefer not to answer'];
 
   const [gender, setGender] = useState(false);
@@ -43,13 +45,15 @@ const Gender = props => {
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.1} showBackButton={true} />
-      <ScrollView contentContainerStyle={[Layout.fillGrow, Gutters.small2xHPadding, Layout.justifyContentBetween]}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
         <View style={Gutters.mediumTMargin}>
-          <Text
-            color="commonCol"
-            style={Fonts.titleRegular}
-            text={'What is your gender?'}
-          />
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your gender?'} />
           <Text
             color="commonCol"
             style={[Gutters.regularVMargin, Fonts.textMedium]}
@@ -71,11 +75,7 @@ const Gender = props => {
               ]}
               onPress={() => setGender(item)}
             >
-              <Text
-                text={item}
-                color="commonCol"
-                style={Fonts.titleRegular}
-              />
+              <Text text={item} color="commonCol" style={Fonts.titleRegular} />
               <Image source={Images.forwardIcon} style={styles.rightArrow} />
             </TouchableOpacity>
           ))}
@@ -92,27 +92,29 @@ const Gender = props => {
         </View>
       </ScrollView>
 
-      <Modal
-        visible={welcomeModal}
-        style={Layout.fill}
-        animationType="slide"
-        transparent={true}
-      >
-        <ScrollView contentContainerStyle={[Layout.fillGrow, Global.opacityBg75, Layout.justifyContentBetween]}>
+      <Modal visible={welcomeModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <ScrollView
+          contentContainerStyle={[
+            Layout.fillGrow,
+            Global.opacityBg75,
+            Layout.justifyContentBetween,
+          ]}
+        >
           <View style={[Layout.fill, Layout.justifyContentCenter]}>
             <View style={[Layout.center, { zIndex: 1 }]}>
               <Image source={Images.otLogo} style={styles.logoStyle} />
             </View>
 
             <View style={[Layout.center, Gutters.small2xTMargin]}>
-              <Text
-                text="Welcome to Orum Training !"
-                color="secondary"
-                style={Fonts.titleMedium}
-              />
+              <Text text="Welcome to Orum Training !" color="secondary" style={Fonts.titleMedium} />
               <Text
                 color="secondary"
-                style={[Fonts.textLarge, Fonts.textLeft, Gutters.small2xTMargin, Gutters.mediumHMargin]}
+                style={[
+                  Fonts.textLarge,
+                  Fonts.textLeft,
+                  Gutters.small2xTMargin,
+                  Gutters.mediumHMargin,
+                ]}
                 text="Next, we are going to ask you questions regarding your exercise goals then nutrition preferences"
               />
             </View>
