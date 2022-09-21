@@ -294,6 +294,7 @@ class ProfileViewSet(ModelViewSet):
 class UpdateProfile(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['patch']
 
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
@@ -848,14 +849,10 @@ class PostViewSet(ModelViewSet):
         post_video = []
         image = ''
         video = ''
-        video_thumbnail = ''
-        data = {}
         if request.data.get("image"):
             image = dict((request.data).lists())['image']
         if request.data.get("video"):
             video = dict((request.data).lists())['video']
-        if request.data.get("video_thumbnail"):
-            video_thumbnail = dict((request.data).lists())['video_thumbnail']
         post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
         serializer = self.get_serializer(data=post_content)
         if serializer.is_valid():
@@ -868,12 +865,9 @@ class PostViewSet(ModelViewSet):
                 post_image_serializer = PostImageSerializer(data=post_image, many=True)
                 if post_image_serializer.is_valid(raise_exception=True):
                     post_image_serializer.save()
-            if video and video_thumbnail:
+            if video:
                 for v in video:
-                    for thumbnail in video_thumbnail:
-                        data = {'post': serializer.data.get("id"), "video": v, "video_thumbnail": thumbnail}
-                        video_thumbnail.remove(thumbnail)
-                        break
+                    data = {'post': serializer.data.get("id"), "video": v}
                     post_video.append(data)
                 post_video_serializer = PostVideoSerializer(data=post_video, many=True)
                 if post_video_serializer.is_valid(raise_exception=True):
