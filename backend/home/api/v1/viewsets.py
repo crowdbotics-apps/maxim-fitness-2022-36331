@@ -614,7 +614,7 @@ class SessionViewSet(ModelViewSet):
         if start_date:
             date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
             end = date_time_obj + timedelta(days=7)
-            queryset = queryset.filter(date_time__range=[date_time_obj, end])
+            queryset = queryset.filter(date_time__range=[start_date, end.date()])
         if request.GET.get('reset'):
             for session in queryset:
                 session.reset()
@@ -695,7 +695,9 @@ class SessionViewSet(ModelViewSet):
         day = request.GET.get("day")
         reset = request.GET.get('reset')
         if day:
-            session = Session.objects.filter(user=request.user, date_time__week_day=day).first()
+            # date_time_obj = datetime.strptime(day, '%Y-%m-%d')
+            # session = Session.objects.filter(user=request.user).first()
+            session = Session.objects.filter(user=request.user, date_time=day).first()
             if reset:
                 session.reset()
             serializer = self.serializer_class(session, context={'request': request})

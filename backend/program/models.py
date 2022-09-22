@@ -18,7 +18,7 @@ class Report(models.Model):
 
 class Session(models.Model):
     user = models.ForeignKey(User, related_name='sessions', on_delete=models.CASCADE)
-    date_time = models.DateTimeField()
+    date_time = models.DateField()
     name = models.CharField(max_length=500, null=True)
     program = models.ForeignKey("Program", related_name='sessions', on_delete=models.CASCADE, null=True)
 
@@ -85,7 +85,7 @@ class Program(models.Model):
         return self.name
 
     def get_date_time(self, days_gap):
-        date_time = datetime.today() + timedelta(days=days_gap)
+        date_time = datetime.today().date() + timedelta(days=days_gap)
         return date_time
 
     def create_session(self, user):
