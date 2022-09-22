@@ -21,6 +21,7 @@ const initialState = {
   getCalories: false,
   getCaloeriesError: false,
 
+  mealRequesting: false,
   meals: [],
   mealsError: false
 }
@@ -73,13 +74,13 @@ export const customCalReducer = (state = initialState, action) => {
     case GET_MEALS_REQUEST:
       return {
         ...state,
-        requesting: true
+        mealRequesting: true
       }
     case GET_MEALS_SUCCESS:
       return {
         ...state,
         meals: action.data,
-        requesting: true,
+        mealRequesting: false,
       }
 
     default:

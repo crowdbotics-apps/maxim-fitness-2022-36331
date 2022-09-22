@@ -86,5 +86,7 @@ export default {
   forwordIcon: require('src/assets/images/forwardIcon.png'),
   iconBurger: require('src/assets/images/hamburger.png'),
   splashLogo: require('src/assets/images/splash_logo.png'),
-  addMealIcon: require('src/assets/images/add_icon_meal.png')
+  addMealIcon: require('src/assets/images/add_icon_meal.png'),
+  leftArrow: require('src/assets/images/left-arrow.png'),
+  barCode: require('src/assets/images/barcode.png'),
 };

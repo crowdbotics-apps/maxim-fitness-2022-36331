@@ -1,29 +1,32 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList } from 'react-native';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
 import { Icon } from 'native-base';
 // components
-import { HeaderForDrawer, SearchablePaginatedList, MealEmptyItem, Text } from '../../components';
+import { HeaderForDrawer, MealEmptyItem, Text } from '../../components';
 import { Gutters, Layout, Global } from '../../theme';
 // Actions
 import { getMealsRequest } from '../../ScreenRedux/customCalRedux';
-import { getAllSessionRequest } from '../../ScreenRedux/programServices';
+import { getAllSessionRequest, getDaySessionRequest } from '../../ScreenRedux/programServices';
 
 const HomeScreen = props => {
   const {
+    mealRequesting,
     meals = [],
     navigation,
     allSessions,
     loadingAllSession,
+    todaySessions,
+    todayRequest
   } = props;
-
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       props.getMealsRequest()
       const newDate = moment(new Date()).format('YYYY-MM-DD');
       props.getAllSessionRequest(newDate);
+      props.getDaySessionRequest(newDate)
     });
     return unsubscribe;
   }, [props.navigation]);
@@ -35,103 +38,110 @@ const HomeScreen = props => {
   const { row, fill, center, fullWidth, justifyContentBetween } = Layout;
   const { secondaryBg } = Global;
 
-  const emptyList = () => (
-    <View style={[fill, center]}>
-      <Text text={`Empty meals`} />
-    </View>
-  );
-
-  const renderItem = (
-    {
-      date_time: clock,
-      food_items: mealItems,
-      carbohydrate: numberOfCarbs,
-      protein: numberOfProtein,
-      fat: numberOfFat,
-      id,
-    },
-    index,
-  ) => {
+  const renderItem = ({ item, index }) => {
     return (
-      <MealEmptyItem
-        clock={clock}
-        mealItems={mealItems}
-        numberOfProtein={numberOfProtein}
-        numberOfCarbs={numberOfCarbs}
-        numberOfFat={numberOfFat}
-        id={id}
-        index={index}
-        navigation={navigation}
-        titleContainerStyle={{
-          paddingTop: 0,
-        }}
-      />
+      <View style={smallHMargin}>
+        <MealEmptyItem item={item} index={index} navigation={navigation} />
+      </View>
     );
   };
 
   return (
     <SafeAreaView style={[secondaryBg, fill]}>
-      <View style={[fill, fullWidth]}>
-        <HeaderForDrawer hideHamburger />
+      <HeaderForDrawer hideHamburger />
+      <View style={[row, styles.wrapper, smallHMargin]}>
+        <LinearGradient
+          start={start}
+          end={end}
+          colors={['#5daffe', '#5daffe']}
+          style={[
+            row,
+            fill,
+            regularHPadding,
+            regularVPadding,
+            tinyHMargin,
+            styles.linearGradient,
+          ]}
+        >
+          <View style={justifyContentBetween}>
+            <View style={row}>
+              <Text style={styles.textStyle} text="Day 1" />
+              <Text style={styles.subTextStyle} text="W1" />
+            </View>
 
-        <View>
-          <View style={[row, smallHMargin, styles.wrapper]}>
-            <LinearGradient
-              start={start}
-              end={end}
-              colors={['#5daffe', '#5daffe']}
-              style={[
-                row,
-                fill,
-                regularHPadding,
-                regularVPadding,
-                tinyHMargin,
-                styles.linearGradient,
-              ]}
-            >
-              <View style={justifyContentBetween}>
-                <View style={row}>
-                  <Text style={styles.textStyle} text="Day 1" />
-                  <Text style={styles.subTextStyle} text="W1" />
-                </View>
-
-                {loadingAllSession ? (
-                  <View>
-                    <ActivityIndicator size="small" color="white" />
-                  </View>
+            {todayRequest ? (
+              <View>
+                <ActivityIndicator size="small" color="white" />
+              </View>
+            ) : (
+              <View>
+                {todaySessions?.name ? (
+                  <Text style={styles.textStyle} text={todaySessions.name} />
                 ) : (
-                  <>
-                    {allSessions?.query?.length ? (
-                      allSessions?.query?.map((item, index) => {
-                        const currentDate = moment(new Date()).format('MM/DD/YYYY');
-                        const todayDayString = moment(item.date_time).format('MM/DD/YYYY');
-                        if (todayDayString === currentDate) {
-                          return (
-                            <View key={index}>
-                              {item.name ? (
-                                <Text key={index} style={styles.textStyle} text={item.name} />
-                              ) : (
-                                <Text key={index} style={styles.textStyle} text="Rest Day" />
-                              )}
-                            </View>
-                          );
-                        }
-                      })
-                    ) : (
-                      <Text style={styles.textStyle} text="Rest Day" />
-                    )}
-                  </>
+                  <Text style={styles.textStyle} text="Rest Day" />
                 )}
               </View>
-              <View style={[center, styles.iconMainStyle]}>
-                <Icon type="FontAwesome5" name="dumbbell" style={styles.iconInnerStyle} />
-              </View>
-            </LinearGradient>
+            )}
+          </View>
+          <View style={[center, styles.iconMainStyle]}>
+            <Icon type="FontAwesome5" name="dumbbell" style={styles.iconInnerStyle} />
+          </View>
+        </LinearGradient>
 
+        <LinearGradient
+          start={start}
+          end={end}
+          colors={['#ff634e', '#ff634e']}
+          style={[
+            row,
+            fill,
+            tinyHMargin,
+            regularHPadding,
+            regularVPadding,
+            styles.linearGradient,
+          ]}
+        >
+          <View style={justifyContentBetween}>
+            <View style={row}>
+              <Text style={styles.textStyle} text="Day 1" />
+              <Text style={styles.subTextStyle} text="W1" />
+            </View>
+
+            <View style={row}>
+              {todayRequest ? (
+                <View>
+                  <ActivityIndicator size="small" color="white" />
+                </View>
+              ) : todaySessions?.id ? (
+                <View>
+                  <Text
+                    style={styles.middleTextStyle}
+                    text={todaySessions?.cardio_length}
+                  />
+                  <Text style={styles.middleSubTextStyle} text="minutes" />
+                </View>
+              ) : (
+                <Text style={styles.textStyle} text="Rest Day" />
+              )}
+            </View>
+          </View>
+
+          <View style={[center, styles.iconMainStyle, styles.iconMainStyle2]}>
+            <Icon type="FontAwesome5" name="heartbeat" style={styles.iconInnerStyle} />
+          </View>
+        </LinearGradient>
+      </View>
+      <View style={smallHMargin}>
+        {todayRequest ? (
+          <View style={[row, small2xTMargin, styles.wrapper, center]}>
+            <ActivityIndicator size="small" color="black" />
+          </View>
+        ) : todaySessions?.workouts?.length > 0 ? (
+          <View style={[row, styles.wrapper, small2xTMargin]}>
             <LinearGradient
               start={start}
               end={end}
-              colors={['#ff634e', '#ff634e']}
+              colors={['#5bf547', '#32fc7d']}
               style={[
                 row,
                 fill,
@@ -141,92 +151,48 @@ const HomeScreen = props => {
                 styles.linearGradient,
               ]}
             >
-              <View style={justifyContentBetween}>
-                <View style={row}>
-                  <Text style={styles.textStyle} text="Day 1" />
-                  <Text style={styles.subTextStyle} text="W1" />
-                </View>
-
-                <View style={row}>
-                  {loadingAllSession ? (
-                    <View>
-                      <ActivityIndicator size="small" color="white" />
-                    </View>
-                  ) : (
-                    <>
-                      {allSessions?.query?.length ? (
-                        allSessions.query.map((item, index) => {
-                          const currentDate = moment(new Date()).format('MM/DD/YYYY');
-                          const todayDayString = moment(item.date_time).format('MM/DD/YYYY');
-                          if (todayDayString === currentDate) {
-                            return (
-                              <View key={index}>
-                                <Text
-                                  style={styles.middleTextStyle}
-                                  text={item && item.cardio_length}
-                                />
-                                <Text style={styles.middleSubTextStyle} text="minutes" />
-                              </View>
-                            );
-                          }
-                        })
-                      ) : (
-                        <Text style={styles.textStyle} text="Rest Day" />
-                      )}
-                    </>
-                  )}
-                </View>
-              </View>
-
-              <View style={[center, styles.iconMainStyle, styles.iconMainStyle2]}>
-                <Icon type="FontAwesome5" name="heartbeat" style={styles.iconInnerStyle} />
-              </View>
-            </LinearGradient>
-          </View>
-          {true ? (
-            <View style={[row, smallHMargin, styles.wrapper, small2xTMargin]}>
-              <LinearGradient
-                start={start}
-                end={end}
-                colors={['#5bf547', '#32fc7d']}
-                style={[
-                  row,
-                  fill,
-                  regularHPadding,
-                  regularVPadding,
-                  tinyHMargin,
-                  styles.linearGradient,
-                ]}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Exercise')}
+                style={[fullWidth, center, { height: 70 }]}
               >
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Exercise')}
-                  style={[fullWidth, center, { height: 70 }]}
-                >
-                  <Text style={styles.startWorkoutWrapper}>Start {'\n'} Workout</Text>
-                </TouchableOpacity>
-              </LinearGradient>
+                <Text style={styles.startWorkoutWrapper}>Start {'\n'} Workout</Text>
+              </TouchableOpacity>
+            </LinearGradient>
 
-              <LinearGradient
-                start={start}
-                end={end}
-                colors={['#fff', '#fff']}
-                style={[row, fill, regularHPadding, regularVPadding, tinyHMargin]}
+            <LinearGradient
+              start={start}
+              end={end}
+              colors={['#fff', '#fff']}
+              style={[row, fill, regularHPadding, regularVPadding, tinyHMargin]}
+            />
+          </View>
+        ) : null}
+      </View>
+      <View style={[fill, small2xTMargin, styles.lastContainer]}>
+        {mealRequesting ? (
+          <View style={styles.loaderStyle}>
+            <ActivityIndicator size="large" color="green" />
+          </View>
+        ) : meals.length > 0 ? (
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                colors={['#9Bd35A', '#689F38']}
+                refreshing={mealRequesting}
+                onRefresh={() => props.getMealsRequest()}
+                progressViewOffset={20}
               />
-            </View>
-          ) : null}
-        </View>
-        <View style={[fill, styles.lastContainer, small2xTMargin]}>
-          <SearchablePaginatedList
-            style={fill}
-            ListEmptyComponent={emptyList}
-            keyExtractor={item => `${item.id}`}
-            list={meals}
-            fetchListAction={() => props.getMealsRequest()}
-            renderItem={({ item, index }) => renderItem(item, index)}
-            search=""
-            filter=""
+            }
+            data={meals}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            keyboardShouldPersistTaps={'handled'}
           />
-        </View>
+        ) : (
+          <View style={[fill, Layout.alignItemsCenter]}>
+            <Text style={{ fontSize: 18, color: 'black' }} text="No meals are available!" />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -251,10 +217,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
-
     elevation: 6,
   },
-
   wrapper: {
     height: 100,
     borderRadius: 25,
@@ -266,12 +230,8 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   middleSubTextStyle: {
-    // lineHeight: 30,
-    // paddingLeft: 5,
     color: '#fff',
   },
-
-  // old
   iconMainStyle: {
     top: 0,
     right: 0,
@@ -302,13 +262,17 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
+  mealRequesting: state.customCalReducer.mealRequesting,
   meals: state.customCalReducer.meals,
   loadingAllSession: state.programReducer.requesting,
   allSessions: state.programReducer.getAllSessions,
+  todaySessions: state.programReducer.todaySessions,
+  todayRequest: state.programReducer.todayRequest,
 });
 
 const mapDispatchToProps = dispatch => ({
   getMealsRequest: () => dispatch(getMealsRequest()),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
+  getDaySessionRequest: data => dispatch(getDaySessionRequest(data))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

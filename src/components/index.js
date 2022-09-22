@@ -24,7 +24,6 @@ import DashboardCard from './DashboardCard'
 import RuningCard from './RuningCard'
 import HeaderForDrawer from './HeaderForDrawer'
 import MealEmptyItem from './MealEmptyItem'
-import SearchablePaginatedList from './SearchablePaginatedList'
 
 export {
   Text,
@@ -53,5 +52,4 @@ export {
   RuningCard,
   HeaderForDrawer,
   MealEmptyItem,
-  SearchablePaginatedList
 };

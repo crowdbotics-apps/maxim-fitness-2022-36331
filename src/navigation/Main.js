@@ -28,6 +28,9 @@ import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
 import AddExercise from '../screens/CustomWorkOut/AddExercise'
 import SettingScreen from '../screens/SettingScreen'
 import HomeScreen from '../screens/HomeScreen'
+import MealRegulator from '../screens/MealRegulator'
+import SelectBrand from '../screens/SelectBrand'
+import LogFoods from '../screens/LogFoods';
 const { home, profileTab, feed, nutrition, exercise } = Images
 
 const mainStack = createStackNavigator()
@@ -190,6 +193,9 @@ const MainNavigator = () => (
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
     <mainStack.Screen name='HomeScreen' component={HomeScreen} />
+    <mainStack.Screen name='MealRegulator' component={MealRegulator} />
+    <mainStack.Screen name='SelectBrand' component={SelectBrand} />
+    <mainStack.Screen name='LogFoods' component={LogFoods} />
   </mainStack.Navigator>
 )
 

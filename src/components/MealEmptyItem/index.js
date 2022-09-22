@@ -5,19 +5,12 @@ import moment from 'moment';
 import Text from '../Text';
 import { Gutters, Layout, Global, Colors, Images } from '../../theme';
 
-const MealEmptyItem = ({
-  clock,
-  mealItems,
-  numberOfProtein,
-  numberOfCarbs,
-  numberOfFat,
-  id,
-  index,
-  navigation,
-  titleContainerStyle,
-  setSelectedMealAction,
-  getMealsFoodAction,
-}) => {
+const MealEmptyItem = ({ item, index, navigation }) => {
+
+  const clock = item.date_time
+  const mealItems = item.food_items
+  const id = item.id
+
   const getCarbs = item => {
     let carbs = 0;
     let currentD = moment(new Date()).format('YYYY-MM-DD');
@@ -75,25 +68,25 @@ const MealEmptyItem = ({
   return (
     <TouchableOpacity
       key={index}
-    // onPress={() => {
-    //   setSelectedMealAction({
-    //     date_time: clock,
-    //     food_items: mealItems,
-    //     carbohydrate: numberOfCarbs,
-    //     protein: numberOfProtein,
-    //     fat: numberOfFat,
-    //     id,
-    //   });
-    //   getMealsFoodAction(dateTime, id);
-    //   let currentD = moment(new Date()).format('YYYY-MM-DD');
-    //   if (mealItems.length && currentD) {
-    //     navigation.navigate('LogFoodsScreen');
-    //   } else {
-    //     navigation.navigate('MealRegulatorScreen');
-    //   }
-    // }}
+      onPress={() => {
+        // setSelectedMealAction({
+        //   date_time: clock,
+        //   food_items: mealItems,
+        //   carbohydrate: numberOfCarbs,
+        //   protein: numberOfProtein,
+        //   fat: numberOfFat,
+        //   id,
+        // });
+        // getMealsFoodAction(dateTime, id);
+        // let currentD = moment(new Date()).format('YYYY-MM-DD');
+        // if (mealItems.length && currentD) {
+        //   navigation.navigate('LogFoodsScreen');
+        // } else {
+        navigation.navigate('MealRegulator');
+        // }
+      }}
     >
-      <View style={[smallVPadding, titleContainerStyle]}>
+      <View style={smallVPadding}>
         <Text style={styles.mealText} text={`Meal ${index + 1}`} />
       </View>
       <View
