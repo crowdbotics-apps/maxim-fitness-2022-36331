@@ -10,6 +10,7 @@ import { Gutters, Layout, Global } from '../../theme';
 // Actions
 import { getMealsRequest } from '../../ScreenRedux/customCalRedux';
 import { getAllSessionRequest, getDaySessionRequest } from '../../ScreenRedux/programServices';
+import { selectedMealsRequest, getMealFoodRequest } from '../../ScreenRedux/nutritionRedux'
 
 const HomeScreen = props => {
   const {
@@ -19,7 +20,8 @@ const HomeScreen = props => {
     allSessions,
     loadingAllSession,
     todaySessions,
-    todayRequest
+    todayRequest,
+    selectedMeal
   } = props;
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
@@ -41,7 +43,13 @@ const HomeScreen = props => {
   const renderItem = ({ item, index }) => {
     return (
       <View style={smallHMargin}>
-        <MealEmptyItem item={item} index={index} navigation={navigation} />
+        <MealEmptyItem
+          item={item}
+          index={index}
+          navigation={navigation}
+          selectedMealsRequest={props.selectedMealsRequest}
+          getMealFoodRequest={props.getMealFoodRequest}
+        />
       </View>
     );
   };
@@ -268,11 +276,14 @@ const mapStateToProps = state => ({
   allSessions: state.programReducer.getAllSessions,
   todaySessions: state.programReducer.todaySessions,
   todayRequest: state.programReducer.todayRequest,
+  selectedMeal: state.nutritionReducer.selectedMeal
 });
 
 const mapDispatchToProps = dispatch => ({
   getMealsRequest: () => dispatch(getMealsRequest()),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
-  getDaySessionRequest: data => dispatch(getDaySessionRequest(data))
+  getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
+  selectedMealsRequest: data => dispatch(selectedMealsRequest(data)),
+  getMealFoodRequest: (data, id) => dispatch(getMealFoodRequest(data, id))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

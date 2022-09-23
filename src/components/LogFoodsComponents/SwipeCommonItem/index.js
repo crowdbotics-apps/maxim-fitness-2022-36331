@@ -33,8 +33,7 @@ const SwipeCommonItem = ({
     setCalories(data);
   };
 
-  const { smallBMargin, tinyTPadding, tinnyBPadding, smallVMargin, smallLPadding, smallRPadding } =
-    Gutters;
+  const { smallBMargin, smallVMargin, smallLPadding, smallRPadding } = Gutters;
   const { row, center } = Layout;
   const { border } = Global;
 
@@ -44,8 +43,6 @@ const SwipeCommonItem = ({
         style={[
           smallLPadding,
           smallRPadding,
-          // tinyTPadding,
-          // tinnyBPadding,
           styles.mainSwipeContainer,
         ]}
       >

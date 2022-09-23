@@ -1,11 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-// translation
-import { useTranslation } from 'react-i18next';
 import Fonts from '../../assets/images/fonts';
 
 const TouchableDeleteAll = ({ onPress, clear }) => {
-  const { t } = useTranslation();
   return (
     <>
       {clear ? (
@@ -17,7 +14,7 @@ const TouchableDeleteAll = ({ onPress, clear }) => {
       ) : (
         <View style={styles.mainContainer}>
           <TouchableOpacity onPress={onPress}>
-            <Text style={styles.buttonText}>{t('todayScreen.deleteAllItems')}</Text>
+            <Text style={styles.buttonText}>{'Delete All Items'}</Text>
           </TouchableOpacity>
         </View>
       )}

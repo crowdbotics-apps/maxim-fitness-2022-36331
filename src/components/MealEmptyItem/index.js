@@ -5,7 +5,7 @@ import moment from 'moment';
 import Text from '../Text';
 import { Gutters, Layout, Global, Colors, Images } from '../../theme';
 
-const MealEmptyItem = ({ item, index, navigation }) => {
+const MealEmptyItem = ({ item, index, navigation, selectedMealsRequest, getMealFoodRequest }) => {
 
   const clock = item.date_time
   const mealItems = item.food_items
@@ -69,21 +69,14 @@ const MealEmptyItem = ({ item, index, navigation }) => {
     <TouchableOpacity
       key={index}
       onPress={() => {
-        // setSelectedMealAction({
-        //   date_time: clock,
-        //   food_items: mealItems,
-        //   carbohydrate: numberOfCarbs,
-        //   protein: numberOfProtein,
-        //   fat: numberOfFat,
-        //   id,
-        // });
-        // getMealsFoodAction(dateTime, id);
-        // let currentD = moment(new Date()).format('YYYY-MM-DD');
-        // if (mealItems.length && currentD) {
-        //   navigation.navigate('LogFoodsScreen');
-        // } else {
-        navigation.navigate('MealRegulator');
-        // }
+        selectedMealsRequest(item);
+        getMealFoodRequest(dateTime, id);
+        let currentD = moment(new Date()).format('YYYY-MM-DD');
+        if (mealItems.length && currentD) {
+          navigation.navigate('LogFoods');
+        } else {
+          navigation.navigate('MealRegulator');
+        }
       }}
     >
       <View style={smallVPadding}>
@@ -129,17 +122,10 @@ const MealEmptyItem = ({ item, index, navigation }) => {
           </View>
           <View style={[fill, justifyContentCenter, alignItemsEnd, regularHPadding]}>
             <TouchableOpacity
-            // onPress={() => {
-            //   setSelectedMealAction({
-            //     date_time: clock,
-            //     food_items: mealItems,
-            //     carbohydrate: numberOfCarbs,
-            //     protein: numberOfProtein,
-            //     fat: numberOfFat,
-            //     id,
-            //   });
-            //   navigation.navigate('MealRegulatorScreen');
-            // }}
+              onPress={() => {
+                selectedMealsRequest(item);
+                navigation.navigate('MealRegulator');
+              }}
             >
               <Image style={styles.imageAddIcon} source={Images.addMealIcon} />
             </TouchableOpacity>

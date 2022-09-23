@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import LottieView from 'lottie-react-native';
 import Voice from '@react-native-community/voice';
 import { Images, Layout, Gutters, Global } from '../../theme';
+import { getSpeechRequest } from '../../ScreenRedux/nutritionRedux'
 
 const MealRegulator = props => {
   const { navigation } = props;
@@ -69,7 +70,7 @@ const MealRegulator = props => {
   };
 
   const reviewFood = () => {
-    // props.getFoodItems(partialResults);
+    props.getSpeechRequest(partialResults);
     navigation.navigate('LogFoods');
     setPartialResults([]);
   };
@@ -159,10 +160,10 @@ const MealRegulator = props => {
           style={[
             styles.linearGradient,
             styles.shadowStyle,
-            { opacity: !partialResults.length ? 1 : 0.5 },
+            { opacity: partialResults.length ? 1 : 0.5 },
           ]}
         >
-          <TouchableOpacity disabled={!partialResults.length ? false : true} onPress={reviewFood}>
+          <TouchableOpacity disabled={partialResults.length ? false : true} onPress={reviewFood}>
             <Text style={{ color: '#fff' }}>Review Foods</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -227,6 +228,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
-  // getFoodItems: (data) => dispatch(getFoodItems(data)),
+  getSpeechRequest: (data) => dispatch(getSpeechRequest(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(MealRegulator);

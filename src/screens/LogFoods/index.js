@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { connect } from 'react-redux';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 import SwipeSelectedItem from '../../components/LogFoodsComponents/SwipeSelectedItem';
@@ -23,33 +24,31 @@ import GradientButton from '../../components/LogFoodsComponents/GradientButton';
 import TableColumn from './TableColumn';
 import TouchableDeleteAll from './TouchableDeleteAll';
 
-// translation
-import { useTranslation } from 'react-i18next';
-
 // import HeaderWithSearch from '../../components/HeaderWithSearch';
 // import Fonts from '../../assets/fonts';
 import { Images, Layout, Gutters, Global } from '../../theme';
 import moment from 'moment';
+import { postLogFoodRequest, resetFoodItems, deleteAllMeals } from '../../ScreenRedux/nutritionRedux';
 
-const LogFoods = ({
-  // products,
-  // searchActive,
-  // setSelectedProductsAction,
-  // unsetSearchActiveAction,
-  removeAllSelectedProductsAction,
-  logFood,
-  updateFoodItems,
-  food,
-  navigation,
-  scannedProduct,
-  // resetFoodItems,
-  brandedItems,
-  commonItems,
-  getMealsFood,
-  removeSelectedProductsAction,
-  productUnitAction,
-}) => {
-  const { t } = useTranslation();
+const LogFoods = (props) => {
+  const {
+    removeAllSelectedProductsAction,
+    updateFoodItems,
+    food,
+    navigation,
+    scannedProduct,
+    resetFoodItems,
+
+    speechState,
+    brandedState,
+    commonState,
+    selectedMeal,
+    loaderLogFood,
+
+    getMealsFood,
+    removeSelectedProductsAction,
+    productUnitAction,
+  } = props
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState('');
 
@@ -101,7 +100,7 @@ const LogFoods = ({
   }, [isFocused]);
 
   const clearAllData = () => {
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setSpeechData([]);
@@ -124,7 +123,7 @@ const LogFoods = ({
   useEffect(() => {
     // createNewMealSpeach();
     return () => {
-      // resetFoodItems();
+      resetFoodItems();
     };
   }, []);
 
@@ -135,22 +134,22 @@ const LogFoods = ({
   }, [getMealsFood]);
 
   useEffect(() => {
-    if (food && food.length) {
-      setSpeechData(food);
+    if (speechState && speechState.length) {
+      setSpeechData(speechState);
     }
-  }, [food]);
+  }, [speechState]);
 
   useEffect(() => {
-    if (brandedItems) {
-      setBrandedData([brandedItems]);
+    if (brandedState) {
+      setBrandedData([brandedState]);
     }
-  }, [brandedItems]);
+  }, [brandedState]);
 
   useEffect(() => {
-    if (commonItems && commonItems.length) {
-      setCommonData(commonItems);
+    if (commonState && commonState.length) {
+      setCommonData(commonState);
     }
-  }, [commonItems]);
+  }, [commonState]);
 
   useEffect(() => {
     if (scannedProduct) {
@@ -222,7 +221,7 @@ const LogFoods = ({
     removeSelectedProductsAction(item.id);
     // updateFoodItems(newData);
 
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setTotalCal(0);
@@ -240,7 +239,7 @@ const LogFoods = ({
     setSpeechData(newData);
     updateFoodItems(newData);
 
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setTotalCal(0);
@@ -258,7 +257,7 @@ const LogFoods = ({
     setCommonData(newData);
     updateFoodItems(newData);
 
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setTotalCal(0);
@@ -274,7 +273,7 @@ const LogFoods = ({
   const onDeleteBranded = () => {
     setBrandedData([]);
 
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setTotalCal(0);
@@ -290,7 +289,7 @@ const LogFoods = ({
   const onDeleteScan = () => {
     setScanData([]);
 
-    // resetFoodItems();
+    resetFoodItems();
     setValue('');
 
     setTotalCal(0);
@@ -392,7 +391,6 @@ const LogFoods = ({
           created: formatedDate,
         }))
         : [];
-    setLoading(true);
 
     const data = [
       {
@@ -402,10 +400,8 @@ const LogFoods = ({
         scan: scan,
       },
     ];
-    await logFood(data);
-    setLoading(false);
-    await clearAllData();
-    // navigation.navigate('NutritionScreen');
+    await props.postLogFoodRequest(selectedMeal?.id, data);
+    clearAllData();
   };
 
   const selectedCalories = f => {
@@ -551,35 +547,6 @@ const LogFoods = ({
               <Image style={styles.barCodeStyle} source={Images.barCode} />
             </TouchableOpacity>
           </View>
-          {/* <TouchableOpacity style={styles.headerContainer}>
-            <HeaderWithSearch
-              searchStringState={value}
-              productItems={products}
-              // setSearchString={setSearchString}
-              setSelectedItems={setSelectedProductsAction}
-              resetValue={searchActive}
-              unsetSearchActive={unsetSearchActiveAction}
-              navigation={navigation}
-            />
-            <TouchableOpacity
-              style={styles.onSearchDiv}
-              onPress={() => navigation.navigate('     <TouchableOpacity style={styles.headerContainer}>
-            <HeaderWithSearch
-              searchStringState={value}
-              productItems={products}
-              // setSearchString={setSearchString}
-              setSelectedItems={setSelectedProductsAction}
-              resetValue={searchActive}
-              unsetSearchActive={unsetSearchActiveAction}
-              navigation={navigation}
-            />
-            <TouchableOpacity
-              style={styles.onSearchDiv}
-              onPress={() => navigation.navigate('SelectBrand')}
-            />
-          </TouchableOpacity>SelectBrand')}
-            />
-          </TouchableOpacity> */}
           <View style={[fill, small2xHMargin]}>
             <View style={[center, small2xVPadding, fullWidth]}>
               <Text style={styles.swipeHeaderText}> Swipe left to delete </Text>
@@ -834,14 +801,18 @@ const LogFoods = ({
               buttonContentContainerProp={{ paddingBottom: 0 }}
               onPress={logFoodAction}
               isDone={disable}
-              loading={loading}
+              loading={loaderLogFood}
             />
           </View>
           {deleteFnc() && (
             <View style={[row, fill, justifyContentCenter, alignItemsCenter, regularHPadding]}>
               <TouchableDeleteAll
                 onPress={() => {
-                  removeAllSelectedProductsAction();
+                  const data = {
+                    foodId: selectedMeal?.food_items?.id,
+                    mealId: selectedMeal.id
+                  }
+                  // props.deleteAllMeals(data);
                   // navigation.navigate('Home');
                 }}
               />
@@ -953,4 +924,18 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LogFoods;
+const mapStateToProps = state => ({
+  speechState: state.nutritionReducer.speechState,
+  commonState: state.nutritionReducer.commonState,
+  brandedState: state.nutritionReducer.brandedState,
+  selectedMeal: state.nutritionReducer.selectedMeal,
+  loaderLogFood: state.nutritionReducer.loader,
+  getMealsFood: state.nutritionReducer.getMealsFoodState,
+});
+
+const mapDispatchToProps = dispatch => ({
+  postLogFoodRequest: (id, data) => dispatch(postLogFoodRequest(id, data)),
+  resetFoodItems: () => dispatch(resetFoodItems()),
+  deleteAllMeals: (data) => dispatch(deleteAllMeals(data))
+});
+export default connect(mapStateToProps, mapDispatchToProps)(LogFoods);
