@@ -27,8 +27,11 @@ import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
 import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
 import AddExercise from '../screens/CustomWorkOut/AddExercise'
 import SettingScreen from '../screens/SettingScreen'
+import {modules} from '@modules'
+
 const { home, profileTab, feed, nutrition, exercise } = Images
 
+const Chat = modules[0].value.navigator;
 const mainStack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 
@@ -188,6 +191,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="SettingScreen" component={SettingScreen} />
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
+    <mainStack.Screen name="Chat" component={Chat} />
   </mainStack.Navigator>
 )
 
