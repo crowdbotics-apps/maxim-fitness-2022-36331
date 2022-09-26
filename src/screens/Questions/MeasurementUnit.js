@@ -33,8 +33,6 @@ const MeasurementUnit = props => {
     props.updateAnswers(tempData);
   };
 
-  console.log('answers', props.answers);
-
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.37} showBackButton />
@@ -84,7 +82,7 @@ const MeasurementUnit = props => {
 };
 
 const styles = StyleSheet.create({
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain' }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

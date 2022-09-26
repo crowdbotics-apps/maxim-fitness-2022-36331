@@ -37,9 +37,6 @@ const CustormCalories = props => {
   const [isVisible, setIsVisible] = useState(false);
   const [showModalHistory, setShowModalHistory] = useState(false);
 
-  console.log('getCalories: ', props.getCalories)
-  console.log('meals: ', props.meals);
-
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       props.getCustomCalRequest()
@@ -232,33 +229,33 @@ const CustormCalories = props => {
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                    return (
-                      <TouchableOpacity
-                        key={i}
-                        // onPress={() => {
-                        //   if (item.message === 'Comment Post' || 'Like Post') {
-                        //     navigation.navigate('PostDetail', { item: item });
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        //   if (item.message === 'Started following you') {
-                        //     navigation.navigate('ProfileView', item);
-                        //   }
-                        //   if (item.message === 'Message') {
-                        //     navigation.navigate('ChatRoom');
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        // }}
-                      >
-                        <RuningCard
-                          item={item}
-                          Notification={item.message}
-                          Time={calculatePostTime(item)}
-                        />
-                      </TouchableOpacity>
-                    );
-                  })
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                    // onPress={() => {
+                    //   if (item.message === 'Comment Post' || 'Like Post') {
+                    //     navigation.navigate('PostDetail', { item: item });
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    //   if (item.message === 'Started following you') {
+                    //     navigation.navigate('ProfileView', item);
+                    //   }
+                    //   if (item.message === 'Message') {
+                    //     navigation.navigate('ChatRoom');
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    // }}
+                    >
+                      <RuningCard
+                        item={item}
+                        Notification={item.message}
+                        Time={calculatePostTime(item)}
+                      />
+                    </TouchableOpacity>
+                  );
+                })
                 : null}
             </View>
           </ScrollView>

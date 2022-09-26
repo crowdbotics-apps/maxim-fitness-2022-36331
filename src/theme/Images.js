@@ -83,5 +83,10 @@ export default {
   duplicateIcon: require('src/assets/images/duplicateIcon.png'),
   sendMessage: require('src/assets/images/sendMessage.png'),
   uploadMedia: require('src/assets/images/uploadMedia.png'),
-  forwordIcon: require('src/assets/images/forwardIcon.png')
+  forwordIcon: require('src/assets/images/forwardIcon.png'),
+  iconBurger: require('src/assets/images/hamburger.png'),
+  splashLogo: require('src/assets/images/splash_logo.png'),
+  addMealIcon: require('src/assets/images/add_icon_meal.png'),
+  leftArrow: require('src/assets/images/left-arrow.png'),
+  barCode: require('src/assets/images/barcode.png'),
 };

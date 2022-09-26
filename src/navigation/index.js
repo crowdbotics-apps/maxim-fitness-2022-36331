@@ -8,7 +8,7 @@ import { navigationRef } from './NavigationService';
 import AuthStackScreen from './AuthScreens';
 import MainNavigator from './Main';
 import QuestionStackScreen from './QuestionScreens';
-import { getProfile } from '../ScreenRedux/profileRedux';
+import { profileData } from '../ScreenRedux/profileRedux';
 
 const authStack = createStackNavigator();
 const mainStack = createStackNavigator();
@@ -16,11 +16,7 @@ const questionStack = createStackNavigator();
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
-  const { renderTab, getProfile, profile, accessToken } = props;
-
-  useEffect(() => {
-    renderTab && getProfile();
-  }, [renderTab]);
+  const { renderTab, profile, accessToken } = props;
 
   return (
     <NavigationContainer
@@ -34,7 +30,7 @@ const Navigation = props => {
     >
       <authStack.Navigator screenOptions={{ headerShown: false }}>
         {accessToken ? (
-          true ? (
+          profile?.is_survey ? (
             <mainStack.Screen name="MainStack" component={MainNavigator} />
           ) : (
             <questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
@@ -55,7 +51,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getProfile: () => dispatch(getProfile()),
+  profileData: () => dispatch(profileData()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

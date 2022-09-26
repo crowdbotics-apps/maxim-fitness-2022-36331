@@ -141,7 +141,7 @@ const Gender = props => {
 
 const styles = StyleSheet.create({
   logoStyle: { height: 140, width: 140, resizeMode: 'contain' },
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain' }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

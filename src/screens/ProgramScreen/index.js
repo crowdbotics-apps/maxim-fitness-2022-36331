@@ -16,9 +16,6 @@ import { connect } from 'react-redux';
 
 const ProgramScreen = props => {
   const { navigation, getAllSessions, loadingAllSession } = props;
-
-  console.log('getAllSessions: ', getAllSessions);
-
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(1);

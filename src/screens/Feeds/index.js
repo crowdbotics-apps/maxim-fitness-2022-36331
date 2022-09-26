@@ -17,7 +17,6 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 const Feeds = props => {
   const { feeds, requesting, navigation, profile } = props
-  console.log('profile: ', profile);
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1);
   // const [uploadAvatar, setUploadAvatar] = useState('');

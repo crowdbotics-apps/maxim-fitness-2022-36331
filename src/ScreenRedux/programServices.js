@@ -12,13 +12,21 @@ import { sortSessionBySets } from '../utils/common';
 
 const ALL_SESSIONS_REQUEST = 'ProgramScreen/ALL_SESSIONS_REQUEST';
 const ALL_SESSIONS_SUCCESS = 'ProgramScreen/ALL_SESSIONS_SUCCESS';
+
+const TODAY_SESSIONS_REQUEST = 'ProgramScreen/TODAY_SESSIONS_REQUEST';
+const TODAY_SESSIONS_SUCCESS = 'ProgramScreen/TODAY_SESSIONS_SUCCESS';
+
 const REPS_WEIGHT_REQUEST = 'ProgramScreen/REPS_WEIGHT_REQUEST';
 const REPS_WEIGHT_SUCCESS = 'ProgramScreen/REPS_WEIGHT_SUCCESS';
+
 const PICK_SESSION = 'ProgramScreen/PICK_SESSION';
+
 const SETS_DONE_REQUEST = 'ProgramScreen/SETS_DONE_REQUEST';
 const SETS_DONE_SUCCESS = 'ProgramScreen/SETS_DONE_SUCCESS';
+
 const EXERCISE_DONE_REQUEST = 'ProgramScreen/EXERCISE_DONE_REQUEST';
 const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
+
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -27,6 +35,16 @@ export const getAllSessionRequest = data => ({
 
 export const getAllSessionSuccess = data => ({
   type: ALL_SESSIONS_SUCCESS,
+  data,
+});
+
+export const getDaySessionRequest = data => ({
+  type: TODAY_SESSIONS_REQUEST,
+  data,
+});
+
+export const getDaySessionSuccess = data => ({
+  type: TODAY_SESSIONS_SUCCESS,
   data,
 });
 
@@ -83,6 +101,9 @@ const initialState = {
   setDone: false,
   exeLoading: false,
   exerciseDone: false,
+
+  todayRequest: false,
+  todaySessions: false,
 };
 
 export const programReducer = (state = initialState, action) => {
@@ -98,6 +119,19 @@ export const programReducer = (state = initialState, action) => {
         ...state,
         getAllSessions: action.data,
         requesting: false,
+      };
+
+    case TODAY_SESSIONS_REQUEST:
+      return {
+        ...state,
+        todayRequest: true,
+      };
+
+    case TODAY_SESSIONS_SUCCESS:
+      return {
+        ...state,
+        todaySessions: action.data,
+        todayRequest: false,
       };
 
     case REPS_WEIGHT_REQUEST:
@@ -175,6 +209,32 @@ function* getAllSessions({ data }) {
   } catch (e) {
     console.log('eee:', e);
     yield put(getAllSessionSuccess(false));
+  }
+}
+
+async function getTodaySessionAPI(data) {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/session/get_by_day/?day=${data}`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'GET',
+  };
+  return XHR(URL, options);
+}
+
+function* getTodaySessions({ data }) {
+  console.log('Day session: ', data);
+  try {
+    const response = yield call(getTodaySessionAPI, data);
+    console.log('Res today session: ', response);
+    // const query = sortSessionBySets(response?.data?.query);
+    yield put(getDaySessionSuccess(response.data));
+  } catch (e) {
+    console.log('Err today session:', e);
+    yield put(getDaySessionSuccess(false));
   }
 }
 
@@ -291,4 +351,5 @@ export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
   takeLatest(SETS_DONE_REQUEST, setDoneAction),
+  takeLatest(TODAY_SESSIONS_REQUEST, getTodaySessions),
 ]);
