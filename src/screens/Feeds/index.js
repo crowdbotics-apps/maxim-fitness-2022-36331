@@ -93,7 +93,7 @@ const Feeds = props => {
             : { uri: profile?.profile_picture }
         }
         onPressPlus={() => navigation.navigate('AddPost')}
-        onPressSearch={() => navigation.navigate('CreateDirectChannel')}
+        onPressSearch={() => navigation.navigate('SearchProfile')}
         onAvatarChange={() => navigation.navigate('SettingScreen')}
       />
       <Text style={styles.content} text="Latest" />

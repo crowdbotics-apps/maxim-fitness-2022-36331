@@ -162,7 +162,7 @@ const ProfileScreen = props => {
           <Loader isLoading={props.requesting} />
           <View>
             <ImageBackground
-              source={profileBackGround}
+              source={ userDetail?.user_detail?.background_picture ? {uri: userDetail?.user_detail?.background_picture} : profileBackGround}
               style={{ height: (273 / 375) * width, width: '100%' }}
             >
               <View style={styles.backgroundStyle}>

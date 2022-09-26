@@ -15,14 +15,10 @@ const Stack = createStackNavigator();
 
 const Navigator = () => {
   return <Stack.Navigator>
-    <Stack.Screen options={{ headerShown: false }} name="Channels" component={CreateDirectChannel} />
+    <Stack.Screen options={{ headerShown: false }} name="Channels" component={Conversation} />
     <Stack.Screen name="Channel" component={Chat}
       options={({ navigation, route }) => ({
-        headerRight: () => <View style={options.NavigationStyle.headerRight}>
-          <Pressable onPress={() => navigation.navigate("ChannelDetails", { item: route.params.item })}>
-            <Text>Details</Text>
-          </Pressable>
-        </View>
+        header: () => null
       })}
     />
     <Stack.Screen name="ChannelDetails" component={ChannelDetails} options={({ navigation, route }) => ({
