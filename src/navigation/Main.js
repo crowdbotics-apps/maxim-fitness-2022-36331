@@ -31,8 +31,12 @@ import HomeScreen from '../screens/HomeScreen'
 import MealRegulator from '../screens/MealRegulator'
 import SelectBrand from '../screens/SelectBrand'
 import LogFoods from '../screens/LogFoods';
+import {modules} from '@modules'
+
+import SubscriptionScreen from '../screens/Subscription'
 const { home, profileTab, feed, nutrition, exercise } = Images
 
+const Chat = modules[0].value.navigator;
 const mainStack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 
@@ -208,6 +212,8 @@ const MainNavigator = () => (
     <mainStack.Screen name='MealRegulator' component={MealRegulator} />
     <mainStack.Screen name='SelectBrand' component={SelectBrand} />
     <mainStack.Screen name='LogFoods' component={LogFoods} />
+    <mainStack.Screen name='SubscriptionScreen' component={SubscriptionScreen} />
+    <mainStack.Screen name="Chat" component={Chat} />
   </mainStack.Navigator>
 )
 
