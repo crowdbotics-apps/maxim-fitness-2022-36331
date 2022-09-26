@@ -19,7 +19,7 @@ import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
-// import { createThumbnail } from "react-native-create-thumbnail";
+import { createThumbnail } from "react-native-create-thumbnail";
 
 //action
 import { AddPostData } from '../../ScreenRedux/addPostRequest';
@@ -32,6 +32,7 @@ const AddPost = props => {
   const [showPost, setShowPost] = useState(false);
   const [imageData, setImageData] = useState([]);
   const [content, setContent] = useState(false);
+  const [videoThumbnail, setVideoThumbNail] = useState(false)
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -42,22 +43,25 @@ const AddPost = props => {
     }
   }, [isFocused]);
 
-  // const thumbNailData = ()=>{
-  //   if(imageData.length){
-  //     imageData.map((item)=>{
-  //       if(item.mime === 'video/mp4'){
-  //         createThumbnail({
-  //           url: item.path,
-  //         })
-  //           .then(response => setVideoThumbNail(response))
-  //           .catch(err => console.log({err}));
-  //       }})
+
+  // useEffect(() => {
+  //   if (imageData.length) {
+  //     createThumbnail({
+  //       url:  imageData[0].path,
+  //     })
+  //       .then(response => [setVideoThumbNail(response), console.log('response---', response)])
+  //       .catch(err => console.log({err}));
   //   }
-  // }
+  // }, [imageData]);
 
   const aa = () => {
     let formData = new FormData();
     formData.append('content', content);
+    // formData.append('video_thumbnail', {
+    //   uri: videoThumbnail.path,
+    //   type: videoThumbnail.mime,
+    //   name: videoThumbnail.path,
+    // });
     imageData.map((item, index) => {
       if (item.mime === 'video/mp4') {
         formData.append('video', {

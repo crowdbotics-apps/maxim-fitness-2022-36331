@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { Text, BottomSheet, Loader } from '../../components';
 import { Images } from 'src/theme';
@@ -35,6 +36,7 @@ const ProfileScreen = props => {
   const [showLoader, setShowLoader] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     profileBackGround,
@@ -45,6 +47,7 @@ const ProfileScreen = props => {
     flagIcon,
     editProfileButton,
     followingButton,
+    circleClose,
   } = Images;
 
   const isFocused = useIsFocused();
@@ -394,29 +397,51 @@ const ProfileScreen = props => {
       >
         <View
           style={{
-            backgroundColor: 'white',
-            paddingHorizontal: 20,
+            backgroundColor: 'black',
+            paddingHorizontal: 5,
             flex: 1,
+            paddingTop: 20,
           }}
         >
-          <Video
-            source={{
-              uri: showModal,
-            }}
-            style={{ height: 300, width: '100%' }}
-            muted={false}
-            repeat={true}
-            // onEnd={() => setStart(false)}
-            resizeMode="cover"
-            rate={1}
-            posterResizeMode="cover"
-            playInBackground={true}
-            playWhenInactive={true}
-            ignoreSilentSwitch="ignore"
-            disableFocus={true}
-            mixWithOthers={'mix'}
-            controls={true}
-          />
+          <TouchableOpacity onPress={() => setShowModal(false)} style={{ alignItems: 'flex-end' }}>
+            <Image
+              source={circleClose}
+              style={{
+                height: 40,
+                width: 40,
+                borderWidth: 1,
+              }}
+            />
+          </TouchableOpacity>
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color="white"
+                // style={{ position: 'absolute', borderWidth: 1, borderColor: 1 }}
+              />
+            )}
+            <Video
+              source={{
+                uri: showModal,
+              }}
+              style={{ height: 300, width: '100%' }}
+              muted={false}
+              repeat={true}
+              // onEnd={() => setStart(false)}
+              resizeMode="cover"
+              rate={1}
+              posterResizeMode="cover"
+              playInBackground={true}
+              playWhenInactive={true}
+              ignoreSilentSwitch="ignore"
+              disableFocus={true}
+              mixWithOthers={'mix'}
+              controls={true}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => setLoading(false)}
+            />
+          </View>
         </View>
       </Modal>
     </>

@@ -16,6 +16,7 @@ const FACEBOOK_LOGIN = 'SCREEN/FACEBOOK_LOGIN';
 const GOOGLE_LOGIN = 'SCREEN/GOOGLE_LOGIN';
 const SET_ACCESS_TOKEN = 'SCREEN/SET_ACCESS_TOKEN';
 const SET_USER_DETAIL = 'SCREEN/SET_USER_DETAIL';
+const SUBSCRIPTION_DATA = 'SCREEN/SUBSCRIPTION_DATA'
 const RESET = 'SCREEN/RESET';
 
 const initialState = {
@@ -24,6 +25,7 @@ const initialState = {
   accessToken: false,
   googleRequesting: false,
   faceBookRequesting: false,
+  subscriptionData: false
 }
 
 //Actions
@@ -49,6 +51,11 @@ export const setAccessToken = accessToken => ({
 
 export const setUserDetail = data => ({
   type: SET_USER_DETAIL,
+  data
+})
+
+export const subscriptionData = data => ({
+  type: SUBSCRIPTION_DATA,
   data
 })
 
@@ -88,6 +95,12 @@ export const loginReducer = (state = initialState, action) => {
         requesting: false
       }
 
+      case SUBSCRIPTION_DATA:
+      return {
+        ...state,
+        subscriptionData: action.data,
+      }
+
     case RESET:
       return {
         ...state,
@@ -115,19 +128,21 @@ function loginAPI(data) {
 function* login({ data }) {
   try {
     const response = yield call(loginAPI, data)
+    console.log('login success response----', response);
     AsyncStorage.setItem('authToken', response.data.token)
     yield put(setUserDetail(response.data.user))
-    yield put(setAccessToken(response.data.token))
-    // if(response?.data?.subscription === false){
-    //   navigate('Subscription')
-    // }
-    // else{
-    //   yield put(setAccessToken(response.data.token))
-    //   showMessage({
-    //     message: 'Login successfully',
-    //     type: 'success',
-    //   })
-    // }
+    yield put(subscriptionData(response?.data?.subscription))
+    // yield put(setAccessToken(response.data.token))
+    if(response?.data?.subscription === false){
+      navigate('Subscription')
+    }
+    else{
+      yield put(setAccessToken(response.data.token))
+      showMessage({
+        message: 'Login successfully',
+        type: 'success',
+      })
+    }
   } catch (e) {
     const { response } = e
     console.log('error response---', response);
