@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native';
 
+import { PUBNUB_PUB, PUBNUB_SUB, FILESTACK_KEY } from "@env"
+
 const styles = StyleSheet.create({
   textInput: {
     paddingVertical: 4,
@@ -55,9 +57,9 @@ export const ListViewStyle = StyleSheet.create({
   },
 });
 
-const PUBNUB_PUB = 'pub-c-445ac9b7-3c84-4533-8ae4-df6b085dc351';
-const PUBNUB_SUB = 'sub-c-f2103d2e-74da-4e80-addd-ea20fb4beea6';
-const FILESTACK_KEY = 'AAPKloXQDQy61KlIW09M6z';
+// const PUBNUB_PUB = PUBNUB_PUB;
+// const PUBNUB_SUB = PUBNUB_SUB;
+// const FILESTACK_KEY = FILESTACK_KEY;
 
 const user = {
   name: 'Mark Kelley',
