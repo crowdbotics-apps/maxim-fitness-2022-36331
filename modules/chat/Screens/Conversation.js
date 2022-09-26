@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { Images } from 'src/theme';
 import { useStore } from "../Store";
 import {
   Text,
@@ -7,7 +8,9 @@ import {
   Image,
   Pressable,
   SectionList,
-  StyleSheet
+  StyleSheet,
+  Dimensions,
+  TextInput
 } from "react-native";
 // @ts-ignore
 import { usePubNub } from "pubnub-react";
@@ -23,6 +26,9 @@ const Conversations = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [conversationList, setConversationList] = useState([]);
   const [search, setSearch] = useState("");
+  const { width } = Dimensions.get('window');
+  const { profile, messageImage, backImage, searchImage } = Images;
+
 
   const bootstrap = () => {
     setLoading(true);
@@ -87,7 +93,7 @@ const Conversations = ({ navigation }) => {
                 response.channels[channel]?.occupants[0]?.state?.last_seen;
               const DATA = [
                 {
-                  title: "Channels",
+                  title: "",
                   data: channels
                     .filter((item) => {
                       return item.custom.type === 1;
@@ -95,7 +101,7 @@ const Conversations = ({ navigation }) => {
                     .map((obj) => ({ ...obj }))
                 },
                 {
-                  title: "Direct Chats",
+                  title: "",
                   data: channels
                     .filter((item) => {
                       return item.custom.type === 0;
@@ -114,40 +120,39 @@ const Conversations = ({ navigation }) => {
   const ListItem = (item) => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("Channel", { item: item })}
-      >
-        <View key={item.id} style={styles.ListItem}>
-          <View style={styles.ProfileContainer}>
-            <View style={styles.ProfileBox}>
-              <Circle
-                letter={(item.name ? item.name[0] : "").toUpperCase()}
-                source={item.custom.caption}
-              />
-            </View>
-            <View style={styles.Profile}>
-              <Text
-                style={{
-                  ...styles.ProfileText,
-                  marginTop: "last_seen" in item && item.last_seen ? 1 : 8
-                }}
-              >
-                {item.name}
-              </Text>
-              {"last_seen" in item && item.last_seen && (
-                <Text style={styles.LastSeenText}>
-                  Last seen: {timeSince(new Date(item?.last_seen).getTime())}
-                </Text>
-              )}
+          style={{
+            marginTop: 25,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+          onPress={() => navigation.navigate("Channel", { item: item })}
+        >
+          {console.log('item0000-----', item)}
+          <View style={{ flexDirection: 'row' }}>
+            <Image
+              source={profile}
+              style={{
+                height: (61 / 375) * width,
+                width: (61 / 375) * width,
+                borderRadius: (31 / 375) * width,
+              }}
+            />
+            <View style={{ justifyContent: 'center', marginLeft: 15 }}>
+              <Text style={{ fontSize: 12 }} >{item?.name && item.name.toUpperCase()}</Text>
+              <Text style={{ color: '#D3D3D3', fontSize: 12 }} > {item.custom.owner} </Text>
             </View>
           </View>
-        </View>
-      </TouchableOpacity>
+          <View style={{ justifyContent: 'center' }}>
+            <Text text="2 days" style={{ color: '#D3D3D3', fontSize: 12 }} />
+          </View>
+        </TouchableOpacity>
     );
   };
 
   return (
     <View style={styles.Container}>
-      <View style={styles.TopProfileContainer}>
+      {/* <View style={styles.TopProfileContainer}>
         <View style={styles.ProfileContainer}>
           <View style={styles.ProfileBox}>
             <Image
@@ -161,8 +166,53 @@ const Conversations = ({ navigation }) => {
             </Text>
           </View>
         </View>
-      </View>
-      <SearchBar value={search} onChange={setSearch} />
+      </View> */}
+      <View
+          style={{
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            marginTop: 20,
+            justifyContent: 'space-between',
+          }}
+        >
+          <TouchableOpacity
+            style={{ justifyContent: 'center' }}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={backImage} style={{ height: 20, width: 30 }} />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 22 }} >Messages</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("CreateDirectChannel")}>
+            <Image source={messageImage} style={{ height: 30, width: 30 }} />
+          </TouchableOpacity>
+        </View>
+      {/* <SearchBar value={search} onChange={setSearch} /> */}
+      <View style={{ paddingHorizontal: 20, marginTop: 30, flexDirection: 'row' }}>
+          <TextInput
+            style={{
+              height: 40,
+              borderRadius: 20,
+              borderColor: '#D3D3D3',
+              borderWidth: 1,
+              paddingHorizontal: 60,
+              width: '100%',
+              position: 'relative',
+            }}
+            placeholder="Search People"
+            onChangeText={setSearch}
+          />
+          <View
+            style={{
+              position: 'absolute',
+              marginTop: 5,
+              paddingLeft: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Image source={searchImage} style={{ height: 30, width: 30 }} />
+          </View>
+        </View>
       <SectionList
         refreshing={loading}
         onRefresh={async () => {
@@ -173,18 +223,18 @@ const Conversations = ({ navigation }) => {
         renderItem={({ item }) => ListItem(item)}
         renderSectionHeader={({ section: { title } }) => (
           <View style={styles.ListContainer}>
-            <Text style={styles.GroupHeading}>{title}</Text>
+            {/* <Text style={styles.GroupHeading}>{title}</Text> */}
             {title === "Channels"
               ? (
               <Pressable onPress={() => navigation.navigate("CreateChannel")}>
-                <Text style={styles.GroupHeading}>Create group</Text>
+                {/* <Text style={styles.GroupHeading}>Create group</Text> */}
               </Pressable>
                 )
               : (
               <Pressable
                 onPress={() => navigation.navigate("CreateDirectChannel")}
               >
-                <Text style={styles.GroupHeading}>New chat</Text>
+                {/* <Text style={styles.GroupHeading}>New chat</Text> */}
               </Pressable>
                 )}
           </View>

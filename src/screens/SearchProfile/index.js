@@ -106,7 +106,7 @@ const SearchProfile = props => {
         ) : profileUserData?.length ? (
           profileUserData?.map(item => (
             <TouchableOpacity
-              onPress={() => navigation.navigate('MessageScreen')}
+              onPress={() => navigation.navigate('Chat')}
               style={{
                 marginTop: 25,
                 paddingHorizontal: 20,
