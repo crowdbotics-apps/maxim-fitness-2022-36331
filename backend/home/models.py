@@ -1,6 +1,7 @@
 from django.db import models
 
-# Create your models here.
+import wget
+import os
 from friendship.models import FollowingManager, Follow, bust_cache
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,6 +15,9 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from solo.models import SingletonModel
 from home.nutritionix import Nutritionix
+from thumbnail import generate_thumbnail
+from django.core.files import File
+from maxim_fitness_2022_36331.settings import MEDIA_URL, MEDIA_ROOT
 
 
 from program.models import Program, Session
@@ -383,6 +387,18 @@ class PostVideo(models.Model):
     video_thumbnail = models.FileField(upload_to='post_video/thumbnail', null=True, blank=True)
     created = models.DateField(auto_now_add=True)
 
+    # @property
+    # def video_thumbnail_url(self):
+    #     if self.video_thumbnail:
+    #         url = s3.generate_presigned_url(
+    #             ClientMethod='get_object',
+    #             Params={
+    #                 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+    #                 'Key': "media/" + self.video_thumbnail.name
+    #             })
+    #         return url
+    #     return None
+
 
 class Comment(models.Model):
     post = models.ForeignKey('Post', related_name='comments', on_delete=models.CASCADE)
@@ -495,10 +511,31 @@ def program_assign_user_delete(sender, instance, **kwargs):
      Session.objects.filter(user=instance.user).delete()
 
 
-# from friendship.models import FollowingManager, Follow, bust_cache
-# from django.core.exceptions import ValidationError
-# from friendship.exceptions import AlreadyExistsError
-# from friendship.signals import (follower_created, followee_created, following_created)
+@receiver(post_save, sender=PostVideo)
+def save_video_thumbnail(sender, instance, created, **kwargs):
+    if created:
+        post_video = PostVideo.objects.get(id=instance.id)
+        path_to_file = MEDIA_URL + post_video.video.name
+        filename_sp = post_video.video.name.split("/")[-1].split(".")[0]
+        destination_file_name = f"{filename_sp}.{post_video.video.name.split('.')[-1]}"
+        thumbnail_file_name = f"{filename_sp}.png"
+        try:
+            wget.download(post_video.video.url, destination_file_name)
+            options = {
+                'trim': False,
+                'height': 300,
+                'width': 300,
+                'quality': 85,
+                'type': 'thumbnail'
+            }
+            generate_thumbnail(destination_file_name, thumbnail_file_name, options)
+            # TODO: upload thumbnail_file_name to post_video.thumbnail
+            post_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+        except Exception as e:
+            print(e)
+        finally:
+            os.remove(destination_file_name)
+            os.remove(thumbnail_file_name)
 
 
 class Following(FollowingManager):

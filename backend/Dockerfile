@@ -8,6 +8,17 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 FROM crowdbotics/cb-django:3.8-slim-buster AS release
 ARG SECRET_KEY
 
+# libpq-dev and python3-dev help with psycopg2
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3-dev unoconv ffmpeg imagemagick curl \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  && rm -rf /var/lib/apt/lists/*
+  # You can add additional steps to the build by appending commands down here using the
+  # format `&& <command>`. Remember to add a `\` at the end of LOC 12.
+  # WARNING: Changes to this file may cause unexpected behaviors when building the app.
+  # Change it at your own risk.
+
+#RUN apt-get install -y --no-install-recommends unoconv ffmpeg imagemagick curl
 # Set Working directory
 WORKDIR /opt/webapp
 

@@ -108,6 +108,8 @@ class LoginViewSet(ViewSet):
         user_serializer = UserSerializer(user, context={'request': request})
         if user_serializer.data["stripe_customer_id"]:
             subscription = stripe.Subscription.list(customer=user_serializer.data["stripe_customer_id"], limit=1)
+            if not subscription:
+                subscription = False
         #
         # def get_subscription(self, customer_id):
         #     return stripe.Subscription.list(customer=customer_id, limit=1)
@@ -625,6 +627,50 @@ class SessionViewSet(ModelViewSet):
         }
         return Response(data)
         # return Response(serializer.data)
+
+    @action(detail=False, methods=["post"])
+    def create_custom_workout(self, request):
+        session_date = self.request.data.get("session_date")
+        exercise_ids = self.request.data.get("exercise_ids")
+        set = self.request.data.get("set")
+        session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
+        if session:
+            w_session = Session.objects.create(
+                user=self.request.user,
+                date_time=session_date,
+                program=session.program,
+                cardio=session.cardio,
+                cardio_length=session.cardio_length,
+                cardio_frequency=session.cardio_frequency,
+                heart_rate=session.heart_rate,
+                location=session.location,
+                protein=session.protein,
+                carb=session.carb,
+                carb_casual=session.carb_casual,
+                name=session.name,
+            )
+            session.delete()
+            order = 1
+
+            for exe_id in exercise_ids:
+                exercise = Exercise.objects.get(id=exe_id)
+                workout = Workout.objects.create(
+                    session=w_session,
+                    exercise=exercise,
+                    order=order
+                )
+                order = order + 1
+                for set in set:
+                    print('set', set["set_type"])
+                    s_ = Set.objects.create(
+                        workout=workout,
+                        set_no=set["set_no"],
+                        reps=set["reps"],
+                        weight=set["weight"],
+                        timer=set["timer"],
+                        set_type=set["set_type"],
+                    )
+        return Response("data save successful")
 
     @action(detail=False, methods=['post'])
     def mark_set_done(self, request):
