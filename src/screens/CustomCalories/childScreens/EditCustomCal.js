@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 import Slider from 'react-native-slider'
+import { connect } from 'react-redux';
+import { postRequiredCalRequest } from '../../../ScreenRedux/customCalRedux'
 
 const EditCustomCal = props => {
-  const [value, setValue] = useState(0.5)
-  const [value1, setValue1] = useState(0.4)
-  const [value2, setValue2] = useState(0.2)
+  const { profile, consumeCalories } = props
+  const [protein, setProtein] = useState(0.5)
+  const [carbs, setCarbs] = useState(0.5)
+  const [fat, setFat] = useState(0.5)
+  const [calories, setCalories] = useState(0.5)
 
   const {
     row,
@@ -19,7 +23,23 @@ const EditCustomCal = props => {
     justifyContentBetween,
   } = Layout;
   const { regularHPadding, smallVPadding, regularHMargin, regularVMargin } = Gutters;
-  const fontSize15TextCenter = { fontSize: 14, textAlign: 'center', flexWrap: 'wrap' };
+  const fontSize15TextCenter = { fontSize: 14, lineHeight: 16, textAlign: 'center', flexWrap: 'wrap' };
+
+  const postEditCal = () => {
+    const data = {
+      "calories": Number(calories).toFixed(0).length > 1 ? Number(calories).toFixed(0) : Number(consumeCalories[0]?.goals_values?.calories),
+      "protein": Number(((protein.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
+      "carbs": Number(((carbs.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
+      "fat": Number(((fat.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
+    }
+    props.navigation.navigate('EditCaloriesManually', data)
+  }
+
+  const calculateCalories = (val) => {
+    const persentage = val.toFixed(2) * 100
+    const dd = persentage * 20.45
+    return dd.toFixed(2)
+  }
 
   return (
     <View style={styles.mainContainer}>
@@ -34,6 +54,7 @@ const EditCustomCal = props => {
               backgroundColor: Colors.alto,
               borderRadius: 10,
             }}
+            onPress={postEditCal}
           />
           <Text
             text="Manually edit the amount of calories to consume"
@@ -42,8 +63,18 @@ const EditCustomCal = props => {
         </View>
         <View style={[regularHMargin, regularVMargin]}>
           <Text color="commonCol" text="Calories" bold smallTitle />
-          <View style={[row, justifyContentStart, alignItemsStart, regularVMargin]}>
-            <Text text={'2,045'} color="nonary" bold large underlined />
+          <View style={[row, justifyContentStart, Layout.alignItemsEnd, regularVMargin]}>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: '#929292', }}>
+              <TextInput
+                value={calories}
+                placeholderTextColor={'#000'}
+                autoFocus={false}
+                placeholder={Number(consumeCalories[0]?.goals_values?.calories).toLocaleString()}
+                style={{ fontSize: 20, lineHeight: 20, fontWeight: '600', paddingVertical: 5, margin: 0 }}
+                onChangeText={(val) => setCalories(val)}
+              />
+            </View>
+            {/* <Text text={(consumeCalories[0]?.goals_values?.calories).toLocaleString() || 0} color="nonary" bold large underlined /> */}
             <Text
               text={'Calories per day'}
               style={[fontSize15TextCenter, Gutters.regularHMargin]}
@@ -62,14 +93,14 @@ const EditCustomCal = props => {
                 { width: 50, height: 25, backgroundColor: Colors.alto },
               ]}
             >
-              <Text text={'40/%'} style={fontSize15TextCenter} bold />
+              <Text text={`${(protein * 100).toFixed(0)}/%`} style={fontSize15TextCenter} bold />
             </View>
           </View>
           <View>
             <Slider
-              style={{ width: 260, height: 30 }}
-              value={value}
-              onValueChange={val => setValue(val)}
+              style={{ width: 250, height: 30 }}
+              value={protein}
+              onValueChange={val => setProtein(val)}
               thumbStyle={{
                 width: 30,
                 height: 30,
@@ -78,18 +109,18 @@ const EditCustomCal = props => {
                 borderWidth: 1,
                 borderColor: Colors.azureradiance,
               }}
-              trackStyle={{ width: 260, height: 20, borderRadius: 10, backgroundColor: 'gray' }}
+              trackStyle={{ width: 250, height: 20, borderRadius: 10, backgroundColor: 'gray' }}
               minimumTrackTintColor={'#45a1f8'}
             />
             <View style={[row, regularHMargin, Gutters.smallTMargin]}>
               <View style={[row, fill, justifyContentStart, alignItemsStart]}>
-                <Text text={(value * 100).toFixed(2)} color="nonary" bold medium />
+                <Text text={calculateCalories(protein)} color="nonary" bold medium />
                 <Text text={'calories'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
               <View
                 style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}
               >
-                <Text text={((value / 7) * 100).toFixed(2)} color="nonary" bold medium />
+                <Text text={(calculateCalories(protein) / profile?.number_of_meal).toFixed(2)} color="nonary" bold medium />
                 <Text text={'g per day'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
             </View>
@@ -107,14 +138,14 @@ const EditCustomCal = props => {
                 { width: 50, height: 25, backgroundColor: Colors.alto },
               ]}
             >
-              <Text text={'40/%'} style={fontSize15TextCenter} bold />
+              <Text text={`${(carbs * 100).toFixed(0)}/%`} style={fontSize15TextCenter} bold />
             </View>
           </View>
           <View>
             <Slider
               style={{ width: 250, height: 30 }}
-              value={value1}
-              onValueChange={val => setValue1(val)}
+              value={carbs}
+              onValueChange={val => setCarbs(val)}
               thumbStyle={{
                 width: 30,
                 height: 30,
@@ -127,13 +158,13 @@ const EditCustomCal = props => {
               minimumTrackTintColor={'#f0bc40'}
             />
             <View style={[row, regularHMargin, Gutters.smallTMargin]}>
-              <View style={[row, justifyContentStart, alignItemsStart]}>
-                <Text text={(value1 * 100).toFixed(2)} style={{ color: '#f0bc40' }} bold medium />
+              <View style={[row, fill, justifyContentStart, alignItemsStart]}>
+                <Text text={calculateCalories(carbs)} style={{ color: '#f0bc40' }} bold medium />
                 <Text text={'calories'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
-              <View style={[row, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
+              <View style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
                 <Text
-                  text={((value1 / 7) * 100).toFixed(2)}
+                  text={(calculateCalories(carbs) / profile?.number_of_meal).toFixed(2)}
                   style={{ color: '#f0bc40' }}
                   bold
                   medium
@@ -155,14 +186,14 @@ const EditCustomCal = props => {
                 { width: 50, height: 25, backgroundColor: Colors.alto },
               ]}
             >
-              <Text text={'20/%'} style={fontSize15TextCenter} bold />
+              <Text text={`${(fat * 100).toFixed(0)}/%`} style={fontSize15TextCenter} bold />
             </View>
           </View>
           <View>
             <Slider
               style={{ width: 250, height: 30 }}
-              value={value2}
-              onValueChange={val => setValue2(val)}
+              value={fat}
+              onValueChange={val => setFat(val)}
               thumbStyle={{
                 width: 30,
                 height: 30,
@@ -175,13 +206,13 @@ const EditCustomCal = props => {
               minimumTrackTintColor={'#ed6d57'}
             />
             <View style={[row, regularHMargin, Gutters.smallTMargin]}>
-              <View style={[row, justifyContentStart, alignItemsStart]}>
-                <Text text={(value2 * 100).toFixed(2)} style={{ color: '#ed6d57' }} bold medium />
+              <View style={[row, fill, justifyContentStart, alignItemsStart]}>
+                <Text text={calculateCalories(fat)} style={{ color: '#ed6d57' }} bold medium />
                 <Text text={'calories'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
-              <View style={[row, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
+              <View style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
                 <Text
-                  text={((value2 / 7) * 100).toFixed(2)}
+                  text={(calculateCalories(fat) / profile?.number_of_meal).toFixed(2)}
                   style={{ color: '#ed6d57' }}
                   bold
                   medium
@@ -192,13 +223,10 @@ const EditCustomCal = props => {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => props.navigation.navigate('EditCaloriesManually')}
-          style={[fill, regularHPadding, justifyContentBetween, styles.cardStyle]}
-        >
+        <View style={[fill, regularHPadding, justifyContentBetween, styles.cardStyle]}>
           <View style={row}>
             <Text
-              text="Based on"
+              text="Based on "
               style={{
                 fontSize: 18,
                 opacity: 0.7,
@@ -209,12 +237,12 @@ const EditCustomCal = props => {
               bold
             />
             <Text
-              text=" 6 "
+              text={profile?.number_of_meal || 0}
               style={{ fontSize: 30, opacity: 0.7, textAlign: 'center', color: Colors.primary }}
               bold
             />
             <Text
-              text={'meals per day, aim for the '}
+              text={' meals per day, aim for the '}
               style={{
                 fontSize: 18,
                 opacity: 0.7,
@@ -243,12 +271,12 @@ const EditCustomCal = props => {
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
               <Text
-                text=" 34 "
+                text={(calculateCalories(protein) / profile?.number_of_meal).toFixed(2)}
                 style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: Colors.primary }}
                 bold
               />
               <Text
-                text={'grams per meal'}
+                text={' grams per meal'}
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
             </View>
@@ -258,12 +286,12 @@ const EditCustomCal = props => {
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
               <Text
-                text=" 34 "
+                text={(calculateCalories(carbs) / profile?.number_of_meal).toFixed(2)}
                 style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: '#f0bc40' }}
                 bold
               />
               <Text
-                text={'grams per meal'}
+                text={' grams per meal'}
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
             </View>
@@ -273,12 +301,12 @@ const EditCustomCal = props => {
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
               <Text
-                text=" 34 "
+                text={(calculateCalories(fat) / profile?.number_of_meal).toFixed(2)}
                 style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: '#ed6d57' }}
                 bold
               />
               <Text
-                text={'grams per meal'}
+                text={' grams per meal'}
                 style={{ fontSize: 18, opacity: 0.7, textAlign: 'center', color: 'black' }}
               />
             </View>
@@ -289,7 +317,7 @@ const EditCustomCal = props => {
               text="*for fat loss, keep carb rich meals structured before and directly following your workout"
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -327,4 +355,16 @@ const styles = StyleSheet.create({
   track: { width: 200, height: 20, borderRadius: 10, backgroundColor: Colors.alto }
 });
 
-export default EditCustomCal;
+// export default EditCustomCal;
+
+const mapStateToProps = state => ({
+  consumeCalories: state.customCalReducer.getCalories,
+  meals: state.customCalReducer.meals,
+  profile: state.login.userDetail,
+});
+
+const mapDispatchToProps = dispatch => ({
+  postRequiredCalRequest: (id, data) => dispatch(postRequiredCalRequest(id, data)),
+  // getMealsRequest: () => dispatch(getMealsRequest()),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(EditCustomCal);

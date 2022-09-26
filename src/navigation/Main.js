@@ -16,9 +16,9 @@ import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile'
-import CustormCalories from '../screens/CustormCalories';
-import EditCustomCal from '../screens/CustormCalories/childScreens/EditCustomCal';
-import EditCaloriesManually from '../screens/CustormCalories/childScreens/EditCaloriesManually';
+import CustomCalories from '../screens/CustomCalories';
+import EditCustomCal from '../screens/CustomCalories/childScreens/EditCustomCal';
+import EditCaloriesManually from '../screens/CustomCalories/childScreens/EditCaloriesManually';
 import SearchProfile from '../screens/SearchProfile';
 import MessageScreen from '../screens/MessageScreen'
 import ChatScreen from '../screens/chatScreen';
@@ -40,8 +40,8 @@ const Tab = createBottomTabNavigator()
 const BottomNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Home2"
-      screenOptions={{
+      initialRouteName="Feed"
+      screenOptions={({ route }) => ({
         tabBarStyle: {
           shadowColor: '#000',
           shadowOffset: {
@@ -55,11 +55,17 @@ const BottomNavigator = () => {
           shadowColor: 'black',
           backgroundColor: 'white',
           height: Platform.OS === 'ios' ? hp('12%') : hp('10%')
-        }
-      }}
+        },
+        tabBarButton: ['Home', 'Profile', 'Feed', 'Custom', 'FatLose'].includes(route.name)
+          ? undefined
+          : () => {
+            return null;
+          },
+      })}
+
     >
       <Tab.Screen
-        name="HomeScreen"
+        name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -78,7 +84,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="ProfileScreen"
+        name="Profile"
         component={ProfileScreen}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -97,7 +103,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="Home2"
+        name="Feed"
         component={Feeds}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -116,8 +122,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="CustormCalories"
-        component={CustormCalories}
+        name="Custom"
+        component={CustomCalories}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -135,7 +141,7 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="FatLoseProgram"
+        name="FatLose"
         component={FatLoseProgram}
         options={{
           tabBarLabel: ({ focused }) => (
@@ -152,6 +158,12 @@ const BottomNavigator = () => {
           header: () => null
         }}
       />
+
+      <Tab.Screen name='HomeScreen' component={HomeScreen} options={{ header: () => null }} />
+      <Tab.Screen name="ProfileScreen" component={ProfileScreen} options={{ header: () => null }} />
+      <Tab.Screen name="Feeds" component={Feeds} options={{ header: () => null }} />
+      <Tab.Screen name="CustomCalories" component={CustomCalories} options={{ header: () => null }} />
+      <Tab.Screen name="FatLoseProgram" component={FatLoseProgram} options={{ header: () => null }} />
     </Tab.Navigator>
   )
 }
@@ -178,21 +190,21 @@ const MainNavigator = () => (
     <mainStack.Screen name="Subscription" component={Subscription} />
     <mainStack.Screen name="CreditCard" component={CreditCard} />
     <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
-    <mainStack.Screen name="Feeds" component={Feeds} />
+    {/* <mainStack.Screen name="Feeds" component={Feeds} /> */}
     <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
     <mainStack.Screen name="EditProfile" component={EditProfile} />
-    <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
-    <mainStack.Screen name="CustormCalories" component={CustormCalories} />
+    {/* <mainStack.Screen name="ProfileScreen" component={ProfileScreen} /> */}
+    {/* <mainStack.Screen name="CustomCalories" component={CustomCalories} /> */}
     <mainStack.Screen name="SearchProfile" component={SearchProfile} />
     <mainStack.Screen name="MessageScreen" component={MessageScreen} />
     <mainStack.Screen name="ChatScreen" component={ChatScreen} />
-    <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} />
+    {/* <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} /> */}
     <mainStack.Screen name="CustomExercise" component={CustomExercise} />
     <mainStack.Screen name="AddExercise" component={AddExercise} />
     <mainStack.Screen name="SettingScreen" component={SettingScreen} />
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
-    <mainStack.Screen name='HomeScreen' component={HomeScreen} />
+    {/* <mainStack.Screen name='HomeScreen' component={HomeScreen} /> */}
     <mainStack.Screen name='MealRegulator' component={MealRegulator} />
     <mainStack.Screen name='SelectBrand' component={SelectBrand} />
     <mainStack.Screen name='LogFoods' component={LogFoods} />
