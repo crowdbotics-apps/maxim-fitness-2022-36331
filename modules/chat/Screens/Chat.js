@@ -33,7 +33,7 @@ const Chat = ({ route, navigation }) => {
   const { width } = Dimensions.get('window');
 
 
-
+  
   useEffect(() => {
     pubnub.fetchMessages(
       {

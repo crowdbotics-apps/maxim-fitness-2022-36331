@@ -286,7 +286,7 @@ const ViewPost = props => {
                 : param?.post_image?.length > 0
                 ? param.post_image.map(item => item.image)
                 : param?.post_video?.length > 0
-                ? param.post_image.map(item => item.video)
+                ? param.post_video.map(item => item.video_thumbnail)
                 : []
             }
             style={styles.foodImageStyle}
