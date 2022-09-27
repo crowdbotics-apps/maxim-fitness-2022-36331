@@ -241,7 +241,7 @@ const Chat = ({ route, navigation }) => {
             </View>
           </View>
           <View style={{ alignItems: 'center', backgroundColor: 'white' }}>
-            <Text bold style={{ fontSize: 20 }} >Test User</Text>
+            <Text bold style={{ fontSize: 20 }} >{channel.name}</Text>
             <Text style={{ color: '#D3D3D3', fontSize: 12 }} >THE ROCK</Text>
           </View>
       <GiftedChat

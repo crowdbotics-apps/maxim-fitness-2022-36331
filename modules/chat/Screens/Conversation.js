@@ -41,12 +41,10 @@ const Conversations = ({ navigation }) => {
     _id:   chatData?.user_detail?.id,
   };
 
-  console.log('apidata', apidata);
-
   const createChat = async item => {
-    const res = await createDirectChannel(pubnub, state.user._id, item._id, {
+    const res = await createDirectChannel(pubnub, userDetail.id, item._id, {
       name: userDetail.username + ' - ' + item.name,
-      custom: { type: 0, owner: state.user._id },
+      custom: { type: 0, owner: userDetail.id },
     });
     dispatch({
       channels: {
@@ -54,7 +52,7 @@ const Conversations = ({ navigation }) => {
         [res.channel]: {
           id: res.channel,
           name: userDetail.username + ' - ' + item.name,
-          custom: { type: ChannelType.Direct, owner: state.user._id },
+          custom: { type: ChannelType.Direct, owner: userDetail.id },
         },
       },
     });
@@ -70,7 +68,7 @@ const Conversations = ({ navigation }) => {
 
   const bootstrap = () => {
     setLoading(true);
-    fetchChannels(pubnub, state.user._id).then(channels => {
+    fetchChannels(pubnub, userDetail.id).then(channels => {
       dispatch({ channels });
       setLoading(false);
     });

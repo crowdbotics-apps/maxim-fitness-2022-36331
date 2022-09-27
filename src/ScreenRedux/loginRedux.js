@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../navigation/NavigationService';
 import { showMessage } from 'react-native-flash-message';
+import {newSubScription} from './subscriptionRedux'
 
 // config
 import { API_URL } from '../config/app';
@@ -128,11 +129,11 @@ function loginAPI(data) {
 function* login({ data }) {
   try {
     const response = yield call(loginAPI, data)
-    console.log('login success response----', response);
     AsyncStorage.setItem('authToken', response.data.token)
     yield put(setUserDetail(response.data.user))
-    yield put(subscriptionData(response?.data?.subscription))
-    // yield put(setAccessToken(response.data.token))
+    if(response?.data?.subscription){
+      yield put(newSubScription(response?.data?.subscription?.data[0]))
+    }
     if(response?.data?.subscription === false){
       navigate('Subscription')
     }
@@ -175,7 +176,7 @@ function* facebookLogin({ data }) {
       message: 'Facebook login successfully',
       type: 'success',
     })
-  } catch (e) {
+  }  catch (e) {
     const { response } = e
     console.log('facebook login error response----', response);
     yield put(reset())
@@ -187,7 +188,6 @@ function* facebookLogin({ data }) {
 }
 
 function googleLoginAPI(data) {
-  console.log('accessToken----- in saga', data);
   const URL = `${API_URL}/login/google/`
   const options = {
     method: 'POST',
