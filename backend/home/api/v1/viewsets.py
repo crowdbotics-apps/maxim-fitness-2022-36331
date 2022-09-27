@@ -615,7 +615,7 @@ class SessionViewSet(ModelViewSet):
         start_date = self.request.query_params.get("date")
         if start_date:
             date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
-            end = date_time_obj + timedelta(days=7)
+            end = date_time_obj + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[start_date, end.date()])
         if request.GET.get('reset'):
             for session in queryset:
@@ -632,7 +632,7 @@ class SessionViewSet(ModelViewSet):
     def create_custom_workout(self, request):
         session_date = self.request.data.get("session_date")
         exercise_ids = self.request.data.get("exercise_ids")
-        set = self.request.data.get("set")
+        sets = self.request.data.get("set")
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
         if session:
             w_session = Session.objects.create(
@@ -660,16 +660,16 @@ class SessionViewSet(ModelViewSet):
                     order=order
                 )
                 order = order + 1
-                for set in set:
-                    print('set', set["set_type"])
-                    s_ = Set.objects.create(
-                        workout=workout,
-                        set_no=set["set_no"],
-                        reps=set["reps"],
-                        weight=set["weight"],
-                        timer=set["timer"],
-                        set_type=set["set_type"],
-                    )
+                for set in sets:
+                    if set["ex_id"] == exercise.id:
+                        s_ = Set.objects.create(
+                            workout=workout,
+                            set_no=set["set_no"],
+                            reps=set["reps"],
+                            weight=set["weight"],
+                            timer=set["timer"],
+                            set_type=set["set_type"],
+                        )
         return Response("data save successful")
 
     @action(detail=False, methods=['post'])
@@ -875,23 +875,6 @@ class PostViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
 
         request_data = request.data
-
-        # if 'image' in request_data.keys():
-        #     print("The key exists")
-        #     image = request_data['image']
-        #     format, img_str = image.split(';base64,')
-        #     ext = format.split('/')[-1]
-        #     file_name = f'{datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")}.{ext}'
-        #     image = ContentFile(base64.b64decode(img_str), file_name)
-        #     request_data['image'] = image
-        # elif 'video' in request_data.keys():
-        #     print("The key doesn't exist")
-        #     video = request_data['video']
-        #     format, video_str = video.split(';base64,')
-        #     ext = format.split('/')[-1]
-        #     file_name = f'{datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")}.{ext}'
-        #     video = ContentFile(base64.b64decode(video_str), file_name)
-        #     request_data['video'] = video
 
         post_image = []
         post_video = []
