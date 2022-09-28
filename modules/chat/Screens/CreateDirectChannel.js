@@ -16,7 +16,6 @@ const CreateDirectChannel = ({ navigation }) => {
   const data = search ? state.contacts.filter(item => item.name.includes(search)) : state.contacts;
 
   const createChat = async item => {
-    console.log('item---', item);
 
     const res = await createDirectChannel(pubnub, state.user._id, item._id, {
       name: state.user.name + ' - ' + item.name,

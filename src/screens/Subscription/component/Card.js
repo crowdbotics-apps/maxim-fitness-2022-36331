@@ -9,7 +9,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import { Gutters, Layout, Global } from '../../../theme'
 
 const Card = props => {
-  const { onPress, getPlans } = props
+  const { onPress, getPlans, subsucriptionId } = props
   const {
     regularHMargin,
     regularVPadding,
@@ -76,9 +76,9 @@ const Card = props => {
       <View style={[center, row, { marginTop: -20, backgroundColor: 'transparent' }]}>
         <Button
           color="secondary"
-          text={'Buy Now'}
+          text={getPlans[0]?.id === subsucriptionId ? 'Already Bought' : 'Buy Now'}
           style={[border, center, regularHPadding, { height: 40, borderRadius: 30 }]}
-          onPress={onPress}
+          onPress={getPlans[0]?.id !== subsucriptionId ? onPress : null}
         />
       </View>
     </>

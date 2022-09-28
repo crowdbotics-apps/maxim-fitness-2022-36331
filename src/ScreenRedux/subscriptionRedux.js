@@ -14,6 +14,7 @@ import XHR from 'src/utils/XHR';
 const GET_PLAN_REQUEST = 'SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST';
 const GET_PLAN_SUCCESS = 'SUBSCRIPTION_SCREEN/GET_PLAN_SUCCESS';
 const GET_PLAN_FAILURE = 'SUBSCRIPTION_SCREEN/GET_PLAN_FAILURE';
+const NEW_SUBSCRIPTION = 'SUBSCRIPTION_SCREEN/NEW_SUBSCRIPTION';
 const RESET = 'SUBSCRIPTION_SCREEN/RESET';
 
 
@@ -38,6 +39,7 @@ const initialState = {
   SRequesting: false,
   getSubscription: false,
   getSubscriptionError: false,
+  subscriptionData: false
 }
 
 //Actions
@@ -84,6 +86,11 @@ export const postSubscriptionSuccess = data => ({
 export const postSubscriptionFailure = error => ({
   type: POST_SUBSCRIPTION_FAILURE,
   error
+})
+
+export const newSubScription = data => ({
+  type: NEW_SUBSCRIPTION,
+  data
 })
 
 export const reset = () => ({
@@ -151,6 +158,13 @@ export const subscriptionReducer = (state = initialState, action) => {
         getSubscriptionError: action.error,
         requesting: false
       }
+
+   case NEW_SUBSCRIPTION:
+      return {
+        ...state,
+        subscriptionData: action.data,
+      }
+      
       case RESET:
         return {
           ...state,
@@ -238,9 +252,9 @@ function* postSubscription({ data }) {
     const response = yield call(postSubscriptionAPI, data)
     const token = AsyncStorage.getItem('authToken')
     yield put(setAccessToken(token))
-    // navigate('Feeds')
     console.log('SUBSCRIPTION RESPONSE: ', response);
-    // yield put(postSubscriptionSuccess(response.data.data))
+    yield put(newSubScription(response.data))
+     navigate('Feeds')
   } catch (e) {
     console.log('SUBSCRIPTION ERROR: ', e);
     const { response } = e

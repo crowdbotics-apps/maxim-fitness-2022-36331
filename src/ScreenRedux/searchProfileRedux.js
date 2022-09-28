@@ -14,10 +14,12 @@ import XHR from 'src/utils/XHR';
 const GET_USER = 'SEARCH_SCREEN/GET_USER';
 const GET_USER_SUCCESS = 'SEARCH_SCREEN/GET_USER_SUCCESS';
 const GET_USER_RESET = 'SEARCH_SCREEN/GET_USER_RESET';
+const CHAT_USER_DATA = 'SEARCH_SCREEN/CHAT_USER_DATA'
 
 const initialState = {
   requesting: false,
   profileUserData: false,
+  chatUserData: false
 }
 
 //Actions
@@ -35,6 +37,10 @@ export const resetUserProfile = () => ({
   type: GET_USER_RESET,
 })
 
+export const userChat = (data) => ({
+  type: CHAT_USER_DATA,
+  data
+})
 //Reducers
 export const userProfileReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -55,6 +61,11 @@ export const userProfileReducer = (state = initialState, action) => {
         ...state,
         requesting: false,
       }
+      case CHAT_USER_DATA:
+      return {
+        ...state,
+        chatUserData: action.data,
+      }   
 
     default:
       return state

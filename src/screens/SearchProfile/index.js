@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import { Text } from '../../components';
 
 //action
-import { getUserProfile } from '../../ScreenRedux/searchProfileRedux';
+import { getUserProfile, userChat } from '../../ScreenRedux/searchProfileRedux';
 import { followUser, unFollowUser } from '../../ScreenRedux/profileRedux';
 
 const { backImage, searchImage, profileBackGround, followButton, profile, followingButton } = Images;
@@ -106,7 +106,7 @@ const SearchProfile = props => {
         ) : profileUserData?.length ? (
           profileUserData?.map(item => (
             <TouchableOpacity
-              onPress={() => navigation.navigate('Chat')}
+              onPress={() => [navigation.navigate('Chat'), props.userChat(item)]}
               style={{
                 marginTop: 25,
                 paddingHorizontal: 20,
@@ -169,5 +169,6 @@ const mapDispatchToProps = dispatch => ({
   getUserProfile: data => dispatch(getUserProfile(data)),
   followUser: data => dispatch(followUser(data)),
   unFollowUser: data => dispatch(unFollowUser(data)),
+  userChat: data => dispatch(userChat(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SearchProfile);
