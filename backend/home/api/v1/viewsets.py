@@ -52,7 +52,8 @@ from home.api.v1.serializers import (
     CaloriesRequiredSerializer,
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
-    PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer
+    PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
+    ExerciseTypeSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -64,7 +65,7 @@ from .permissions import (
 from home.models import Product, ProductUnit, Meal, FoodItem, Category, Recipe, Post, Form, ConsumeCalories, Following\
     , Comment, ReportAPost, BlockUser
 from home.nutritionix import Nutritionix
-from program.models import Exercise, Session, Workout, Set, Report, ProgramExercise
+from program.models import Exercise, Session, Workout, Set, Report, ProgramExercise, ExerciseType
 from users.models import AnswerProgram
 from notification.models import Notification
 
@@ -596,10 +597,26 @@ class RecipeViewSet(ModelViewSet):
 
 # Program viewsets
 
+class ExerciseTypeViewSet(ModelViewSet):
+    serializer_class = ExerciseTypeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ExerciseType.objects.all()
+        return queryset
+
+
 class ExerciseViewSet(ModelViewSet):
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
     http_method_names = ['get']
+
+    def get_queryset(self):
+        queryset = self.queryset
+        exercise_type = self.request.query_params.get("exercise_type")
+        if exercise_type:
+            queryset = queryset.filter(exercise_type__id=exercise_type)
+        return queryset
 
 
 class SessionViewSet(ModelViewSet):
@@ -631,6 +648,7 @@ class SessionViewSet(ModelViewSet):
     @action(detail=False, methods=["post"])
     def create_custom_workout(self, request):
         session_date = self.request.data.get("session_date")
+        workout_title = self.request.data.get("title")
         exercise_ids = self.request.data.get("exercise_ids")
         sets = self.request.data.get("set")
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
@@ -647,7 +665,7 @@ class SessionViewSet(ModelViewSet):
                 protein=session.protein,
                 carb=session.carb,
                 carb_casual=session.carb_casual,
-                name=session.name,
+                name=workout_title,
             )
             session.delete()
             order = 1
