@@ -140,11 +140,7 @@ const HomeScreen = props => {
         </LinearGradient>
       </View>
       <View style={smallHMargin}>
-        {todayRequest ? (
-          <View style={[row, small2xTMargin, styles.wrapper, center]}>
-            <ActivityIndicator size="small" color="black" />
-          </View>
-        ) : todaySessions?.workouts?.length > 0 ? (
+        {todaySessions?.workouts?.length > 0 ? (
           <View style={[row, styles.wrapper, small2xTMargin]}>
             <LinearGradient
               start={start}

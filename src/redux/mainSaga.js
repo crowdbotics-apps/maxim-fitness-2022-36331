@@ -14,6 +14,7 @@ import questionRedux from '../screens/Questions/Redux'
 import searchProfileRedux from '../ScreenRedux/searchProfileRedux'
 import settingRedux from '../ScreenRedux/settingScreenRedux'
 import nutritionRedux from '../ScreenRedux/nutritionRedux'
+import addExerciseRedux from '../ScreenRedux/addExerciseRedux'
 export function* mainSaga() {
   yield all([
     SignIn,
@@ -28,6 +29,7 @@ export function* mainSaga() {
     questionRedux,
     searchProfileRedux,
     settingRedux,
-    nutritionRedux
+    nutritionRedux,
+    addExerciseRedux
   ]);
 }
