@@ -628,12 +628,34 @@ class SessionViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        how_many_week = queryset.count() / 7
         start_date = self.request.query_params.get("date")
-        if start_date:
-            date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
-            end = date_time_obj + timedelta(days=6)
-            queryset = queryset.filter(date_time__range=[start_date, end.date()])
+        how_many_week = queryset.count() / 7
+        first_day = queryset.first().date_time
+        last_day = queryset.first().date_time
+        day_with_date = {}
+        day_no = 1
+        for d in queryset:
+            day_with_date[str(d.date_time)] = day_no
+            day_no += 1
+
+        d_no = day_with_date.get(start_date)
+        if d_no:
+            if d_no <= 7:
+                last_day = first_day + timedelta(days=6)
+            elif d_no <= 14:
+                first_day = first_day + timedelta(days=8)
+                last_day = first_day + timedelta(days=6)
+            elif d_no <= 21:
+                first_day = first_day + timedelta(days=16)
+                last_day = first_day + timedelta(days=6)
+            elif d_no <= 28:
+                first_day = first_day + timedelta(days=24)
+                last_day = first_day + timedelta(days=6)
+            queryset = queryset.filter(date_time__range=[first_day, last_day])
+        # if start_date:
+        #     date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
+        #     end = date_time_obj + timedelta(days=6)
+        #     queryset = queryset.filter(date_time__range=[start_date, end.date()])
         if request.GET.get('reset'):
             for session in queryset:
                 session.reset()
@@ -643,7 +665,6 @@ class SessionViewSet(ModelViewSet):
             "query": serializer.data
         }
         return Response(data)
-        # return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
     def create_custom_workout(self, request):
