@@ -863,7 +863,6 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  getAllSessions: state.programReducer.getAllSessions,
   repsWeightState: state.programReducer.repsWeight,
   loader: state.programReducer.loader,
   exerciseObj: state.programReducer.exerciseObj,

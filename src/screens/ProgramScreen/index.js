@@ -15,7 +15,7 @@ import { getAllSessionRequest, pickSession } from '../../ScreenRedux/programServ
 import { connect } from 'react-redux';
 
 const ProgramScreen = props => {
-  const { navigation, getAllSessions, loadingAllSession } = props;
+  const { navigation, getWeekSessions, loadingAllSession } = props;
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(1);
@@ -26,8 +26,8 @@ const ProgramScreen = props => {
   const { secondaryBg, turtiaryBg } = Global;
 
   useEffect(() => {
-    if (getAllSessions) {
-      getAllSessions?.query?.map(item => {
+    if (getWeekSessions) {
+      getWeekSessions?.query?.map(item => {
         let currentD = moment(new Date()).format('YYYY-MM-DD');
         let cardDate = moment(item.date_time).format('YYYY-MM-DD');
 
@@ -40,7 +40,7 @@ const ProgramScreen = props => {
         }
       })
     }
-  }, [getAllSessions])
+  }, [getWeekSessions])
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -57,8 +57,8 @@ const ProgramScreen = props => {
   const previousExercise = () => {
     if (activeIndex > 1) {
       setActiveIndex(prevState => prevState - 1);
-      if (getAllSessions?.query?.length) {
-        const today = new Date(getAllSessions.query[0].date_time);
+      if (getWeekSessions?.query?.length) {
+        const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() - 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
         props.getAllSessionRequest(hh);
@@ -67,10 +67,10 @@ const ProgramScreen = props => {
   };
 
   const nextExercise = () => {
-    if (getAllSessions?.week > activeIndex) {
+    if (getWeekSessions?.week > activeIndex) {
       setActiveIndex(prevState => prevState + 1);
-      if (getAllSessions?.query?.length) {
-        const today = new Date(getAllSessions.query[0].date_time);
+      if (getWeekSessions?.query?.length) {
+        const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() + 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
         props.getAllSessionRequest(hh);
@@ -87,7 +87,7 @@ const ProgramScreen = props => {
             onPress={previousExercise}
             disabled={loading || loadingAllSession}
           >
-            {getAllSessions?.week > 0 && activeIndex > 1 && (
+            {getWeekSessions?.week > 0 && activeIndex > 1 && (
               <>
                 <Icon type="FontAwesome5" name="caret-left" />
                 <Text
@@ -103,7 +103,7 @@ const ProgramScreen = props => {
             onPress={nextExercise}
             disabled={loading || loadingAllSession}
           >
-            {getAllSessions?.week > activeIndex && (
+            {getWeekSessions?.week > activeIndex && (
               <>
                 <Text
                   color="primary"
@@ -119,12 +119,12 @@ const ProgramScreen = props => {
           <View style={[styles.container, styles.horizontal]}>
             <ActivityIndicator size="large" color="#000" />
           </View>
-        ) : getAllSessions?.query?.length < 1 ? (
+        ) : getWeekSessions?.query?.length < 1 ? (
           <View style={[fill, center, styles.noProgramWrapper]}>
             <Text text="No Program Assigned!" style={styles.noProgramWrapperText} />
           </View>
         ) : (
-          getAllSessions?.query?.map((item, index) => {
+          getWeekSessions?.query?.map((item, index) => {
             let currentD = moment(new Date()).format('YYYY-MM-DD');
             let cardDate = moment(item.date_time).format('YYYY-MM-DD');
 
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  getAllSessions: state.programReducer.getAllSessions,
+  getWeekSessions: state.programReducer.getWeekSessions,
   // exerciseSwapped: state.sessions && state.sessions.exerciseSwapped,
   // loadingAllSession: state.sessions && state.sessions.loadingAllSession,
   // saveSwipeState: state.sessions && state.sessions.saveSwipeState,

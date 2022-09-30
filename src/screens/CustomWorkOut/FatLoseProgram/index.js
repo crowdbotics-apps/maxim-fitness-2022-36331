@@ -5,24 +5,48 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  KeyboardAvoidingView,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from 'react-native';
-import { Text, BottomSheet, Button } from '../../../components';
-import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
+
+import moment from 'moment'
 import { Icon } from 'native-base';
 import { connect } from 'react-redux'
-import { getDaySessionRequest, getAllSessionRequest, pickSession } from '../../../ScreenRedux/programServices'
-import moment from 'moment'
+import Modal from 'react-native-modal';
+import { CalendarList } from 'react-native-calendars';
 import LinearGradient from 'react-native-linear-gradient';
 
-const FatLoseProgram = props => {
-  const { navigation, todayRequest, todaySessions, getAllSessions } = props;
+import { Text, BottomSheet } from '../../../components';
+import Loader from '../../../components/Loader'
+import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
+import { getDaySessionRequest, getAllSessionRequest, pickSession } from '../../../ScreenRedux/programServices'
 
+const FatLoseProgram = props => {
+  const { navigation, todayRequest, todaySessions, getAllSessions, getWeekSessions } = props;
   let refDescription = useRef('');
   const [activeIndex, setActiveIndex] = useState(1);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+  const [data, setData] = useState({})
+  const [loading, setLoading] = useState(false)
+
+  const vacation = { key: 'vacation', color: 'red', selectedDotColor: 'blue' };
+  const massage = { key: 'massage', color: 'blue', selectedDotColor: 'blue' };
+
+  useEffect(() => {
+    getWeekSessions?.query?.map((p, i) => {
+      if (p.date_time === moment(new Date()).format('YYYY-MM-DD')) {
+        setIndex(i)
+      }
+    })
+  }, [getWeekSessions])
+
+  useEffect(() => {
+    getAllSessions?.query?.map((d, i) => {
+      setData(prevState => ({ ...prevState, [d.date_time]: { dots: [vacation, massage] } }))
+    })
+  }, [getAllSessions])
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -37,11 +61,12 @@ const FatLoseProgram = props => {
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
   const { smallVMargin, regularHMargin, tinyLMargin } = Gutters;
 
+
   const nextExercise = () => {
-    if (getAllSessions?.week > activeIndex) {
+    if (getWeekSessions?.week > activeIndex) {
       setActiveIndex(prevState => prevState + 1);
-      if (getAllSessions?.query?.length) {
-        const today = new Date(getAllSessions.query[0].date_time);
+      if (getWeekSessions?.query?.length) {
+        const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() + 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
         props.getAllSessionRequest(hh);
@@ -53,8 +78,8 @@ const FatLoseProgram = props => {
   const previousExercise = () => {
     if (activeIndex > 1) {
       setActiveIndex(prevState => prevState - 1);
-      if (getAllSessions?.query?.length) {
-        const today = new Date(getAllSessions.query[0].date_time);
+      if (getWeekSessions?.query?.length) {
+        const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() - 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
         props.getAllSessionRequest(hh);
@@ -76,8 +101,8 @@ const FatLoseProgram = props => {
   const end = { x: 1, y: 0 };
 
   // useEffect(() => {
-  //   if (getAllSessions) {
-  //     getAllSessions?.query?.map(item => {
+  //   if (getWeekSessions) {
+  //     getWeekSessions?.query?.map(item => {
   //       let currentD = moment(new Date()).format('YYYY-MM-DD');
   //       let cardDate = moment(item.date_time).format('YYYY-MM-DD');
 
@@ -90,10 +115,10 @@ const FatLoseProgram = props => {
   //       }
   //     })
   //   }
-  // }, [getAllSessions])
+  // }, [getWeekSessions])
 
   const selectExerciseObj = () => {
-    getAllSessions?.query?.map((item, index) => {
+    getWeekSessions?.query?.map((item, index) => {
       if (todaySessions?.id === item.id) {
         const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
           workoutItem => !workoutItem.done
@@ -106,10 +131,35 @@ const FatLoseProgram = props => {
           item: item,
         });
       }
-
     })
-
   }
+
+  const openModal = () => {
+    setIsModal(true)
+    props.getAllSessionRequest();
+  }
+
+  const onDayPress = (date) => {
+    // setLoading(true)
+    getWeekSessions?.query?.map((d, i) => {
+      if (d.date_time === date?.dateString) {
+        setIndex(i)
+        const newDate = moment(d.date_time).format('YYYY-MM-DD');
+        props.getDaySessionRequest(newDate);
+        setIsModal(false)
+      } else {
+        if (getWeekSessions?.query?.length - 1) {
+          previousExercise()
+        } else {
+          nextExercise()
+          setIndex(i)
+          setIsModal(false)
+        }
+      }
+    })
+    // setLoading(false)
+  }
+
 
 
   return (
@@ -118,16 +168,16 @@ const FatLoseProgram = props => {
         <View style={[smallVMargin, regularHMargin]}>
           <Text style={styles.heading}>Max's Fat Loss Program</Text>
           <View style={[row, alignItemsCenter, justifyContentBetween, Gutters.small2xTMargin]}>
-            <TouchableOpacity style={row} onPress={getAllSessions?.week > activeIndex ? nextExercise : previousExercise}>
-              {getAllSessions?.week > 0 && activeIndex > 1 ? <Icon type="FontAwesome5" name={"chevron-left"} style={[styles.IconStyle]} /> : null}
+            <TouchableOpacity style={row} onPress={getWeekSessions?.week > activeIndex ? nextExercise : previousExercise}>
+              {getWeekSessions?.week > 0 && activeIndex > 1 ? <Icon type="FontAwesome5" name={"chevron-left"} style={styles.IconStyle} /> : null}
               <Text
                 color="primary"
-                text={`Week ${getAllSessions?.week > 0 && activeIndex > 1 ? getAllSessions?.week - 1 : getAllSessions?.week === undefined ? '' : getAllSessions?.week}`}
+                text={`Week ${getWeekSessions?.week > 0 && activeIndex > 1 ? getWeekSessions?.week - 1 : getWeekSessions?.week === undefined ? '' : getWeekSessions?.week}`}
                 style={[tinyLMargin, styles.smallText]}
               />
-              {getAllSessions?.week > 0 && activeIndex > 1 ? null : <Icon type="FontAwesome5" name={"chevron-right"} style={[styles.IconStyle]} />}
+              {getWeekSessions?.week > 0 && activeIndex > 1 ? null : <Icon type="FontAwesome5" name={"chevron-right"} style={styles.IconStyle} />}
             </TouchableOpacity>
-            <TouchableOpacity style={row}>
+            <TouchableOpacity style={row} onPress={openModal}>
               <Text
                 text={'Calendar'}
                 style={[tinyLMargin, styles.CalenderText]}
@@ -141,7 +191,7 @@ const FatLoseProgram = props => {
           </View>
           <View style={Layout.alignItemsCenter}>
             <ScrollView horizontal contentContainerStyle={[Layout.fillGrow, Layout.justifyContentBetween]}>
-              {getAllSessions?.query?.map((d, i) => {
+              {getWeekSessions?.query?.map((d, i) => {
                 const day = new Date(d.date_time).getDate()
                 const weekDayName = moment(d.date_time).format('dd');
                 return (
@@ -166,7 +216,7 @@ const FatLoseProgram = props => {
                     </View>
                     {
                       d?.name !== 'Rest' ?
-                        <View style={[row]}>
+                        <View style={row}>
                           <View style={{ backgroundColor: 'red', height: 7, width: 8, borderRadius: 10 }} />
                           <View style={{ backgroundColor: 'green', left: -2, height: 7, width: 8, borderRadius: 10 }} />
                         </View>
@@ -364,7 +414,48 @@ const FatLoseProgram = props => {
           </View>
         </View>
       </ScrollView>
-      {/* bootom */}
+
+      {/* calender */}
+      <Modal
+        visible={isModal}
+        onBackdropPress={() => setIsModal(false)}
+        style={[
+          Global.halfOpacityBg,
+
+          {
+            padding: 0,
+            margin: 0,
+            paddingTop: 100,
+          }
+        ]}
+      >
+        {props.requesting
+          ?
+          <View style={[Layout.fill, Layout.center, Global.secondaryBg, Global.topLRBorderRadius20]}>
+            <ActivityIndicator size="large" color="green" />
+          </View>
+          :
+          <View style={[Global.topLRBorderRadius20, Global.secondaryBg]}>
+            <CalendarList
+              style={{ marginTop: 25 }}
+              current={new Date().toISOString()}
+              markingType={'multi-dot'}
+              markedDates={data}
+              hideExtraDays={true}
+              firstDay={1}
+              hideDayNames={true}
+              pastScrollRange={0}
+              onDayPress={onDayPress}
+              futureScrollRange={12}
+              scrollEnabled={true}
+              showScrollIndicator={true}
+              initialNumToRender={1}
+            />
+          </View>
+        }
+      </Modal>
+      {/* calender */}
+
       <BottomSheet
         reff={refDescription}
         h={200}
@@ -501,7 +592,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => ({
   todayRequest: state.programReducer.todayRequest,
   todaySessions: state.programReducer.todaySessions,
-  getAllSessions: state.programReducer.getAllSessions
+  requesting: state.programReducer.requesting,
+  getAllSessions: state.programReducer.getAllSessions,
+  getWeekSessions: state.programReducer.getWeekSessions,
 })
 
 const mapDispatchToProps = (dispatch) => ({

@@ -17,11 +17,8 @@ const HomeScreen = props => {
     mealRequesting,
     meals = [],
     navigation,
-    allSessions,
-    loadingAllSession,
     todaySessions,
     todayRequest,
-    selectedMeal
   } = props;
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
@@ -269,7 +266,6 @@ const mapStateToProps = state => ({
   mealRequesting: state.customCalReducer.mealRequesting,
   meals: state.customCalReducer.meals,
   loadingAllSession: state.programReducer.requesting,
-  allSessions: state.programReducer.getAllSessions,
   todaySessions: state.programReducer.todaySessions,
   todayRequest: state.programReducer.todayRequest,
   selectedMeal: state.nutritionReducer.selectedMeal

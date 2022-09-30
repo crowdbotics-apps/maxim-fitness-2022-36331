@@ -12,6 +12,7 @@ import { sortSessionBySets } from '../utils/common';
 
 const ALL_SESSIONS_REQUEST = 'ProgramScreen/ALL_SESSIONS_REQUEST';
 const ALL_SESSIONS_SUCCESS = 'ProgramScreen/ALL_SESSIONS_SUCCESS';
+const WEEK_SESSIONS_SUCCESS = 'ProgramScreen/WEEK_SESSIONS_SUCCESS';
 
 const TODAY_SESSIONS_REQUEST = 'ProgramScreen/TODAY_SESSIONS_REQUEST';
 const TODAY_SESSIONS_SUCCESS = 'ProgramScreen/TODAY_SESSIONS_SUCCESS';
@@ -35,6 +36,11 @@ export const getAllSessionRequest = data => ({
 
 export const getAllSessionSuccess = data => ({
   type: ALL_SESSIONS_SUCCESS,
+  data,
+});
+
+export const getWeekSessionSuccess = data => ({
+  type: WEEK_SESSIONS_SUCCESS,
   data,
 });
 
@@ -90,6 +96,8 @@ export const exerciseDoneSuccess = data => ({
 const initialState = {
   requesting: false,
   getAllSessions: false,
+  getWeekSessions: false,
+
   loader: false,
   repsWeight: false,
 
@@ -118,6 +126,13 @@ export const programReducer = (state = initialState, action) => {
       return {
         ...state,
         getAllSessions: action.data,
+        requesting: false,
+      };
+
+    case WEEK_SESSIONS_SUCCESS:
+      return {
+        ...state,
+        getWeekSessions: action.data,
         requesting: false,
       };
 
@@ -187,7 +202,7 @@ export const programReducer = (state = initialState, action) => {
   }
 };
 
-async function getAllSessionAPI(data) {
+async function getWeekSessionAPI(data) {
   const token = await AsyncStorage.getItem('authToken')
   const URL = `${API_URL}/session/?date=${data}`;
   const options = {
@@ -200,12 +215,33 @@ async function getAllSessionAPI(data) {
   return XHR(URL, options);
 }
 
+async function getAllSessionAPI() {
+  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/session/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'GET',
+  };
+  return XHR(URL, options);
+}
+
 function* getAllSessions({ data }) {
   try {
-    const response = yield call(getAllSessionAPI, data);
-    console.log('response allsession: ', response);
-    const query = sortSessionBySets(response?.data?.query);
-    yield put(getAllSessionSuccess({ ...response?.data, query }));
+    if (data) {
+      const response = yield call(getWeekSessionAPI, data);
+      console.log('Week session res: ', response);
+      const query = sortSessionBySets(response?.data?.query);
+      yield put(getWeekSessionSuccess({ ...response?.data, query }));
+    } else {
+      const response = yield call(getAllSessionAPI);
+      console.log('Allsession res: ', response);
+      const query = sortSessionBySets(response?.data?.query);
+      yield put(getAllSessionSuccess({ ...response?.data, query }));
+    }
+
   } catch (e) {
     console.log('eee:', e);
     yield put(getAllSessionSuccess(false));
