@@ -631,7 +631,7 @@ class SessionViewSet(ModelViewSet):
         start_date = self.request.query_params.get("date")
         how_many_week = queryset.count() / 7
         first_day = queryset.first().date_time
-        last_day = queryset.first().date_time
+        last_day = queryset.last().date_time
         day_with_date = {}
         day_no = 1
         for d in queryset:
