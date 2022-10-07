@@ -21,6 +21,7 @@ const initialState = {
   getCalories: false,
   getCaloeriesError: false,
 
+  mealRequesting: false,
   meals: [],
   mealsError: false
 }
@@ -73,13 +74,13 @@ export const customCalReducer = (state = initialState, action) => {
     case GET_MEALS_REQUEST:
       return {
         ...state,
-        requesting: true
+        mealRequesting: true
       }
     case GET_MEALS_SUCCESS:
       return {
         ...state,
         meals: action.data,
-        requesting: true,
+        mealRequesting: false,
       }
 
     default:
@@ -102,9 +103,9 @@ async function getCustomCalAPI() {
   return XHR(URL, options)
 }
 
-function* getCustomCal({ data }) {
+function* getCustomCal() {
   try {
-    const response = yield call(getCustomCalAPI, data)
+    const response = yield call(getCustomCalAPI)
     console.log('CAL RESPONSE: ', response);
     yield put(getCustomCalSuccess(response.data))
   } catch (e) {
@@ -113,6 +114,33 @@ function* getCustomCal({ data }) {
   }
 }
 
+//Saga
+async function getMealsAPI() {
+  const URL = `${API_URL}/meal/`
+  const token = await AsyncStorage.getItem('authToken')
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token  ${token}`
+    }
+  }
 
+  return XHR(URL, options)
+}
 
-export default all([takeLatest(GET_CALORIES_REQUEST, getCustomCal)])
+function* getMeals() {
+  try {
+    const response = yield call(getMealsAPI)
+    console.log('MEALS RESPONSE: ', response);
+    yield put(getMealsSuccess(response.data))
+  } catch (e) {
+    console.log('MEALS ERROR: ', e);
+    yield put(getMealsSuccess(false))
+  }
+}
+
+export default all([
+  takeLatest(GET_CALORIES_REQUEST, getCustomCal),
+  takeLatest(GET_MEALS_REQUEST, getMeals),
+])

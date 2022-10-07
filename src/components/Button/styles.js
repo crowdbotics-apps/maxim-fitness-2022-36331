@@ -27,12 +27,13 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   disabledStyle: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   buttonText: {
     fontWeight: 'bold',
-    fontSize: 15,
-    lineHeight: 15,
+    fontSize: 18,
+    lineHeight: 20,
+    letterSpacing: 1
   },
   borderStyle: {
     borderColor: Colors.deepsapphire,

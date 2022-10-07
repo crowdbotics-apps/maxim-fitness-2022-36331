@@ -1,23 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-  ScrollView
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, SafeAreaView } from 'react-native';
+import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button, InputField } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
 
-//Libraires
-import { connect } from 'react-redux';
-import LinearGradient from 'react-native-linear-gradient';
+//Themes
+import { Global, Layout, Gutters, Fonts } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -26,8 +16,7 @@ const WeightPounds = props => {
   const {
     navigation: { navigate },
   } = props;
-
-  const [pound, setPounds] = useState(false);
+  const [pound, setPounds] = useState('');
 
   const onNext = () => {
     const tempData = props.answers;
@@ -36,77 +25,54 @@ const WeightPounds = props => {
     navigate('FitnessGoal');
   };
 
-
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderTitle percentage={0.52} showBackButton={true} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1 }}>
-          <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-            <Text
-              style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-              text={'What is your Weight?'}
-            />
-          </View>
-
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
+      <HeaderTitle percentage={0.52} showBackButton />
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
+        <View style={Gutters.mediumTMargin}>
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your Weight?'} />
+        </View>
+        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
           <View
             style={[
-              {
-                height: 65,
-                marginTop: 20,
-                marginHorizontal: 40,
-                justifyContent: 'center',
-                borderBottomWidth: 1,
-                borderBottomColor: '#808080',
-              },
+              Layout.row,
+              Global.height65,
+              Layout.alignItemsCenter,
+              Layout.justifyContentBetween,
+              Global.borderB,
+              Global.borderAlto
             ]}
           >
-            <TextInput
-              style={{ fontSize: 24 }}
-              placeholder={'Pounds'}
-              keyboardType="numeric"
+            <InputField
+              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              value={pound}
               onChangeText={val => setPounds(val)}
+              placeholder="Pounds"
+              autoCapitalize="none"
+              keyboardType="numeric"
             />
           </View>
         </View>
-
-        <View style={{ justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{ marginHorizontal: 40, marginBottom: 25 }}
-            onPress={() => onNext()}
+        <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
             disabled={!pound}
-          >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            style={Gutters.regularBMargin}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
-    height: 53,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
-});
 
 const mapStateToProps = state => ({
   answers: state.questionReducer.answers,

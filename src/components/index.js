@@ -21,6 +21,9 @@ import ModalInput from './ModalInput'
 import RuningWorkout from './RuningWorkout'
 import ProfileComponent from './ProfileComponent';
 import DashboardCard from './DashboardCard'
+import RuningCard from './RuningCard'
+import HeaderForDrawer from './HeaderForDrawer'
+import MealEmptyItem from './MealEmptyItem'
 
 export {
   Text,
@@ -45,5 +48,8 @@ export {
   ModalInput,
   RuningWorkout,
   ProfileComponent,
-  DashboardCard
+  DashboardCard,
+  RuningCard,
+  HeaderForDrawer,
+  MealEmptyItem,
 };

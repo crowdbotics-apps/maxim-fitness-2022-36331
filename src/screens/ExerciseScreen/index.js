@@ -126,7 +126,6 @@ const ExerciseScreen = props => {
       // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
       // if (findFirstNotDoneSet !== undefined) {
       const setId = selectedSession[0]?.sets[0]?.id
-      console.log('setId: ', setId);
       props.repsWeightRequest(setId, null, null)
       // }
     });
@@ -189,9 +188,8 @@ const ExerciseScreen = props => {
     setRepsColor(true)
     refReps.current.close();
     const id = repsWeightState.id
-    const reps = `${repsState}${showModalRepsTwo ? '/' : ''}${
-      showModalRepsThree ? '/' : ''
-    }${repsTwo}${showModalRepsThree ? '/' : ''}${repsThree}`
+    const reps = `${repsState}${showModalRepsTwo ? '/' : ''}${showModalRepsThree ? '/' : ''
+      }${repsTwo}${showModalRepsThree ? '/' : ''}${repsThree}`
     const dd = 'reps'
     props.repsWeightRequest(id, reps, dd);
     setReps('');
@@ -203,9 +201,8 @@ const ExerciseScreen = props => {
     setWeightColor(true)
     refWeight.current.close();
     const id = repsWeightState.id
-    const weight = `${weightState}${showModalWeightTwo ? '/' : ''}${
-      showModalWeightThree ? '/' : ''
-    }${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`
+    const weight = `${weightState}${showModalWeightTwo ? '/' : ''}${showModalWeightThree ? '/' : ''
+      }${weightTwo}${showModalWeightThree ? '/' : ''}${weightThree}`
     const dd = 'weight'
     props.repsWeightRequest(id, weight, dd);
     setWeight('');
@@ -496,8 +493,8 @@ const ExerciseScreen = props => {
                             ? 'Complete'
                             : item.sets[item.sets.length - 1].id &&
                               item.sets[item.sets.length - 1].done
-                            ? 'Done'
-                            : 'Done, Start Rest'
+                              ? 'Done'
+                              : 'Done, Start Rest'
                         }
                         buttonIcon={Images.iconDoneStartRest}
                         colorsGradient={['#3180BD', '#6EC2FA']}
@@ -760,12 +757,11 @@ const ExerciseScreen = props => {
                         <Text
                           regularTitle
                           color="quinary"
-                          text={`${
-                            (index + 1 === 1 && 'a') ||
+                          text={`${(index + 1 === 1 && 'a') ||
                             (index + 1 === 2 && 'b') ||
                             (index + 1 === 3 && 'c') ||
                             (index + 1 === 4 && 'd')
-                          }. ${exercise?.name}`}
+                            }. ${exercise?.name}`}
                         />
                       </View>
                       <View style={center}>

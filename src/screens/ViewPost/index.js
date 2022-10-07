@@ -443,7 +443,7 @@ const ViewPost = props => {
             commentData && addAComment();
           }}
         >
-          <Image source={Images.sendMessage} style={{ height: 30, width: 30 }} />
+          <Image source={Images.arrowIcon} style={{ height: 30, width: 30 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

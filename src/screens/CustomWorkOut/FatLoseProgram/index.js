@@ -16,6 +16,10 @@ import { Layout, Global, Gutters, Images, Colors } from '../../../theme';
 import { Icon } from 'native-base';
 import DatePicker from 'react-native-date-picker';
 const FatLoseProgram = props => {
+  const {
+    navigation: { navigate },
+  } = props;
+
   const datesBlacklistFunc = date => {
     return date.isoWeekday() === 6; // disable Saturdays
   };
@@ -25,6 +29,44 @@ const FatLoseProgram = props => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   let refDescription = useRef('');
+
+  //MarkedDates
+  const markedDatesArray = [
+    {
+      date: new Date(),
+      dots: [
+        {
+          color: 'red',
+        },
+        {
+          color: 'blue',
+        },
+      ],
+    },
+
+    {
+      date: '2022-09-23',
+      dots: [
+        {
+          color: 'red',
+        },
+        {
+          color: 'blue',
+        },
+      ],
+    },
+    {
+      date: '2022-09-25',
+      dots: [
+        {
+          color: 'red',
+        },
+        {
+          color: 'blue',
+        },
+      ],
+    },
+  ];
   return (
     <SafeAreaView style={[fill, { backgroundColor: 'white' }]}>
       <ScrollView>
@@ -37,14 +79,14 @@ const FatLoseProgram = props => {
                   // setDate(true);
                 }}
                 color="primary"
-                text={`Week 1`}
+                text={'Week 1'}
                 style={[tinyLMargin, styles.smallText]}
               />
               <Icon type="FontAwesome5" name="chevron-right" style={[styles.IconStyle]} />
             </View>
             <View style={[row]}>
               <Text
-                text={`Calendar`}
+                text={'Calendar'}
                 style={[tinyLMargin, styles.CalenderText]}
                 // onPress={() => setOpen(true)}
               />
@@ -55,23 +97,23 @@ const FatLoseProgram = props => {
               />
             </View>
           </View>
-          <View style={{  }}>
+          <View style={{ alignItems: 'center' }}>
             <CalendarStrip
-               
               dateNumberStyle={{ fontSize: 20 }}
-              calendarHeaderStyle={{color:"white"}}
-              dateNameStyle={{ fontSize: 15 }}
+              calendarHeaderStyle={{ color: 'white' }}
+              dateNameStyle={{ fontSize: 15, color: 'grey' }}
               iconLeft={false}
               iconRight={false}
               datesBlacklist={datesBlacklistFunc}
-              style={{ height: 100, width: 340 }}
-              scrollable
+              style={{ height: 80, width: 410 }}
+              markedDates={markedDatesArray}
+              // scrollable
             />
           </View>
-          <Text text={`Today's Workout`} style={styles.headind2} />
+          <Text text={"Today's Workout"} style={styles.headind2} />
           <View style={[styles.cardView]}>
             <View style={[row, justifyContentBetween]}>
-              <Text text={`Day 3`} color="primary" style={styles.dayText} />
+              <Text text={'Day 3'} color="primary" style={styles.dayText} />
               <Image source={etc} style={styles.imgStyle} />
             </View>
             <View style={[row]}>
@@ -144,13 +186,17 @@ const FatLoseProgram = props => {
             <Image source={findbtn} style={styles.btn1} />
           </View> */}
           <View style={[center, styles.cardView2]}>
-            <Text text={`Create the a Custom Workout`} style={styles.heading3} />
+            <Text text={'Create the a Custom Workout'} style={styles.heading3} />
             <View style={{ marginHorizontal: 10, marginTop: 10 }}>
               <Text
-                text={`Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput`}
+                text={
+                  'Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput'
+                }
                 style={styles.praText}
               />
-              <Image source={workoutbtn} style={styles.btn2} />
+              <TouchableOpacity onPress={() => navigate('AddExercise')}>
+                <Image source={workoutbtn} style={styles.btn2} />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -176,7 +222,7 @@ const FatLoseProgram = props => {
             <View style={[row, alignItemsCenter]}>
               <Image source={threeLine} style={{ width: 50, height: 50 }} />
               <Text
-                text={`View Workout`}
+                text={'View Workout'}
                 style={{
                   fontSize: 20,
                   lineHeight: 18,
@@ -190,7 +236,7 @@ const FatLoseProgram = props => {
             <View style={[row, alignItemsCenter, { marginTop: 20 }]}>
               <Image source={circle} style={{ width: 50, height: 50 }} />
               <Text
-                text={`Resechedule Workout`}
+                text={'Resechedule Workout'}
                 style={{
                   fontSize: 20,
                   lineHeight: 18,

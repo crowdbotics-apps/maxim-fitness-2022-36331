@@ -1,128 +1,116 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  Modal,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-
-//Libraires
-import LinearGradient from 'react-native-linear-gradient';
+import React, { useState, useEffect } from 'react';
+import { View, Image, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import Images from '../../theme/Images';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
 
 const ActivityLevel = props => {
-  const { forwardIcon, otLogo } = Images;
-
   const {
     navigation: { navigate },
   } = props;
-
-  const exerciseArray = [
-    {
-      heading: 'Sedantry',
-      description:
-        'Office job, watches TV for extended periods, video gaming, minimal movement on daily basis',
-    },
-    {
-      heading: 'Low Activity',
-      description:
-        '30-60 minutes per day of moderate intensity physical activity(210-240 minutes per week)',
-    },
-    {
-      heading: 'Active',
-      description: 'Atleast 60 minutes per day of moderate intensity physical activity',
-    },
-    {
-      heading: 'Very Active',
-      description: '120 minutes per day of vigorous physical activity',
-    },
-  ];
-
   const [exerciseLevel, setExerciseLevel] = useState(false);
 
-  const onNext = () => {
-    const tempData = props.answers;
-    tempData.activity_level = exerciseLevel;
-    navigate('MeasurementUnit');
-    props.updateAnswers(tempData);
-  };
   useEffect(() => {
     if (props.answers && props.answers.activity_level) {
       setExerciseLevel(props.answers.activity_level);
     }
   }, []);
 
+  const onNext = () => {
+    const tempData = props.answers;
+    tempData.activity_level = exerciseLevel;
+    props.updateAnswers(tempData);
+    navigate('MeasurementUnit');
+  };
+
+  const exerciseArray = [
+    {
+      value: 1,
+      heading: 'Sedantry',
+      description:
+        'Office job, watches TV for extended periods, video gaming, minimal movement on daily basis',
+    },
+    {
+      value: 2,
+      heading: 'Low Activity',
+      description:
+        '30-60 minutes per day of moderate intensity physical activity(210-240 minutes per week)',
+    },
+    {
+      value: 3,
+      heading: 'Active',
+      description: 'Atleast 60 minutes per day of moderate intensity physical activity',
+    },
+    {
+      value: 4,
+      heading: 'Very Active',
+      description: '120 minutes per day of vigorous physical activity',
+    },
+  ];
+
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderTitle showBackButton={true} percentage={0.33} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
+      <HeaderTitle percentage={0.33} showBackButton />
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
+        <View style={Gutters.mediumTMargin}>
           <Text
-            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
+            color="commonCol"
+            style={Fonts.titleRegular}
             text={'What is level of your Activity?'}
           />
         </View>
-
-        <View style={{ flex: 1 }}>
-          {exerciseArray.map(item => (
+        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+          {exerciseArray.map((item, i) => (
             <TouchableOpacity
+              key={i}
               style={[
-                {
-                  marginHorizontal: 40,
-                  borderBottomWidth: exerciseLevel !== item.heading ? 1 : null,
-                  borderBottomColor: exerciseLevel !== item.heading ? '#e1e1e1' : '#a5c2d0',
-                  borderWidth: exerciseLevel === item.heading ? 1 : null,
-                  paddingVertical: 11,
-                  borderColor: '#a5c2d0',
-                },
+                Layout.row,
+                // Global.height65,
+                Gutters.smallHPadding,
+                Layout.alignItemsCenter,
+                Layout.justifyContentBetween,
+                exerciseLevel === item.value ? Global.border : Global.borderB,
+                exerciseLevel !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
-              onPress={() => setExerciseLevel(item.heading)}
+              onPress={() => setExerciseLevel(item.value)}
             >
-              <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 20, color: '#6f6f6f', fontWeight: '600' }}>{item.heading}</Text>
-                  <Text style={{ color: '#7d7d7d', marginTop: 5 }}>{item.description}</Text>
-                </View>
-                <View style={{ width: 30, alignItems: 'flex-end', justifyContent: 'center' }}>
-                  <Image source={forwardIcon} style={{ height: 20, width: 10 }} />
-                </View>
+              <View style={[Layout.justifyContentBetween, Gutters.regularVMargin, Layout.fill4x]}>
+                <Text text={item.heading} color="commonCol" style={Fonts.titleSmall} bold />
+                <Text
+                  color="commonCol"
+                  style={[Fonts.textMedium, Gutters.tinyTMargin]}
+                  text={item.description}
+                />
+              </View>
+              <View style={[Layout.fillHalf, Layout.alignItemsEnd]}>
+                <Image source={Images.forwardIcon} style={styles.rightArrow} />
               </View>
             </TouchableOpacity>
           ))}
         </View>
-
-        <View style={{ justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{
-              marginHorizontal: 40,
-              marginBottom: 25,
-              opacity: exerciseLevel !== false ? 1 : 0.7,
-            }}
+        <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
             disabled={!exerciseLevel}
-            onPress={() => {
-              onNext();
-            }}
-          >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            style={Gutters.regularBMargin}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -130,25 +118,7 @@ const ActivityLevel = props => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
-    height: 53,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

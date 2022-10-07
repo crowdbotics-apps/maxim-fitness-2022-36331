@@ -16,10 +16,26 @@ import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile'
-import CustormCalories from '../screens/CustormCalories'
+import CustormCalories from '../screens/CustormCalories';
+import EditCustomCal from '../screens/CustormCalories/childScreens/EditCustomCal';
+import EditCaloriesManually from '../screens/CustormCalories/childScreens/EditCaloriesManually';
+import SearchProfile from '../screens/SearchProfile';
+import MessageScreen from '../screens/MessageScreen'
+import ChatScreen from '../screens/chatScreen';
+// Custom exercise screens
+import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
+import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
+import AddExercise from '../screens/CustomWorkOut/AddExercise'
+import SettingScreen from '../screens/SettingScreen'
+import HomeScreen from '../screens/HomeScreen'
+import MealRegulator from '../screens/MealRegulator'
+import SelectBrand from '../screens/SelectBrand'
+import LogFoods from '../screens/LogFoods';
+import {modules} from '@modules'
 
 const { home, profileTab, feed, nutrition, exercise } = Images
 
+const Chat = modules[0].value.navigator;
 const mainStack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 
@@ -47,7 +63,7 @@ const BottomNavigator = () => {
     >
       <Tab.Screen
         name="HomeScreen"
-        component={Feeds}
+        component={HomeScreen}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -122,8 +138,8 @@ const BottomNavigator = () => {
       />
 
       <Tab.Screen
-        name="ProgramScreen"
-        component={ProgramScreen}
+        name="FatLoseProgram"
+        component={FatLoseProgram}
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
@@ -170,6 +186,20 @@ const MainNavigator = () => (
     <mainStack.Screen name="EditProfile" component={EditProfile} />
     <mainStack.Screen name="ProfileScreen" component={ProfileScreen} />
     <mainStack.Screen name="CustormCalories" component={CustormCalories} />
+    <mainStack.Screen name="SearchProfile" component={SearchProfile} />
+    <mainStack.Screen name="MessageScreen" component={MessageScreen} />
+    <mainStack.Screen name="ChatScreen" component={ChatScreen} />
+    <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} />
+    <mainStack.Screen name="CustomExercise" component={CustomExercise} />
+    <mainStack.Screen name="AddExercise" component={AddExercise} />
+    <mainStack.Screen name="SettingScreen" component={SettingScreen} />
+    <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
+    <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
+    <mainStack.Screen name='HomeScreen' component={HomeScreen} />
+    <mainStack.Screen name='MealRegulator' component={MealRegulator} />
+    <mainStack.Screen name='SelectBrand' component={SelectBrand} />
+    <mainStack.Screen name='LogFoods' component={LogFoods} />
+    <mainStack.Screen name="Chat" component={Chat} />
   </mainStack.Navigator>
 )
 

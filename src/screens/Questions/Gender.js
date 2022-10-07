@@ -1,38 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  StyleSheet,
-  SafeAreaView,
   Modal,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
   Image,
-  TouchableOpacity,
+  StyleSheet,
   ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
-
-//Libraires
-import LinearGradient from 'react-native-linear-gradient';
 import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import Images from '../../theme/Images';
+import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
 
 const Gender = props => {
-  const { forwardIcon, otLogo } = Images;
-
   const {
     navigation: { navigate },
   } = props;
-
   const genderArray = ['Male', 'Female', 'Prefer not to answer'];
 
   const [gender, setGender] = useState(false);
@@ -41,10 +32,10 @@ const Gender = props => {
   const onNext = () => {
     const tempData = props.answers;
     tempData.gender = gender;
-
     props.updateAnswers(tempData);
     setWelcomeModal(true);
   };
+
   useEffect(() => {
     if (props.answers && props.answers.gender) {
       setGender(props.answers.gender);
@@ -52,96 +43,95 @@ const Gender = props => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
       <HeaderTitle percentage={0.1} showBackButton={true} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
+        <View style={Gutters.mediumTMargin}>
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your gender?'} />
           <Text
-            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-            text={'What is your gender?'}
+            color="commonCol"
+            style={[Gutters.regularVMargin, Fonts.textMedium]}
+            text="This answer has influence on how your program is designed"
           />
-
-          <Text style={{ marginTop: 18, color: '#828282', fontSize: 17, marginBottom: 20 }}>
-            This answer has influence on how your program is designed
-          </Text>
         </View>
-
-        {genderArray.map(item => (
-          <TouchableOpacity
-            style={[
-              {
-                height: 65,
-                //   marginTop: 15,
-                marginHorizontal: 40,
-                alignItems: 'center',
-                borderBottomWidth: gender !== item ? 1 : null,
-                flexDirection: 'row',
-                borderBottomColor: gender !== item ? '#e1e1e1' : '#a5c2d0',
-                justifyContent: 'space-between',
-                paddingHorizontal: 11,
-                borderWidth: gender === item ? 1 : null,
-                borderColor: '#a5c2d0',
-              },
-            ]}
-            onPress={() => setGender(item)}
-          >
-            <Text style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}>{item}</Text>
-            <Image source={forwardIcon} style={{ height: 20, width: 10 }} />
-          </TouchableOpacity>
-        ))}
-
-        <View style={{ height: '42%', justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{ marginHorizontal: 40, marginBottom: 25, opacity: gender !== false ? 1 : 0.7 }}
+        <View style={[Layout.justifyContentStart, Layout.fill]}>
+          {genderArray.map((item, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[
+                Layout.row,
+                Global.height65,
+                Gutters.smallHPadding,
+                Layout.alignItemsCenter,
+                Layout.justifyContentBetween,
+                gender === item ? Global.border : Global.borderB,
+                gender !== item ? Global.borderAlto : { borderColor: Colors.primary },
+              ]}
+              onPress={() => setGender(item)}
+            >
+              <Text text={item} color="commonCol" style={Fonts.titleRegular} />
+              <Image source={Images.forwardIcon} style={styles.rightArrow} />
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={Layout.justifyContentEnd}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
             disabled={!gender}
-            onPress={() => onNext()}
-          >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            style={Gutters.regularBMargin}
+          />
         </View>
       </ScrollView>
 
-      <Modal
-        visible={welcomeModal}
-        style={{ backgroundColor: 'red', flex: 1 }}
-        animationType="slide"
-        transparent={true}
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: 'rgba(0, 0, 0, 0.85);', justifyContent: 'space-between' }}>
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-            <View style={[styles.centeredView, { zIndex: 1 }]}>
-              <Image source={otLogo} style={{ height: 110, width: 140 }} />
+      <Modal visible={welcomeModal} style={Layout.fill} animationType="slide" transparent={true}>
+        <ScrollView
+          contentContainerStyle={[
+            Layout.fillGrow,
+            Global.opacityBg75,
+            Layout.justifyContentBetween,
+          ]}
+        >
+          <View style={[Layout.fill, Layout.justifyContentCenter]}>
+            <View style={[Layout.center, { zIndex: 1 }]}>
+              <Image source={Images.otLogo} style={styles.logoStyle} />
             </View>
 
-            <View style={[styles.centeredView, { marginTop: 20 }]}>
-              <Text style={{ fontSize: 24, color: '#fff' }}>Welcome to Orum Training!</Text>
-            </View>
-
-            <View style={[styles.centeredView, { marginTop: 24, marginHorizontal: 39 }]}>
-              <Text style={{ fontSize: 18, color: '#fff', textAlign: 'left' }}>
-                Next, we are going to ask you questions regarding your exercise goals then nutrition
-                preferences
-              </Text>
+            <View style={[Layout.center, Gutters.small2xTMargin]}>
+              <Text text="Welcome to Orum Training !" color="secondary" style={Fonts.titleMedium} />
+              <Text
+                color="secondary"
+                style={[
+                  Fonts.textLarge,
+                  Fonts.textLeft,
+                  Gutters.small2xTMargin,
+                  Gutters.mediumHMargin,
+                ]}
+                text="Next, we are going to ask you questions regarding your exercise goals then nutrition preferences"
+              />
             </View>
           </View>
 
-          <View style={{ justifyContent: 'flex-end' }}>
-            <TouchableOpacity
-              style={{ marginHorizontal: 40, marginBottom: 25 }}
+          <View style={Layout.justifyContentEnd}>
+            <Button
+              block
+              text={'Next'}
+              color="primary"
               onPress={() => {
                 setWelcomeModal(false);
                 navigate('ExerciseLevel');
               }}
-            >
-              <LinearGradient
-                style={[styles.logInButton]}
-                colors={['#048ECC', '#0460BB', '#0480C6']}
-              >
-                <Text style={styles.loginText}>Next</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              disabled={!gender}
+              style={[Gutters.small2xHMargin, Gutters.regularVMargin]}
+            />
           </View>
         </ScrollView>
       </Modal>
@@ -150,25 +140,8 @@ const Gender = props => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
-    height: 53,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
+  logoStyle: { height: 140, width: 140, resizeMode: 'contain' },
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
 });
 
 const mapStateToProps = state => ({

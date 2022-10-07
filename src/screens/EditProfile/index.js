@@ -24,7 +24,7 @@ const EditProfile = props => {
   const { profileBackGround, cameraIcon, backArrow } = Images;
   const { navigation, userDetail, editRequesting } = props;
   const { width, height } = Dimensions.get('window');
-  console.log('userDetail----', userDetail);
+
   const stateSchema = {
     firstName: {
       value: '',
@@ -92,14 +92,14 @@ const EditProfile = props => {
     formData.append('last_name', state.lastName.value);
     formData.append('user_name', state.userName.value);
     formData.append('description', state.discription.value);
-    if (state?.profileImage?.value) {
+    if (state?.profileImage?.value?.path) {
       formData.append('profile_picture', {
         uri: state.profileImage.value.path,
         type: state.profileImage.value.mime,
         name: state.profileImage.value.path,
       });
     }
-    if (state?.backgroundImage?.value) {
+    if (state?.backgroundImage?.value?.path) {
       formData.append('background_picture', {
         uri: state.backgroundImage.value.path,
         type: state.backgroundImage.value.mime,
@@ -153,8 +153,8 @@ const EditProfile = props => {
               state?.backgroundImage?.value?.path
                 ? { uri: state.backgroundImage.value.path }
                 : state?.backgroundImage?.value
-                ? { uri: state.backgroundImage.value }
-                : profileBackGround
+                  ? { uri: state.backgroundImage.value }
+                  : profileBackGround
             }
             style={{ height: (273 / 375) * width, width: '100%' }}
           >
@@ -188,8 +188,8 @@ const EditProfile = props => {
                 state?.profileImage?.value?.path
                   ? { uri: state.profileImage.value.path }
                   : state?.profileImage?.value
-                  ? { uri: state.profileImage.value }
-                  : profileBackGround
+                    ? { uri: state.profileImage.value }
+                    : profileBackGround
               }
               style={{
                 height: 100,

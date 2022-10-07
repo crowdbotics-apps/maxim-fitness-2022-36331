@@ -1,23 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-  ScrollView
-} from 'react-native';
-
-//Libraries
-import LinearGradient from 'react-native-linear-gradient';
+import React, { useState } from 'react';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
-import { Text } from '../../components';
-import HeaderTitle from './Components/headerTitle';
+import { Text, Button, InputField } from '../../components';
+import HeaderTitle from './Components/HeaderTitle';
+
+//Themes
+import { Global, Layout, Gutters, Fonts } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -26,108 +16,83 @@ const FeetHeight = props => {
   const {
     navigation: { navigate },
   } = props;
-
   const [feet, setFeet] = useState('');
   const [inches, setInches] = useState('');
 
   const onNext = () => {
     const tempData = props.answers;
-    tempData.height = `${feet}'${inches}`;
+    tempData.height = `${feet}.${inches}`;
     props.updateAnswers(tempData);
     navigate('WeightPounds');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderTitle percentage={0.47} showBackButton={true} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ marginHorizontal: 40, marginTop: 30 }}>
-          <Text
-            style={{ fontSize: 24, color: '#6f6f6f', fontWeight: '500' }}
-            text={'What is your height?'}
-          />
-          {/*
-        <Text style={{marginTop: 18}}>
-          This answer has influence on how your program is designed
-        </Text> */}
+    <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
+      <HeaderTitle percentage={0.47} showBackButton />
+      <ScrollView
+        contentContainerStyle={[
+          Layout.fillGrow,
+          Gutters.small2xHPadding,
+          Layout.justifyContentBetween,
+        ]}
+      >
+        <View style={Gutters.mediumTMargin}>
+          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your height?'} />
         </View>
-
-        <View
-          style={[
-            {
-              height: 65,
-              marginTop: 20,
-              marginHorizontal: 40,
-              justifyContent: 'center',
-              borderBottomWidth: 1,
-              borderBottomColor: '#808080',
-            },
-          ]}
-        >
-          <TextInput
-            style={{ fontSize: 24 }}
-            placeholder={'Feet'}
-            onChangeText={val => setFeet(val)}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <View
-          style={[
-            {
-              // height: 65,
-              marginTop: 15,
-              marginHorizontal: 40,
-              justifyContent: 'center',
-              borderBottomWidth: 1,
-              borderBottomColor: '#808080',
-            },
-          ]}
-        >
-          <TextInput
-            style={{ fontSize: 24 }}
-            placeholder={'Inches'}
-            onChangeText={val => setInches(val)}
-            keyboardType="numeric"
-          />
-        </View>
-        <View style={{ height: '59%', justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{ marginHorizontal: 40, marginBottom: 25 }}
-            onPress={() => onNext()}
-            disabled={!feet || !inches}
+        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+          <View
+            style={[
+              Layout.row,
+              Global.height65,
+              Layout.alignItemsCenter,
+              Layout.justifyContentBetween,
+              Global.borderB,
+              Global.borderAlto
+            ]}
           >
-            <LinearGradient style={[styles.logInButton]} colors={['#048ECC', '#0460BB', '#0480C6']}>
-              <Text style={styles.loginText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            <InputField
+              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              value={feet}
+              onChangeText={val => setFeet(val)}
+              placeholder="Feet"
+              autoCapitalize="none"
+              keyboardType="numeric"
+            />
+          </View>
+          <View
+            style={[
+              Layout.row,
+              Global.height65,
+              Layout.alignItemsCenter,
+              Layout.justifyContentBetween,
+              Global.borderB,
+              Global.borderAlto
+            ]}
+          >
+            <InputField
+              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              value={inches}
+              onChangeText={val => setInches(val)}
+              placeholder="Inches"
+              autoCapitalize="none"
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+        <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
+          <Button
+            block
+            text={'Next'}
+            color="primary"
+            onPress={onNext}
+            disabled={!feet}
+            style={Gutters.regularBMargin}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logInButton: {
-    height: 53,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
-});
 
 const mapStateToProps = state => ({
   answers: state.questionReducer.answers,

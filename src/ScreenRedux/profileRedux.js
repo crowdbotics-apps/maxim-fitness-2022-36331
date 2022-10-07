@@ -1,7 +1,11 @@
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { setUserDetail } from './loginRedux'
+
 import { showMessage } from 'react-native-flash-message';
+
+
+//Actions
+import { setUserDetail } from './loginRedux'
 
 // config
 import { API_URL } from '../config/app'
@@ -25,12 +29,16 @@ const REPORT_USER = 'PROFILE_SCREEN/REPORT_USER';
 const BLOCK_USER = 'PROFILE_SCREEN/BLOCK_USER';
 
 const ROUTE_DATA = 'PROFILE_SCREEN/ROUTE_DATA';
+const PROFILE_DATA_REQUEST = 'PROFILE_SCREEN/PROFILE_DATA_REQUEST';
+const PROFILE_DATA_SUCCESS = 'PROFILE_SCREEN/PROFILE_DATA_SUCCESS';
 
 const initialState = {
   requesting: false,
   profileData: false,
   routeDetail: false,
   editRequesting: false,
+  request: false,
+  profile: false,
 }
 
 //Actions
@@ -84,6 +92,16 @@ export const reportUser = data => ({
   data
 })
 
+export const profileData = () => ({
+  type: PROFILE_DATA_REQUEST
+})
+
+export const profileDataSuccess = (data) => ({
+  type: PROFILE_DATA_SUCCESS,
+  data
+})
+
+
 //Reducers
 export const profileReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -115,6 +133,19 @@ export const profileReducer = (state = initialState, action) => {
       return {
         ...state,
         editRequesting: true
+      }
+
+    case PROFILE_DATA_REQUEST:
+      return {
+        ...state,
+        request: true
+      }
+
+    case PROFILE_DATA_SUCCESS:
+      return {
+        ...state,
+        profile: action.data,
+        request: false
       }
 
     default:
@@ -221,16 +252,15 @@ async function updateProfile(data, id) {
 function* updateUserData({ data, id }) {
   try {
     const response = yield call(updateProfile, data, id)
-    showMessage({message: 'profile Updated successfully', type: 'success'})
+    showMessage({ message: 'profile Updated successfully', type: 'success' })
     yield put(setUserDetail(response.data))
   } catch (e) {
     const { response } = e
-    showMessage({message: 'Something went wrong', type: 'danger'})
+    showMessage({ message: 'Something went wrong', type: 'danger' })
   } finally {
     yield put(resetProfile())
   }
 }
-
 
 async function blockUserAPI(data) {
   const URL = `${API_URL}/block-user/`
@@ -251,7 +281,7 @@ function* blockUserData({ data }) {
   try {
     const response = yield call(blockUserAPI, data)
     showMessage({
-      message: "Blocked user Successfully",
+      message: 'Blocked user Successfully',
       type: 'success',
     })
   } catch (e) {
@@ -279,12 +309,38 @@ function* reportUserData({ data }) {
   try {
     const response = yield call(reportUserAPI, data)
     showMessage({
-      message: "Report user Successfully",
+      message: 'Report user Successfully',
       type: 'success',
     })
   } catch (e) {
     const { response } = e
     console.log('Report user  failure response0000', response);
+  }
+}
+
+async function profileDataAPI() {
+  const URL = `${API_URL}/profile/`
+  const token = await AsyncStorage.getItem('authToken')
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token  ${token}`
+    }
+  }
+
+  return XHR(URL, options)
+}
+
+function* profileRequest() {
+  try {
+    const response = yield call(profileDataAPI)
+    console.log('Profile response: ', response);
+    yield put(setUserDetail(response?.data[0]))
+    // yield put(profileDataSuccess(response?.data[0]))
+  } catch (e) {
+    const { response } = e
+    console.log('Profile error: ', response);
   }
 }
 
@@ -295,5 +351,5 @@ export default all([
   takeLatest(EDIT_PROFILE, updateUserData),
   takeLatest(BLOCK_USER, blockUserData),
   takeLatest(REPORT_USER, reportUserData),
-
+  takeLatest(PROFILE_DATA_REQUEST, profileRequest),
 ])

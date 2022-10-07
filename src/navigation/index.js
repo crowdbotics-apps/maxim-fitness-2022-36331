@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 // import { createDrawerNavigator } from "@react-navigation/drawer"
@@ -8,6 +8,7 @@ import { navigationRef } from './NavigationService';
 import AuthStackScreen from './AuthScreens';
 import MainNavigator from './Main';
 import QuestionStackScreen from './QuestionScreens';
+import { profileData } from '../ScreenRedux/profileRedux';
 
 const authStack = createStackNavigator();
 const mainStack = createStackNavigator();
@@ -15,6 +16,8 @@ const questionStack = createStackNavigator();
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
+  const { renderTab, profile, accessToken } = props;
+
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -26,10 +29,14 @@ const Navigation = props => {
       }}
     >
       <authStack.Navigator screenOptions={{ headerShown: false }}>
-        {!props.accessToken ? (
-          <authStack.Screen name="MainStack" component={MainNavigator} />
+        {accessToken ? (
+          profile?.is_survey ? (
+            <mainStack.Screen name="MainStack" component={MainNavigator} />
+          ) : (
+            <questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
+          )
         ) : (
-          <mainStack.Screen name="AuthStack" component={AuthStackScreen} />
+          <authStack.Screen name="AuthStack" component={AuthStackScreen} />
           //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
         )}
       </authStack.Navigator>
@@ -39,6 +46,12 @@ const Navigation = props => {
 
 const mapStateToProps = state => ({
   accessToken: state.login.accessToken,
+  profile: state.login.userDetail,
+  renderTab: state.questionReducer.renderTab,
 });
 
-export default connect(mapStateToProps, null)(Navigation);
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

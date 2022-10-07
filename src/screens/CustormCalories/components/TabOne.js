@@ -18,13 +18,7 @@ const TabOne = props => {
     justifyContentBetween,
   } = Layout;
   const { border } = Global;
-  const {
-    smallHPadding,
-    regularVPadding,
-    regularHMargin,
-    smallLMargin,
-    mediumVMargin,
-  } = Gutters;
+  const { smallHPadding, regularVPadding, regularHMargin, smallLMargin, mediumVMargin } = Gutters;
 
   const start = { x: 0, y: 1 };
   const end = { x: 0, y: 0 };
@@ -84,15 +78,9 @@ const TabOne = props => {
                     <ActivityIndicator size="large" color="#000" />
                   )} */}
               <View>
-                {true && (
-                  <Text text={'Fat Loss'} color="nonary" bold center />
-                )}
-                {false && (
-                  <Text text={'Strength and Hypertropy'} color="nonary" bold center />
-                )}
-                {false && (
-                  <Text text={'Maintenance'} color="nonary" bold center />
-                )}
+                {true && <Text text={'Fat Loss'} color="nonary" bold center />}
+                {false && <Text text={'Strength and Hypertropy'} color="nonary" bold center />}
+                {false && <Text text={'Maintenance'} color="nonary" bold center />}
               </View>
             </LinearGradient>
           </TouchableOpacity>

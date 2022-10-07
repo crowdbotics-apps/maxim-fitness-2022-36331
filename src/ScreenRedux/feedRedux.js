@@ -123,11 +123,9 @@ async function getFeedAPI(data) {
 function* getFeeds({ data }) {
   try {
     const response = yield call(getFeedAPI, data)
-    console.log('FEEDS RESPONSE: ', response);
     yield put(getFeedsSuccess(response.data))
   } catch (e) {
     const { response } = e
-    console.log('FEEDS ERROR: ', e);
     yield put(getFeedsFailure(e))
   }
 }

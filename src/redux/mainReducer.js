@@ -12,6 +12,8 @@ import { programReducer } from '../ScreenRedux/programServices'
 import { profileReducer } from '../ScreenRedux/profileRedux'
 import { questionReducer } from '../screens/Questions/Redux'
 import { customCalReducer } from '../ScreenRedux/customCalRedux'
+import { userProfileReducer } from '../ScreenRedux/searchProfileRedux'
+import { nutritionReducer } from '../ScreenRedux/nutritionRedux'
 
 const appPersistConfig = {
   key: 'login',
@@ -29,5 +31,7 @@ export default {
   programReducer,
   profileReducer,
   questionReducer,
-  customCalReducer
+  customCalReducer,
+  userProfileReducer,
+  nutritionReducer
 };
