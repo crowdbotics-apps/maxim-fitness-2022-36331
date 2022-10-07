@@ -4,7 +4,13 @@ import * as Progress from 'react-native-progress';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 
-const TabThree = ({ setShowModalHistory, navigation }) => {
+const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalories }) => {
+  useEffect(() => {
+    calculateCalories(consumeCalories);
+    calculateProtein(consumeCalories);
+    calculateCarbs(consumeCalories);
+    calculateFat(consumeCalories);
+  }, []);
   const {
     row,
     fill,
@@ -29,6 +35,31 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
   } = Gutters;
   const fontSize15TextCenter = { fontSize: 15, textAlign: 'center' };
 
+  const calculateCalories = conCal => {
+    const value = conCal[0]?.calories;
+    const value2 = conCal[0]?.goals_values?.calories;
+    const data = value / value2;
+    return data;
+  };
+  const calculateProtein = conCal => {
+    const value = conCal[0]?.protein;
+    const value2 = conCal[0]?.goals_values?.protein;
+    const data = value / value2;
+    return data;
+  };
+  const calculateCarbs = conCal => {
+    const value = conCal[0]?.carbs;
+    const value2 = conCal[0]?.goals_values?.carbs;
+    const data = value / value2;
+    return data;
+  };
+  const calculateFat = conCal => {
+    const value = conCal[0]?.fat;
+    const value2 = conCal[0]?.goals_values?.fat;
+    const data = value / value2;
+    return data;
+  };
+
   return (
     <>
       <View style={[row, justifyContentBetween, alignItemsCenter, small2xHMargin, smallVPadding]}>
@@ -38,7 +69,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
       <View style={[center, regularHMargin, regularVMargin]}>
         <View style={positionR}>
           <Progress.Circle
-            progress={0.75}
+            progress={calculateCalories(consumeCalories) || 0}
             size={200}
             color={'#ea3465'}
             unfilledColor={'#fae0e0'}
@@ -50,7 +81,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
         <View style={positionA}>
           <Text text="Calories" style={fontSize15TextCenter} />
           <Text
-            text={'75'}
+            text={consumeCalories[0]?.calories || '0'}
             style={{
               fontSize: 35,
               color: 'black',
@@ -59,20 +90,20 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
             }}
             bold
           />
-          <Text text={`Goal ${100}`} style={fontSize15TextCenter} />
+          <Text text={`Goal ${consumeCalories[0]?.goals_values?.calories || 0}`} style={fontSize15TextCenter} />
         </View>
       </View>
       <View style={[row, regularBMargin, regularHMargin, justifyContentBetween, alignItemsCenter]}>
         <View style={alignItemsStart}>
           <Text text="Protein" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
-            <Text text={`${10} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${30} g`} style={fontSize15TextCenter} />
+            <Text text={`${consumeCalories[0]?.protein || 0} /`} style={fontSize15TextCenter} bold />
+            <Text text={`${consumeCalories[0]?.goals_values?.protein || 0} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
           <Progress.Bar
-            progress={0.25}
+            progress={calculateProtein(consumeCalories) || 0}
             width={Dimensions.get('window').width - 200}
             height={22}
             color={'#45a1f8'}
@@ -87,13 +118,13 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
         <View style={alignItemsStart}>
           <Text text="Carbohydrates" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
-            <Text text={`${15} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${30} g`} style={fontSize15TextCenter} />
+            <Text text={`${consumeCalories[0]?.carbs || 0} /`} style={fontSize15TextCenter} bold />
+            <Text text={`${consumeCalories[0]?.goals_values?.carbs || 0} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
           <Progress.Bar
-            progress={0.5}
+            progress={calculateCarbs(consumeCalories) || 0}
             width={Dimensions.get('window').width - 200}
             height={22}
             color={'#f0bc40'}
@@ -108,13 +139,13 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
         <View style={alignItemsStart}>
           <Text text="Fats" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
-            <Text text={`${20} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${30} g`} style={fontSize15TextCenter} />
+            <Text text={`${consumeCalories[0]?.fat || 0} /`} style={fontSize15TextCenter} bold />
+            <Text text={`${consumeCalories[0]?.goals_values?.fat || 0} g`} style={fontSize15TextCenter} />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
           <Progress.Bar
-            progress={0.6}
+            progress={calculateFat(consumeCalories) || 0}
             width={Dimensions.get('window').width - 200}
             height={22}
             unfilledColor={'#d6d5d5'}
@@ -138,7 +169,7 @@ const TabThree = ({ setShowModalHistory, navigation }) => {
           />
           <Text text="Edit" color="nonary" onPress={() => navigation.navigate('EditCustomCal')} />
         </View>
-        <Text text={`${6} meals`} color="nonary" />
+        <Text text={`${profileData.number_of_meal} meals`} color="nonary" />
       </View>
     </>
   );

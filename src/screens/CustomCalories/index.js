@@ -28,8 +28,11 @@ import { Layout, Global, Gutters, Colors, Images } from '../../theme';
 import { calculatePostTime } from '../../utils/functions';
 import { TabOne, TabThree } from './components';
 import { getCustomCalRequest, getMealsRequest } from '../../ScreenRedux/customCalRedux';
+import moment from 'moment';
+import { useIsFocused } from '@react-navigation/native';
 
-const CustormCalories = props => {
+const CustomCalories = props => {
+  const { meals, profile, getCalories } = props
   let refWeight = useRef('');
   const [tab, setTab] = useState(2);
   const [value, setValue] = useState(false);
@@ -37,13 +40,57 @@ const CustormCalories = props => {
   const [isVisible, setIsVisible] = useState(false);
   const [showModalHistory, setShowModalHistory] = useState(false);
 
+
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
-      props.getCustomCalRequest()
+      // props.getCustomCalRequest()
       props.getMealsRequest()
     });
     return unsubscribe;
   }, [props.navigation]);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
+  }, [meals, isFocused]);
+
+  useEffect(() => {
+    isFocused && props.getCustomCalRequest()
+  }, [meals, isFocused]);
+
+  const calculateMeals = () => {
+    if (meals.length) {
+      let percentTotalCal = 0;
+      let percentToGetProtein = 0;
+      let percentToGetCarbohydrate = 0;
+      let percentToGetFat = 0;
+      meals &&
+        meals.forEach(item => {
+          item.food_items.map(food => {
+            const currentDate = moment(new Date()).format('YYYY-MM-DD');
+            if (currentDate === moment(food.created).format('YYYY-MM-DD')) {
+              let cal = Math.ceil(food.food.calories * food.unit.quantity);
+              let carbs = Math.ceil(food.food.carbohydrate * food.unit.quantity);
+              let protein = Math.ceil(food.food.proteins * food.unit.quantity);
+              let fat = Math.ceil(food.food.fat * food.unit.quantity);
+              percentTotalCal += cal;
+              percentToGetProtein += protein;
+              percentToGetCarbohydrate += carbs;
+              percentToGetFat += fat;
+            }
+          });
+        });
+      const conCalData = {
+        user: profile && profile.id,
+        calories: Math.ceil(percentTotalCal),
+        protein: Math.ceil(percentToGetProtein),
+        carbs: Math.ceil(percentToGetCarbohydrate),
+        fat: Math.ceil(percentToGetFat),
+      };
+      return conCalData
+    }
+  };
 
   const {
     row,
@@ -136,7 +183,12 @@ const CustormCalories = props => {
             )}
           </Content>
         )}
-        {tab === 2 && <TabThree navigation={props.navigation} />}
+        {tab === 2 &&
+          <TabThree
+            navigation={props.navigation}
+            profileData={profile}
+            consumeCalories={getCalories} />
+        }
         {tab === 3 && (
           <>
             <View style={[row, alignItemsCenter, regularHMargin]}>
@@ -472,11 +524,12 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   getCalories: state.customCalReducer.getCalories,
-  meals: state.customCalReducer.meals
+  meals: state.customCalReducer.meals,
+  profile: state.login.userDetail,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCustomCalRequest: () => dispatch(getCustomCalRequest()),
+  getCustomCalRequest: (data) => dispatch(getCustomCalRequest(data)),
   getMealsRequest: () => dispatch(getMealsRequest()),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(CustormCalories);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories);

@@ -7,19 +7,21 @@ import { usePubNub } from "pubnub-react";
 import { cloneArray, getUrl, loadHistory, sendMessage, sortArray } from "../utils";
 // @ts-ignore
 import { launchImageLibrary } from "react-native-image-picker";
-import { StyleSheet, Image, View, Text } from "react-native";
+import { StyleSheet, Image, View, Text, TouchableOpacity, Dimensions } from "react-native";
 import {
   Menu,
   MenuOptions,
   MenuOption,
   MenuTrigger
 } from "react-native-popup-menu";
+import { Images } from 'src/theme';
 
 import Video from "react-native-video";
 // @ts-ignore
 import EmojiSelector from "react-native-emoji-selector";
 
 const Chat = ({ route, navigation }) => {
+  console.log('route-----', route);
   const pubnub = usePubNub();
   const { state, dispatch } = useStore();
   const { item } = route.params;
@@ -27,7 +29,11 @@ const Chat = ({ route, navigation }) => {
   const channel = state.channels[route.params.item.id];
   const [actionSheet, setActionSheet] = useState(false);
   const [textInput, setTextInput] = useState(null);
+  const { profile, backImage } = Images;
+  const { width } = Dimensions.get('window');
 
+
+  
   useEffect(() => {
     pubnub.fetchMessages(
       {
@@ -216,6 +222,28 @@ const Chat = ({ route, navigation }) => {
 
   return (
     <>
+    <View style={{ paddingHorizontal: 20, flexDirection: 'row', marginTop: 20, backgroundColor: 'white' }}>
+            <TouchableOpacity
+              style={{ justifyContent: 'center', flex: 1 }}
+              onPress={() => navigation.goBack()}
+            >
+              <Image source={backImage} style={{ height: 20, width: 30 }} />
+            </TouchableOpacity>
+            <View style={{ flex: 1.5 }}>
+              <Image
+                source={profile}
+                style={{
+                  height: (61 / 375) * width,
+                  width: (61 / 375) * width,
+                  borderRadius: (31 / 375) * width,
+                }}
+              />
+            </View>
+          </View>
+          <View style={{ alignItems: 'center', backgroundColor: 'white' }}>
+            <Text bold style={{ fontSize: 20 }} >{channel.name}</Text>
+            <Text style={{ color: '#D3D3D3', fontSize: 12 }} >THE ROCK</Text>
+          </View>
       <GiftedChat
         text={textInput}
         onInputTextChanged={(text) => setTextInput(text)}

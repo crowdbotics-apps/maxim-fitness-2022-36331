@@ -19,7 +19,6 @@ const { backImage, searchImage, profile, followingButton, messageImage } = Image
 const MessageScreen = props => {
   const { navigation, profileUserData, requesting } = props;
   const { width } = Dimensions.get('window');
-  const [followUser, setFollowUser] = useState([]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>

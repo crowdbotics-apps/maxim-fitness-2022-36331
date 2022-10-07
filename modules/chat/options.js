@@ -60,6 +60,17 @@ export const ListViewStyle = StyleSheet.create({
 // const PUBNUB_PUB = PUBNUB_PUB;
 // const PUBNUB_SUB = PUBNUB_SUB;
 // const FILESTACK_KEY = FILESTACK_KEY;
+// const userDetail = useSelector(state => state.login);
+// const userData =() => {
+
+//   // let userDetail = await AsyncStorage.getItem('userDetail')
+//   // let finalData = JSON.parse(userDetail)
+//   // return finalData.then(response => response)
+// }
+
+// userData().then((response) => console.log('response---', response.username))  
+// console.log('userData----', userData());
+
 
 const user = {
   name: 'Mark Kelley',

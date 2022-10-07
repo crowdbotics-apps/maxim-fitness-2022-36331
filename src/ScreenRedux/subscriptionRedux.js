@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // config
 import { API_URL } from '../config/app';
 import { setAccessToken } from './loginRedux'
+import { navigate } from '../navigation/NavigationService';
+
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -12,6 +14,10 @@ import XHR from 'src/utils/XHR';
 const GET_PLAN_REQUEST = 'SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST';
 const GET_PLAN_SUCCESS = 'SUBSCRIPTION_SCREEN/GET_PLAN_SUCCESS';
 const GET_PLAN_FAILURE = 'SUBSCRIPTION_SCREEN/GET_PLAN_FAILURE';
+const NEW_SUBSCRIPTION = 'SUBSCRIPTION_SCREEN/NEW_SUBSCRIPTION';
+const RESET = 'SUBSCRIPTION_SCREEN/RESET';
+
+
 
 const GET_CUSTOMERID_REQUEST = 'SUBSCRIPTION_SCREEN/GET_CUSTOMERID_REQUEST';
 const GET_CUSTOMERID_SUCCESS = 'SUBSCRIPTION_SCREEN/GET_CUSTOMERID_SUCCESS';
@@ -33,6 +39,7 @@ const initialState = {
   SRequesting: false,
   getSubscription: false,
   getSubscriptionError: false,
+  subscriptionData: false
 }
 
 //Actions
@@ -80,6 +87,17 @@ export const postSubscriptionFailure = error => ({
   type: POST_SUBSCRIPTION_FAILURE,
   error
 })
+
+export const newSubScription = data => ({
+  type: NEW_SUBSCRIPTION,
+  data
+})
+
+export const reset = () => ({
+  type: RESET,
+})
+
+
 
 //Reducers
 export const subscriptionReducer = (state = initialState, action) => {
@@ -141,6 +159,18 @@ export const subscriptionReducer = (state = initialState, action) => {
         requesting: false
       }
 
+   case NEW_SUBSCRIPTION:
+      return {
+        ...state,
+        subscriptionData: action.data,
+      }
+      
+      case RESET:
+        return {
+          ...state,
+          requesting: false
+        }
+
     default:
       return state
   }
@@ -163,11 +193,15 @@ async function getPlanAPI() {
 function* getFeeds() {
   try {
     const response = yield call(getPlanAPI)
-    console.log('PLANE RESPONSE: ', response);
+    console.log('get plan success response----', response);
     yield put(getPlanSuccess(response.data.data))
   } catch (e) {
     const { response } = e
+    console.log('get plan error response----', response);
     yield put(getPlanFailure(e))
+  }
+  finally {
+    yield put(reset())
   }
 }
 
@@ -188,10 +222,11 @@ async function getCustomerIdAPI() {
 function* getCustomerId() {
   try {
     const response = yield call(getCustomerIdAPI)
-    console.log('GET CUSTOMER ID RESPONSE: ', response);
+    console.log('customer id success response-----', response);
     yield put(getCustomerIdSuccess(response.data.data))
   } catch (e) {
-    console.log('GET CUSTOMER ID ERROR: ', e);
+    const { response} = e
+    console.log('get id failure response----', response);
     yield put(getCustomerIdFailure(e))
   }
 }
@@ -218,11 +253,15 @@ function* postSubscription({ data }) {
     const token = AsyncStorage.getItem('authToken')
     yield put(setAccessToken(token))
     console.log('SUBSCRIPTION RESPONSE: ', response);
-    // yield put(postSubscriptionSuccess(response.data.data))
+    yield put(newSubScription(response.data))
+     navigate('Feeds')
   } catch (e) {
     console.log('SUBSCRIPTION ERROR: ', e);
     const { response } = e
     // yield put(postSubscriptionFailure(e))
+  }
+  finally {
+    yield put(reset())
   }
 }
 

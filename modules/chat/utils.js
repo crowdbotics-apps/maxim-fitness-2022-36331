@@ -168,11 +168,11 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
     await pubnub.objects.setChannelMetadata({
       channel,
       data: customData
-    });
+    })
     await pubnub.objects.setChannelMembers({
       channel,
-      uuids: [{ id: userId }, { id: `${chatWithId}` }]
-    });
+      uuids: [{ id: `${userId}` }, { id: `${chatWithId}` }]
+    })
     await pubnub.channelGroups.addChannels({
       channels: [channel],
       channelGroup: userId

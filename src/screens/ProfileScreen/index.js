@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { Text, BottomSheet, Loader } from '../../components';
 import { Images } from 'src/theme';
@@ -35,6 +36,8 @@ const ProfileScreen = props => {
   const [showLoader, setShowLoader] = useState(false);
   const [visible, setIsVisible] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [videoUri, setVideoUri] = useState(false)
 
   const {
     profileBackGround,
@@ -45,6 +48,7 @@ const ProfileScreen = props => {
     flagIcon,
     editProfileButton,
     followingButton,
+    circleClose,
   } = Images;
 
   const isFocused = useIsFocused();
@@ -159,7 +163,7 @@ const ProfileScreen = props => {
           <Loader isLoading={props.requesting} />
           <View>
             <ImageBackground
-              source={profileBackGround}
+              source={ userDetail?.background_picture ? {uri: userDetail?.background_picture} : profileBackGround}
               style={{ height: (273 / 375) * width, width: '100%' }}
             >
               <View style={styles.backgroundStyle}>
@@ -182,7 +186,7 @@ const ProfileScreen = props => {
             </ImageBackground>
             <View style={styles.profileImage}>
               <Image
-                source={profileBackGround}
+                source={userDetail?.profile_picture ? {uri: userDetail?.profile_picture} : profileBackGround}
                 style={{
                   height: 100,
                   width: 100,
@@ -275,19 +279,16 @@ const ProfileScreen = props => {
                   }}
                 >
                   {showVideo && item[0]?.video ? (
-                    <TouchableOpacity onPress={() => setShowModal(item[0]?.video)}>
-                      <Video
+                    <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[0]?.video)]}>
+                      <Image
                         source={{
-                          uri: item[0]?.video,
+                          uri: item[0]?.video_thumbnail,
                         }}
                         style={{
                           height: (300 / 375) * width,
                           width: (175 / 375) * width,
                           borderRadius: 20,
-                          borderWidth: 1,
                         }}
-                        resizeMode="cover"
-                        posterResizeMode="cover"
                       />
                     </TouchableOpacity>
                   ) : (
@@ -306,18 +307,18 @@ const ProfileScreen = props => {
                     style={{ marginLeft: i % 2 === 0 ? 10 : 0, marginRight: i % 2 === 0 ? 0 : 10 }}
                   >
                     {showVideo ? (
-                      <Video
+                      <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[1]?.video)]}>
+                      <Image
                         source={{
-                          uri: item[1]?.video,
+                          uri: item[1]?.video_thumbnail,
                         }}
                         style={{
                           height: (145 / 375) * width,
                           width: (175 / 375) * width,
                           borderRadius: 20,
                         }}
-                        resizeMode="cover"
-                        posterResizeMode="cover"
                       />
+                      </TouchableOpacity>
                     ) : (
                       <TouchableOpacity onPress={() => setIsVisible(true)}>
                         <Image
@@ -331,9 +332,10 @@ const ProfileScreen = props => {
                       </TouchableOpacity>
                     )}
                     {showVideo ? (
-                      <Video
+                      <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[2]?.video)]}>
+                      <Image
                         source={{
-                          uri: item[1]?.video,
+                          uri: item[2]?.video_thumbnail,
                         }}
                         style={{
                           height: (145 / 375) * width,
@@ -341,13 +343,12 @@ const ProfileScreen = props => {
                           borderRadius: 20,
                           marginTop: 10,
                         }}
-                        resizeMode="cover"
-                        posterResizeMode="cover"
                       />
+                      </TouchableOpacity>
                     ) : (
                       <TouchableOpacity onPress={() => setIsVisible(true)}>
                         <Image
-                          source={{ uri: item[1]?.image }}
+                          source={{ uri: item[2]?.image }}
                           style={{
                             height: (145 / 375) * width,
                             width: (175 / 375) * width,
@@ -394,29 +395,50 @@ const ProfileScreen = props => {
       >
         <View
           style={{
-            backgroundColor: 'white',
-            paddingHorizontal: 20,
+            backgroundColor: 'black',
+            paddingHorizontal: 5,
             flex: 1,
+            paddingTop: 20,
           }}
         >
-          <Video
-            source={{
-              uri: showModal,
-            }}
-            style={{ height: 300, width: '100%' }}
-            muted={false}
-            repeat={true}
-            // onEnd={() => setStart(false)}
-            resizeMode="cover"
-            rate={1}
-            posterResizeMode="cover"
-            playInBackground={true}
-            playWhenInactive={true}
-            ignoreSilentSwitch="ignore"
-            disableFocus={true}
-            mixWithOthers={'mix'}
-            controls={true}
-          />
+          <TouchableOpacity onPress={() => setShowModal(false)} style={{ alignItems: 'flex-end' }}>
+            <Image
+              source={circleClose}
+              style={{
+                height: 40,
+                width: 40,
+                borderWidth: 1,
+              }}
+            />
+          </TouchableOpacity>
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color="white"
+              />
+            )}
+            <Video
+              source={{
+                uri: videoUri,
+              }}
+              style={{ height: 300, width: '100%' }}
+              muted={false}
+              repeat={true}
+              // onEnd={() => setStart(false)}
+              resizeMode="cover"
+              rate={1}
+              posterResizeMode="cover"
+              playInBackground={true}
+              playWhenInactive={true}
+              ignoreSilentSwitch="ignore"
+              disableFocus={true}
+              mixWithOthers={'mix'}
+              controls={true}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => setLoading(false)}
+            />
+          </View>
         </View>
       </Modal>
     </>

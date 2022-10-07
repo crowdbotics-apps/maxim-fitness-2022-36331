@@ -6,7 +6,7 @@ import { calculatePostTime } from 'src/utils/functions';
 import { SliderBox } from 'react-native-image-slider-box';
 import Share from 'react-native-share';
 import { connect } from 'react-redux';
-import { routeData } from '../../ScreenRedux/profileRedux'
+import { routeData } from '../../ScreenRedux/profileRedux';
 import Carousel from 'react-native-snap-carousel';
 import Video from 'react-native-video';
 
@@ -55,15 +55,20 @@ const FeedCard = props => {
   };
 
   const movetoNextScreen = item => {
-    routeData(item)
-    navigation.navigate('ProfileScreen')
-  }
+    routeData(item);
+    navigation.navigate('ProfileScreen');
+  };
 
-  const renderData =()=> {
-    return(
-      <Video source={{uri: "https://maxim-fitness-2022-36331.s3.amazonaws.com/media/post_video/video/mixkit-baby-on-the-belly-of-his-mother-plays-and-smiles-4042-large_am3NaY6.mp4"}} style={{height: 200, width: 200}}/>
-    )
-  }
+  const renderData = () => {
+    return (
+      <Video
+        source={{
+          uri: 'https://maxim-fitness-2022-36331.s3.amazonaws.com/media/post_video/video/mixkit-baby-on-the-belly-of-his-mother-plays-and-smiles-4042-large_am3NaY6.mp4',
+        }}
+        style={{ height: 200, width: 200 }}
+      />
+    );
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -97,12 +102,12 @@ const FeedCard = props => {
             images={
               item && (item?.post_image?.length && item?.post_video?.length) > 0
                 ? [...item.post_image, ...item.post_video].map(item =>
-                    item.image ? item.image : item.video
+                    item.image ? item.image : item.video_thumbnail
                   )
-                : item?.post_image?.length > 0
+                : item?.post_image?.length > 0 && item.post_video?.length === 0
                 ? item.post_image.map(item => item.image)
-                : item?.post_video?.length > 0
-                ? item.post_image.map(item => item.video)
+                : item?.post_video?.length > 0 && item?.post_image?.length === 0
+                ? item.post_video.map(item => item.video_thumbnail)
                 : []
             }
             style={styles.foodImageStyle}
@@ -113,13 +118,6 @@ const FeedCard = props => {
             dotStyle={styles.sliderBoxStyle}
             paginationBoxVerticalPadding={20}
           />
-            {/* <Carousel
-              // ref={(c) => { this._carousel = c; }}
-              data={[1,1]}
-              renderItem={()=> <Video source={{uri: "https://maxim-fitness-2022-36331.s3.amazonaws.com/media/post_video/video/mixkit-baby-on-the-belly-of-his-mother-plays-and-smiles-4042-large_am3NaY6.mp4"}} style={{height: 200, width: 200}}/>}
-              sliderWidth={200}
-              itemWidth={200}
-            /> */}
         </View>
         <View style={styles.bottomTextStyle}>
           <Text

@@ -59,10 +59,10 @@ const SettingScreen = props => {
             <Text text="Settings" style={{ fontSize: 22, color: '#0D5565' }} bold />
           </View>
         </View>
-        <View style={[styles.mainHeading]}>
+        <TouchableOpacity onPress={()=> navigation.navigate('SubscriptionScreen')} style={[styles.mainHeading]}>
           <Text text="SubScription Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
-        </View>
+        </TouchableOpacity>
         <View style={[styles.mainHeading]}>
           <Text text="Payment Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />

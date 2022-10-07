@@ -18,7 +18,8 @@ import { Gutters, Layout, Global, Images } from '../../theme'
 import Modal from 'react-native-modal'
 
 const SubscriptionScreen = props => {
-  const { navigation, getPlans } = props;
+  const { navigation, getPlans, userDetail, subscriptionData } = props;
+  console.log('subscriptionData0--------', subscriptionData);
   const [curentTab, setCurentTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [active, setActive] = useState(true);
@@ -60,7 +61,7 @@ const SubscriptionScreen = props => {
   };
   return (
     <>
-      <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
+      <TouchableOpacity style={styles.leftArrow} onPress={() => navigation.goBack()}>
         <Image source={Images.backArrow} style={styles.backArrowStyle} />
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
@@ -83,6 +84,7 @@ const SubscriptionScreen = props => {
             setIsVisible={setIsVisible}
             navigation={navigation}
             getPlans={getPlans}
+            subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
         {curentTab === 1 && (
@@ -91,6 +93,7 @@ const SubscriptionScreen = props => {
             setIsVisible={setIsVisible}
             navigation={navigation}
             getPlans={getPlans}
+            subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
         {curentTab === 2 && (
@@ -99,6 +102,7 @@ const SubscriptionScreen = props => {
             setIsVisible={setIsVisible}
             navigation={navigation}
             getPlans={getPlans}
+            subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
       </Content>
@@ -202,7 +206,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
   customerId: state.subscriptionReducer.getCISuccess,
+  subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.requesting,
+  userDetail: state.login.userDetail,
   // subscription: state.subscription.subscription,
 });
 
