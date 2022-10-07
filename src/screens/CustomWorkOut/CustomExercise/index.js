@@ -13,7 +13,7 @@ import {
 import { connect } from 'react-redux';
 
 //Components
-import { Text, BottomSheet, Button } from '../../../components';
+import { Text, InputField, BottomSheet, Button } from '../../../components';
 
 //Libraries
 import Modal from 'react-native-modal';
@@ -21,12 +21,11 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import ImagePicker from 'react-native-image-crop-picker';
 
 //Themes
-import { Images } from 'src/theme';
+import { Global, Gutters, Layout, Colors, Images, Fonts } from '../../../theme';
+import { postCustomExRequest } from '../../../ScreenRedux/addExerciseRedux';
 
 const CustomExercise = props => {
   const {
-    backArrow,
-    profileBackGround,
     redBin,
     circleClose,
     radioBlue,
@@ -34,14 +33,13 @@ const CustomExercise = props => {
     greyNext,
     duplicateIcon,
   } = Images;
-  const { navigation } = props;
+  const { navigation, route, cRequesting, getCustomExState, todaySessions, } = props;
   const { width, height } = Dimensions.get('window');
 
-  const [secondView, setSecondView] = useState(false);
   const [reps, setReps] = useState('');
+  const [title, setTitle] = useState('');
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
-
   const [deleteModal, setDeleteModal] = useState(false);
 
   //BottomSheetRefs
@@ -56,7 +54,7 @@ const CustomExercise = props => {
   const [dualReps, setDualReps] = useState({ state1: '', state2: '' });
   const [temporaryReps, setTemporaryReps] = useState(false);
 
-  const numberOfExercise = 1;
+  const numberOfExercise = route?.params?.exercises?.length;
 
   const ex1 = 'Exercise 1';
   const ex2 = 'Exercise 2';
@@ -105,289 +103,166 @@ const CustomExercise = props => {
     }
   };
 
+  const addDataCustomEx = () => {
+    const payload = {
+      "title": title ? title : 'title',
+      "session_date": todaySessions?.date_time,
+      "exercise_ids": route?.params?.exercises?.map((ex, i) => ex.id),
+      "set": sets
+    }
+    props.postCustomExRequest(payload)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={Layout.fillGrow}>
         <View
-          style={{
-            marginHorizontal: 13,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 17,
-          }}
+          style={[
+            Layout.row,
+            Gutters.regularVMargin,
+            Gutters.regularHMargin,
+            Layout.alignItemsCenter,
+            Layout.justifyContentBetween,
+          ]}
         >
-          <Image source={backArrow} />
-          <View
-            style={{
-              backgroundColor: '#e9e9e9',
-              paddingHorizontal: 10,
-              borderRadius: 27,
-              height: 22,
-            }}
-          >
-            <Text style={{ fontWeight: '500' }}>Done</Text>
-          </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image source={Images.back2} style={{ width: 30, height: 25, resizeMode: 'contain' }} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={addDataCustomEx} style={styles.doneStyle}>
+            <Text text="Done" />
+          </TouchableOpacity>
         </View>
 
         <View
-          style={{
-            marginTop: 10,
-            marginHorizontal: 13,
-            borderBottomWidth: 1,
-            borderBottomColor: '#e9e9e9',
-          }}
+          style={[
+            Layout.row,
+            Global.borderB,
+            Global.height60,
+            Global.borderAlto,
+            Layout.alignItemsCenter,
+            Gutters.regularHMargin,
+            Layout.justifyContentBetween,
+          ]}
         >
-          <TextInput
-            placeholderTextColor={'#929292'}
+          <InputField
+            inputStyle={[Fonts.titleRegular, Layout.fill]}
+            value={title}
+            onChangeText={val => setTitle(val)}
             placeholder="Workout Title"
-            style={{ fontSize: 20, fontWeight: '600' }}
+            autoCapitalize="none"
           />
         </View>
 
-        <View style={styles.tableView}>
-          {numberOfExercise === 1 ? (
-            <View
-              style={{
-                marginHorizontal: 10,
-                // justifyContent: 'space-between',
-                flexDirection: 'row',
-                marginTop: 15,
-              }}
-            >
-              <Image
-                source={profileBackGround}
-                style={{ height: 90, width: 100, borderRadius: 10 }}
-              />
+        <View style={[styles.tableView, Gutters.regularHMargin, Gutters.regularVMargin, Gutters.regularBPadding]}>
+          {
+            //numberOfExercise === 1 ? (
+            //<View style={[Layout.row, Gutters.smallHMargin, Gutters.smallVMargin]}>
+            //<Image source={Images.profileBackGround} style={styles.exerciseImage} />
+            //<Text text="Barbell bench press" style={styles.exerciseName} />
+            //</View>
+            // ) :
+            route?.params?.exercises?.map((exe, i) => {
+              return (
+                <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
+                  <View style={Layout.row}>
+                    <Image source={exe?.video ? { uri: exe.video } : Images.profileBackGround} style={styles.exerciseImage1} />
+                    <Text style={styles.exerciseName1} text={`a. ${exe.name}`} />
+                  </View>
 
-              <Text style={{ marginLeft: 20, color: '#636363', fontSize: 20, fontWeight: '700' }}>
-                Barbell bench press
-              </Text>
-            </View>
-          ) : (
-            <>
-              <View
-                style={{
-                  marginHorizontal: 10,
-                  marginTop: 15,
-                }}
-              >
-                <View style={{ flexDirection: 'row' }}>
-                  <Image
-                    source={profileBackGround}
-                    style={{ height: 60, width: 90, borderRadius: 5 }}
-                  />
-
-                  <Text
-                    style={{
-                      marginLeft: 20,
-                      color: '#636363',
-                      fontSize: 20,
-                      fontWeight: '700',
-                      alignSelf: 'center',
-                    }}
-                  >
-                    a. {ex1}
-                  </Text>
+                  {/* <View style={[Layout.row, Gutters.smallTMargin]}>
+                    <Image source={Images.profileBackGround} style={styles.exerciseImage1} />
+                    <Text style={styles.exerciseName1} text={`a. ${ex2}`} />
+                  </View> */}
                 </View>
-
-                <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                  <Image
-                    source={profileBackGround}
-                    style={{ height: 60, width: 90, borderRadius: 5 }}
-                  />
-
-                  <Text
-                    style={{
-                      marginLeft: 20,
-                      color: '#636363',
-                      fontSize: 20,
-                      fontWeight: '700',
-                      alignSelf: 'center',
-                    }}
-                  >
-                    b. {ex2}
-                  </Text>
-                </View>
-              </View>
-            </>
-          )}
+              )
+            })
+          }
 
           <View
-            style={{
-              marginHorizontal: 10,
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              marginTop: 15,
-            }}
+            style={[
+              Layout.row,
+              Gutters.smallHMargin,
+              Gutters.smallTMargin,
+              Layout.justifyContentAround,
+            ]}
           >
-            <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Set</Text>
-            <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Reps</Text>
-            <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Rest</Text>
+            <Text style={styles.setStyle} text="Set" />
+            <Text style={styles.setStyle} text="Reps" />
+            <Text style={styles.setStyle} text="Rest" />
           </View>
-          <View style={{ marginTop: 7 }}>
+          <View style={Gutters.smallTMargin}>
             {numberOfExercise === 1 &&
               sets.map((item, i) => (
                 <TouchableOpacity
                   onPress={() => setCurrentIndex(i)}
-                  style={{
-                    marginHorizontal: 38,
-                    flexDirection: 'row',
-                    justifyContent: 'space-around',
-                    backgroundColor: currentIndex === i ? '#9cdaff' : '#f3f1f4',
-                    marginTop: 5,
-                    height: 35,
-                    borderRadius: 6,
-                    alignItems: 'center',
-                  }}
+                  style={[
+                    Layout.row,
+                    Global.height35,
+                    Gutters.tinyTMargin,
+                    Gutters.largeHMargin,
+                    Layout.alignItemsCenter,
+                    Layout.justifyContentAround,
+                    {
+                      borderRadius: 6,
+                      backgroundColor: currentIndex === i ? '#9cdaff' : '#f3f1f4',
+                    }
+                  ]}
                 >
-                  <Text style={{ color: '#5e5e5e', fontWeight: '700' }}>{i + 1}</Text>
-                  <Text style={{ color: '#5e5e5e', fontWeight: '700', marginHorizontal: 33 }}>
-                    {item.reps}
-                  </Text>
-                  <Text style={{ color: '#5e5e5e', fontWeight: '700' }}>
-                    {!item.rest ? '-' : item.rest}
-                  </Text>
+                  <Text style={styles.setTextStyle} text={i + 1} />
+                  <Text style={[styles.setTextStyle, Gutters.mediumHMargin]} text={item.reps} />
+                  <Text style={styles.setTextStyle} text={!item.rest ? '-' : item.rest} />
                 </TouchableOpacity>
               ))}
             {numberOfExercise === 2 &&
               dualSets.map((item, i) => (
                 <TouchableOpacity
                   style={[
-                    styles.dualSets,
+                    Global.borderR10,
+                    Gutters.largeHMargin,
+                    Gutters.smallBMargin,
+                    Gutters.regularBPadding,
                     {
                       backgroundColor: i === currentIndex ? '#74ccff' : '#f1f1f1',
-                    },
-                  ]}
+                    }]}
                   onPress={() => setCurrentIndex(i)}
                 >
-                  <Text
-                    style={{
-                      marginLeft: 20,
-                      color: '#636363',
-                      fontSize: 17,
-                      fontWeight: '700',
-                      marginTop: 5,
-                    }}
-                  >
-                    {i + 1}
-                  </Text>
-
+                  <Text style={styles.dualSetsStyle} text={i + 1} />
                   <View style={styles.dualSetsSecondView}>
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 80,
-                        marginLeft: -10,
-                      }}
-                    >
-                      {item.exerciseA.name}
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 50,
-                        marginHorizontal: 40,
-                        marginLeft: 10,
-                      }}
-                    >
-                      {item.exerciseA.reps}
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 50,
-                        marginRight: -30,
-                      }}
-                    >
-                      {item.exerciseA.rest === 0 ? '-' : item.exerciseB.rest}
-                    </Text>
+                    <Text style={styles.dualSetsName} text={item.exerciseA.name} />
+                    <Text style={styles.dualSetRepsStyle} text={item.exerciseA.reps} />
+                    <Text style={styles.dualSetRestStyle} text={item.exerciseA.rest === 0 ? '-' : item.exerciseB.rest} />
                   </View>
-
-                  <View style={[styles.dualSetsSecondView1]}>
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 80,
-                        marginLeft: -10,
-                      }}
-                    >
-                      {item.exerciseB.name}
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 50,
-                        marginHorizontal: 40,
-                        marginLeft: 10,
-                      }}
-                    >
-                      {item.exerciseB.reps}
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: '#636363',
-                        fontSize: 13,
-                        fontWeight: '700',
-                        marginTop: 5,
-                        width: 50,
-                        marginRight: -30,
-                      }}
-                    >
-                      {item.exerciseB.rest === 0 ? '-' : item.exerciseB.rest}
-                    </Text>
+                  <View style={styles.dualSetsSecondView1}>
+                    <Text style={styles.dualSecondEx} text={item.exerciseB.name} />
+                    <Text style={styles.dualSecondReps} text={item.exerciseB.reps} />
+                    <Text style={styles.dualSecondRest} text={item.exerciseB.rest === 0 ? '-' : item.exerciseB.rest} />
                   </View>
                 </TouchableOpacity>
               ))}
           </View>
 
-          <View style={{ marginHorizontal: 38 }}>
+          <View style={Gutters.largeHMargin}>
             <TouchableOpacity
               onPress={() => {
                 numberOfExercise === 1 && refRBSheet.current.open();
                 numberOfExercise === 2 && refRBSheetDual.current.open();
               }}
-              style={{
-                backgroundColor: '#e9e9e9',
-                paddingHorizontal: 10,
-                borderRadius: 6,
-                marginTop: 7,
-                height: 22,
-                width: 80,
-              }}
+              style={styles.addSetsButton}
             >
-              <Text style={{ fontWeight: '500', color: '#7e7e7e' }}>Add Set</Text>
+              <Text style={styles.addSetsText} text="Add Set" />
             </TouchableOpacity>
           </View>
 
           <View
-            style={{
-              marginHorizontal: 10,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 20,
-            }}
+            style={[
+              Layout.row,
+              Gutters.smallHMargin,
+              Gutters.small2xTMargin,
+              Layout.justifyContentBetween,
+            ]}
           >
             <TouchableOpacity
-              style={{ flexDirection: 'row' }}
+              style={Layout.row}
               onPress={() => duplicateSet()}
               disabled={currentIndex || currentIndex === 0 ? false : true}
             >
@@ -411,13 +286,10 @@ const CustomExercise = props => {
         closeOnPressMask={false}
         animationType="slide"
         customStyles={{
-          wrapper: {
-            // backgroundColor: 'transparent',
-          },
           container: {
             backgroundColor: '#f1f1f1',
             borderRadius: 40,
-            height: 300,
+            height: 320,
             marginBottom: 10,
           },
           draggableIcon: {
@@ -427,113 +299,116 @@ const CustomExercise = props => {
       >
         <View style={styles.secondView}>
           <ScrollView>
-            <View style={{ alignItems: 'flex-end', marginRight: 20 }}>
-              <View style={{ flexDirection: 'row', width: '55%', justifyContent: 'space-between' }}>
-                <Text style={{ color: '#636363', fontSize: 20, fontWeight: '700' }}>Set 1</Text>
-                <TouchableOpacity onPress={() => refRBSheet.current.close()}>
-                  <Image source={circleClose} style={{ height: 20, width: 20 }} />
-                </TouchableOpacity>
+            <View style={[Layout.row, Layout.fill, Gutters.small2xHMargin, Layout.justifyContentBetween]}>
+              <View style={Layout.fill} />
+              <View style={[Layout.fill, Layout.center]}>
+                <Text style={styles.setOneTextStyle} text="Set 1" />
               </View>
+              <TouchableOpacity onPress={() => refRBSheet.current.close()} style={[Layout.fill, Layout.alignItemsEnd, Layout.justifyContentCenter]}>
+                <Image source={circleClose} style={{ height: 25, width: 25 }} />
+              </TouchableOpacity>
             </View>
 
             <View
-              style={{
-                marginLeft: 45,
-                marginRight: 25,
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-                marginTop: 20,
-              }}
+              style={[
+                Layout.row,
+                Gutters.largeHMargin,
+                Gutters.small2xTMargin,
+                Layout.justifyContentBetween,
+              ]}
             >
-              <View>
-                <View style={styles.secondaryBoxes}>
-                  <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Enter Reps</Text>
-                  <TextInput
-                    style={{ fontSize: 24, fontWeight: '700', color: '#5e5e5e', marginTop: 5 }}
-                    onChangeText={val => setReps(val)}
-                  />
-                </View>
-
-                <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center' }}>
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
-                  <Text style={{ fontSize: 12, color: '#646464', textAlign: 'center' }}>
-                    Keep reps the{'\n'} same for {'\n'} remaining sets
-                  </Text>
-                </View>
+              <View style={styles.secondaryBoxes}>
+                <Text style={{ color: '#00a1ff', fontWeight: '700' }} text="Enter Reps" />
+                <TextInput
+                  style={{ fontSize: 24, fontWeight: '700', color: '#5e5e5e', marginTop: 5 }}
+                  onChangeText={val => setReps(val)}
+                />
               </View>
 
-              <View>
-                <View style={[styles.secondaryBoxes, { width: 120 }]}>
-                  <Text style={{ color: '#00a1ff', fontWeight: '700' }}>Enter Rest</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View>
-                      <TextInput
-                        style={{
-                          borderBottomColor: '#bababa',
-                          marginTop: 14,
-                          height: 30,
-                          width: 30,
-                          // padding: 10,
-                          borderBottomWidth: 1,
-                          paddingBottom: -10,
-                        }}
-                        onChangeText={val => setMinutes(val)}
-                        maxLength={2}
-                      />
-                      <Text style={{ color: '#646464', fontSize: 12 }}>Min</Text>
-                    </View>
-
-                    <Text
+              <View style={[styles.secondaryBoxes, { width: 120 }]}>
+                <Text style={{ color: '#00a1ff', fontWeight: '700' }} text="Enter Rest" />
+                <View style={[Layout.row, Layout.alignItemsCenter]}>
+                  <View>
+                    <TextInput
                       style={{
-                        color: '#646464',
-                        fontSize: 30,
-                        fontWeight: '700',
-                        marginHorizontal: 10,
+                        width: 30,
+                        height: 30,
+                        marginTop: 14,
+                        paddingBottom: -10,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#bababa',
                       }}
-                    >
-                      :
-                    </Text>
-                    <View>
-                      <TextInput
-                        style={{
-                          borderBottomColor: '#bababa',
-                          width: 30,
-                          height: 30,
-                          borderBottomWidth: 1,
-                          paddingBottom: -10,
-                          marginTop: 14,
-                        }}
-                        maxLength={3}
-                        onChangeText={val => setSeconds(val)}
-                      />
+                      onChangeText={val => setMinutes(val)}
+                      maxLength={2}
+                    />
+                    <Text style={{ color: '#646464', fontSize: 12 }} text="Min" />
+                  </View>
 
-                      <Text style={{ color: '#646464', fontSize: 12 }}>Sec</Text>
-                    </View>
+                  <Text
+                    style={{
+                      color: '#646464',
+                      fontSize: 30,
+                      fontWeight: '700',
+                      marginHorizontal: 10,
+                    }}
+
+                    text=":"
+                  />
+                  <View>
+                    <TextInput
+                      style={{
+                        borderBottomColor: '#bababa',
+                        width: 30,
+                        height: 30,
+                        borderBottomWidth: 1,
+                        paddingBottom: -10,
+                        marginTop: 14,
+                      }}
+                      maxLength={3}
+                      onChangeText={val => setSeconds(val)}
+                    />
+
+                    <Text style={{ color: '#646464', fontSize: 12 }} text="Sec" />
                   </View>
                 </View>
+              </View>
+            </View>
+            <View
+              style={[
+                Layout.row,
+                Gutters.largeHMargin,
+                Gutters.small2xTMargin,
+                Layout.justifyContentBetween,
+              ]}
+            >
 
-                <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center' }}>
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
-                  <Text style={{ fontSize: 12, color: '#646464', textAlign: 'center' }}>
-                    Keep rest the{'\n'} same for {'\n'} remaining sets
-                  </Text>
-                </View>
+              <View style={[Layout.row, Gutters.smallTMargin, Layout.alignItemsCenter]}>
+                <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                <Text style={{ fontSize: 12, color: '#646464', textAlign: 'center' }}>
+                  Keep reps the{'\n'} same for {'\n'} remaining sets
+                </Text>
+              </View>
+              <View style={[Layout.row, Gutters.smallTMargin, Layout.alignItemsCenter]}>
+                <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                <Text style={{ fontSize: 12, color: '#646464', textAlign: 'center' }}>
+                  Keep rest the{'\n'} same for {'\n'} remaining sets
+                </Text>
               </View>
             </View>
 
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 10,
-                marginBottom: 10,
-              }}
-            >
+            <View style={[Layout.center, Gutters.smallVMargin, Gutters.regularBPadding]}>
               <TouchableOpacity
                 onPress={() => {
                   setSets(prevValues => [
                     ...prevValues,
-                    { reps: reps, rest: minutes * 60 + parseFloat(seconds) },
+                    {
+                      ex_id: route?.params?.exercises?.map(e => e.id),
+                      set_no: 1,
+                      reps: reps,
+                      weight: 10,
+                      set_type: "ct",
+                      timer: minutes * 60 + parseFloat(seconds)
+                    },
                   ]);
                   refRBSheet.current.close();
                   resetValues();
@@ -629,7 +504,6 @@ const CustomExercise = props => {
                           marginTop: 14,
                           height: 30,
                           width: 30,
-                          // padding: 10,
                           borderBottomWidth: 1,
                           paddingBottom: -10,
                         }}
@@ -717,8 +591,8 @@ const CustomExercise = props => {
                       ? false
                       : true
                     : dualReps.state2 !== '' && minutes !== 0
-                    ? false
-                    : true
+                      ? false
+                      : true
                 }
               >
                 <Image
@@ -738,32 +612,31 @@ const CustomExercise = props => {
         onBackdropPress={() => setDeleteModal(false)}
       >
         <View
-          style={{
-            height: 250,
-            marginHorizontal: 20,
-            backgroundColor: '#fff',
-            borderRadius: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+          style={[
+            Gutters.small2xHMargin,
+            Global.secondaryBg,
+            Global.borderR10,
+            Layout.center,
+            {
+              height: 250,
+            }
+          ]}
         >
-          <Text style={{ fontSize: 24, fontWeight: '700', textAlign: 'center' }}>
-            Are you sure you want to delete this set?
-          </Text>
+          <Text style={styles.deleteText} text="Are you sure you want to delete this set?" />
 
-          <View style={{ flexDirection: 'row', marginTop: 20 }}>
+          <View style={[Layout.row, Gutters.small2xTMargin]}>
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#74ccff' }]}
               onPress={() => deleteSet()}
             >
-              <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
+              <Text style={styles.yesNoButton} text="Yes" />
             </TouchableOpacity>
-            <View style={{ marginHorizontal: 20 }} />
+            <View style={Gutters.small2xHMargin} />
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#f3f1f4' }]}
               onPress={() => setDeleteModal(false)}
             >
-              <Text style={{ fontWeight: '700', color: '#000' }}>No</Text>
+              <Text style={styles.yesNoButton} text="No" />
             </TouchableOpacity>
           </View>
         </View>
@@ -773,10 +646,101 @@ const CustomExercise = props => {
 };
 
 const styles = StyleSheet.create({
+  doneStyle: {
+    backgroundColor: '#e9e9e9',
+    borderRadius: 20,
+    height: 25,
+    width: 70,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  exerciseName: { marginLeft: 10, color: '#636363', fontSize: 20, fontWeight: '700' },
+  exerciseImage: { height: 90, width: 100, borderRadius: 10 },
+  exerciseImage1: { height: 60, width: 90, borderRadius: 5 },
+  exerciseName1: {
+    marginLeft: 20,
+    color: '#636363',
+    fontSize: 20,
+    fontWeight: '700',
+    alignSelf: 'center',
+  },
+  setStyle: { color: '#00a1ff', fontWeight: '700' },
+  setTextStyle: { color: '#5e5e5e', fontWeight: '700' },
+  dualSetsStyle: {
+    marginLeft: 20,
+    color: '#636363',
+    fontSize: 17,
+    fontWeight: '700',
+    marginTop: 5,
+  },
+  dualSetsName: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 80,
+    marginLeft: -10,
+  },
+  dualSetRepsStyle: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 50,
+    marginHorizontal: 40,
+    marginLeft: 10,
+  },
+  dualSetRestStyle: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 50,
+    marginRight: -30,
+  },
+  dualSecondEx: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 80,
+    marginLeft: -10,
+  },
+  dualSecondReps: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 50,
+    marginHorizontal: 40,
+    marginLeft: 10,
+  },
+  dualSecondRest: {
+    color: '#636363',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 5,
+    width: 50,
+    marginRight: -30,
+  },
+  addSetsButton: {
+    backgroundColor: '#e9e9e9',
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginTop: 7,
+    height: 22,
+    width: 80,
+  },
+  addSetsText: { fontWeight: '500', color: '#7e7e7e' },
+  deleteText: { fontSize: 24, fontWeight: '700', textAlign: 'center' },
+  yesNoButton: { fontWeight: '700', color: '#000' },
+  setOneTextStyle: { color: '#636363', fontSize: 20, fontWeight: '700' },
+
+
+
   container: {
     flexGrow: 1,
     backgroundColor: 'white',
-    // paddingBottom: 20,
   },
   backgroundStyle: {
     justifyContent: 'space-between',
@@ -788,27 +752,19 @@ const styles = StyleSheet.create({
   subTextStyle: { fontSize: 16, color: 'gray' },
   tableView: {
     backgroundColor: '#fff',
-    marginHorizontal: 9,
-    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    marginBottom: 10,
     shadowOpacity: 0.22,
     borderRadius: 5,
     shadowRadius: 2.22,
     elevation: 3,
-    paddingBottom: 10,
-    // height: 500,
   },
   secondView: {
-    marginHorizontal: 7,
     borderRadius: 35,
     backgroundColor: '#f1f1f1',
-    marginTop: 10,
-    marginBottom: 15,
   },
   secondaryBoxes: {
     width: 110,
@@ -827,26 +783,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
   },
-  dualSets: {
-    marginHorizontal: 38,
-    borderRadius: 6,
-    height: 140,
-    marginBottom: 10,
-  },
   dualSetsSecondView: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#bababa',
     marginHorizontal: 20,
     paddingBottom: 10,
-    // borderWidth:1,
     justifyContent: 'space-around',
   },
   dualSetsSecondView1: {
     flexDirection: 'row',
     marginTop: 10,
     marginHorizontal: 20,
-    // paddingBottom: 10,
     justifyContent: 'space-around',
   },
   delBtnStyles: {
@@ -859,7 +807,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  cRequesting: state.addExerciseReducer.cRequesting,
+  getCustomExState: state.addExerciseReducer.getCustomExState,
+  todaySessions: state.programReducer.todaySessions,
+});
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  postCustomExRequest: (data) => dispatch(postCustomExRequest(data))
+});
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise);

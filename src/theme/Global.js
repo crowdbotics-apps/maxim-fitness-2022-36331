@@ -46,6 +46,9 @@ export default StyleSheet.create({
   opacityBg75: {
     backgroundColor: 'rgba(0, 0, 0, 0.9)'
   },
+  redBg: {
+    backgroundColor: 'red'
+  },
   border: {
     borderWidth: 1,
   },
@@ -78,6 +81,8 @@ export default StyleSheet.create({
     borderTopRightRadius: 20,
   },
   // heights
+  height30: { height: 30 },
+  height35: { height: 35 },
   height40: { height: 40 },
   height60: { height: 60 },
   height65: { height: 65 },
