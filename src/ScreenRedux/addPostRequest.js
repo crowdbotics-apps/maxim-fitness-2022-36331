@@ -1,8 +1,10 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigate } from '../navigation/NavigationService'
+import { getFeedsRequest } from './feedRedux'
 
 // config
-import {API_URL} from '../config/app';
+import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -61,11 +63,13 @@ async function addPostAPI(data) {
   return XHR(URL, options)
 }
 
-function* AddPost({data}) {
+function* AddPost({ data }) {
   try {
     const response = yield call(addPostAPI, data)
+    navigate('Feeds')
+    // yield put((getFeedsRequest(1)))
   } catch (e) {
-    const {response} = e
+    const { response } = e
   } finally {
     yield put(reset())
   }

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,19 +12,21 @@ import {
   ActivityIndicator
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
-import {AccessToken, LoginManager} from 'react-native-fbsdk';
-import {Images} from 'src/theme';
-import {connect} from 'react-redux';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import { Images } from 'src/theme';
+import { connect } from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
-//actions
-import {loginUser, googleLoginUser, facebookLoginUser} from '../../ScreenRedux/loginRedux';
-import appleAuth, {AppleButton} from '@invertase/react-native-apple-authentication';
+import { useIsFocused } from '@react-navigation/native';
 
-const {backIcon, orumIcon, facebookButton, googleIcon, smallGoogleIcon, faceBookIcon} = Images
+//actions
+import { loginUser, googleLoginUser, facebookLoginUser } from '../../ScreenRedux/loginRedux';
+import appleAuth, { AppleButton } from '@invertase/react-native-apple-authentication';
+
+const { backIcon, orumIcon, facebookButton, googleIcon, smallGoogleIcon, faceBookIcon } = Images
 const SignIn = props => {
-  const {navigation} = props
+  const { navigation } = props
 
   const stateSchema = {
     email: {
@@ -48,7 +50,7 @@ const SignIn = props => {
     }
   }
 
-  const {state, handleOnChange, disable} = useForm(stateSchema, validationStateSchema)
+  const { state, handleOnChange, disable, setState } = useForm(stateSchema, validationStateSchema)
 
   const OnLogInPress = () => {
     let loginData = {
@@ -76,7 +78,7 @@ const SignIn = props => {
           return res.accessToken
         })
         .catch(err => console.log('err', err))
-      let apiData = {access_token: myToken}
+      let apiData = { access_token: myToken }
       myToken && props.googleLoginUser(apiData)
       // this.setState({ userInfo });
     } catch (error) {
@@ -104,7 +106,7 @@ const SignIn = props => {
         await AccessToken.getCurrentAccessToken()
           .then(async res => {
             const token = res.accessToken.toString()
-            let data = {access_token: token}
+            let data = { access_token: token }
             props.facebookLoginUser(data)
           })
           .catch(err => {
@@ -157,16 +159,22 @@ const SignIn = props => {
       }
     }
   }
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused) {
+      setState(stateSchema)
+    }
+  }, [isFocused])
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <ScrollView
-        contentContainerStyle={{flexGrow: 1, paddingBottom: 30}}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
         <Image source={backIcon} style={styles.backIconStyle} />
-        <View style={{marginHorizontal: 22}}>
-          <View style={{alignItems: 'center'}}>
+        <View style={{ marginHorizontal: 22 }}>
+          <View style={{ alignItems: 'center' }}>
             <Image source={orumIcon} style={styles.orumIcon} />
             <Text style={styles.mainTextStyle}>Create or login your account to start</Text>
             <Text style={styles.mainTextStyle}>training</Text>
@@ -185,14 +193,14 @@ const SignIn = props => {
             ]}
             onPress={() => facebooksignUp()}
           >
-            <View style={{justifyContent: 'center', flex: 1}}>
-              <Image source={faceBookIcon} style={{height: 19, width: 9}} />
+            <View style={{ justifyContent: 'center', flex: 1 }}>
+              <Image source={faceBookIcon} style={{ height: 19, width: 9 }} />
             </View>
             {props.faceBookRequesting ? (
-              <ActivityIndicator style={{flex: 6, marginRight: 30}} color="black" />
+              <ActivityIndicator style={{ flex: 6, marginRight: 30 }} color="black" />
             ) : (
-              <View style={{justifyContent: 'center', flex: 2}}>
-                <Text style={{color: 'white', fontSize: 14, fontWeight: '700'}}>
+              <View style={{ justifyContent: 'center', flex: 2 }}>
+                <Text style={{ color: 'white', fontSize: 14, fontWeight: '700' }}>
                   Login via Facebook
                 </Text>
               </View>
@@ -212,21 +220,21 @@ const SignIn = props => {
             ]}
             onPress={() => signInGoogle()}
           >
-            <View style={{justifyContent: 'center', flex: 1}}>
+            <View style={{ justifyContent: 'center', flex: 1 }}>
               <Image source={smallGoogleIcon} style={{}} />
             </View>
             {props.googleRequesting ? (
-              <ActivityIndicator style={{flex: 6, marginRight: 30}} color="black" />
+              <ActivityIndicator style={{ flex: 6, marginRight: 30 }} color="black" />
             ) : (
-              <View style={{justifyContent: 'center', flex: 2}}>
-                <Text style={{color: '#303042', fontSize: 14, fontWeight: '700'}}>
+              <View style={{ justifyContent: 'center', flex: 2 }}>
+                <Text style={{ color: '#303042', fontSize: 14, fontWeight: '700' }}>
                   Login via Google
                 </Text>
               </View>
             )}
           </TouchableOpacity>
           {Platform.OS === 'ios' && (
-            <View style={[styles.card, {width: '100%', marginTop: 20, borderRadius: 10}]}>
+            <View style={[styles.card, { width: '100%', marginTop: 20, borderRadius: 10 }]}>
               <AppleButton
                 buttonStyle={AppleButton.Style.BLACK}
                 buttonType={AppleButton.Type.SIGN_IN}
@@ -240,21 +248,23 @@ const SignIn = props => {
             </View>
           )}
           <Text style={styles.loginTextStyle}>Or Login with</Text>
-          <View style={{marginHorizontal: 3}}>
+          <View style={{ marginHorizontal: 3 }}>
             <TextInput
               keyboardType="email-address"
+              value={state.email.value}
               onChangeText={value => handleOnChange('email', value)}
-              style={[styles.inputStyle, {marginTop: 9}]}
+              style={[styles.inputStyle, { marginTop: 9 }]}
               placeholder="Email"
             />
-            <Text style={{color: 'red'}}>{state.email.error}</Text>
+            <Text style={{ color: 'red' }}>{state.email.error}</Text>
             <TextInput
               secureTextEntry={true}
+              value={state.password.value}
               onChangeText={value => handleOnChange('password', value)}
-              style={[styles.inputStyle, {marginTop: 18}]}
+              style={[styles.inputStyle, { marginTop: 18 }]}
               placeholder="Password"
             />
-            <Text style={{color: 'red'}}>{state.password.error}</Text>
+            <Text style={{ color: 'red' }}>{state.password.error}</Text>
             <Text
               style={{
                 color: '#0460BB',
@@ -269,7 +279,7 @@ const SignIn = props => {
             <TouchableOpacity
               onPress={() => OnLogInPress()}
               disabled={disable}
-              style={{marginTop: 53}}
+              style={{ marginTop: 53 }}
             >
               <LinearGradient style={styles.logInButton} colors={['#048ECC', '#0460BB', '#0480C6']}>
                 {props.requesting ? (
@@ -288,7 +298,7 @@ const SignIn = props => {
             >
               <Text>Don’t have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                <Text style={{fontWeight: '700'}}>Sign Up </Text>
+                <Text style={{ fontWeight: '700' }}>Sign Up </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -321,8 +331,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 53
   },
-  faceBookIcon: {width: '100%', height: 49, marginTop: 9},
-  googleIcon: {width: '100%', height: 49},
+  faceBookIcon: { width: '100%', height: 49, marginTop: 9 },
+  googleIcon: { width: '100%', height: 49 },
   loginTextStyle: {
     color: '#303042',
     fontWeight: '400',
@@ -370,7 +380,7 @@ const styles = StyleSheet.create({
     elevation: 10
   },
 
-  loginText: {fontSize: 16, color: 'white', fontWeight: '700'}
+  loginText: { fontSize: 16, color: 'white', fontWeight: '700' }
 })
 
 const mapStateToProps = state => ({

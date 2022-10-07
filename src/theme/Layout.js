@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import { StyleSheet } from 'react-native'
 
 export default StyleSheet.create({
   /* Column Layouts */
@@ -139,19 +139,19 @@ export default StyleSheet.create({
   },
   /* Operation Layout */
   mirror: {
-    transform: [{scaleX: -1}],
+    transform: [{ scaleX: -1 }],
   },
   rotate90: {
-    transform: [{rotate: '90deg'}],
+    transform: [{ rotate: '90deg' }],
   },
   rotate45: {
-    transform: [{rotate: '45deg'}],
+    transform: [{ rotate: '45deg' }],
   },
   rotate90Inverse: {
-    transform: [{rotate: '-90deg'}],
+    transform: [{ rotate: '-90deg' }],
   },
   rotate180Inverse: {
-    transform: [{rotate: '-180deg'}],
+    transform: [{ rotate: '-180deg' }],
   },
   positionR: {
     position: 'relative'

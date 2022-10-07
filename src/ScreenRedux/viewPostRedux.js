@@ -1,9 +1,9 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {showMessage} from 'react-native-flash-message';
+import { showMessage } from 'react-native-flash-message';
 
 // config
-import {API_URL} from '../config/app'
+import { API_URL } from '../config/app'
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -41,10 +41,11 @@ export const resetViewPost = error => ({
   error
 })
 
-export const addComment = (data, setNewCommentData) => ({
+export const addComment = (data, postData, callBack) => ({
   type: ADD_COMMENT,
   data,
-  setNewCommentData
+  postData,
+  callBack
 })
 
 export const addCommentSuccess = data => ({
@@ -52,9 +53,11 @@ export const addCommentSuccess = data => ({
   data
 })
 
-export const replyComment = data => ({
+export const replyComment = (data, subCommentData, callBack) => ({
   type: REPLY_COMMENT,
-  data
+  data,
+  subCommentData,
+  callBack
 })
 
 export const likeComment = data => ({
@@ -103,13 +106,13 @@ async function getPostAPI(data) {
   return XHR(URL, options)
 }
 
-function* getPostData({data}) {
+function* getPostData({ data }) {
   try {
     const response = yield call(getPostAPI, data)
     console.log('get feeds success response----', response);
     yield put(getPostSuccess(response.data))
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('get post failure response0000', response);
   } finally {
     yield put(resetViewPost())
@@ -131,12 +134,14 @@ async function addCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* addCommentData({data, setNewCommentData}) {
+function* addCommentData({ data, postData, callBack }) {
   try {
     const response = yield call(addCommentAPI, data)
-    setNewCommentData(response.data)
+    postData.comments = [response.data, ...postData.comments];
+    callBack(true)
+    // setNewCommentData(response.data)
   } catch (e) {
-    const {response} = e
+    const { response } = e
   } finally {
     yield put(resetViewPost())
   }
@@ -157,14 +162,16 @@ async function replyCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* replyCommentData({data}) {
-  console.log('reply comment data-----', data);
+function* replyCommentData({ data, subCommentData, callBack }) {
   try {
     const response = yield call(replyCommentAPI, data)
-    console.log('reply comment success response----', response);
-    // yield put(getPostSuccess(response.data))
+    subCommentData.subComment = subCommentData?.subComment?.length
+      ? [...subCommentData.subComment, response.data]
+      : [response.data]
+    callBack(true)
+    // setSubCommentData(response.data)
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('reply comment failure response----', response);
   } finally {
     yield put(resetViewPost())
@@ -186,12 +193,12 @@ async function likeCommentAPI(data) {
   return XHR(URL, options)
 }
 
-function* likeCommentData({data}) {
+function* likeCommentData({ data }) {
   try {
     const response = yield call(likeCommentAPI, data)
     console.log('like comment success response-----', response);
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('like comment failure response----', response);
   }
 }

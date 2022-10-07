@@ -1,6 +1,6 @@
 import React from 'react'
-import {Button as NBButton} from 'native-base'
-import {Text, ActivityIndicator} from 'react-native'
+import { Button as NBButton } from 'native-base'
+import { Text, ActivityIndicator } from 'react-native'
 
 // styles
 import styles from './styles'
@@ -20,7 +20,7 @@ const Button = ({
   disabled,
   loading,
 }) => {
-  const {buttonText, button, disabledStyle, borderStyle} = styles;
+  const { buttonText, button, disabledStyle, borderStyle } = styles;
 
   return (
     <NBButton

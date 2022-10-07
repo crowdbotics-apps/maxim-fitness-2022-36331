@@ -1,2 +1,2 @@
-export const API_URL = 'https://orumtraining-23610.botics.co/api/v1';
-// export const API_URL = "https://d2a7-119-160-57-122.ngrok.io/api/v1"
+export const API_URL = 'https://maxim-fitness-2022-36331.botics.co/api/v1';
+// export const API_URL = 'https://68c3-39-53-82-57.ngrok.io/api/v1';

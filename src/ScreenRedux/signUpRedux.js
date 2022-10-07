@@ -1,14 +1,14 @@
-import {all, call, put, takeLatest} from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 // import AsyncStorage from "@react-native-community/async-storage"
-import {showMessage} from 'react-native-flash-message';
-import {navigate} from '../navigation/NavigationService';
+import { showMessage } from 'react-native-flash-message';
+import { navigate } from '../navigation/NavigationService';
 
 // config
-import {API_URL} from '../config/app';
+import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 
 //Types
 const SIGN_UP = 'SCREEN/SIGNUP';
@@ -58,7 +58,7 @@ function SignUpAPI(data) {
   return XHR(URL, options)
 }
 
-function* SignUp({data}) {
+function* SignUp({ data }) {
   try {
     const response = yield call(SignUpAPI, data)
     navigate('SignIn')
@@ -73,7 +73,7 @@ function* SignUp({data}) {
     //     type: "success"
     //   })
   } catch (e) {
-    const {response} = e
+    const { response } = e
     console.log('registration error response', response);
     showMessage({
       message: response && response.data.email[0],
