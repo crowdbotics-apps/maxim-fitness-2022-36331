@@ -326,10 +326,10 @@ REST_FRAMEWORK = {
 PUSH_NOTIFICATIONS_SETTINGS = {
     "FCM_API_KEY":  env.str("FCM_SERVER_KEY", ""),
     # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
-    "APNS_AUTH_KEY_PATH": "",
-    "APNS_AUTH_KEY_ID": "",
-    "APNS_TEAM_ID": "",
-    "APNS_TOPIC": "",
+    "APNS_AUTH_KEY_PATH": env.str("APNS_AUTH_KEY_PATH", ""),
+    "APNS_AUTH_KEY_ID": env.str("APNS_AUTH_KEY_ID", ""),
+    "APNS_TEAM_ID": env.str("APNS_TEAM_ID", ""),
+    "APNS_TOPIC": env.str("APNS_TOPIC", ""),
     "APNS_USE_SANDBOX": False,
     "UPDATE_ON_DUPLICATE_REG_ID": True
 }
