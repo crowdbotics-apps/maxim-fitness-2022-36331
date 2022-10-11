@@ -1,4 +1,4 @@
-package com.maxim_fitness_2022_36331;
+package com.crowdbotics.maximsandersaolcom_ma_892;
 
 import com.facebook.react.ReactActivity;
 
