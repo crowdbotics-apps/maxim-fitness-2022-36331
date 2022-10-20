@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -62,8 +62,24 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Orum Training application need access of camera for Bar code scanner</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need to use for login via facebook and google</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Need to use for login via facebook and google</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Orum Training application need access of microphone for Bar code scanner or Speech Recognition</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Orum Training application need access of photo library for Bar code scanner</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Orum Training application need access of the speech recognition for adding meals</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
