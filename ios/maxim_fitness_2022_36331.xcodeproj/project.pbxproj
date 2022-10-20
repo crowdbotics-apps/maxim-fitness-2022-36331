@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		205DC67490702A094BBAD7BB /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5F89D3DED6B230279DEE44 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */; };
+		60DA089A290185B600422D04 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60DA0899290185B500422D04 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A7A40A874DEAD59F01AEE3B4 /* libPods-maxim_fitness_2022_36331.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A564C73AEEBCBA7FB8A6EF3 /* libPods-maxim_fitness_2022_36331.a */; };
 /* End PBXBuildFile section */
@@ -37,6 +38,8 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = maxim_fitness_2022_36331/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = maxim_fitness_2022_36331/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = maxim_fitness_2022_36331/main.m; sourceTree = "<group>"; };
+		60DA08982901859000422D04 /* maxim_fitness_2022_36331.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = maxim_fitness_2022_36331.entitlements; path = maxim_fitness_2022_36331/maxim_fitness_2022_36331.entitlements; sourceTree = "<group>"; };
+		60DA0899290185B500422D04 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = maxim_fitness_2022_36331/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AAF8BAE151E81DE5AF5215EF /* Pods-maxim_fitness_2022_36331.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-maxim_fitness_2022_36331.debug.xcconfig"; path = "Target Support Files/Pods-maxim_fitness_2022_36331/Pods-maxim_fitness_2022_36331.debug.xcconfig"; sourceTree = "<group>"; };
 		BF5F89D3DED6B230279DEE44 /* libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-maxim_fitness_2022_36331-maxim_fitness_2022_36331Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +89,8 @@
 		13B07FAE1A68108700A75B9A /* maxim_fitness_2022_36331 */ = {
 			isa = PBXGroup;
 			children = (
+				60DA0899290185B500422D04 /* GoogleService-Info.plist */,
+				60DA08982901859000422D04 /* maxim_fitness_2022_36331.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -242,6 +247,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				60DA089A290185B600422D04 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,14 +453,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = maxim_fitness_2022_36331/maxim_fitness_2022_36331.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = P4AH42QGG9;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = maxim_fitness_2022_36331/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Orum Training";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -462,6 +476,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.orumtraining;
 				PRODUCT_NAME = maxim_fitness_2022_36331;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = OrumTrainingAppleSignIn;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -474,13 +490,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = maxim_fitness_2022_36331/maxim_fitness_2022_36331.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = P4AH42QGG9;
 				INFOPLIST_FILE = maxim_fitness_2022_36331/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Orum Training";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -488,6 +512,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.orumtraining;
 				PRODUCT_NAME = maxim_fitness_2022_36331;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = OrumTrainingAppleSignIn;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
