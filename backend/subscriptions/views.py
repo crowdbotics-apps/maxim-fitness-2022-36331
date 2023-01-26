@@ -462,7 +462,6 @@ def subscription_created_handler(event, **kwargs):
         )
 
 
-
 @webhooks.handler("customer.subscription.updated")
 def subscription_updated_handler(event, **kwargs):
     subscription_data = event.data.get("object", {})

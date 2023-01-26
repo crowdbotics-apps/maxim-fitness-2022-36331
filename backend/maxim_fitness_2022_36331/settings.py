@@ -45,7 +45,6 @@ try:
 except (DefaultCredentialsError, PermissionDenied):
     pass
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -57,7 +56,6 @@ SITE_ID = 1
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
-
 
 # Application definition
 
@@ -74,7 +72,8 @@ LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
     "program",
-    "notification"
+    "notification",
+    'subscriptions',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -95,6 +94,7 @@ THIRD_PARTY_APPS = [
     'nested_admin',
     "friendship",
     "solo",
+    "djstripe",
 
     # end fcm_django push notifications
     "push_notifications",
@@ -134,7 +134,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'maxim_fitness_2022_36331.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -149,7 +148,6 @@ if env.str("DATABASE_URL", default=None):
     DATABASES = {
         'default': env.db()
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -169,7 +167,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -178,7 +175,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -231,7 +227,6 @@ EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-
 # AWS S3 config
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
@@ -239,10 +234,10 @@ AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", "")
 AWS_STORAGE_REGION = env.str("AWS_STORAGE_REGION", "")
 
 USE_S3 = (
-    AWS_ACCESS_KEY_ID and
-    AWS_SECRET_ACCESS_KEY and
-    AWS_STORAGE_BUCKET_NAME and
-    AWS_STORAGE_REGION
+        AWS_ACCESS_KEY_ID and
+        AWS_SECRET_ACCESS_KEY and
+        AWS_STORAGE_BUCKET_NAME and
+        AWS_STORAGE_REGION
 )
 
 if USE_S3:
@@ -261,7 +256,6 @@ if USE_S3:
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
-
 
 # Swagger settings for api docs
 SWAGGER_SETTINGS = {
@@ -285,6 +279,8 @@ def google_service_account_config():
         return json.loads(base64.b64decode(service_account_config))
     except (binascii.Error, ValueError):
         return {}
+
+
 GOOGLE_SERVICE_ACCOUNT_CONFIG = google_service_account_config()
 if GOOGLE_SERVICE_ACCOUNT_CONFIG:
     GS_CREDENTIALS = service_account.Credentials.from_service_account_info(GOOGLE_SERVICE_ACCOUNT_CONFIG)
@@ -293,7 +289,6 @@ if GS_BUCKET_NAME:
     DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     GS_DEFAULT_ACL = "publicRead"
-
 
 # Four Digit Token Generator
 DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
@@ -312,7 +307,8 @@ STRIPE_LIVE_SECRET_KEY = env.str('STRIPE_LIVE_SECRET_KEY', '')
 STRIPE_TEST_PUBLIC_KEY = env.str('STRIPE_TEST_PUBLIC_KEY', '')
 STRIPE_TEST_SECRET_KEY = env.str('STRIPE_TEST_SECRET_KEY', '')
 STRIPE_LIVE_MODE = False
-DJSTRIPE_WEBHOOK_VALIDATION='retrieve_event'
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
+DJSTRIPE_WEBHOOK_VALIDATION = 'retrieve_event'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -322,9 +318,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'],
 }
 
-
 PUSH_NOTIFICATIONS_SETTINGS = {
-    "FCM_API_KEY":  env.str("FCM_SERVER_KEY", ""),
+    "FCM_API_KEY": env.str("FCM_SERVER_KEY", ""),
     # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
     "APNS_AUTH_KEY_PATH": env.str("APNS_AUTH_KEY_PATH", ""),
     "APNS_AUTH_KEY_ID": env.str("APNS_AUTH_KEY_ID", ""),
