@@ -68,13 +68,13 @@ const SubscriptionScreen = props => {
         <Loader isLoading={props.requesting} />
 
         <TouchableOpacity onPress={() => setCurentTab(0)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Diet" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />
+          <Text text="Free" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCurentTab(1)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Exercise" style={curentTab === 1 && { fontWeight: 'bold' }} smallTitle />
+          <Text text="Modal1" style={curentTab === 1 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setCurentTab(2)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Pro" style={curentTab === 2 && { fontWeight: 'bold' }} smallTitle />
+          <Text text="Modal2" style={curentTab === 2 && { fontWeight: 'bold' }} smallTitle />
         </TouchableOpacity>
       </View>
       <Content>
