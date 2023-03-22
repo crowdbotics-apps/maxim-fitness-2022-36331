@@ -39,7 +39,10 @@ django-push-notifications = "~=2.0.0"
 django-autoslug = "*"
 onesignal-sdk = "*"
 stripe = "*"
+dj-stripe = "*"
 django-solo = "*"
 django-nested-admin = "*"
 thumbnail = "*"
 wget = "*"
+[pipenv]
+allow_prereleases = true
