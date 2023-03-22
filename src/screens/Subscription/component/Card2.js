@@ -1,7 +1,7 @@
 import React from 'react'
 
 // components
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Text } from '../../../components'
 import Button from '../../../components/Button'
 import LinearGradient from 'react-native-linear-gradient'
@@ -38,25 +38,17 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
         colors={['#ffd329', '#f81fe1']}
         style={[fill, mediumHMargin, regularVPadding, regularTMargin, styles.gradientWrapper]}
       >
-        <View style={[row, center, fill, mediumTMargin]}>
-          <Text
-            text={`$ ${getPlans.length > 0 ? getPlans[2].amount : ''}`}
-            regularTitle
-            color="secondary"
-            bold
-          />
-          <Text text={' / month'} large color="secondary" />
-        </View>
-        <View style={[fill3x, justifyContentAround, mediumHMargin]}>
+        
+        <View style={[fill, justifyContentAround, mediumHMargin]}>
           <View style={[row, alignItemsCenter]}>
             <Text text={'⚪'} style={{ fontSize: 8, marginRight: 5 }} />
-            <Text text={'Customized Exercise Program'} color="secondary" />
+            <Text text={'User will recieve a nutrition plan'} color="secondary" style={{fontSize:16}} />
           </View>
           <View style={[row, alignItemsCenter]}>
             <Text text={'⚪'} style={{ fontSize: 8, marginRight: 5 }} />
-            <Text text={'Voice diet tracking'} color="secondary" />
+            <Text text={'User will have option to custom the Nutrition plan'} color="secondary" style={{fontSize:16}} />
           </View>
-          <View style={[row, alignItemsCenter]}>
+          {/* <View style={[row, alignItemsCenter]}>
             <Text text={'⚪'} style={{ fontSize: 8, marginRight: 5 }} />
             <Text text={'Synergistic diet and exercise strategy'} color="secondary" />
           </View>
@@ -67,8 +59,24 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
           <View style={[row, alignItemsCenter]}>
             <Text text={'⚪'} style={{ fontSize: 8, marginRight: 5 }} />
             <Text text={'Data and analytics'} color="secondary" />
-          </View>
+          </View> */}
         </View>
+        <View style={[row, center, fill, mediumTMargin]}>
+          <Text
+            text={`$ ${getPlans.length > 0 ? getPlans[2].amount : ''}`}
+            regularTitle
+            color="secondary"
+            bold
+          />
+          <Text text={' / month'} large color="secondary" />
+        </View>
+        {getPlans[2]?.id === subsucriptionId?
+          <TouchableOpacity style={styles.cancelButton}>
+          <Text style={styles.text}>Cancel</Text>
+         </TouchableOpacity>:
+         null
+      
+      }
         <View
           style={[row, fill, justifyContentCenter, regularHMargin, alignItemsEnd, regularVPadding]}
         >
@@ -108,6 +116,23 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     height: 540,
   },
+  cancelButton:{
+    height:40, 
+    width:"50%", 
+    backgroundColor:"white", 
+    alignSelf:"center", 
+    justifyContent:"center", 
+    alignItems:"center",
+    borderRadius:12,
+    borderWidth:1,
+    borderColor:"red",
+    marginTop:80
+  },
+  text:{
+fontSize:15,
+fontWeight:"bold",
+color:"red"
+  }
 });
 
 export default Card2s;

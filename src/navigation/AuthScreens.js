@@ -9,7 +9,7 @@ import CreditCard from '../screens/CreditCard';
 
 const authStack = createStackNavigator()
 
-const AuthStackScreen = () => (
+const AuthStackScreen = () => ( 
   <authStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="SignIn">
     <authStack.Screen name="SignIn" component={SignIn} />
     <authStack.Screen name="SignUp" component={SignUp} />

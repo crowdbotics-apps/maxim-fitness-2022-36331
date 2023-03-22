@@ -27,6 +27,7 @@ const Button = ({
       style={[
         button,
         border && borderStyle,
+      
         styles[`${color}Bg`],
         (loading || disabled) && disabledStyle,
         style,
@@ -39,6 +40,7 @@ const Button = ({
       onPress={onPress}
       icon={icon}
       transparent={true}
+      
     >
       <>
         {loading ? (

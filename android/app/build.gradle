@@ -137,6 +137,14 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+         packagingOptions {
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libfbjni.so'
+        pickFirst '**/llibturbomodulejsijni.so'
+        pickFirst '**/libturbomodulejsijni.so'
+        // Add more according to your error here
+    }
     }
     splits {
         abi {
@@ -183,6 +191,7 @@ android {
         }
     }
 }
+
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

@@ -219,6 +219,19 @@ const SignUp = props => {
                 )}
               </LinearGradient>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => props.navigation.navigate("Subscription")}>
+              <LinearGradient
+                style={[styles.logInButton]}
+                colors={['#048ECC', '#0460BB', '#0480C6']}
+              >
+                {/* {props.requesting ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.loginText}>Continue</Text>
+                )} */}
+                 <Text style={styles.loginText}>Continue</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -271,6 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop:11
   },
   loginText: { fontSize: 16, color: 'white', fontWeight: '700' },
   card: {
