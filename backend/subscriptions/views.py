@@ -10,7 +10,7 @@ from djstripe.settings import STRIPE_SECRET_KEY
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 import djstripe
 from djstripe.models import Price
 
@@ -84,7 +84,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = InternalSubscriptionSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['GET'])
+    @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
         prices = Price.objects.filter(active=True)
