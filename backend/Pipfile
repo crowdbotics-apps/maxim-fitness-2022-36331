@@ -44,5 +44,7 @@ django-solo = "*"
 django-nested-admin = "*"
 thumbnail = "*"
 wget = "*"
+psycopg2-binary = "*"
+
 [pipenv]
 allow_prereleases = true

@@ -3,6 +3,8 @@ import json
 from collections import OrderedDict
 
 from django.db.models import Prefetch, Q, Exists, OuterRef
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -13,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from django.core.files.base import ContentFile
 
 from friendship.models import Follow
@@ -383,7 +386,6 @@ class FacebookLogin(SocialLoginView):
         resp["token"] = resp["key"]
         response = Response(resp, status=status.HTTP_200_OK)
         return response
-
 
 
 class GoogleLogin(SocialLoginView):
@@ -1062,6 +1064,7 @@ class SettingsViewSet(ModelViewSet):
 
 class PaymentViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     @action(detail=False, methods=['get'])
     def get_customer_id(self, request):
@@ -1085,18 +1088,57 @@ class PaymentViewSet(ViewSet):
             return Response(cards)
         return Response("User not a customer", status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        method='POST',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['card_number', 'card_exp_month', 'card_exp_year', 'card_cvv'],
+            properties={
+                'card_number': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Card Number'
+                ),
+                'card_exp_month': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Card Expiry Month'
+                ),
+                'card_exp_year': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Card Expiry Year'
+                ),
+                'card_cvv': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Card CVV'
+                ),
+            },
+
+        ),
+        # responses=create_subscription_responses()
+    )
     @action(detail=False, methods=['post'])
     def create_card(self, request):
-        if request.user.stripe_customer_id:
-            try:
-                card = stripe.Customer.create_source(
-                    request.user.stripe_customer_id,
-                    source=request.data['card_token'],
-                )
-            except Exception as e:
-                return Response(str(e))
-            return Response(card)
-        return Response("User not a customer", status=status.HTTP_400_BAD_REQUEST)
+        serializer = CardDetailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        token = stripe.Token.create(
+            card={
+                "number": data.get("card_number"),
+                "exp_month": data.get("card_exp_month"),
+                "exp_year": data.get("card_exp_year"),
+                "cvc": data.get("card_cvv")
+            }, )
+
+        try:
+            card = stripe.Customer.create_source(
+                request.user.stripe_customer_id,
+                source=token.id,
+            )
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                'detail': f"Error occurred while creating card. ErrorInfo: {str(e)}"
+            })
+        else:
+            return Response(status=status.HTTP_200_OK, data=card)
 
     @action(detail=False, methods=['post'])
     def delete_card(self, request):
@@ -1133,27 +1175,28 @@ class PaymentViewSet(ViewSet):
             request.user.save()
         return Response(self.get_subscription(request.user.stripe_customer_id))
 
+    @swagger_auto_schema(
+        method='POST',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['plan_id'],
+            properties={
+                'plan_id': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Subscription Plan ID'
+                ),
+                'product': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Product'
+                ),
+            },
+
+        ),
+        # responses=create_subscription_responses()
+    )
     @action(detail=False, methods=['post'])
     def create_subscription(self, request):
-        serializer = CardDetailSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.data
-        token = stripe.Token.create(
-            card={
-                "number": data.get("card_number"),
-                "exp_month": data.get("card_exp_month"),
-                "exp_year": data.get("card_exp_year"),
-                "cvc": data.get("card_cvv")
-            }, )
-        try:
-            stripe.Customer.create_source(
-                request.user.stripe_customer_id,
-                source=token.id,
-            )
-        except Exception as e:
-            return Response(str(e))
-
-        plan = data.get("plan_id")
+        plan = request.data.get("plan_id")
         if plan:
             cus_sub = self.get_subscription(request.user.stripe_customer_id)
             if cus_sub:
