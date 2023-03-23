@@ -491,8 +491,6 @@ class CardDetailSerializer(serializers.Serializer):
     card_exp_month = serializers.CharField(required=True)
     card_exp_year = serializers.CharField(required=True)
     card_cvv = serializers.CharField(required=True)
-    plan_id = serializers.CharField(required=True)
-    product = serializers.CharField(required=False)
 
 
 class CaloriesRequiredSerializer(serializers.ModelSerializer):

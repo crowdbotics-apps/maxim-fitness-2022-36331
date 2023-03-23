@@ -10,7 +10,7 @@ from djstripe.settings import STRIPE_SECRET_KEY
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 import djstripe
 from djstripe.models import Price
 
@@ -28,11 +28,6 @@ from .api_docs_helper import *
 
 
 stripe.api_key = STRIPE_SECRET_KEY
-
-lookup_keys = [
-    'standard',
-    'premium'
-]
 
 
 class SubscriptionViewSet(viewsets.ViewSet):
@@ -63,7 +58,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
         lookup_keys_data = []
         for price in prices:
             lookup_key = price.product.name.lower()
-            if lookup_key in lookup_keys:
+            if lookup_key:
                 stripe_price = stripe.Price.modify(price.id, lookup_key=lookup_key)
                 Price.sync_from_stripe_data(stripe_price)
                 lookup_keys_data.append(lookup_key)
@@ -89,10 +84,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = InternalSubscriptionSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['GET'])
+    @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
-        prices = Price.objects.filter(lookup_key__in=lookup_keys, active=True)
+        prices = Price.objects.filter(active=True)
         data = []
         for price in prices:
             item = {
@@ -217,7 +212,6 @@ class SubscriptionViewSet(viewsets.ViewSet):
             try:
                 internal_customer = InternalCustomer.objects.filter(user=request.user).first()
                 payment_method_id = data.get('payment_method_id', None)
-                customer_id = ""
                 if internal_customer:
                     customer_id = internal_customer.stripe_id
                 else:
@@ -324,8 +318,6 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 customer_id = customer.id
                 internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
                 internal_customer.save()
-                djstripe.models.Customer.sync_from_stripe_data(customer)
-
                 djstripe.models.Customer.sync_from_stripe_data(customer)
 
             try:
@@ -470,8 +462,6 @@ def subscription_updated_handler(event, **kwargs):
         expand=['items.data.price.product']
     )
     pass
-
-
 
 
 @webhooks.handler("customer.subscription.deleted")

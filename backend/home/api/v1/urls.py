@@ -36,6 +36,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from subscriptions.views import SubscriptionViewSet
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -89,6 +90,8 @@ router.register('report-post', ReportAPostViewSet, basename='report_post')
 router.register('report-user', ReportAUserViewSet, basename='report_user')
 router.register('block-user', BlockedUserViewSet, basename='block_user')
 router.register("chat", ChatViewSet, basename="chat")
+
+router.register("subscription", SubscriptionViewSet, basename="subscription")
 
 
 urlpatterns = [
