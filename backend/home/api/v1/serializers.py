@@ -486,11 +486,6 @@ class FormSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CardDetailSerializer(serializers.Serializer):
-    card_number = serializers.CharField(required=True)
-    card_exp_month = serializers.CharField(required=True)
-    card_exp_year = serializers.CharField(required=True)
-    card_cvv = serializers.CharField(required=True)
 
 
 class CaloriesRequiredSerializer(serializers.ModelSerializer):
