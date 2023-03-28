@@ -20,7 +20,6 @@ from home.api.v1.viewsets import (
     FollowViewSet,
     FormViewSet,
     SettingsViewSet,
-    PaymentViewSet,
     SetViewSet,
     CaloriesRequiredViewSet,
     ConsumeCaloriesViewSet,
@@ -76,7 +75,6 @@ router.register('session', SessionViewSet, basename='session')
 router.register('report', ReportViewSet, basename='report')
 router.register('follow', FollowViewSet, basename='report')
 router.register('settings', SettingsViewSet, basename='settings')
-router.register('payment', PaymentViewSet, basename='payment')
 router.register('set', SetViewSet, basename='set')
 router.register('calories-required', CaloriesRequiredViewSet, basename='calories_required')
 router.register('consume-calories', ConsumeCaloriesViewSet, basename='consume_calories')
