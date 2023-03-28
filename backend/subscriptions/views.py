@@ -414,7 +414,6 @@ class SubscriptionViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=['POST'])
     def pay(self, request, *args, **kwargs):
-        # TODO: This is where the user subscribes to a plan
         serializer = PaymentRequestSerializer(data=request.data)
 
         if serializer.is_valid():
