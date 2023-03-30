@@ -122,6 +122,7 @@ class LoginViewSet(ViewSet):
 class ProfileViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
@@ -601,6 +602,7 @@ class RecipeViewSet(ModelViewSet):
 class ExerciseTypeViewSet(ModelViewSet):
     serializer_class = ExerciseTypeSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         queryset = ExerciseType.objects.all()
@@ -608,6 +610,8 @@ class ExerciseTypeViewSet(ModelViewSet):
 
 
 class ExerciseViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
     http_method_names = ['get']

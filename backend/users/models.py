@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import EmailMultiAlternatives
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -162,3 +163,20 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     msg.attach_alternative(email_html_message, "text/html")
     msg.send()
+
+
+class UserPhoto(models.Model):
+    user = models.OneToOneField(User, related_name='photos', on_delete=models.CASCADE)
+    image = models.FileField(
+        upload_to="user/images", null=True, blank=True, validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])]
+    )
+
+
+class UserVideo(models.Model):
+    user = models.OneToOneField(User, related_name='videos', on_delete=models.CASCADE)
+    video = models.FileField(
+        upload_to="user/videos",
+        null=True,
+        blank=True,
+        validators=[FileExtensionValidator(['mp4', 'mov', 'wmv', 'webm', 'avi', 'mkv'])]
+    )
