@@ -9,10 +9,10 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework import status, permissions, parsers, mixins
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -30,7 +30,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike, \
     PostVideo, ReportAUser
-from users.models import Settings
+from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
     SignupSerializer,
     UserSerializer,
@@ -55,7 +55,7 @@ from home.api.v1.serializers import (
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
-    ExerciseTypeSerializer
+    ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -122,6 +122,7 @@ class LoginViewSet(ViewSet):
 class ProfileViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
@@ -304,6 +305,44 @@ class UpdateProfile(ModelViewSet):
     def get_queryset(self):
         queryset = User.objects.filter(pk=self.request.user.pk)
         return queryset
+
+
+class UserPhotoViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+    serializer_class = UserPhotoSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    parser_classes = [parsers.FormParser, parsers.MultiPartParser]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return UserPhoto.objects.filter(user=self.request.user)
+
+
+class UserVideoViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+    serializer_class = UserVideoSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    parser_classes = [parsers.FormParser, parsers.MultiPartParser]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return UserVideo.objects.filter(user=self.request.user)
 
 
 class UserSearchViewSet(ModelViewSet):
@@ -601,6 +640,7 @@ class RecipeViewSet(ModelViewSet):
 class ExerciseTypeViewSet(ModelViewSet):
     serializer_class = ExerciseTypeSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         queryset = ExerciseType.objects.all()
@@ -608,6 +648,8 @@ class ExerciseTypeViewSet(ModelViewSet):
 
 
 class ExerciseViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
     http_method_names = ['get']

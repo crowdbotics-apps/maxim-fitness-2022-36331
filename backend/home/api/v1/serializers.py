@@ -18,7 +18,7 @@ from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem
     PostCommentReply, PostCommentLike, PostVideo, ReportAUser
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
-from users.models import Settings
+from users.models import Settings, UserPhoto, UserVideo
 
 User = get_user_model()
 
@@ -523,3 +523,13 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPhoto
+        fields = ['image']
+
+
+class UserVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserVideo
+        fields = ['video']
