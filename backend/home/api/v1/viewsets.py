@@ -665,6 +665,7 @@ class ExerciseViewSet(ModelViewSet):
 class SessionViewSet(ModelViewSet):
     serializer_class = SessionSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         return Session.objects.filter(user=self.request.user).order_by('date_time')

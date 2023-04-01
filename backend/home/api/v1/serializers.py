@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.http import HttpRequest
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from allauth.account import app_settings as allauth_settings
 from allauth.account.forms import ResetPasswordForm
@@ -369,6 +373,19 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = '__all__'
+
+    def validate_date_time(self, value):
+        if timezone.now().date() > value:
+            raise serializers.ValidationError("Please select a valid day.")
+
+        query_filter = Q(date_time=value, user=self.context['request'].user)
+        if self.instance:
+            query_filter &= ~Q(id=self.instance.id)
+        if Session.objects.filter(query_filter).exists():
+            raise serializers.ValidationError(
+                "Please select a different day. There is a session already scheduled for the selected day."
+            )
+        return value
 
 
 class ReportSerializer(serializers.ModelSerializer):
