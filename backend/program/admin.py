@@ -203,6 +203,7 @@ class WorkoutInline(nested_admin.NestedStackedInline):
 
 
 class SessionAdmin(nested_admin.NestedModelAdmin):
+    list_display = ['name', 'date_time', 'user', 'program']
     inlines = [WorkoutInline]
 
 
