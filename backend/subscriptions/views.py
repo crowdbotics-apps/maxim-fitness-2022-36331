@@ -198,20 +198,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
-        prices = Price.objects.filter(active=True)
-        data = []
-        for price in prices:
-            item = {
-                "price_id": price.id,
-                "currency": price.currency,
-                "amount": price.unit_amount / 100,
-                "plan": price.product.name,
-                "plan_id": price.product.id,
-                "metadata": price.product.metadata,
-                "interval": "monthly"
-            }
-            data.append(item)
-        return Response(status=status.HTTP_200_OK, data=data)
+        prices = stripe.Price.list()
+        return Response(status=status.HTTP_200_OK, data=prices)
 
     @swagger_auto_schema(
         method='POST',
