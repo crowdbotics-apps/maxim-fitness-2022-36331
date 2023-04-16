@@ -53,12 +53,22 @@ class SubscriptionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def create_subscription(self, request):
         price = request.data.get("price_id")
+        internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+        if internal_customer:
+            customer_id = internal_customer.stripe_id
+        else:
+            customer = stripe.Customer.create(email=request.user.email)
+            customer_id = customer.id
+            internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+            internal_customer.save()
+            djstripe.models.Customer.sync_from_stripe_data(customer)
+
         if price:
-            cus_sub = stripe.Subscription.list(customer=request.user.stripe_customer_id, limit=1)
+            cus_sub = stripe.Subscription.list(customer=customer_id, limit=1)
             if cus_sub:
                 cus_sub = cus_sub.data[0]
             kwargs = {
-                'customer': request.user.stripe_customer_id,
+                'customer': customer_id,
                 'items': [
                     {"price": request.data['price_id']},
                 ],
@@ -164,7 +174,18 @@ class SubscriptionViewSet(viewsets.ViewSet):
         data = request.data
         try:
             card_id = data.get('card_id', None)
-            response = stripe.Customer.delete_source(request.user.stripe_customer_id, card_id)
+            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+
+            if internal_customer:
+                customer_id = internal_customer.stripe_id
+            else:
+                customer = stripe.Customer.create(email=request.user.email)
+                customer_id = customer.id
+                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+                internal_customer.save()
+                djstripe.models.Customer.sync_from_stripe_data(customer)
+
+            response = stripe.Customer.delete_source(customer_id, card_id)
             return Response(response)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
@@ -203,7 +224,16 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['GET'])
     def all_subscriptions(self, request, *args, **kwargs):
-        data = stripe.Subscription.list(customer=request.user.stripe_customer_id)
+        internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+        if internal_customer:
+            customer_id = internal_customer.stripe_id
+        else:
+            customer = stripe.Customer.create(email=request.user.email)
+            customer_id = customer.id
+            internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+            internal_customer.save()
+            djstripe.models.Customer.sync_from_stripe_data(customer)
+        data = stripe.Subscription.list(customer=customer_id)
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['GET'])
