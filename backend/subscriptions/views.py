@@ -238,7 +238,16 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['GET'])
     def active_subscriptions(self, request, *args, **kwargs):
-        data = stripe.Subscription.list(status='active')
+        internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+        if internal_customer:
+            customer_id = internal_customer.stripe_id
+        else:
+            customer = stripe.Customer.create(email=request.user.email)
+            customer_id = customer.id
+            internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+            internal_customer.save()
+            djstripe.models.Customer.sync_from_stripe_data(customer)
+        data = stripe.Subscription.list(status='active', customer=customer_id)
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
