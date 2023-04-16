@@ -127,9 +127,19 @@ class SubscriptionViewSet(viewsets.ViewSet):
                     "cvc": data.get("card_cvv")
                 },
             )
-            card_data = stripe.Customer.create_source(request.user.stripe_customer_id, source=card_token['id'])
+            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+            if internal_customer:
+                customer_id = internal_customer.stripe_id
+            else:
+                customer = stripe.Customer.create(email=request.user.email)
+                customer_id = customer.id
+                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+                internal_customer.save()
+                djstripe.models.Customer.sync_from_stripe_data(customer)
+
+            card_data = stripe.Customer.create_source(customer_id, source=card_token['id'])
             if data.get('default'):
-                stripe.Customer.modify(request.user.stripe_customer_id, metadata={"default_source": card_data["id"]})
+                stripe.Customer.modify(customer_id, metadata={"default_source": card_data["id"]})
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
                 'detail': f"Error occurred while creating card. ErrorInfo: {str(e)}"
