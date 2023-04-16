@@ -398,7 +398,17 @@ class SubscriptionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['GET'])
     def my_cards(self, request, *args, **kwargs):
         try:
-            cards = stripe.Customer.list_sources(request.user.stripe_customer_id, object="card")
+            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+            if internal_customer:
+                customer_id = internal_customer.stripe_id
+            else:
+                customer = stripe.Customer.create(email=request.user.email)
+                customer_id = customer.id
+                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+                internal_customer.save()
+                djstripe.models.Customer.sync_from_stripe_data(customer)
+
+            cards = stripe.Customer.list_sources(customer_id, object="card")
             return Response(status=status.HTTP_200_OK, data=cards)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
