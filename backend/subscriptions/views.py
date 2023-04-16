@@ -238,15 +238,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['GET'])
     def active_subscriptions(self, request, *args, **kwargs):
-        queryset = InternalSubscription.objects.filter(
-            customer__user=request.user
-        )
-        queryset = queryset.filter(
-            Q(status='active') |
-            Q(status='trialing')
-        )
-        serializer = InternalSubscriptionSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = stripe.Subscription.list(status='active')
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
