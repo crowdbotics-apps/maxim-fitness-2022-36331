@@ -80,8 +80,12 @@ class SubscriptionViewSet(viewsets.ViewSet):
         method='POST',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['card_number', 'card_exp_month', 'card_exp_year', 'card_cvv'],
+            required=['card_holder_name', 'card_number', 'card_exp_month', 'card_exp_year', 'card_cvv', 'default'],
             properties={
+                'card_holder_name': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    title='Cardholder Name'
+                ),
                 'card_number': openapi.Schema(
                     type=openapi.TYPE_STRING,
                     title='Card Number'
@@ -94,9 +98,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
                     type=openapi.TYPE_STRING,
                     title='Card Expiry Year'
                 ),
-                'card_cvv': openapi.Schema(
+                'card_cvc': openapi.Schema(
                     type=openapi.TYPE_STRING,
-                    title='Card CVV'
+                    title='Card CVC'
+                ),
+                'default': openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN,
+                    title='Default Card'
                 ),
             },
 
@@ -110,43 +118,48 @@ class SubscriptionViewSet(viewsets.ViewSet):
         data = serializer.data
 
         try:
-            data = stripe.PaymentMethod.create(
-                type="card",
+            card_token = stripe.Token.create(
                 card={
+                    "name": data.get("card_holder_name"),
                     "number": data.get("card_number"),
                     "exp_month": data.get("card_exp_month"),
                     "exp_year": data.get("card_exp_year"),
                     "cvc": data.get("card_cvv")
                 },
             )
-            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
-            payment_method_id = data.get('id', None)
-            if internal_customer:
-                customer_id = internal_customer.stripe_id
-            else:
-                customer = stripe.Customer.create(email=request.user.email)
-                customer_id = customer.id
-                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
-                internal_customer.save()
-                djstripe.models.Customer.sync_from_stripe_data(customer)
-
-            stripe.PaymentMethod.attach(payment_method_id, customer=customer_id)
+            card_data = stripe.Customer.create_source(request.user.stripe_customer_id, source=card_token['id'])
+            if data.get('default'):
+                stripe.Customer.modify(request.user.stripe_customer_id, metadata={"default_source": card_data["id"]})
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
                 'detail': f"Error occurred while creating card. ErrorInfo: {str(e)}"
             })
         else:
-            return Response(status=status.HTTP_200_OK, data=data)
+            return Response(status=status.HTTP_200_OK, data=card_data)
 
-    @action(detail=False, methods=['post'])
+    @swagger_auto_schema(
+        method='POST',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['card_id'],
+            properties={
+                'card_id': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+
+        ),
+        responses=pay_subscription_responses()
+    )
+    @action(detail=False, methods=['POST'])
     def delete_card(self, request):
-        if request.user.stripe_customer_id:
-            response = stripe.Customer.delete_source(
-                request.user.stripe_customer_id,
-                request.data['card_id']
-            )
+        data = request.data
+        try:
+            card_id = data.get('card_id', None)
+            response = stripe.Customer.delete_source(request.user.stripe_customer_id, card_id)
             return Response(response)
-        return Response("User not a customer", status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                'detail': f"An error occurred while processing your request. ErrorInfo: {str(e)}"
+            })
 
     @action(detail=False, methods=['GET'])
     def config(self, request, *args, **kwargs):
@@ -198,7 +211,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
-        prices = stripe.Price.list()
+        prices = []
+        for price in stripe.Price.list().get('data', []):
+            price['product_details'] = stripe.Product.retrieve(price['product'])
+            prices.append(price)
         return Response(status=status.HTTP_200_OK, data=prices)
 
     @swagger_auto_schema(
@@ -371,16 +387,9 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['GET'])
     def my_cards(self, request, *args, **kwargs):
-        customer = InternalCustomer.objects.filter(user=request.user).first()
         try:
-            if customer:
-                cards = stripe.PaymentMethod.list(customer=customer.stripe_id, type='card')
-                return Response(status=status.HTTP_200_OK, data=cards)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={
-                    'detail': f"Could not find a customer detail for user {request.user.username}"
-                })
-
+            cards = stripe.Customer.list_sources(request.user.stripe_customer_id, object="card")
+            return Response(status=status.HTTP_200_OK, data=cards)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
                 'detail': f"An error occurred while processing your request. ErrorInfo: {str(e)}"
@@ -390,11 +399,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
         method='POST',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['price_id', 'payment_method_id', 'save_card'],
+            required=['price_id', 'card_id'],
             properties={
                 'price_id': openapi.Schema(type=openapi.TYPE_STRING),
-                'payment_method_id': openapi.Schema(type=openapi.TYPE_STRING),
-                'save_card': openapi.Schema(type=openapi.TYPE_STRING, description='Save card on checkout'),
+                'card_id': openapi.Schema(type=openapi.TYPE_STRING),
             },
 
         ),
@@ -402,43 +410,34 @@ class SubscriptionViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=['POST'])
     def pay(self, request, *args, **kwargs):
-        serializer = PaymentRequestSerializer(data=request.data)
+        price_id = request.data.get('price_id', '')
+        card_id = request.data.get('card_id', '')
 
-        if serializer.is_valid():
-            price_id = request.data.get('price_id', '')
-            payment_method_id = request.data.get('payment_method_id', '')
-
-            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
-            if internal_customer:
-                customer_id = internal_customer.stripe_id
-            else:
-                customer = stripe.Customer.create(email=request.user.email)
-                customer_id = customer.id
-                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
-                internal_customer.save()
-                djstripe.models.Customer.sync_from_stripe_data(customer)
-
-            try:
-                payment_method = stripe.PaymentMethod.attach(payment_method_id, customer=customer_id)
-                djstripe.models.PaymentMethod.sync_from_stripe_data(payment_method)
-
-                subscription = stripe.Subscription.create(
-                    customer=customer_id,
-                    default_payment_method=payment_method_id,
-                    items=[{"price": price_id}]
-                )
-
-                djstripe.models.Subscription.sync_from_stripe_data(subscription)
-
-            except Exception as e:
-                return Response({'detail': f'Card Declined. ErrorInfo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
-
-            return Response(status=status.HTTP_200_OK, data={
-                "subscription": subscription,
-                "message": "subscription created successfully"
-            })
+        internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+        if internal_customer:
+            customer_id = internal_customer.stripe_id
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+            customer = stripe.Customer.create(email=request.user.email)
+            customer_id = customer.id
+            internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+            internal_customer.save()
+            djstripe.models.Customer.sync_from_stripe_data(customer)
+
+        try:
+            subscription = stripe.Subscription.create(
+                customer=customer_id,
+                default_source=card_id,
+                items=[{"price": price_id}]
+            )
+            djstripe.models.Subscription.sync_from_stripe_data(subscription)
+
+        except Exception as e:
+            return Response({'detail': f'Card Declined. ErrorInfo: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_200_OK, data={
+            "subscription": subscription,
+            "message": "subscription created successfully"
+        })
 
     @swagger_auto_schema(
         method='POST',

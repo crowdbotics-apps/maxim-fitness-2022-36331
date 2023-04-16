@@ -86,7 +86,9 @@ class UpdatePlanRequestSerializer(serializers.Serializer):
 
 
 class CardDetailSerializer(serializers.Serializer):
+    card_holder_name = serializers.CharField(required=True)
     card_number = serializers.CharField(required=True)
     card_exp_month = serializers.CharField(required=True)
     card_exp_year = serializers.CharField(required=True)
-    card_cvv = serializers.CharField(required=True)
+    card_cvc = serializers.CharField(required=True)
+    default = serializers.BooleanField(required=False)
