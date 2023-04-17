@@ -52,7 +52,6 @@ class SubscriptionViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=['post'])
     def create_subscription(self, request):
-        price = request.data.get("price_id")
         internal_customer = InternalCustomer.objects.filter(user=request.user).first()
         if internal_customer:
             customer_id = internal_customer.stripe_id
@@ -63,28 +62,23 @@ class SubscriptionViewSet(viewsets.ViewSet):
             internal_customer.save()
             djstripe.models.Customer.sync_from_stripe_data(customer)
 
-        if price:
-            cus_sub = stripe.Subscription.list(customer=customer_id, limit=1)
-            if cus_sub:
-                cus_sub = cus_sub.data[0]
-            kwargs = {
-                'customer': customer_id,
-                'items': [
+        active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
+
+        if active_subscriptions.get('data'):
+            return Response('User already has active subscription.', status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            subscription = stripe.Subscription.create(
+                customer=customer_id,
+                items=[
                     {"price": request.data['price_id']},
                 ],
-            }
+            )
 
-            if not cus_sub:
-                kwargs['trial_period_days'] = 7
-            try:
-                subscription = stripe.Subscription.create(**kwargs)
-                if cus_sub:
-                    stripe.Subscription.delete(cus_sub.id)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-            except stripe.error.InvalidRequestError as E:
-                return Response(str(E), status=status.HTTP_400_BAD_REQUEST)
-
-            return Response(subscription)
+        return Response(subscription)
 
     @swagger_auto_schema(
         method='POST',
@@ -545,9 +539,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = ChangeSubscriptionRequestSerializer(data=data)
         if serializer.is_valid():
             try:
+                subscription = stripe.Subscription.retrieve(data.get('subscription_id'))
                 subscription = stripe.Subscription.modify(
-                    data.get('subscription_id'),
+                    subscription.id,
+                    cancel_at_period_end=False,
+                    proration_behavior='create_prorations',
                     items=[{
+                        'id': subscription['items']['data'][0].id,
                         'price': data.get('new_subscription_price_id')
                     }]
                 )
