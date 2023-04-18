@@ -180,3 +180,8 @@ class UserVideo(models.Model):
         blank=True,
         validators=[FileExtensionValidator(['mp4', 'mov', 'wmv', 'webm', 'avi', 'mkv'])]
     )
+    thumbnail = models.FileField(
+        upload_to="user/videos/thumbnails",
+        null=True,
+        blank=True,
+    )

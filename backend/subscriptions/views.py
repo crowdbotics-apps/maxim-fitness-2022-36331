@@ -70,6 +70,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
         try:
             subscription = stripe.Subscription.create(
                 customer=customer_id,
+                trial_period_days=7,
                 items=[
                     {"price": request.data['price_id']},
                 ],

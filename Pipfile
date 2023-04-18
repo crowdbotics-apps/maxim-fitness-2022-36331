@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+psycopg2 = "==2.8.6"
+psycopg2-binary = "==2.8.6"
+ffmpeg-python = "*"
 
 [dev-packages]
 

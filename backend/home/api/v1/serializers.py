@@ -1,6 +1,10 @@
 from datetime import datetime
+from pathlib import Path
 
+import ffmpeg
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from django.core.files.temp import NamedTemporaryFile
 from django.db.models import Q
 from django.http import HttpRequest
 from django.utils import timezone
@@ -549,4 +553,42 @@ class UserPhotoSerializer(serializers.ModelSerializer):
 class UserVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserVideo
-        fields = ['video']
+        fields = ['video', 'thumbnail']
+
+    def create(self, validated_data):
+        user_video = super().create(validated_data)
+
+        with NamedTemporaryFile() as temp_video_file:
+            in_memory_file = user_video.video
+
+            if in_memory_file.multiple_chunks():
+                for chunk in in_memory_file.chunks():
+                    temp_video_file.write(chunk)
+            else:
+                temp_video_file.write(in_memory_file.read())
+
+            try:
+                probe = ffmpeg.probe(temp_video_file.name)
+                time = float(probe['streams'][0]['duration']) // 2
+                width = probe['streams'][0]['width']
+
+                with NamedTemporaryFile(suffix='.jpg') as temp_thumbnail_file:
+                    (
+                        ffmpeg
+                        .input(temp_video_file.name, ss=time)
+                        .filter('scale', width, -1)
+                        .output(temp_thumbnail_file.name, vframes=1)
+                        .overwrite_output()
+                        .run(capture_stdout=True, capture_stderr=True)
+                    )
+                    user_video.thumbnail.save(
+                        Path(temp_thumbnail_file.name).name, ContentFile(temp_thumbnail_file.read()), save=True
+                    )
+
+            except ffmpeg.Error as e:
+                error = e.stderr.decode()
+                raise serializers.ValidationError(
+                    {"detail": f"An error occurred getting the thumbnail from the video: {error}"}
+                )
+
+        return user_video
