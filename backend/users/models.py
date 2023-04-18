@@ -166,14 +166,14 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 
 
 class UserPhoto(models.Model):
-    user = models.OneToOneField(User, related_name='photos', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='photos', on_delete=models.CASCADE)
     image = models.FileField(
         upload_to="user/images", null=True, blank=True, validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])]
     )
 
 
 class UserVideo(models.Model):
-    user = models.OneToOneField(User, related_name='videos', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='videos', on_delete=models.CASCADE)
     video = models.FileField(
         upload_to="user/videos",
         null=True,
