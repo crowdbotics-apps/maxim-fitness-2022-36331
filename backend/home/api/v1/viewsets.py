@@ -28,7 +28,7 @@ from rest_auth.registration.views import SocialLoginView
 from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
-from home.models import UserProgram, CaloriesRequired, Following, Chat, PostImage, PostCommentReply, PostCommentLike, \
+from home.models import UserProgram, CaloriesRequired, Chat, PostImage, PostCommentReply, PostCommentLike, \
     PostVideo, ReportAUser
 from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
@@ -39,7 +39,6 @@ from home.api.v1.serializers import (
     MealPostSerializer,
     FoodItemSerializer,
     FoodItemPostSerializer,
-    RecipeItemSerializer,
     CategorySerializer,
     RecipeSerializer,
     PostSerializer,
@@ -59,10 +58,6 @@ from home.api.v1.serializers import (
 )
 from .permissions import (
     RecipePermission,
-    ProfilePermission,
-    SocialPermission,
-    ProgramPermission,
-    DietPermission
 )
 from home.models import Product, ProductUnit, Meal, FoodItem, Category, Recipe, Post, Form, ConsumeCalories, Following\
     , Comment, ReportAPost, BlockUser
