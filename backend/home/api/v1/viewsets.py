@@ -69,6 +69,7 @@ from notification.models import Notification
 import stripe
 
 # import stripe
+from django.db.models import Count
 
 User = get_user_model()
 nix = Nutritionix(settings.NIX_APP_ID, settings.NIX_API_KEY)
@@ -263,6 +264,8 @@ class ProfileViewSet(ModelViewSet):
     def get_follower(self, request, pk):
         # instance = self.get_object()
         instance = User.objects.filter(id=pk).first()
+        likes = Post.objects.filter(user=self.request.user).aggregate(total_likes=Count('likes__id')).get('total_likes',
+                                                                                                          0)
         post_ids = []
         follower = UserSerializer(Follow.objects.followers(instance), context={"request": request}, many=True)
         following = UserSerializer(Follow.objects.following(instance), context={'request': request}, many=True)
@@ -282,7 +285,8 @@ class ProfileViewSet(ModelViewSet):
                 if self.request.user.id == d_index['id']:
                     f = True
         return Response({"follower": followers, "post": posts, "following": followings, 'follow': f,
-                         "user_detail": user_detail.data, "post_image": post_image.data, "post_video": post_video.data})
+                         "user_detail": user_detail.data, "post_image": post_image.data, "post_video": post_video.data,
+                         "likes_count": likes})
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, RecipePermission])
     def get_fav_recipes(self, request, pk=None):
