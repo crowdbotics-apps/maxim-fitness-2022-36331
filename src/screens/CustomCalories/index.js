@@ -32,7 +32,7 @@ import moment from 'moment';
 import { useIsFocused } from '@react-navigation/native';
 
 const CustomCalories = props => {
-  const { meals, profile, getCalories } = props
+  const { meals, profile, getCalories } = props;
   let refWeight = useRef('');
   const [tab, setTab] = useState(2);
   const [value, setValue] = useState(false);
@@ -40,11 +40,10 @@ const CustomCalories = props => {
   const [isVisible, setIsVisible] = useState(false);
   const [showModalHistory, setShowModalHistory] = useState(false);
 
-
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
       // props.getCustomCalRequest()
-      props.getMealsRequest()
+      props.getMealsRequest();
     });
     return unsubscribe;
   }, [props.navigation]);
@@ -52,11 +51,11 @@ const CustomCalories = props => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
+    isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals());
   }, [meals, isFocused]);
 
   useEffect(() => {
-    isFocused && props.getCustomCalRequest()
+    isFocused && props.getCustomCalRequest();
   }, [meals, isFocused]);
 
   const calculateMeals = () => {
@@ -88,7 +87,7 @@ const CustomCalories = props => {
         carbs: Math.ceil(percentToGetCarbohydrate),
         fat: Math.ceil(percentToGetFat),
       };
-      return conCalData
+      return conCalData;
     }
   };
 
@@ -140,12 +139,15 @@ const CustomCalories = props => {
     setTab(i);
   };
 
+  console.log('getCaloriesgetCalories', getCalories);
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
       <ProfileComponent
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         onPressSocial={() => props.navigation.navigate('ProfileScreen')}
+        onPressMsg={() => props.navigation.navigate('ChatScreen')}
+        // onPressNotify={() => props.navigation.navigate('ChatScreen')}
       />
       <View style={[row, justifyContentBetween, regularHPadding, styles.currentTabStyleMap]}>
         {data.map((item, i) => {
@@ -183,12 +185,13 @@ const CustomCalories = props => {
             )}
           </Content>
         )}
-        {tab === 2 &&
+        {tab === 2 && (
           <TabThree
             navigation={props.navigation}
             profileData={profile}
-            consumeCalories={getCalories} />
-        }
+            consumeCalories={getCalories}
+          />
+        )}
         {tab === 3 && (
           <>
             <View style={[row, alignItemsCenter, regularHMargin]}>
@@ -281,33 +284,33 @@ const CustomCalories = props => {
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                    // onPress={() => {
-                    //   if (item.message === 'Comment Post' || 'Like Post') {
-                    //     navigation.navigate('PostDetail', { item: item });
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    //   if (item.message === 'Started following you') {
-                    //     navigation.navigate('ProfileView', item);
-                    //   }
-                    //   if (item.message === 'Message') {
-                    //     navigation.navigate('ChatRoom');
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    // }}
-                    >
-                      <RuningCard
-                        item={item}
-                        Notification={item.message}
-                        Time={calculatePostTime(item)}
-                      />
-                    </TouchableOpacity>
-                  );
-                })
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        // onPress={() => {
+                        //   if (item.message === 'Comment Post' || 'Like Post') {
+                        //     navigation.navigate('PostDetail', { item: item });
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        //   if (item.message === 'Started following you') {
+                        //     navigation.navigate('ProfileView', item);
+                        //   }
+                        //   if (item.message === 'Message') {
+                        //     navigation.navigate('ChatRoom');
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        // }}
+                      >
+                        <RuningCard
+                          item={item}
+                          Notification={item.message}
+                          Time={calculatePostTime(item)}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })
                 : null}
             </View>
           </ScrollView>
@@ -518,7 +521,7 @@ const styles = StyleSheet.create({
     height: 50,
     resizeMode: 'cover',
     borderWidth: 1,
-    borderColor: 'gray'
+    borderColor: 'gray',
   },
 });
 
@@ -529,7 +532,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCustomCalRequest: (data) => dispatch(getCustomCalRequest(data)),
+  getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsRequest: () => dispatch(getMealsRequest()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories);

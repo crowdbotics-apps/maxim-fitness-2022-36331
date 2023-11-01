@@ -24,7 +24,7 @@ const Gender = props => {
   const {
     navigation: { navigate },
   } = props;
-  const genderArray = ['Male', 'Female', 'Prefer not to answer'];
+  const genderArray = ['Male', 'Female'];
 
   const [gender, setGender] = useState(false);
   const [welcomeModal, setWelcomeModal] = useState(false);
@@ -141,7 +141,7 @@ const Gender = props => {
 
 const styles = StyleSheet.create({
   logoStyle: { height: 140, width: 140, resizeMode: 'contain' },
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel },
 });
 
 const mapStateToProps = state => ({

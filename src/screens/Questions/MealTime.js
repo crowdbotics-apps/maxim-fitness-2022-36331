@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { connect } from 'react-redux';
-import moment from 'moment'
+import moment from 'moment';
 
 //Components
 import { Text, Button } from '../../components';
@@ -26,8 +26,11 @@ import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
 
 const MealTime = props => {
-  const { navigation: { navigate }, route: { params } } = props;
-  const deviceWidth = Dimensions.get('window').width
+  const {
+    navigation: { navigate },
+    route: { params },
+  } = props;
+  const deviceWidth = Dimensions.get('window').width;
   const { numberOfMeals } = params;
   const [meals, setMeals] = useState([]);
   const [exerciseLevel, setExerciseLevel] = useState(false);
@@ -42,7 +45,7 @@ const MealTime = props => {
         return {
           meal: `Meal ${index + 1}`,
           time: '',
-          mealTime: ''
+          mealTime: '',
         };
       });
   };
@@ -60,7 +63,7 @@ const MealTime = props => {
   const onSelectMeal = (index, time, mealTime) => {
     const data = [...meals];
     data[index].time = time;
-    data[index].mealTime = mealTime
+    data[index].mealTime = mealTime;
     setMeals(data);
   };
 
@@ -121,11 +124,18 @@ const MealTime = props => {
                 onPress={() => {
                   setSelectedMeal(i);
                   setTimeModal(true);
+                  if (meals[i]?.time) {
+                    setTime(new Date(moment(String(meals[i]?.time), 'hh:mm').format()));
+                  }
                 }}
               >
                 <Text text={item.meal} color="commonCol" style={Fonts.titleRegular} />
                 {item.time ? (
-                  <Text text={item.time} color="commonCol" style={Fonts.titleRegular} />
+                  <Text
+                    text={moment(item?.time, 'HH:mm').format('hh:mm A')}
+                    color="commonCol"
+                    style={Fonts.titleRegular}
+                  />
                 ) : (
                   <Image source={Images.downIcon} style={styles.rightArrow} />
                 )}
@@ -166,7 +176,14 @@ const MealTime = props => {
             />
             <TouchableOpacity
               style={[Gutters.small2xVMargin, { width: deviceWidth - 175 }]}
-              onPress={() => setTimeModal(false)}
+              onPress={() => {
+                if (time) {
+                  const timee = moment(time, ['h:mm A']).format('HH:mm');
+                  onSelectMeal(selectedMeal, timee, time);
+                }
+
+                setTimeModal(false);
+              }}
             >
               <LinearGradient
                 style={styles.gradientStyle}

@@ -27,7 +27,7 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 const ThingsToKnow = props => {
   const { answers, profile } = props;
 
-  const deviceWidth = Dimensions.get('window').width
+  const deviceWidth = Dimensions.get('window').width;
   const [welcomeModal, setWelcomeModal] = useState(false);
   const [isExcercise, setIsExcercise] = useState(false);
   const [isNutrition, setIsNutrition] = useState(false);
@@ -43,7 +43,7 @@ const ThingsToKnow = props => {
 
         setTimeout(() => {
           // navigate('')
-          setWelcomeModal(false)
+          setWelcomeModal(false);
         }, 2000);
       }, 2000);
     }, 2000);
@@ -66,14 +66,14 @@ const ThingsToKnow = props => {
       consultations: state,
       request_type: 'question',
     };
-    setWelcomeModal(true)
-    showProgress()
-    props.submitQuestionRequest(profile, data, setWelcomeModal, showProgress)
-    props.renderTabs()
+    setWelcomeModal(true);
+    showProgress();
+    props.submitQuestionRequest(profile, data, setWelcomeModal, showProgress);
+    props.renderTabs();
     setTimeout(() => {
-      showProgress(false)
+      showProgress(false);
     }, 6000);
-  }
+  };
 
   const thingsArray = [
     {
@@ -86,13 +86,13 @@ const ThingsToKnow = props => {
       number: 2,
       heading: 'Consult with a Dietician',
       description:
-        'A registered dietician is a professionalwho can inform you about eating healthy.Contact a registered dietician beforestarting any diet or meal plan to ensureyou are consuming the appropriate    amount of nutrients',
+        'A registered dietitian is a professional who can inform you about eating healthily. Contact a registered dietitian before starting any diet or meal plan to ensure you are consuming the appropriate amount of nutrients.',
     },
     {
       number: 3,
       heading: 'Limitations of Liability',
       description:
-        'Orum Training is science based and follows the highest industry standards in exercise science and nutrition. However, it is important to consult a physician and/ or registered dietician before starting our services, to identify your limitations. By clicking slide to accept, you accept responsibility to consult with health professionals and do not hold Orum Training responsible for injuries from exercise or diet.',
+        'Orum Training is science-based and follows the highest industry standards in exercise science and nutrition. However, it is important to consult a physician and/or registered dietitian before starting our services to identify your limitations. By clicking "slide to accept," you accept responsibility to consult with health professionals and do not hold Orum Training responsible for injuries from exercise or diet.',
     },
   ];
 
@@ -220,7 +220,7 @@ const ThingsToKnow = props => {
           ]}
         >
           <View style={[Layout.fill, Layout.center]}>
-            <Text style={styles.title}>Thanks {'userName'}!</Text>
+            <Text style={styles.title}>Thanks {profile?.username}!</Text>
             <Text style={[styles.subTitle, { marginBottom: 25 }]}>
               Our AI is customizing your exercise and nutrition program
             </Text>
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 25,
     height: 25,
-    marginLeft: 20
+    marginLeft: 20,
   },
   programItem: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   answers: state.questionReducer.answers,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
 });
 
 const mapDispatchToProps = dispatch => ({

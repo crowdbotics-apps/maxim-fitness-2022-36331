@@ -25,7 +25,7 @@ const Birthday = props => {
   const {
     navigation: { navigate },
   } = props;
-  const deviceWidth = Dimensions.get('window').width
+  const deviceWidth = Dimensions.get('window').width;
 
   const [dateModal, setDateModal] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -99,7 +99,10 @@ const Birthday = props => {
 
           <TouchableOpacity
             style={[Gutters.small2xVMargin, { width: deviceWidth - 100 }]}
-            onPress={() => setDateModal(false)}
+            onPress={() => {
+              setDateModal(false);
+              !navState && setNavState(moment(date).format('YYYY-MM-DD'));
+            }}
           >
             <LinearGradient style={styles.gradientStyle} colors={['#048ECC', '#0460BB', '#0480C6']}>
               <Text style={styles.loginText}>Select Date of Birth</Text>

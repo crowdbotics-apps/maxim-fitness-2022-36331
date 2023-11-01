@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { Content, Icon } from 'native-base'
-import { Text, Button, Loader } from '../../components'
-import Card from './component/Card'
-import Card1 from './component/Card1'
-import Card2 from './component/Card2'
-import { connect } from 'react-redux'
+import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Content, Icon } from 'native-base';
+import { Text, Button, Loader } from '../../components';
+import Card from './component/Card';
+import Card1 from './component/Card1';
+import Card2 from './component/Card2';
+import { connect } from 'react-redux';
 import {
   // getSubscriptionRequest,
   getPlanRequest,
   getCustomerIdRequest,
 } from '../../ScreenRedux/subscriptionRedux';
 
-import { Gutters, Layout, Global, Images } from '../../theme'
-import Modal from 'react-native-modal'
+import { Gutters, Layout, Global, Images } from '../../theme';
+import Modal from 'react-native-modal';
 
 const SubscriptionScreen = props => {
   const { navigation, getPlans, userDetail, subscriptionData } = props;
-  console.log('subscriptionData0--------', subscriptionData);
   const [curentTab, setCurentTab] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [active, setActive] = useState(true);
@@ -30,19 +29,19 @@ const SubscriptionScreen = props => {
   }, []);
 
   const card = () => {
-    let plan_id = getPlans.length > 0 && getPlans[0].id;
-    let product = getPlans.length > 0 && getPlans[0].product;
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans[0]?.id;
+    let product = getPlans?.length > 0 && getPlans && getPlans[0]?.product;
     navigation.navigate('CreditCard', { plan_id, product });
   };
   const card1 = () => {
-    let plan_id = getPlans.length > 0 && getPlans[1].id;
-    let product = getPlans.length > 0 && getPlans[1].product;
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans[1]?.id;
+    let product = getPlans?.length > 0 && getPlans && getPlans[1]?.product;
     navigation.navigate('CreditCard', { plan_id, product });
   };
 
   const card2 = () => {
-    let plan_id = getPlans.length > 0 && getPlans[2].id;
-    let product = getPlans.length > 0 && getPlans[2].product;
+    let plan_id = getPlans?.length > 0 && getPlans[2]?.id;
+    let product = getPlans?.length > 0 && getPlans[2]?.product;
     navigation.navigate('CreditCard', { plan_id, product });
   };
 
@@ -127,7 +126,7 @@ const SubscriptionScreen = props => {
                       height: 40,
                       width: 100,
                       backgroundColor: 'transparent',
-                      borderColor: 'white'
+                      borderColor: 'white',
                     },
                   ]}
                   onPress={() => setData('Yes')}
@@ -143,7 +142,7 @@ const SubscriptionScreen = props => {
                       height: 40,
                       width: 100,
                       backgroundColor: 'transparent',
-                      borderColor: 'white'
+                      borderColor: 'white',
                     },
                   ]}
                   onPress={() => setData('No')}
@@ -172,7 +171,7 @@ const SubscriptionScreen = props => {
                         height: 40,
                         width: 100,
                         backgroundColor: 'transparent',
-                        borderColor: 'white'
+                        borderColor: 'white',
                       },
                     ]}
                     onPress={() => setIsVisible(false)}

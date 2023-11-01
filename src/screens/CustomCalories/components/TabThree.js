@@ -90,15 +90,25 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
             }}
             bold
           />
-          <Text text={`Goal ${consumeCalories[0]?.goals_values?.calories || 0}`} style={fontSize15TextCenter} />
+          <Text
+            text={`Goal ${consumeCalories[0]?.goals_values?.calories || 0}`}
+            style={fontSize15TextCenter}
+          />
         </View>
       </View>
       <View style={[row, regularBMargin, regularHMargin, justifyContentBetween, alignItemsCenter]}>
         <View style={alignItemsStart}>
           <Text text="Protein" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
-            <Text text={`${consumeCalories[0]?.protein || 0} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${consumeCalories[0]?.goals_values?.protein || 0} g`} style={fontSize15TextCenter} />
+            <Text
+              text={`${consumeCalories[0]?.protein || 0} /`}
+              style={fontSize15TextCenter}
+              bold
+            />
+            <Text
+              text={`${consumeCalories[0]?.goals_values?.protein || 0} g`}
+              style={fontSize15TextCenter}
+            />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
@@ -119,7 +129,10 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
           <Text text="Carbohydrates" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
             <Text text={`${consumeCalories[0]?.carbs || 0} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${consumeCalories[0]?.goals_values?.carbs || 0} g`} style={fontSize15TextCenter} />
+            <Text
+              text={`${consumeCalories[0]?.goals_values?.carbs || 0} g`}
+              style={fontSize15TextCenter}
+            />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
@@ -140,7 +153,10 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
           <Text text="Fats" style={fontSize15TextCenter} />
           <View style={[row, center, smallVPadding]}>
             <Text text={`${consumeCalories[0]?.fat || 0} /`} style={fontSize15TextCenter} bold />
-            <Text text={`${consumeCalories[0]?.goals_values?.fat || 0} g`} style={fontSize15TextCenter} />
+            <Text
+              text={`${consumeCalories[0]?.goals_values?.fat || 0} g`}
+              style={fontSize15TextCenter}
+            />
           </View>
         </View>
         <View style={styles.prteinCarbsFat}>
@@ -206,7 +222,7 @@ const styles = StyleSheet.create({
     shadowRadius: 0.27,
 
     elevation: 15,
-  }
+  },
 });
 
 export default TabThree;

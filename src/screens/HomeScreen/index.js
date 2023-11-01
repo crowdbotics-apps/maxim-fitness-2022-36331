@@ -1,5 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator, RefreshControl, FlatList } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  FlatList,
+} from 'react-native';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
@@ -10,22 +18,16 @@ import { Gutters, Layout, Global } from '../../theme';
 // Actions
 import { getMealsRequest } from '../../ScreenRedux/customCalRedux';
 import { getAllSessionRequest, getDaySessionRequest } from '../../ScreenRedux/programServices';
-import { selectedMealsRequest, getMealFoodRequest } from '../../ScreenRedux/nutritionRedux'
+import { selectedMealsRequest, getMealFoodRequest } from '../../ScreenRedux/nutritionRedux';
 
 const HomeScreen = props => {
-  const {
-    mealRequesting,
-    meals = [],
-    navigation,
-    todaySessions,
-    todayRequest,
-  } = props;
+  const { mealRequesting, meals = [], navigation, todaySessions, todayRequest } = props;
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
-      props.getMealsRequest()
+      props.getMealsRequest();
       const newDate = moment(new Date()).format('YYYY-MM-DD');
       props.getAllSessionRequest(newDate);
-      props.getDaySessionRequest(newDate)
+      props.getDaySessionRequest(newDate);
     });
     return unsubscribe;
   }, [props.navigation]);
@@ -59,14 +61,7 @@ const HomeScreen = props => {
           start={start}
           end={end}
           colors={['#5daffe', '#5daffe']}
-          style={[
-            row,
-            fill,
-            regularHPadding,
-            regularVPadding,
-            tinyHMargin,
-            styles.linearGradient,
-          ]}
+          style={[row, fill, regularHPadding, regularVPadding, tinyHMargin, styles.linearGradient]}
         >
           <View style={justifyContentBetween}>
             <View style={row}>
@@ -97,14 +92,7 @@ const HomeScreen = props => {
           start={start}
           end={end}
           colors={['#ff634e', '#ff634e']}
-          style={[
-            row,
-            fill,
-            tinyHMargin,
-            regularHPadding,
-            regularVPadding,
-            styles.linearGradient,
-          ]}
+          style={[row, fill, tinyHMargin, regularHPadding, regularVPadding, styles.linearGradient]}
         >
           <View style={justifyContentBetween}>
             <View style={row}>
@@ -119,10 +107,7 @@ const HomeScreen = props => {
                 </View>
               ) : todaySessions?.id ? (
                 <View>
-                  <Text
-                    style={styles.middleTextStyle}
-                    text={todaySessions?.cardio_length}
-                  />
+                  <Text style={styles.middleTextStyle} text={todaySessions?.cardio_length} />
                   <Text style={styles.middleSubTextStyle} text="minutes" />
                 </View>
               ) : (
@@ -268,7 +253,7 @@ const mapStateToProps = state => ({
   loadingAllSession: state.programReducer.requesting,
   todaySessions: state.programReducer.todaySessions,
   todayRequest: state.programReducer.todayRequest,
-  selectedMeal: state.nutritionReducer.selectedMeal
+  selectedMeal: state.nutritionReducer.selectedMeal,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -276,6 +261,6 @@ const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   selectedMealsRequest: data => dispatch(selectedMealsRequest(data)),
-  getMealFoodRequest: (data, id) => dispatch(getMealFoodRequest(data, id))
+  getMealFoodRequest: (data, id) => dispatch(getMealFoodRequest(data, id)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

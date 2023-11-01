@@ -3,12 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { showMessage } from 'react-native-flash-message';
 
-
 //Actions
-import { setUserDetail } from './loginRedux'
+import { setUserDetail } from './loginRedux';
 
 // config
-import { API_URL } from '../config/app'
+import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
@@ -39,68 +38,67 @@ const initialState = {
   editRequesting: false,
   request: false,
   profile: false,
-}
+};
 
 //Actions
 export const getProfile = data => ({
   type: GET_PROFILE,
-  data
-})
+  data,
+});
 
 export const getProfileSuccess = data => ({
   type: GET_PROFILE_SUCCESS,
-  data
-})
+  data,
+});
 
 export const editProfile = (data, id) => ({
   type: EDIT_PROFILE,
   data,
-  id
-})
+  id,
+});
 
 export const editProfileSuccess = data => ({
   type: EDIT_PROFILE_SUCCESS,
-  data
-})
+  data,
+});
 
 export const resetProfile = () => ({
   type: RESET_GET_PROFILE,
-})
+});
 
 export const followUser = data => ({
   type: FOLLOW_USER,
-  data
-})
+  data,
+});
 
 export const unFollowUser = data => ({
   type: UNFOLLOW_USER,
-  data
-})
+  data,
+});
 
 export const routeData = data => ({
   type: ROUTE_DATA,
-  data
-})
+  data,
+});
 
 export const blockUser = data => ({
   type: BLOCK_USER,
-  data
-})
+  data,
+});
 
 export const reportUser = data => ({
   type: REPORT_USER,
-  data
-})
+  data,
+});
 
 export const profileData = () => ({
-  type: PROFILE_DATA_REQUEST
-})
+  type: PROFILE_DATA_REQUEST,
+});
 
-export const profileDataSuccess = (data) => ({
+export const profileDataSuccess = data => ({
   type: PROFILE_DATA_SUCCESS,
-  data
-})
-
+  data,
+});
 
 //Reducers
 export const profileReducer = (state = initialState, action) => {
@@ -108,134 +106,132 @@ export const profileReducer = (state = initialState, action) => {
     case GET_PROFILE:
       return {
         ...state,
-        requesting: true
-      }
+        requesting: true,
+      };
 
     case GET_PROFILE_SUCCESS:
       return {
         ...state,
         profileData: action.data,
-        requesting: false
-      }
+        requesting: false,
+      };
     case RESET_GET_PROFILE:
       return {
         ...state,
         requesting: false,
-        editRequesting: false
-      }
+        editRequesting: false,
+      };
 
     case ROUTE_DATA:
       return {
         ...state,
-        routeDetail: action.data
-      }
+        routeDetail: action.data,
+      };
     case EDIT_PROFILE:
       return {
         ...state,
-        editRequesting: true
-      }
+        editRequesting: true,
+      };
 
     case PROFILE_DATA_REQUEST:
       return {
         ...state,
-        request: true
-      }
+        request: true,
+      };
 
     case PROFILE_DATA_SUCCESS:
       return {
         ...state,
         profile: action.data,
-        request: false
-      }
+        request: false,
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
 //Saga
 async function getProfileAPI(data) {
-  const URL = `${API_URL}/profile/${data}/follower/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/profile/${data}/follower/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getProfileData({ data }) {
   try {
-    const response = yield call(getProfileAPI, data)
-    console.log('get profile success response----', response);
-    yield put(getProfileSuccess(response.data))
+    const response = yield call(getProfileAPI, data);
+    yield put(getProfileSuccess(response.data));
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('get profile failure response0000', response);
   } finally {
-    yield put(resetProfile())
+    yield put(resetProfile());
   }
 }
 
 async function followUserAPI(data) {
-  const URL = `${API_URL}/follow/add_follow/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/follow/add_follow/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* followuserData({ data }) {
   try {
-    const response = yield call(followUserAPI, data)
-    console.log('follow user success response----', response);
+    const response = yield call(followUserAPI, data);
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('follow user  failure response0000', response);
   }
 }
 
 async function unfollowUserAPI(data) {
-  const URL = `${API_URL}/follow/remove_follow/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/follow/remove_follow/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* unfollowuserData({ data }) {
   try {
-    const response = yield call(unfollowUserAPI, data)
+    const response = yield call(unfollowUserAPI, data);
     console.log('unfollow user success response----', response);
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('unfollow user  failure response0000', response);
   }
 }
 
 async function updateProfile(data, id) {
-  const URL = `${API_URL}/update-profile/${id}/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/update-profile/${id}/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'PATCH',
     headers: {
@@ -243,103 +239,103 @@ async function updateProfile(data, id) {
       'Content-Type': 'multipart/form-data',
       Authorization: `Token  ${token}`,
     },
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* updateUserData({ data, id }) {
   try {
-    const response = yield call(updateProfile, data, id)
-    showMessage({ message: 'profile Updated successfully', type: 'success' })
-    yield put(setUserDetail(response.data))
+    const response = yield call(updateProfile, data, id);
+    showMessage({ message: 'profile Updated successfully', type: 'success' });
+    yield put(setUserDetail(response.data));
   } catch (e) {
-    const { response } = e
-    showMessage({ message: 'Something went wrong', type: 'danger' })
+    const { response } = e;
+    showMessage({ message: 'Something went wrong', type: 'danger' });
   } finally {
-    yield put(resetProfile())
+    yield put(resetProfile());
   }
 }
 
 async function blockUserAPI(data) {
-  const URL = `${API_URL}/block-user/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/block-user/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* blockUserData({ data }) {
   try {
-    const response = yield call(blockUserAPI, data)
+    const response = yield call(blockUserAPI, data);
     showMessage({
       message: 'Blocked user Successfully',
       type: 'success',
-    })
+    });
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('block user  failure response0000', response);
   }
 }
 
 async function reportUserAPI(data) {
-  const URL = `${API_URL}/report-user/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/report-user/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* reportUserData({ data }) {
   try {
-    const response = yield call(reportUserAPI, data)
+    const response = yield call(reportUserAPI, data);
     showMessage({
       message: 'Report user Successfully',
       type: 'success',
-    })
+    });
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('Report user  failure response0000', response);
   }
 }
 
 async function profileDataAPI() {
-  const URL = `${API_URL}/profile/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/profile/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* profileRequest() {
   try {
-    const response = yield call(profileDataAPI)
+    const response = yield call(profileDataAPI);
     console.log('Profile response: ', response);
-    yield put(setUserDetail(response?.data[0]))
+    yield put(setUserDetail(response?.data[0]));
     // yield put(profileDataSuccess(response?.data[0]))
   } catch (e) {
-    const { response } = e
+    const { response } = e;
     console.log('Profile error: ', response);
   }
 }
@@ -352,4 +348,4 @@ export default all([
   takeLatest(BLOCK_USER, blockUserData),
   takeLatest(REPORT_USER, reportUserData),
   takeLatest(PROFILE_DATA_REQUEST, profileRequest),
-])
+]);

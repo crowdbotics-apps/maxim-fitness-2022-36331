@@ -22,7 +22,7 @@ const WorkoutComponent = ({
   item,
   onPress,
   workoutDone,
-  data
+  data,
 }) => {
   const {
     regularHMargin,
