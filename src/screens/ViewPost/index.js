@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import { SliderBox } from 'react-native-image-slider-box';
 //action
 import { getPost, addComment, replyComment, likeComment } from '../../ScreenRedux/viewPostRedux';
-import { postLikeRequest } from '../../ScreenRedux/feedRedux'
+import { postLikeRequest } from '../../ScreenRedux/feedRedux';
 import Share from 'react-native-share';
 
 const ViewPost = props => {
@@ -32,7 +32,7 @@ const ViewPost = props => {
   const [postComments, setPostComments] = useState([]);
   const [newCommentData, setNewCommentData] = useState(false);
   const [subCommentData, setSubCommentData] = useState(false);
-  const [showCancelOption, setCancelOption] = useState(false)
+  const [showCancelOption, setCancelOption] = useState(false);
   const [focusreply, setFocusReply] = useState(false);
   const [param, setParam] = useState([]);
   const [feedsState, setFeedsState] = useState([]);
@@ -136,7 +136,7 @@ const ViewPost = props => {
     if (status) {
       setCommentData(false);
     }
-  }
+  };
 
   const addAComment = () => {
     if (showCancelOption) {
@@ -146,12 +146,12 @@ const ViewPost = props => {
         content: commentData,
       };
       // setCommentData(false);
-      setCancelOption(false)
+      setCancelOption(false);
       props.replyComment(replyCommentData, subCommentData, callBack);
     } else {
       const apiData = {
         comment: commentData,
-        id: param?.id
+        id: param?.id,
       };
       props.addComment(apiData, postData, callBack);
     }
@@ -159,17 +159,17 @@ const ViewPost = props => {
 
   const replyCommentData = item => {
     inputRef.current.focus();
-    setCancelOption(true)
+    setCancelOption(true);
     postData.comments.map(v => {
       if (item.id === v.id) {
-        setSubCommentData(item)
+        setSubCommentData(item);
       }
-    })
+    });
     let apidata = {
       comment: item.id,
       user: item.userId,
       content: commentData,
-      name: item.userName
+      name: item.userName,
     };
     setFocusReply(apidata);
   };
@@ -227,22 +227,22 @@ const ViewPost = props => {
       comment_reply: item.id,
       user: item.user,
     };
-    subCommentFilter(item.comment, item.id)
+    subCommentFilter(item.comment, item.id);
     props.likeComment(apiData);
   };
 
-  let deviceWidth = Dimensions.get('window').width
+  let deviceWidth = Dimensions.get('window').width;
 
   const addLikeAction = () => {
-    let feedId = param?.id
-    likeFilter(feedId)
+    let feedId = param?.id;
+    likeFilter(feedId);
     const callBack = status => {
-      console.log('status: ', status)
-    }
+      console.log('status: ', status);
+    };
 
-    const data = { feedId, callBack }
-    props.postLikeRequest(data)
-  }
+    const data = { feedId, callBack };
+    props.postLikeRequest(data);
+  };
 
   const likeFilter = postId => {
     const updatedFeeds = [...feeds.results];
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 260,
     alignSelf: 'center',
-    marginTop: 10
+    marginTop: 10,
   },
 
   sliderBoxStyle: {
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -10,
     padding: 0,
     margin: 0,
-    top: 40
+    top: 40,
   },
 });
 

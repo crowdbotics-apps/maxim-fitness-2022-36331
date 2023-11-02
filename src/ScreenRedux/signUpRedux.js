@@ -16,17 +16,17 @@ const RESET = 'SCREEN/RESET';
 
 const initialState = {
   requesting: false,
-}
+};
 
 //Actions
 export const signUpUser = data => ({
   type: SIGN_UP,
-  data
-})
+  data,
+});
 
 export const reset = () => ({
-  type: RESET
-})
+  type: RESET,
+});
 
 //Reducers
 export const signUpReducer = (state = initialState, action) => {
@@ -34,35 +34,35 @@ export const signUpReducer = (state = initialState, action) => {
     case SIGN_UP:
       return {
         ...state,
-        requesting: true
-      }
+        requesting: true,
+      };
     case RESET:
       return {
         ...state,
-        requesting: false
-      }
+        requesting: false,
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
 //Saga
 function SignUpAPI(data) {
-  const URL = `${API_URL}/signup/`
+  const URL = `${API_URL}/signup/`;
   const options = {
     method: 'POST',
-    data
-  }
+    data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* SignUp({ data }) {
   try {
-    const response = yield call(SignUpAPI, data)
-    navigate('SignIn')
-    console.log('signUp Success response', response)
+    const response = yield call(SignUpAPI, data);
+    navigate('SignIn');
+    console.log('signUp Success response', response);
     //   AsyncStorage.setItem("authToken", response.data.token)
 
     //   yield put(setAccessToken(response.data.token))
@@ -73,15 +73,15 @@ function* SignUp({ data }) {
     //     type: "success"
     //   })
   } catch (e) {
-    const { response } = e
-    console.log('registration error response', response);
+    const { response } = e;
+    console.log('registration error response', response?.data);
     showMessage({
-      message: response && response.data.email[0],
+      message: response && response?.data?.email[0],
       type: 'danger',
-    })
+    });
   } finally {
-    yield put(reset())
+    yield put(reset());
   }
 }
 
-export default all([takeLatest(SIGN_UP, SignUp)])
+export default all([takeLatest(SIGN_UP, SignUp)]);

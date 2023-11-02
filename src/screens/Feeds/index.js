@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,25 +6,36 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
 } from 'react-native';
-import { Text, Header, FeedCard } from '../../components'
-import { Images } from 'src/theme'
-import { getFeedsRequest, postLikeRequest } from '../../ScreenRedux/feedRedux'
-import { connect } from 'react-redux'
-import { useNetInfo } from '@react-native-community/netinfo'
-import ImagePicker from 'react-native-image-crop-picker'
+import { Text, Header, FeedCard } from '../../components';
+import { Images } from 'src/theme';
+import Video from 'react-native-video';
+import { connect } from 'react-redux';
+import { useNetInfo } from '@react-native-community/netinfo';
+import ImagePicker from 'react-native-image-crop-picker';
+import ImageView from 'react-native-image-viewing';
+import Modal from 'react-native-modal';
+
+//actions
+import { getFeedsRequest, postLikeRequest } from '../../ScreenRedux/feedRedux';
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile } = props
-  const [feedsState, setFeedsState] = useState([])
+  const { feeds, requesting, navigation, profile } = props;
+  const [feedsState, setFeedsState] = useState([]);
   const [page, setPage] = useState(1);
+  const [visible, setIsVisible] = useState(false);
+  const [images, setImages] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [videoUri, setVideoUri] = useState(false);
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   let netInfo = useNetInfo();
   useEffect(() => {
-    props.getFeedsRequest(page)
-  }, [])
+    props.getFeedsRequest(page);
+  }, []);
   const flatList = useRef();
   const moveToTop = () => {
     props.getFeedsRequest(1);
@@ -41,19 +52,33 @@ const Feeds = props => {
     }
   }, [feeds]);
 
+  let imagesArray = [];
+  const renderImages = () => {
+    if (images?.length) {
+      images?.map(item => {
+        imagesArray.push({ uri: item.image });
+      });
+      return imagesArray;
+    }
+  };
+
   const renderItem = ({ item, index }) => {
     return (
-      <TouchableOpacity>
-        <FeedCard
-          item={item}
-          index={index}
-          feeds={feeds}
-          profile={profile}
-          postLikeRequest={props.postLikeRequest}
-          setFeedsState={setFeedsState}
-          navigation={navigation}
-        />
-      </TouchableOpacity>
+      // <TouchableOpacity>
+      <FeedCard
+        item={item}
+        index={index}
+        feeds={feeds}
+        profile={profile}
+        postLikeRequest={props.postLikeRequest}
+        setFeedsState={setFeedsState}
+        navigation={navigation}
+        setIsVisible={setIsVisible}
+        setImages={setImages}
+        setShowModal={setShowModal}
+        setVideoUri={setVideoUri}
+      />
+      // </TouchableOpacity>
     );
   };
 
@@ -124,33 +149,89 @@ const Feeds = props => {
           keyboardShouldPersistTaps={'handled'}
         />
       ) : null}
+      {renderImages() && (
+        <ImageView
+          images={renderImages() && renderImages()}
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+        />
+      )}
+      <Modal
+        isVisible={showModal}
+        onBackdropPress={() => setShowModal(false)}
+        style={{ flex: 1, margin: 0 }}
+      >
+        <View
+          style={{
+            backgroundColor: 'black',
+            paddingHorizontal: 5,
+            flex: 1,
+            paddingTop: 20,
+          }}
+        >
+          <TouchableOpacity onPress={() => setShowModal(false)} style={{ alignItems: 'flex-end' }}>
+            <Image
+              source={Images.circleClose}
+              style={{
+                height: 40,
+                width: 40,
+                borderWidth: 1,
+              }}
+            />
+          </TouchableOpacity>
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            {loading && <ActivityIndicator size="large" color="white" />}
+            <Video
+              source={{
+                uri: videoUri?.video,
+              }}
+              style={{ height: 300, width: '100%' }}
+              muted={false}
+              repeat={true}
+              // onEnd={() => setStart(false)}
+              resizeMode="cover"
+              rate={1}
+              posterResizeMode="cover"
+              playInBackground={true}
+              playWhenInactive={true}
+              ignoreSilentSwitch="ignore"
+              disableFocus={true}
+              mixWithOthers={'mix'}
+              controls={true}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => setLoading(false)}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   content: {
     fontSize: 15,
     color: 'gray',
     paddingHorizontal: 15,
-    marginTop: 10
+    marginTop: 10,
   },
   loaderStyle: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  comingSoon: { fontSize: 20, lineHeight: 18, color: 'black' }
-})
+  comingSoon: { fontSize: 20, lineHeight: 18, color: 'black' },
+});
 
 const mapStateToProps = state => ({
   requesting: state.feedsReducer.requesting,
   feeds: state.feedsReducer.feeds,
-  profile: state.login.userDetail
-})
+  profile: state.login.userDetail,
+});
 
 const mapDispatchToProps = dispatch => ({
   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
   postLikeRequest: data => dispatch(postLikeRequest(data)),
-})
-export default connect(mapStateToProps, mapDispatchToProps)(Feeds)
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Feeds);

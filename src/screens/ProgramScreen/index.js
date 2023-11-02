@@ -36,11 +36,11 @@ const ProgramScreen = props => {
         );
 
         if (currentD === cardDate && item.workouts.length > 0) {
-          props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
+          props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout);
         }
-      })
+      });
     }
-  }, [getWeekSessions])
+  }, [getWeekSessions]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -179,7 +179,7 @@ const ProgramScreen = props => {
                   />
                 </View>
               </View>
-            )
+            );
           })
         )}
       </ScrollView>
@@ -235,7 +235,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
-    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout))
+    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   // pickSessionAction: (data) => dispatch(pickSession(data)),
   // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
   // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),

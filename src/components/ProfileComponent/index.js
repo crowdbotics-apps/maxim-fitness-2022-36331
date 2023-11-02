@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
-import Text from '../Text'
+import Text from '../Text';
 import { Icon } from 'native-base';
 import { Layout, Gutters, Colors, Images } from '../../theme';
 import ProfileHeaderFeed from '../ProfileHeaderFeed';
@@ -10,7 +10,7 @@ const ProfileComponent = ({
   setCurrentTab,
   onPressNotify,
   onPressMsg,
-  onPressSocial
+  onPressSocial,
 }) => {
   const {
     row,

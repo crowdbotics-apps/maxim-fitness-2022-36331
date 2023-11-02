@@ -37,7 +37,7 @@ const ProfileScreen = props => {
   const [visible, setIsVisible] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [videoUri, setVideoUri] = useState(false)
+  const [videoUri, setVideoUri] = useState(false);
 
   const {
     profileBackGround,
@@ -163,7 +163,11 @@ const ProfileScreen = props => {
           <Loader isLoading={props.requesting} />
           <View>
             <ImageBackground
-              source={ userDetail?.background_picture ? {uri: userDetail?.background_picture} : profileBackGround}
+              source={
+                userDetail?.background_picture
+                  ? { uri: userDetail?.background_picture }
+                  : profileBackGround
+              }
               style={{ height: (273 / 375) * width, width: '100%' }}
             >
               <View style={styles.backgroundStyle}>
@@ -186,7 +190,11 @@ const ProfileScreen = props => {
             </ImageBackground>
             <View style={styles.profileImage}>
               <Image
-                source={userDetail?.profile_picture ? {uri: userDetail?.profile_picture} : profileBackGround}
+                source={
+                  userDetail?.profile_picture
+                    ? { uri: userDetail?.profile_picture }
+                    : profileBackGround
+                }
                 style={{
                   height: 100,
                   width: 100,
@@ -241,7 +249,7 @@ const ProfileScreen = props => {
               <Text style={styles.subTextStyle} text="Followers" />
             </View>
             <View style={{ alignItems: 'center' }}>
-              <Text style={styles.mainTextStyle} text="150K" />
+              <Text style={styles.mainTextStyle} text={profileData?.likes_count?.toString()} />
               <Text style={styles.subTextStyle} text="Likes" />
             </View>
             <View style={{ alignItems: 'center' }}>
@@ -279,7 +287,9 @@ const ProfileScreen = props => {
                   }}
                 >
                   {showVideo && item[0]?.video ? (
-                    <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[0]?.video)]}>
+                    <TouchableOpacity
+                      onPress={() => [setShowModal(true), setVideoUri(item[0]?.video)]}
+                    >
                       <Image
                         source={{
                           uri: item[0]?.video_thumbnail,
@@ -307,17 +317,19 @@ const ProfileScreen = props => {
                     style={{ marginLeft: i % 2 === 0 ? 10 : 0, marginRight: i % 2 === 0 ? 0 : 10 }}
                   >
                     {showVideo ? (
-                      <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[1]?.video)]}>
-                      <Image
-                        source={{
-                          uri: item[1]?.video_thumbnail,
-                        }}
-                        style={{
-                          height: (145 / 375) * width,
-                          width: (175 / 375) * width,
-                          borderRadius: 20,
-                        }}
-                      />
+                      <TouchableOpacity
+                        onPress={() => [setShowModal(true), setVideoUri(item[1]?.video)]}
+                      >
+                        <Image
+                          source={{
+                            uri: item[1]?.video_thumbnail,
+                          }}
+                          style={{
+                            height: (145 / 375) * width,
+                            width: (175 / 375) * width,
+                            borderRadius: 20,
+                          }}
+                        />
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity onPress={() => setIsVisible(true)}>
@@ -332,18 +344,20 @@ const ProfileScreen = props => {
                       </TouchableOpacity>
                     )}
                     {showVideo ? (
-                      <TouchableOpacity onPress={() => [setShowModal(true), setVideoUri(item[2]?.video)]}>
-                      <Image
-                        source={{
-                          uri: item[2]?.video_thumbnail,
-                        }}
-                        style={{
-                          height: (145 / 375) * width,
-                          width: (175 / 375) * width,
-                          borderRadius: 20,
-                          marginTop: 10,
-                        }}
-                      />
+                      <TouchableOpacity
+                        onPress={() => [setShowModal(true), setVideoUri(item[2]?.video)]}
+                      >
+                        <Image
+                          source={{
+                            uri: item[2]?.video_thumbnail,
+                          }}
+                          style={{
+                            height: (145 / 375) * width,
+                            width: (175 / 375) * width,
+                            borderRadius: 20,
+                            marginTop: 10,
+                          }}
+                        />
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity onPress={() => setIsVisible(true)}>
@@ -412,12 +426,7 @@ const ProfileScreen = props => {
             />
           </TouchableOpacity>
           <View style={{ flex: 1, justifyContent: 'center' }}>
-            {loading && (
-              <ActivityIndicator
-                size="large"
-                color="white"
-              />
-            )}
+            {loading && <ActivityIndicator size="large" color="white" />}
             <Video
               source={{
                 uri: videoUri,

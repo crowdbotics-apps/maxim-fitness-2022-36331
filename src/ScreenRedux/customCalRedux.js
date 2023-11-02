@@ -1,6 +1,6 @@
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { navigate } from '../navigation/NavigationService'
+import { navigate } from '../navigation/NavigationService';
 
 // config
 import { API_URL } from '../config/app';
@@ -32,49 +32,49 @@ const initialState = {
 
   rCalRequest: false,
   requiredCalories: false,
-  requiredCalError: false
-}
+  requiredCalError: false,
+};
 
 //Actions
-export const getCustomCalRequest = (data) => ({
+export const getCustomCalRequest = data => ({
   type: GET_CALORIES_REQUEST,
-  data
-})
+  data,
+});
 
 export const getCustomCalSuccess = data => ({
   type: GET_CALORIES_SUCCESS,
-  data
-})
+  data,
+});
 
 export const getCustomCalFailure = error => ({
   type: GET_CALORIES_FAILURE,
-  error
-})
+  error,
+});
 
 export const getMealsRequest = () => ({
   type: GET_MEALS_REQUEST,
-})
+});
 
 export const getMealsSuccess = data => ({
   type: GET_MEALS_SUCCESS,
-  data
-})
+  data,
+});
 
 export const postRequiredCalRequest = (id, data) => ({
   type: REQUIRED_CALORIES_REQUEST,
   id,
-  data
-})
+  data,
+});
 
-export const postRequiredCalSuccess = (data) => ({
+export const postRequiredCalSuccess = data => ({
   type: REQUIRED_CALORIES_SUCCESS,
-  data
-})
+  data,
+});
 
-export const postRequiredCalFailure = (error) => ({
+export const postRequiredCalFailure = error => ({
   type: REQUIRED_CALORIES_FAILURE,
-  error
-})
+  error,
+});
 
 //Reducers
 export const customCalReducer = (state = initialState, action) => {
@@ -82,154 +82,151 @@ export const customCalReducer = (state = initialState, action) => {
     case GET_CALORIES_REQUEST:
       return {
         ...state,
-        requesting: true
-      }
+        requesting: true,
+      };
     case GET_CALORIES_SUCCESS:
       return {
         ...state,
         getCalories: action.data,
-        requesting: false
-      }
+        requesting: false,
+      };
     case GET_CALORIES_FAILURE:
       return {
         ...state,
         getCaloeriesError: action.error,
-        requesting: false
-      }
+        requesting: false,
+      };
 
     case GET_MEALS_REQUEST:
       return {
         ...state,
-        mealRequesting: true
-      }
+        mealRequesting: true,
+      };
     case GET_MEALS_SUCCESS:
       return {
         ...state,
         meals: action.data,
         mealRequesting: false,
-      }
+      };
 
     case REQUIRED_CALORIES_REQUEST:
       return {
         ...state,
-        rCalRequest: true
-      }
+        rCalRequest: true,
+      };
     case REQUIRED_CALORIES_SUCCESS:
       return {
         ...state,
         requiredCalories: action.data,
-        rCalRequest: false
-      }
+        rCalRequest: false,
+      };
     case REQUIRED_CALORIES_FAILURE:
       return {
         ...state,
         requiredCalError: action.error,
-        rCalRequest: false
-      }
+        rCalRequest: false,
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
 //Saga
 async function postCustomAPI(data) {
-  const URL = `${API_URL}/consume-calories/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/consume-calories/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data: data
-  }
+    data: data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 async function getCustomCalAPI() {
-  const URL = `${API_URL}/consume-calories/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/consume-calories/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getCustomCal({ data }) {
   try {
     if (data) {
-      const response = yield call(postCustomAPI, data)
-      console.log('post cal RESPONSE: ', response);
-      yield put(getCustomCalSuccess(response.data))
+      const response = yield call(postCustomAPI, data);
+      yield put(getCustomCalSuccess(response.data));
     } else {
-      const response = yield call(getCustomCalAPI)
-      console.log('get cal RESPONSE: ', response);
-      yield put(getCustomCalSuccess(response.data))
+      const response = yield call(getCustomCalAPI);
+      yield put(getCustomCalSuccess(response.data));
     }
-
   } catch (e) {
     console.log('consume cal ERROR: ', e);
-    yield put(getCustomCalFailure(e))
+    yield put(getCustomCalFailure(e));
   }
 }
 
 //Saga
 async function getMealsAPI() {
-  const URL = `${API_URL}/meal/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/meal/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getMeals() {
   try {
-    const response = yield call(getMealsAPI)
+    const response = yield call(getMealsAPI);
     console.log('MEALS RESPONSE: ', response);
-    yield put(getMealsSuccess(response.data))
+    yield put(getMealsSuccess(response.data));
   } catch (e) {
     console.log('MEALS ERROR: ', e);
-    yield put(getMealsSuccess(false))
+    yield put(getMealsSuccess(false));
   }
 }
 
 async function postRequiredCalAPI(id, data) {
-  const URL = `${API_URL}/calories-required/${id}/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/calories-required/${id}/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data: data
-  }
+    data: data,
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* postRequiredCal({ id, data }) {
   try {
-    const response = yield call(postRequiredCalAPI, id, data)
+    const response = yield call(postRequiredCalAPI, id, data);
     console.log('REQIRED RESPONSE: ', response);
-    yield put(postRequiredCalSuccess(response.data))
-    navigate('CustomCalories')
+    yield put(postRequiredCalSuccess(response.data));
+    navigate('CustomCalories');
   } catch (e) {
     console.log('REQIRED ERROR: ', e);
-    yield put(postRequiredCalFailure(false))
+    yield put(postRequiredCalFailure(false));
   }
 }
 
@@ -237,4 +234,4 @@ export default all([
   takeLatest(REQUIRED_CALORIES_REQUEST, postRequiredCal),
   takeLatest(GET_CALORIES_REQUEST, getCustomCal),
   takeLatest(GET_MEALS_REQUEST, getMeals),
-])
+]);

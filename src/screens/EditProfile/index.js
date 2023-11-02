@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Text, BottomSheet, Button } from '../../components';
 import { Images } from 'src/theme';
@@ -90,7 +91,7 @@ const EditProfile = props => {
     let formData = new FormData();
     formData.append('first_name', state.firstName.value);
     formData.append('last_name', state.lastName.value);
-    formData.append('user_name', state.userName.value);
+    formData.append('username', state.userName.value);
     formData.append('description', state.discription.value);
     if (state?.profileImage?.value?.path) {
       formData.append('profile_picture', {
@@ -131,162 +132,164 @@ const EditProfile = props => {
   const refRBSheet = useRef();
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          height: 50,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={backArrow} style={{ height: 20, width: 30 }} />
-        </TouchableOpacity>
-        <Text style={{ fontSize: 20, color: 'gray', fontWeight: 'bold' }} text="Edit Profile" />
-        <View />
-      </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
-        <View>
-          <ImageBackground
-            source={
-              state?.backgroundImage?.value?.path
-                ? { uri: state.backgroundImage.value.path }
-                : state?.backgroundImage?.value
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
+        <View
+          style={{
+            height: 50,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+          }}
+        >
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image source={backArrow} style={{ height: 20, width: 30 }} />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 20, color: 'gray', fontWeight: 'bold' }} text="Edit Profile" />
+          <View />
+        </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
+          <View>
+            <ImageBackground
+              source={
+                state?.backgroundImage?.value?.path
+                  ? { uri: state.backgroundImage.value.path }
+                  : state?.backgroundImage?.value
                   ? { uri: state.backgroundImage.value }
                   : profileBackGround
-            }
-            style={{ height: (273 / 375) * width, width: '100%' }}
-          >
-            <View
-              style={{
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-                marginTop: 10,
-                marginRight: 10,
-              }}
-            >
-              <View />
-              <TouchableOpacity onPress={() => onChangebackgroundImage()}>
-                <Image source={cameraIcon} style={{ height: 30, width: 30 }} />
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-          <TouchableOpacity
-            style={{
-              position: 'absolute',
-              bottom: 15,
-              marginLeft: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}
-            onPress={() => onChangeProfileImage()}
-          >
-            <Image
-              source={
-                state?.profileImage?.value?.path
-                  ? { uri: state.profileImage.value.path }
-                  : state?.profileImage?.value
-                    ? { uri: state.profileImage.value }
-                    : profileBackGround
               }
+              style={{ height: (273 / 375) * width, width: '100%' }}
+            >
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  marginTop: 10,
+                  marginRight: 10,
+                }}
+              >
+                <View />
+                <TouchableOpacity onPress={() => onChangebackgroundImage()}>
+                  <Image source={cameraIcon} style={{ height: 30, width: 30 }} />
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
+            <TouchableOpacity
               style={{
-                height: 100,
-                width: 100,
-                borderRadius: 50,
-              }}
-            />
-            <Image
-              source={cameraIcon}
-              style={{ height: 30, width: 30, marginLeft: -25, marginTop: 60 }}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={{ paddingHorizontal: 20, marginTop: 15 }}>
-          <Text style={{ fontSize: 14, color: 'gray', paddingLeft: 5 }} text="First Name" />
-          <TextInput
-            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
-            onChangeText={value => handleOnChange('firstName', value)}
-            value={state.firstName.value}
-            placeholder="First Name"
-          />
-          <Text style={{ color: 'red' }} text={state.firstName.error} />
-          <Text
-            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
-            text="Last Name"
-          />
-          <TextInput
-            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
-            onChangeText={value => handleOnChange('lastName', value)}
-            value={state.lastName.value}
-            placeholder="Last Name"
-          />
-          <Text style={{ color: 'red' }} text={state.lastName.error} />
-
-          <Text
-            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
-            text="User Name"
-          />
-          <TextInput
-            style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
-            onChangeText={value => handleOnChange('userName', value)}
-            value={state.userName.value}
-            placeholder="User Name"
-          />
-          <Text style={{ color: 'red' }} text={state.userName.error} />
-          <Text
-            style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
-            text="Discription"
-          />
-          <TextInput
-            style={{
-              backgroundColor: 'white',
-              marginTop: 20,
-              borderWidth: 0.5,
-              borderColor: 'gray',
-              textAlignVertical: 'top',
-              paddingHorizontal: 20,
-              paddingTop: 10,
-              borderRadius: 6,
-              height: 180,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 12,
-              },
-              shadowOpacity: 0.58,
-              shadowRadius: 16.0,
-              elevation: 6,
-            }}
-            multiline
-            numberOfLines={10}
-            placeholder="Type here..."
-            onChangeText={value => handleOnChange('discription', value)}
-            value={state.discription.value}
-          />
-          <Text style={{ color: 'red' }} text={state.discription.error} />
-        </View>
-        <View style={{ justifyContent: 'center', flexDirection: 'row', marginTop: 20 }}>
-          <Button
-            color="primary"
-            text={'Save'}
-            style={[
-              {
-                height: 40,
-                width: 150,
-                borderRadius: 40,
-                backgroundColor: '#635eff',
-                borderColor: 'white',
+                position: 'absolute',
+                bottom: 15,
+                marginLeft: 10,
                 justifyContent: 'center',
                 alignItems: 'center',
-              },
-            ]}
-            loading={editRequesting}
-            onPress={() => editProfileData()}
-          />
-        </View>
-      </ScrollView>
+                flexDirection: 'row',
+              }}
+              onPress={() => onChangeProfileImage()}
+            >
+              <Image
+                source={
+                  state?.profileImage?.value?.path
+                    ? { uri: state.profileImage.value.path }
+                    : state?.profileImage?.value
+                    ? { uri: state.profileImage.value }
+                    : profileBackGround
+                }
+                style={{
+                  height: 100,
+                  width: 100,
+                  borderRadius: 50,
+                }}
+              />
+              <Image
+                source={cameraIcon}
+                style={{ height: 30, width: 30, marginLeft: -25, marginTop: 60 }}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{ paddingHorizontal: 20, marginTop: 15 }}>
+            <Text style={{ fontSize: 14, color: 'gray', paddingLeft: 5 }} text="First Name" />
+            <TextInput
+              style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
+              onChangeText={value => handleOnChange('firstName', value)}
+              value={state.firstName.value}
+              placeholder="First Name"
+            />
+            <Text style={{ color: 'red' }} text={state.firstName.error} />
+            <Text
+              style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
+              text="Last Name"
+            />
+            <TextInput
+              style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
+              onChangeText={value => handleOnChange('lastName', value)}
+              value={state.lastName.value}
+              placeholder="Last Name"
+            />
+            <Text style={{ color: 'red' }} text={state.lastName.error} />
+
+            <Text
+              style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
+              text="User Name"
+            />
+            <TextInput
+              style={{ borderBottomColor: 'gray', borderBottomWidth: 1, paddingVertical: 0 }}
+              onChangeText={value => handleOnChange('userName', value)}
+              value={state.userName.value}
+              placeholder="User Name"
+            />
+            <Text style={{ color: 'red' }} text={state.userName.error} />
+            <Text
+              style={{ fontSize: 14, color: 'gray', paddingLeft: 5, marginTop: 20 }}
+              text="Discription"
+            />
+            <TextInput
+              style={{
+                backgroundColor: 'white',
+                marginTop: 20,
+                borderWidth: 0.5,
+                borderColor: 'gray',
+                textAlignVertical: 'top',
+                paddingHorizontal: 20,
+                paddingTop: 10,
+                borderRadius: 6,
+                height: 180,
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 12,
+                },
+                shadowOpacity: 0.58,
+                shadowRadius: 16.0,
+                elevation: 6,
+              }}
+              multiline
+              numberOfLines={10}
+              placeholder="Type here..."
+              onChangeText={value => handleOnChange('discription', value)}
+              value={state.discription.value}
+            />
+            <Text style={{ color: 'red' }} text={state.discription.error} />
+          </View>
+          <View style={{ justifyContent: 'center', flexDirection: 'row', marginTop: 20 }}>
+            <Button
+              color="primary"
+              text={'Save'}
+              style={[
+                {
+                  height: 40,
+                  width: 150,
+                  borderRadius: 40,
+                  backgroundColor: '#635eff',
+                  borderColor: 'white',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}
+              loading={editRequesting}
+              onPress={() => editProfileData()}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
