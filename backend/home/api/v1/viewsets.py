@@ -237,9 +237,9 @@ class ProfileViewSet(ModelViewSet):
             weight = float(weight) / 2.2
             height = (float(height) * 30.48)
 
-        if gender == 1:
+        if gender == 'Male':
             male = (9.99 * float(weight)) + (6.25 * float(height)) - (4.92 * age) + 5
-        if gender == 2:
+        if gender == 'Female':
             female = (9.99 * float(weight)) + (6.25 * float(height)) - (4.92 * age) - 161
 
         if activity_level == 1:
@@ -673,8 +673,9 @@ class SessionViewSet(ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         start_date = self.request.query_params.get("date")
         how_many_week = queryset.count() / 7
-        first_day = queryset.first().date_time
-        last_day = queryset.last().date_time
+        if queryset:
+            first_day = queryset.first().date_time
+            last_day = queryset.last().date_time
         day_with_date = {}
         day_no = 1
         for d in queryset:
@@ -1211,6 +1212,17 @@ class ReportAPostViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = ReportAPost.objects.filter(user=self.request.user)
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        post_id = request.data.get("post")
+        user = request.data.get('user')
+        queryset = ReportAPost.objects.filter(user=user, post__id=post_id)
+        if queryset:
+            return Response({"is_report": True}, status=status.HTTP_200_OK)
+        serializer = ReportAPostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
 
 class ReportAUserViewSet(ModelViewSet):
