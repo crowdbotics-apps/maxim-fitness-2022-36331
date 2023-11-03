@@ -71,6 +71,8 @@ import stripe
 # import stripe
 from django.db.models import Count
 
+from ...utils import send_notification
+
 User = get_user_model()
 nix = Nutritionix(settings.NIX_APP_ID, settings.NIX_API_KEY)
 
@@ -996,7 +998,10 @@ class PostViewSet(ModelViewSet):
         comment = request.data.get('comment')
         com = post.add_comment(request.user, comment)
         res = CommentSerializer(com, context={'request': request})
+        send_notification(sender=request.user.id, receiver=post.user.id,
+                          title="Comment on Post", message=f"{request.user.username} commented on your post {post.title}")
         return Response(res.data)
+
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def add_like(self, request, pk=None):
@@ -1044,6 +1049,8 @@ class FollowViewSet(ViewSet):
         a = Following.add_follower(request.user, other_user)
         if a == 'already follows':
             return Response("already follow")
+        send_notification(sender=self.request.user.id, receiver=other_user.id, title="Follow",
+                          message=f"{self.request.user.username} start following you")
         return Response("Added")
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
@@ -1222,6 +1229,9 @@ class ReportAPostViewSet(ModelViewSet):
         serializer = ReportAPostSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        post = Post.objects.filter(id=post_id).first()
+        send_notification(sender=self.request.user.id, receiver=post.user.id, title="Report Post",
+                          message=f"Your Post is reported by { self.request.user.username}")
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
 

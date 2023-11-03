@@ -17,6 +17,7 @@ from solo.models import SingletonModel
 from home.nutritionix import Nutritionix
 from thumbnail import generate_thumbnail
 from django.core.files import File
+from home.utils import send_notification
 from maxim_fitness_2022_36331.settings import MEDIA_URL, MEDIA_ROOT
 
 
@@ -360,6 +361,10 @@ class Post(models.Model):
             notification = Notification.objects.filter(receiver=self.user, title="Like Post").first()
             if notification:
                 notification.delete()
+        else:
+            send_notification(sender=user.id, receiver=self.user.id,
+                              title="Like Post", message=f"{user.username} likes your post.")
+
 
     def get_like(self, user):
         like = Like.objects.filter(post=self, user=user)
