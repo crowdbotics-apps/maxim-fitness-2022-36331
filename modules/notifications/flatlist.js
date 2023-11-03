@@ -60,7 +60,7 @@ const Notifications = () => {
         <View style={styles.loaderStyle}>
           <ActivityIndicator color={'gray'} size="large" />
         </View>
-      ) : (
+      ) : messages?.length > 0 ? (
         <FlatList
           data={messages}
           renderItem={renderItem}
@@ -68,6 +68,10 @@ const Notifications = () => {
           onRefresh={getNotifications}
           refreshing={loading}
         />
+      ) : (
+        <View style={styles.loaderStyle}>
+          <Text style={{ fontSize: 18 }}>No record found</Text>
+        </View>
       )}
     </View>
   );
