@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
-// @ts-ignore
+
 import { createStackNavigator } from "@react-navigation/stack";
 import Conversation from "../Screens/Conversation";
 import CreateChannel from "../Screens/CreateChannel";
@@ -18,7 +18,11 @@ const Navigator = () => {
     <Stack.Screen options={{ headerShown: false }} name="Channels" component={Conversation} />
     <Stack.Screen name="Channel" component={Chat}
       options={({ navigation, route }) => ({
-        header: () => null
+        headerRight: () => <View style={options.NavigationStyle.headerRight}>
+          <Pressable onPress={() => navigation.navigate("ChannelDetails", { item: route.params.item })}>
+            <Text>Details</Text>
+          </Pressable>
+        </View>
       })}
     />
     <Stack.Screen name="ChannelDetails" component={ChannelDetails} options={({ navigation, route }) => ({

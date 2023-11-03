@@ -139,15 +139,14 @@ const CustomCalories = props => {
     setTab(i);
   };
 
-  console.log('getCaloriesgetCalories', getCalories);
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
       <ProfileComponent
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         onPressSocial={() => props.navigation.navigate('ProfileScreen')}
-        onPressMsg={() => props.navigation.navigate('ChatScreen')}
-        // onPressNotify={() => props.navigation.navigate('ChatScreen')}
+        // onPressMsg={() => props.navigation.navigate('MessageScreen')}
+        onPressNotify={() => props.navigation.navigate('NotificationScreen')}
       />
       <View style={[row, justifyContentBetween, regularHPadding, styles.currentTabStyleMap]}>
         {data.map((item, i) => {

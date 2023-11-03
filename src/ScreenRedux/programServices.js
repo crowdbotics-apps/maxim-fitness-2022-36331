@@ -6,7 +6,7 @@ import { API_URL } from '../config/app';
 
 // utils
 import XHR from 'src/utils/XHR';
-import moment from 'moment'
+import moment from 'moment';
 
 import { sortSessionBySets } from '../utils/common';
 
@@ -27,7 +27,6 @@ const SETS_DONE_SUCCESS = 'ProgramScreen/SETS_DONE_SUCCESS';
 
 const EXERCISE_DONE_REQUEST = 'ProgramScreen/EXERCISE_DONE_REQUEST';
 const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
-
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -58,7 +57,7 @@ export const repsWeightRequest = (id, data, dd) => ({
   type: REPS_WEIGHT_REQUEST,
   id,
   data,
-  dd
+  dd,
 });
 
 export const repsWeightSuccess = data => ({
@@ -70,8 +69,8 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   type: PICK_SESSION,
   exerciseObj,
   selectedSession,
-  nextWorkout
-})
+  nextWorkout,
+});
 
 export const setDoneRequest = id => ({
   type: SETS_DONE_REQUEST,
@@ -85,7 +84,7 @@ export const setDoneSuccess = data => ({
 
 export const exerciseDoneRequest = data => ({
   type: EXERCISE_DONE_REQUEST,
-  data
+  data,
 });
 
 export const exerciseDoneSuccess = data => ({
@@ -203,7 +202,7 @@ export const programReducer = (state = initialState, action) => {
 };
 
 async function getWeekSessionAPI(data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/session/?date=${data}`;
   const options = {
     headers: {
@@ -216,7 +215,7 @@ async function getWeekSessionAPI(data) {
 }
 
 async function getAllSessionAPI() {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/session/`;
   const options = {
     headers: {
@@ -232,16 +231,15 @@ function* getAllSessions({ data }) {
   try {
     if (data) {
       const response = yield call(getWeekSessionAPI, data);
-      console.log('Week session res: ', response);
+      console.log('Week session res: ', response?.data);
       const query = sortSessionBySets(response?.data?.query);
       yield put(getWeekSessionSuccess({ ...response?.data, query }));
     } else {
       const response = yield call(getAllSessionAPI);
-      console.log('Allsession res: ', response);
+      console.log('Allsession res: ', response?.data);
       const query = sortSessionBySets(response?.data?.query);
       yield put(getAllSessionSuccess({ ...response?.data, query }));
     }
-
   } catch (e) {
     console.log('eee:', e);
     yield put(getAllSessionSuccess(false));
@@ -249,7 +247,7 @@ function* getAllSessions({ data }) {
 }
 
 async function getTodaySessionAPI(data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/session/get_by_day/?day=${data}`;
   const options = {
     headers: {
@@ -265,7 +263,7 @@ function* getTodaySessions({ data }) {
   console.log('Day session: ', data);
   try {
     const response = yield call(getTodaySessionAPI, data);
-    console.log('Res today session: ', response);
+    console.log('Res today session: ', response?.data);
     // const query = sortSessionBySets(response?.data?.query);
     yield put(getDaySessionSuccess(response.data));
   } catch (e) {
@@ -275,7 +273,7 @@ function* getTodaySessions({ data }) {
 }
 
 async function updateRepsAPI(id, data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/set/${id}/`;
   const options = {
     headers: {
@@ -283,13 +281,13 @@ async function updateRepsAPI(id, data) {
       Authorization: `Token ${token}`,
     },
     method: 'PATCH',
-    data: { reps: data }
+    data: { reps: data },
   };
   return XHR(URL, options);
 }
 
 async function updateWeightAPI(id, data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/set/${id}/`;
   const options = {
     headers: {
@@ -297,13 +295,13 @@ async function updateWeightAPI(id, data) {
       Authorization: `Token ${token}`,
     },
     method: 'PATCH',
-    data: { weight: data }
+    data: { weight: data },
   };
   return XHR(URL, options);
 }
 
 async function updateSetDoneAPI(id, data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/set/${id}/`;
   const options = {
     headers: {
@@ -311,13 +309,13 @@ async function updateSetDoneAPI(id, data) {
       Authorization: `Token ${token}`,
     },
     method: 'PATCH',
-    data: { done: data }
+    data: { done: data },
   };
   return XHR(URL, options);
 }
 
 async function updateRepsWeightAPI(id) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/set/${id}/`;
   const options = {
     headers: {
@@ -357,7 +355,7 @@ function* updateRepsWeight({ id, data, dd }) {
 }
 
 async function setDoneAPI(id) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/session/mark_workout_done/`;
   const options = {
     headers: {
@@ -365,7 +363,7 @@ async function setDoneAPI(id) {
       Authorization: `Token ${token}`,
     },
     method: 'POST',
-    data: { id: id }
+    data: { id: id },
   };
   return XHR(URL, options);
 }

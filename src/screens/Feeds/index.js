@@ -30,6 +30,8 @@ const Feeds = props => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [videoUri, setVideoUri] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
+
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   let netInfo = useNetInfo();
@@ -52,13 +54,9 @@ const Feeds = props => {
     }
   }, [feeds]);
 
-  let imagesArray = [];
   const renderImages = () => {
     if (images?.length) {
-      images?.map(item => {
-        imagesArray.push({ uri: item.image });
-      });
-      return imagesArray;
+      return images?.map(item => ({ uri: item.image }));
     }
   };
 
@@ -77,6 +75,7 @@ const Feeds = props => {
         setImages={setImages}
         setShowModal={setShowModal}
         setVideoUri={setVideoUri}
+        setImageIndex={setImageIndex}
       />
       // </TouchableOpacity>
     );
@@ -152,11 +151,12 @@ const Feeds = props => {
       {renderImages() && (
         <ImageView
           images={renderImages() && renderImages()}
-          imageIndex={0}
+          imageIndex={imageIndex}
           visible={visible}
           onRequestClose={() => setIsVisible(false)}
         />
       )}
+
       <Modal
         isVisible={showModal}
         onBackdropPress={() => setShowModal(false)}

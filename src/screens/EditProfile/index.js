@@ -55,16 +55,17 @@ const EditProfile = props => {
 
   const validationStateSchema = {
     firstName: {
-      required: true,
+      required: false,
     },
     lastName: {
-      required: true,
+      required: false,
     },
     userName: {
       required: true,
+      validator: validator.username,
     },
     discription: {
-      required: true,
+      required: false,
     },
     profileImage: {
       required: false,
@@ -76,10 +77,10 @@ const EditProfile = props => {
 
   useEffect(() => {
     if (userDetail) {
-      handleOnChange('firstName', userDetail.first_name);
-      handleOnChange('lastName', userDetail.last_name);
-      handleOnChange('userName', userDetail.username);
-      handleOnChange('discription', userDetail.description);
+      userDetail?.first_name && handleOnChange('firstName', userDetail?.first_name);
+      userDetail?.last_name && handleOnChange('lastName', userDetail?.last_name);
+      userDetail?.username && handleOnChange('userName', userDetail.username);
+      userDetail?.description && handleOnChange('discription', userDetail.description);
       handleOnChange('profileImage', userDetail.profile_picture);
       handleOnChange('backgroundImage', userDetail.background_picture);
     }
@@ -285,6 +286,7 @@ const EditProfile = props => {
                 },
               ]}
               loading={editRequesting}
+              disabled={disable}
               onPress={() => editProfileData()}
             />
           </View>

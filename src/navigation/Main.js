@@ -15,30 +15,33 @@ import CreditCard from '../screens/CreditCard';
 import ProgramScreen from '../screens/ProgramScreen';
 import ExerciseScreen from '../screens/ExerciseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import EditProfile from '../screens/EditProfile'
+import EditProfile from '../screens/EditProfile';
 import CustomCalories from '../screens/CustomCalories';
 import EditCustomCal from '../screens/CustomCalories/childScreens/EditCustomCal';
 import EditCaloriesManually from '../screens/CustomCalories/childScreens/EditCaloriesManually';
 import SearchProfile from '../screens/SearchProfile';
-import MessageScreen from '../screens/MessageScreen'
+import MessageScreen from '../screens/MessageScreen';
 import ChatScreen from '../screens/chatScreen';
+import NotificationScreen from '../screens/NotificationScreen';
+
 // Custom exercise screens
-import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram'
+import FatLoseProgram from '../screens/CustomWorkOut/FatLoseProgram';
 import CustomExercise from '../screens/CustomWorkOut/CustomExercise';
-import AddExercise from '../screens/CustomWorkOut/AddExercise'
-import SettingScreen from '../screens/SettingScreen'
-import HomeScreen from '../screens/HomeScreen'
-import MealRegulator from '../screens/MealRegulator'
-import SelectBrand from '../screens/SelectBrand'
+import AddExercise from '../screens/CustomWorkOut/AddExercise';
+import SettingScreen from '../screens/SettingScreen';
+import HomeScreen from '../screens/HomeScreen';
+import MealRegulator from '../screens/MealRegulator';
+import SelectBrand from '../screens/SelectBrand';
+
 import LogFoods from '../screens/LogFoods';
-import {modules} from '@modules'
+import { modules } from '@modules';
 
-import SubscriptionScreen from '../screens/Subscription'
-const { home, profileTab, feed, nutrition, exercise } = Images
+import SubscriptionScreen from '../screens/Subscription';
+const { home, profileTab, feed, nutrition, exercise } = Images;
 
-const Chat = modules[0].value.navigator;
-const mainStack = createStackNavigator()
-const Tab = createBottomTabNavigator()
+// const Chat = modules[0].value.navigator;
+const mainStack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
 // @refresh reset
 const BottomNavigator = () => {
@@ -50,7 +53,7 @@ const BottomNavigator = () => {
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
-            height: 0
+            height: 0,
           },
           shadowOpacity: 0.34,
           shadowRadius: 6.27,
@@ -58,15 +61,14 @@ const BottomNavigator = () => {
           elevation: 10,
           shadowColor: 'black',
           backgroundColor: 'white',
-          height: Platform.OS === 'ios' ? hp('12%') : hp('10%')
+          height: Platform.OS === 'ios' ? hp('12%') : hp('10%'),
         },
         tabBarButton: ['Home', 'Profile', 'Feed', 'Custom', 'FatLose'].includes(route.name)
           ? undefined
           : () => {
-            return null;
-          },
+              return null;
+            },
       })}
-
     >
       <Tab.Screen
         name="Home"
@@ -83,7 +85,7 @@ const BottomNavigator = () => {
               <Image source={home} style={styles.iconStyle1} />
             </View>
           ),
-          header: () => null
+          header: () => null,
         }}
       />
 
@@ -102,7 +104,7 @@ const BottomNavigator = () => {
               <Image source={profileTab} style={styles.image1} />
             </View>
           ),
-          header: () => null
+          header: () => null,
         }}
       />
 
@@ -121,7 +123,7 @@ const BottomNavigator = () => {
               <Image source={feed} style={styles.iconStyle1} />
             </View>
           ),
-          header: () => null
+          header: () => null,
         }}
       />
 
@@ -140,7 +142,7 @@ const BottomNavigator = () => {
               <Image source={nutrition} style={styles.image2} />
             </View>
           ),
-          header: () => null
+          header: () => null,
         }}
       />
 
@@ -159,18 +161,26 @@ const BottomNavigator = () => {
               <Image source={exercise} style={styles.imageStyle} />
             </View>
           ),
-          header: () => null
+          header: () => null,
         }}
       />
 
-      <Tab.Screen name='HomeScreen' component={HomeScreen} options={{ header: () => null }} />
+      <Tab.Screen name="HomeScreen" component={HomeScreen} options={{ header: () => null }} />
       <Tab.Screen name="ProfileScreen" component={ProfileScreen} options={{ header: () => null }} />
       <Tab.Screen name="Feeds" component={Feeds} options={{ header: () => null }} />
-      <Tab.Screen name="CustomCalories" component={CustomCalories} options={{ header: () => null }} />
-      <Tab.Screen name="FatLoseProgram" component={FatLoseProgram} options={{ header: () => null }} />
+      <Tab.Screen
+        name="CustomCalories"
+        component={CustomCalories}
+        options={{ header: () => null }}
+      />
+      <Tab.Screen
+        name="FatLoseProgram"
+        component={FatLoseProgram}
+        options={{ header: () => null }}
+      />
     </Tab.Navigator>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   textContainer: { justifyContent: 'center', alignItems: 'center' },
@@ -180,8 +190,8 @@ const styles = StyleSheet.create({
   imageStyle: { width: 26, height: 13, resizeMode: 'contain' },
   iconStyle1: { width: 20, height: 19, resizeMode: 'contain' },
   image1: { width: 20, height: 21, resizeMode: 'contain' },
-  image2: { width: 20, height: 21, resizeMode: 'contain' }
-})
+  image2: { width: 20, height: 21, resizeMode: 'contain' },
+});
 
 const MainNavigator = () => (
   <mainStack.Navigator
@@ -202,6 +212,8 @@ const MainNavigator = () => (
     <mainStack.Screen name="SearchProfile" component={SearchProfile} />
     <mainStack.Screen name="MessageScreen" component={MessageScreen} />
     <mainStack.Screen name="ChatScreen" component={ChatScreen} />
+    <mainStack.Screen name="NotificationScreen" component={NotificationScreen} />
+
     {/* <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} /> */}
     <mainStack.Screen name="CustomExercise" component={CustomExercise} />
     <mainStack.Screen name="AddExercise" component={AddExercise} />
@@ -209,12 +221,12 @@ const MainNavigator = () => (
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
     {/* <mainStack.Screen name='HomeScreen' component={HomeScreen} /> */}
-    <mainStack.Screen name='MealRegulator' component={MealRegulator} />
-    <mainStack.Screen name='SelectBrand' component={SelectBrand} />
-    <mainStack.Screen name='LogFoods' component={LogFoods} />
-    <mainStack.Screen name='SubscriptionScreen' component={SubscriptionScreen} />
-    <mainStack.Screen name="Chat" component={Chat} />
+    <mainStack.Screen name="MealRegulator" component={MealRegulator} />
+    <mainStack.Screen name="SelectBrand" component={SelectBrand} />
+    <mainStack.Screen name="LogFoods" component={LogFoods} />
+    <mainStack.Screen name="SubscriptionScreen" component={SubscriptionScreen} />
+    {/* <mainStack.Screen name="Chat" component={Chat} /> */}
   </mainStack.Navigator>
-)
+);
 
-export default MainNavigator
+export default MainNavigator;

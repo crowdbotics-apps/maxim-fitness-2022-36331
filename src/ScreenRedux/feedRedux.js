@@ -209,7 +209,12 @@ async function postReportAPI(data) {
 function* postReport({ data, callback }) {
   try {
     const response = yield call(postReportAPI, data);
-    showMessage({ message: 'Report successfully submitted', type: 'success' });
+    if (response?.data?.is_report) {
+      showMessage({ message: 'This post is already reported', type: 'danger' });
+    } else {
+      showMessage({ message: 'Report successfully submitted', type: 'success' });
+    }
+
     yield put(postReportSuccess());
     callback();
   } catch (error) {
@@ -234,7 +239,7 @@ async function postDeleteAPI(id) {
 function* postDelete({ id }) {
   try {
     const response = yield call(postDeleteAPI, id);
-    showMessage({ message: 'Post delete successfully', type: 'success' });
+    showMessage({ message: 'Post remove successfully', type: 'success' });
     yield put(getFeedsRequest(1));
     // callback();
   } catch (error) {

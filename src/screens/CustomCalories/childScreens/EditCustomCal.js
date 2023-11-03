@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
-import Slider from 'react-native-slider'
+import Slider from 'react-native-slider';
 import { connect } from 'react-redux';
-import { postRequiredCalRequest } from '../../../ScreenRedux/customCalRedux'
+import { postRequiredCalRequest } from '../../../ScreenRedux/customCalRedux';
+import { showMessage } from 'react-native-flash-message';
 
 const EditCustomCal = props => {
-  const { profile, consumeCalories } = props
-  const [protein, setProtein] = useState(0.5)
-  const [carbs, setCarbs] = useState(0.5)
-  const [fat, setFat] = useState(0.5)
-  const [calories, setCalories] = useState(0.5)
+  const { profile, consumeCalories } = props;
+  const [protein, setProtein] = useState(0.5);
+  const [carbs, setCarbs] = useState(0.5);
+  const [fat, setFat] = useState(0.5);
+  const [calories, setCalories] = useState(0.5);
 
   const {
     row,
@@ -23,23 +24,54 @@ const EditCustomCal = props => {
     justifyContentBetween,
   } = Layout;
   const { regularHPadding, smallVPadding, regularHMargin, regularVMargin } = Gutters;
-  const fontSize15TextCenter = { fontSize: 14, lineHeight: 16, textAlign: 'center', flexWrap: 'wrap' };
+  const fontSize15TextCenter = {
+    fontSize: 14,
+    lineHeight: 16,
+    textAlign: 'center',
+    flexWrap: 'wrap',
+  };
+
+  useEffect(() => {
+    if (consumeCalories[0]?.goals_values) {
+      consumeCalories[0]?.goals_values?.protein &&
+        setProtein(consumeCalories[0]?.goals_values?.protein / 20.45 / 100);
+      consumeCalories[0]?.goals_values?.carbs &&
+        setCarbs(consumeCalories[0]?.goals_values?.carbs / 20.45 / 100);
+      consumeCalories[0]?.goals_values?.fat &&
+        setFat(consumeCalories[0]?.goals_values?.fat / 20.45 / 100);
+      consumeCalories[0]?.goals_values?.calories &&
+        setCalories(consumeCalories[0]?.goals_values?.calories);
+    }
+  }, []);
 
   const postEditCal = () => {
-    const data = {
-      "calories": Number(calories).toFixed(0).length > 1 ? Number(calories).toFixed(0) : Number(consumeCalories[0]?.goals_values?.calories),
-      "protein": Number(((protein.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
-      "carbs": Number(((carbs.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
-      "fat": Number(((fat.toFixed(2) * 100) * 20.45).toFixed(2)).toFixed(0),
+    if (Number(calories).toFixed(0) < 10) {
+      showMessage({ message: 'Calories value should be greater then 9', type: 'danger' });
+    } else if (Number((protein.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === '0') {
+      showMessage({ message: 'Protein value should be greater then 0', type: 'danger' });
+    } else if (Number((carbs.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === '0') {
+      showMessage({ message: 'Carbs value should be greater then 0', type: 'danger' });
+    } else if (Number((fat.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === '0') {
+      showMessage({ message: 'Fat value should be greater then 0', type: 'danger' });
+    } else {
+      const data = {
+        calories:
+          Number(calories).toFixed(0).length > 1
+            ? Number(calories).toFixed(0)
+            : Number(consumeCalories[0]?.goals_values?.calories),
+        protein: Number((protein.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0),
+        carbs: Number((carbs.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0),
+        fat: Number((fat.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0),
+      };
+      props.navigation.navigate('EditCaloriesManually', data);
     }
-    props.navigation.navigate('EditCaloriesManually', data)
-  }
+  };
 
-  const calculateCalories = (val) => {
-    const persentage = val.toFixed(2) * 100
-    const dd = persentage * 20.45
-    return dd.toFixed(2)
-  }
+  const calculateCalories = val => {
+    const persentage = val.toFixed(2) * 100;
+    const dd = persentage * 20.45;
+    return dd.toFixed(2);
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -64,14 +96,20 @@ const EditCustomCal = props => {
         <View style={[regularHMargin, regularVMargin]}>
           <Text color="commonCol" text="Calories" bold smallTitle />
           <View style={[row, justifyContentStart, Layout.alignItemsEnd, regularVMargin]}>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: '#929292', }}>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: '#929292' }}>
               <TextInput
-                value={calories}
+                value={`${calories}`}
                 placeholderTextColor={'#000'}
                 autoFocus={false}
-                placeholder={Number(consumeCalories[0]?.goals_values?.calories).toLocaleString()}
-                style={{ fontSize: 20, lineHeight: 20, fontWeight: '600', paddingVertical: 5, margin: 0 }}
-                onChangeText={(val) => setCalories(val)}
+                // placeholder={Number(consumeCalories[0]?.goals_values?.calories).toLocaleString()}
+                style={{
+                  fontSize: 20,
+                  lineHeight: 20,
+                  fontWeight: '600',
+                  paddingVertical: 5,
+                  margin: 0,
+                }}
+                onChangeText={val => setCalories(val)}
               />
             </View>
             {/* <Text text={(consumeCalories[0]?.goals_values?.calories).toLocaleString() || 0} color="nonary" bold large underlined /> */}
@@ -120,7 +158,12 @@ const EditCustomCal = props => {
               <View
                 style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}
               >
-                <Text text={(calculateCalories(protein) / profile?.number_of_meal).toFixed(2)} color="nonary" bold medium />
+                <Text
+                  text={(calculateCalories(protein) / profile?.number_of_meal).toFixed(2)}
+                  color="nonary"
+                  bold
+                  medium
+                />
                 <Text text={'g per day'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
             </View>
@@ -162,7 +205,9 @@ const EditCustomCal = props => {
                 <Text text={calculateCalories(carbs)} style={{ color: '#f0bc40' }} bold medium />
                 <Text text={'calories'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
-              <View style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
+              <View
+                style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}
+              >
                 <Text
                   text={(calculateCalories(carbs) / profile?.number_of_meal).toFixed(2)}
                   style={{ color: '#f0bc40' }}
@@ -210,7 +255,9 @@ const EditCustomCal = props => {
                 <Text text={calculateCalories(fat)} style={{ color: '#ed6d57' }} bold medium />
                 <Text text={'calories'} style={[fontSize15TextCenter, Gutters.tinyLMargin]} />
               </View>
-              <View style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}>
+              <View
+                style={[row, fill, justifyContentStart, alignItemsStart, Gutters.regularLMargin]}
+              >
                 <Text
                   text={(calculateCalories(fat) / profile?.number_of_meal).toFixed(2)}
                   style={{ color: '#ed6d57' }}
@@ -352,7 +399,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.azureradiance,
   },
-  track: { width: 200, height: 20, borderRadius: 10, backgroundColor: Colors.alto }
+  track: { width: 200, height: 20, borderRadius: 10, backgroundColor: Colors.alto },
 });
 
 // export default EditCustomCal;
