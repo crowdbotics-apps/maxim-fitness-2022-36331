@@ -998,7 +998,7 @@ class PostViewSet(ModelViewSet):
         comment = request.data.get('comment')
         com = post.add_comment(request.user, comment)
         res = CommentSerializer(com, context={'request': request})
-        send_notification(sender=request.user.id, receiver=post.user.id,
+        send_notification(sender=request.user, receiver=post.user,
                           title="Comment on Post", message=f"{request.user.username} commented on your post {post.title}")
         return Response(res.data)
 
@@ -1049,7 +1049,7 @@ class FollowViewSet(ViewSet):
         a = Following.add_follower(request.user, other_user)
         if a == 'already follows':
             return Response("already follow")
-        send_notification(sender=self.request.user.id, receiver=other_user.id, title="Follow",
+        send_notification(sender=self.request.user, receiver=other_user, title="Follow",
                           message=f"{self.request.user.username} start following you")
         return Response("Added")
 
@@ -1230,7 +1230,7 @@ class ReportAPostViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         post = Post.objects.filter(id=post_id).first()
-        send_notification(sender=self.request.user.id, receiver=post.user.id, title="Report Post",
+        send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
                           message=f"Your Post is reported by { self.request.user.username}")
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
