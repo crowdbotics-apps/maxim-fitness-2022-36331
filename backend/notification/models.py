@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from push_notifications.models import APNSDevice, GCMDevice
-from home.models import Post
 User = get_user_model()
 # Create your models here.
 
@@ -13,7 +12,6 @@ class Notification(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver_notification",)
     title = models.CharField(max_length=200)
     message = models.TextField()
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="notification_post", null=True, blank=True)
     is_read = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 

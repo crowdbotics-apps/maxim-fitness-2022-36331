@@ -4,7 +4,7 @@ from notification.models import Notification
 
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ['sender', 'receiver', 'title', 'message', 'post', 'created']
+    list_display = ['sender', 'receiver', 'title', 'message', 'created']
 
 
 admin.site.register(Notification, NotificationAdmin)

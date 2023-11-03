@@ -1,4 +1,4 @@
-from modules.fcm.serializers import FCMNotificationSerializer
+from notification.models import Notification
 
 
 def send_notification(sender, receiver, title, message):
@@ -8,7 +8,5 @@ def send_notification(sender, receiver, title, message):
         "title": title,
         "message": message
     }
-    serializer = FCMNotificationSerializer(data=data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
+    Notification.objects.create(**data)
     return True

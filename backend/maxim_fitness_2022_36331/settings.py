@@ -318,10 +318,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'],
 }
-FCM_SERVER_KEY=env.str("FCM_SERVER_KEY", "")
 
-# Navigate to your Firebase project settings in the Firebase Console, then proceed to the Service Account section and click on 'Generate a new private key'.
-FCM_SERVICE_FILE_PATH=os.path.join(BASE_DIR, "orum-training-23610-firebase-adminsdk-ba4sw-2d0fd2ffed.json")
 PUSH_NOTIFICATIONS_SETTINGS = {
     "FCM_API_KEY": env.str("FCM_SERVER_KEY", ""),
     # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
