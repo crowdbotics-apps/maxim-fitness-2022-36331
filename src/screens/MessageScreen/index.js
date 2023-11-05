@@ -41,7 +41,7 @@ const MessageScreen = props => {
             <Image source={backImage} style={{ height: 20, width: 30 }} />
           </TouchableOpacity>
           <Text text="Messages" style={{ fontSize: 22 }} bold />
-          <TouchableOpacity onPress={() => navigation.navigate('ChatScreen')}>
+          <TouchableOpacity onPress={() => navigation.navigate('SearchProfile')}>
             <Image source={messageImage} style={{ height: 30, width: 30 }} />
           </TouchableOpacity>
         </View>

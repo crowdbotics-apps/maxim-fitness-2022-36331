@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "750002418089",
+    "project_id": "orum-training-23610",
+    "storage_bucket": "orum-training-23610.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750002418089:android:f60089bfbe6d696bb754b8",
+        "android_client_info": {
+          "package_name": "com.crowdbotics.maximsandersaolcom_ma_892"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750002418089-76ho025581hduqo7pnq66gn9m1ffca4i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.crowdbotics.maximsandersaolcom_ma_892",
+            "certificate_hash": "287f2a6b6aa1c57c4dee9031359c262318303335"
+          }
+        },
+        {
+          "client_id": "750002418089-37ld7o7spro39do9m0mf42j8i6hs6ufq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSG_rLf8n-UZAaw0OppJ6c-Y10_eu8JO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750002418089-37ld7o7spro39do9m0mf42j8i6hs6ufq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750002418089-vhb64sk5laqkfecdt6c2o74q2kum0r0t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.crowdbotics.maximfitness5250"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

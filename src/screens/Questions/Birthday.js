@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Modal,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import { connect } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Components
 import { Text, Button } from '../../components';
@@ -20,9 +21,11 @@ import { Global, Layout, Gutters, Fonts } from '../../theme';
 import DatePicker from 'react-native-date-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import { updateAnswer } from './Redux';
+import RemotePushController from '../../../modules/notifications/utils';
 
 const Birthday = props => {
   const {
+    profile,
     navigation: { navigate },
   } = props;
   const deviceWidth = Dimensions.get('window').width;
@@ -36,6 +39,11 @@ const Birthday = props => {
     tempData.dob = navState;
     navigate('Gender');
   };
+
+  useEffect(async () => {
+    const token = await AsyncStorage.getItem('authToken');
+    RemotePushController(token, profile?.id);
+  }, []);
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
@@ -139,6 +147,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   answers: state.questionReducer.answers,
+  profile: state.login.userDetail,
 });
 
 const mapDispatchToProps = dispatch => ({

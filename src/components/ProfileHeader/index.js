@@ -4,7 +4,7 @@ import Text from '../Text';
 import { Images } from 'src/theme';
 
 const ProfileHeader = props => {
-  const { source, userName, time, content } = props
+  const { source, userName, time, content } = props;
   return (
     <View style={styles.cardHeader}>
       <Image source={source} style={styles.profileImg} />
@@ -15,7 +15,7 @@ const ProfileHeader = props => {
         </View>
         <Text text={content} style={styles.pageText} />
       </View>
-      <Image source={Images.etc} style={styles.profileImg} />
+      {/* <Image source={Images.etc} style={styles.profileImg} /> */}
     </View>
   );
 };

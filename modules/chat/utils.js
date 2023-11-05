@@ -1,4 +1,4 @@
-// @ts-ignore
+
 import RNFS from "react-native-fs";
 
 export const cloneArray = (data) => {
@@ -26,7 +26,6 @@ export const fetchChannels = (pubnub, userId) => {
 };
 
 export const timeSince = (date) => {
-  // @ts-ignore
   const seconds = Math.floor((new Date() - date) / 1000);
   let interval = seconds / 31536000;
   if (interval > 1) {
@@ -168,11 +167,11 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
     await pubnub.objects.setChannelMetadata({
       channel,
       data: customData
-    })
+    });
     await pubnub.objects.setChannelMembers({
       channel,
-      uuids: [{ id: `${userId}` }, { id: `${chatWithId}` }]
-    })
+      uuids: [{ id: userId }, { id: `${chatWithId}` }]
+    });
     await pubnub.channelGroups.addChannels({
       channels: [channel],
       channelGroup: userId

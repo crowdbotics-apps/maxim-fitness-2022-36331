@@ -20,23 +20,24 @@ import { Text } from '../../components';
 import { getUserProfile, userChat } from '../../ScreenRedux/searchProfileRedux';
 import { followUser, unFollowUser } from '../../ScreenRedux/profileRedux';
 
-const { backImage, searchImage, profileBackGround, followButton, profile, followingButton } = Images;
+const { backImage, searchImage, profileBackGround, followButton, profile, followingButton } =
+  Images;
 const SearchProfile = props => {
   const { navigation, profileUserData, requesting } = props;
   const { width } = Dimensions.get('window');
   const [followUser, setFollowUser] = useState([]);
 
-  let newArray = []
+  let newArray = [];
   useEffect(() => {
     if (profileUserData) {
-      let filterData = profileUserData.filter(item => item.follow === true)
+      let filterData = profileUserData.filter(item => item.follow === true);
 
       filterData.map(item => {
-        newArray.push(item.user_detail.id)
-      })
-      setFollowUser(newArray)
+        newArray.push(item.user_detail.id);
+      });
+      setFollowUser(newArray);
     }
-  }, [profileUserData])
+  }, [profileUserData]);
 
   useEffect(() => {
     props.getUserProfile('');
@@ -52,9 +53,9 @@ const SearchProfile = props => {
       );
     }
     if (followUser.includes(item?.user_detail?.id)) {
-      props.unFollowUser({ id: item.user_detail.id })
+      props.unFollowUser({ id: item.user_detail.id });
     } else {
-      props.followUser({ id: item.user_detail.id })
+      props.followUser({ id: item.user_detail.id });
     }
   };
 

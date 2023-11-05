@@ -40,6 +40,7 @@ const FeedCard = props => {
     profile,
     setShowModal,
     setVideoUri,
+    setImageIndex,
   } = props;
 
   const [showMore, setShowMore] = useState(false);
@@ -152,7 +153,7 @@ const FeedCard = props => {
   };
 
   const showConfirmDialog = id => {
-    return Alert.alert('Are your sure?', 'Are you sure you want to remove this post?', [
+    return Alert.alert('Remove Post', 'Are you sure you want to remove this post?', [
       {
         text: 'Yes',
         onPress: () => {
@@ -194,11 +195,7 @@ const FeedCard = props => {
               />
               <Text text={calculatePostTime(item)} style={styles.text2} />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={showMenu}
-
-              // onPress={() => navigation.navigate('ViewPost', item)}
-            >
+            <TouchableOpacity onPress={showMenu}>
               <Menu visible={visible} onRequestClose={hideMenu}>
                 {profile?.id === item?.user?.id ? (
                   <MenuItem textStyle={{ color: 'red' }} onPress={() => action(item, 'delete')}>
@@ -236,6 +233,7 @@ const FeedCard = props => {
                 if (item?.post_image?.length) {
                   setIsVisible(true);
                   setImages(item?.post_image?.length && item?.post_image);
+                  setImageIndex(index);
                 }
                 if (item?.post_video?.length) {
                   setShowModal(true);
@@ -286,7 +284,7 @@ const FeedCard = props => {
         isVisible={isModalVisible}
         animationIn="zoomIn"
         animationOut={'zoomOut'}
-        onBackdropPress={() => toggleModal(false)}
+        // onBackdropPress={() => toggleModal(false)}
       >
         <View style={styles.modalStyle}>
           <View style={styles.reportStyle}>

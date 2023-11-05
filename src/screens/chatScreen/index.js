@@ -14,7 +14,7 @@ import {
   Animated,
 } from 'react-native';
 import { Images } from 'src/theme';
-import { Text, Header } from '../../components'
+import { Text, Header } from '../../components';
 
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images;
 const ChatScreen = props => {
@@ -189,7 +189,7 @@ const ChatScreen = props => {
             style={{
               height: (35 / 375) * width,
               width: (35 / 375) * width,
-              marginLeft: 10
+              marginLeft: 10,
             }}
           />
           <Image

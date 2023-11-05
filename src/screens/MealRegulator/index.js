@@ -14,14 +14,12 @@ import { connect } from 'react-redux';
 import LottieView from 'lottie-react-native';
 import Voice from '@react-native-community/voice';
 import { Images, Layout, Gutters, Global } from '../../theme';
-import { getSpeechRequest } from '../../ScreenRedux/nutritionRedux'
+import { getSpeechRequest } from '../../ScreenRedux/nutritionRedux';
 
 const MealRegulator = props => {
   const { navigation } = props;
   const [partialResults, setPartialResults] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
-
-  console.log('partialResults', partialResults);
 
   useEffect(() => {
     //Setting callbacks for the process status
@@ -77,11 +75,29 @@ const MealRegulator = props => {
 
   return (
     <SafeAreaView style={{ flex: 1, justifyContent: 'space-between', backgroundColor: 'white' }}>
-      <View style={[Layout.row, Layout.alignItemsCenter, Layout.justifyContentBetween, Global.height65, Gutters.regularHMargin]}>
-        <View style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsStart]} >
+      <View
+        style={[
+          Layout.row,
+          Layout.alignItemsCenter,
+          Layout.justifyContentBetween,
+          Global.height65,
+          Gutters.regularHMargin,
+        ]}
+      >
+        <View style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsStart]}>
           <Image style={styles.leftArrowStyle} />
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('SelectBrand')} style={{ flex: 4, alignItems: 'flex-start', paddingHorizontal: 15, paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: 'gray' }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SelectBrand')}
+          style={{
+            flex: 4,
+            alignItems: 'flex-start',
+            paddingHorizontal: 15,
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: 'gray',
+          }}
+        >
           <Text style={{ fontSize: 15, color: 'gray' }}>Search Foods and Products</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -215,7 +231,7 @@ const styles = StyleSheet.create({
   barCodeStyle: {
     height: 40,
     width: 40,
-    resizeMode: 'cover'
+    resizeMode: 'cover',
   },
   onSearchDiv: {
     width: '52%',
@@ -228,6 +244,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
-  getSpeechRequest: (data) => dispatch(getSpeechRequest(data)),
+  getSpeechRequest: data => dispatch(getSpeechRequest(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(MealRegulator);

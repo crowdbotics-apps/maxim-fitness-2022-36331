@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { showMessage } from 'react-native-flash-message';
+import { goBack } from '../navigation/NavigationService';
 
 //Actions
 import { setUserDetail } from './loginRedux';
@@ -248,8 +249,9 @@ async function updateProfile(data, id) {
 function* updateUserData({ data, id }) {
   try {
     const response = yield call(updateProfile, data, id);
-    showMessage({ message: 'profile Updated successfully', type: 'success' });
+    showMessage({ message: 'Profile updated successfully', type: 'success' });
     yield put(setUserDetail(response.data));
+    goBack();
   } catch (e) {
     const { response } = e;
     showMessage({ message: 'Something went wrong', type: 'danger' });

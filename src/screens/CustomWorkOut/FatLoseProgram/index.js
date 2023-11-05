@@ -140,7 +140,7 @@ const FatLoseProgram = props => {
     setIsModal(true);
     props.getAllSessionRequest();
   };
-
+  console.log(' getWeekSessions?.query', getWeekSessions?.query?.length);
   const onDayPress = date => {
     // setLoading(true)
     getWeekSessions?.query?.map((d, i) => {
@@ -167,38 +167,41 @@ const FatLoseProgram = props => {
       <ScrollView>
         <View style={[smallVMargin, regularHMargin]}>
           <Text style={styles.heading}>Max's Fat Loss Program</Text>
-          <View style={[row, alignItemsCenter, justifyContentBetween, Gutters.small2xTMargin]}>
-            <TouchableOpacity
-              style={row}
-              onPress={getWeekSessions?.week > activeIndex ? nextExercise : previousExercise}
-            >
-              {getWeekSessions?.week > 0 && activeIndex > 1 ? (
-                <Icon type="FontAwesome5" name={'chevron-left'} style={styles.IconStyle} />
-              ) : null}
-              <Text
-                color="primary"
-                text={`Week ${
-                  getWeekSessions?.week > 0 && activeIndex > 1
-                    ? getWeekSessions?.week - 1
-                    : getWeekSessions?.week === undefined
-                    ? ''
-                    : getWeekSessions?.week
-                }`}
-                style={[tinyLMargin, styles.smallText]}
-              />
-              {getWeekSessions?.week > 0 && activeIndex > 1 ? null : (
-                <Icon type="FontAwesome5" name={'chevron-right'} style={styles.IconStyle} />
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity style={row} onPress={openModal}>
-              <Text text={'Calendar'} style={[tinyLMargin, styles.CalenderText]} />
-              <Icon
-                type="FontAwesome5"
-                name="chevron-right"
-                style={[styles.IconStyle, { color: 'gray' }]}
-              />
-            </TouchableOpacity>
-          </View>
+          {getWeekSessions?.query?.length > 0 && (
+            <View style={[row, alignItemsCenter, justifyContentBetween, Gutters.small2xTMargin]}>
+              <TouchableOpacity
+                style={row}
+                onPress={getWeekSessions?.week > activeIndex ? nextExercise : previousExercise}
+              >
+                {getWeekSessions?.week > 0 && activeIndex > 1 ? (
+                  <Icon type="FontAwesome5" name={'chevron-left'} style={styles.IconStyle} />
+                ) : null}
+                <Text
+                  color="primary"
+                  text={`Week ${
+                    getWeekSessions?.week > 0 && activeIndex > 1
+                      ? getWeekSessions?.week - 1
+                      : getWeekSessions?.week === undefined
+                      ? ''
+                      : getWeekSessions?.week
+                  }`}
+                  style={[tinyLMargin, styles.smallText]}
+                />
+                {getWeekSessions?.week > 0 && activeIndex > 1 ? null : (
+                  <Icon type="FontAwesome5" name={'chevron-right'} style={styles.IconStyle} />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={row} onPress={openModal}>
+                <Text text={'Calendar'} style={[tinyLMargin, styles.CalenderText]} />
+                <Icon
+                  type="FontAwesome5"
+                  name="chevron-right"
+                  style={[styles.IconStyle, { color: 'gray' }]}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={Layout.alignItemsCenter}>
             <ScrollView
               horizontal
@@ -275,7 +278,7 @@ const FatLoseProgram = props => {
             <View style={[Layout.center, { height: 200 }]}>
               <Text text={'No workout found!'} style={styles.headind2} />
             </View>
-          ) : todaySessions?.name !== 'Rest' ? (
+          ) : todaySessions?.name && todaySessions?.name !== 'Rest' ? (
             <View>
               <Text
                 text={
@@ -437,13 +440,15 @@ const FatLoseProgram = props => {
             <View style={[fill, center, Gutters.regularVMargin]}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('AddExercise')}
-                disabled={todaySessions?.name !== 'Rest'}
+                disabled={todaySessions?.name && todaySessions?.name !== 'Rest'}
               >
                 <LinearGradient
                   start={start}
                   end={end}
                   colors={
-                    todaySessions?.name !== 'Rest' ? ['#dddddd', '#dddddd'] : ['#00a2ff', '#00a2ff']
+                    todaySessions?.name && todaySessions?.name !== 'Rest'
+                      ? ['#dddddd', '#dddddd']
+                      : ['#00a2ff', '#00a2ff']
                   }
                   style={[
                     fill,
