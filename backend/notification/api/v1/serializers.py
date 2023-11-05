@@ -11,8 +11,7 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    send = UserSerializer(source="sender", read_only=True)
-    post_detail = PostSerializer(source="post", read_only=True)
+    sender_detail = UserSerializer(source="sender", read_only=True)
     # image = serializers.ImageField(source='sender.profile_picture', read_only=True)
     # name = serializers.CharField(source='sender.username', read_only=True)
 

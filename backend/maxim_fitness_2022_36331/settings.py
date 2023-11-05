@@ -95,6 +95,7 @@ THIRD_PARTY_APPS = [
     "friendship",
     "solo",
     "djstripe",
+    "fcm_django",
 
     # end fcm_django push notifications
     "push_notifications",
