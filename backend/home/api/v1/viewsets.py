@@ -998,8 +998,10 @@ class PostViewSet(ModelViewSet):
         comment = request.data.get('comment')
         com = post.add_comment(request.user, comment)
         res = CommentSerializer(com, context={'request': request})
-        send_notification(sender=request.user, receiver=post.user,
-                          title="Comment on Post", message=f"{request.user.username} commented on your post {post.title}")
+        if not post.user == request.user:
+            title = post.title if post.title else ""
+            send_notification(sender=request.user, receiver=post.user,
+                              title="Comment on Post", message=f"{request.user.username} comment on your post {title}")
         return Response(res.data)
 
 
@@ -1231,7 +1233,7 @@ class ReportAPostViewSet(ModelViewSet):
         self.perform_create(serializer)
         post = Post.objects.filter(id=post_id).first()
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
-                          message=f"Your Post is reported by { self.request.user.username}")
+                          message=f"Your post is reported by { self.request.user.username}")
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
 
