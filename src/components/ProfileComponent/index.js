@@ -11,6 +11,7 @@ const ProfileComponent = ({
   onPressNotify,
   onPressMsg,
   onPressSocial,
+  unreadCount,
 }) => {
   const {
     row,
@@ -72,9 +73,12 @@ const ProfileComponent = ({
       <View style={[row, fill, alignItemsCenter, justifyContentEnd]}>
         <TouchableOpacity onPress={onPressNotify}>
           <Icon type="FontAwesome5" name="bell" />
-          {true && (
+          {true && unreadCount && (
             <View style={true ? styles.notificationStyle : ''}>
-              <Text text={'2'} style={styles.notificationStyleText} />
+              <Text
+                text={unreadCount > 99 ? '+99' : unreadCount}
+                style={styles.notificationStyleText}
+              />
             </View>
           )}
         </TouchableOpacity>

@@ -1,6 +1,6 @@
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { navigate } from '../navigation/NavigationService'
+import { navigate } from '../navigation/NavigationService';
 
 // config
 import { API_URL } from '../config/app';
@@ -31,6 +31,9 @@ const RESET_FOOD_ITEMS = 'NutritionScreen/RESET_FOOD_ITEMS';
 const GET_MEALS_REQUEST = 'NutritionScreen/GET_MEALS_REQUEST';
 const GET_MEALS_SUCCESS = 'NutritionScreen/GET_MEALS_SUCCESS';
 
+const GET_UNREAD_NOTIFICATIONS = 'NutritionScreen/GET_UNREAD_NOTIFICATIONS';
+const GET_UNREAD_NOTIFICATIONS_SUCCESS = 'NutritionScreen/GET_UNREAD_NOTIFICATIONS_SUCCESS';
+
 const DELETE_ALL_MEALS = 'NutritionScreen/DELETE_ALL_MEALS';
 
 const initialState = {
@@ -52,90 +55,101 @@ const initialState = {
   selectedMeal: false,
 
   getMealsFoodState: false,
-}
+
+  unreadCount: false,
+};
 
 // speech food action
 export const getSpeechRequest = data => ({
   type: GET_SPEECH_REQUEST,
-  data
-})
+  data,
+});
 
 export const getSpeechSuccess = data => ({
   type: GET_SPEECH_SUCCESS,
-  data
-})
+  data,
+});
 
 export const getSpeechFailure = error => ({
   type: GET_SPEECH_FAILURE,
-  error
-})
+  error,
+});
 // search food action
 export const getFoodsSearchRequest = data => ({
   type: GET_FOODS_SEARCH_REQUEST,
-  data
-})
+  data,
+});
 
 export const getFoodsSearchSuccess = data => ({
   type: GET_FOODS_SEARCH_SUCCESS,
-  data
-})
+  data,
+});
 
 export const getFoodsSearchFailure = error => ({
   type: GET_FOODS_SEARCH_FAILURE,
-  error
-})
+  error,
+});
 // common branded action
 
 export const commonBrandedRequest = data => ({
   type: GET_COMMON_BRANDED_REQUEST,
-  data
-})
+  data,
+});
 
 export const commonSuccess = data => ({
   type: GET_COMMON_SUCCESS,
-  data
-})
+  data,
+});
 
 export const brandedSuccess = data => ({
   type: GET_BRANDED_SUCCESS,
-  data
-})
+  data,
+});
 
 export const postLogFoodRequest = (id, data) => ({
   type: POST_LOG_FOOD_REQUEST,
   id,
-  data
-})
+  data,
+});
 
 export const postLogFoodSuccess = data => ({
   type: POST_LOG_FOOD_SUCCESS,
-  data
-})
+  data,
+});
 
 export const selectedMealsRequest = data => ({
   type: SELECTED_MEALS,
-  data
-})
+  data,
+});
 
 export const resetFoodItems = () => ({
-  type: RESET_FOOD_ITEMS
-})
+  type: RESET_FOOD_ITEMS,
+});
 
 export const getMealFoodRequest = (data, id) => ({
   type: GET_MEALS_REQUEST,
   data,
   id,
-})
+});
 
 export const getMealFoodSuccess = data => ({
   type: GET_MEALS_SUCCESS,
-  data
-})
+  data,
+});
 
 export const deleteAllMeals = data => ({
   type: DELETE_ALL_MEALS,
-  data
-})
+  data,
+});
+
+export const getNotificationCount = () => ({
+  type: GET_UNREAD_NOTIFICATIONS,
+});
+
+export const getNotificationCountSuccess = data => ({
+  type: GET_UNREAD_NOTIFICATIONS_SUCCESS,
+  payload: data,
+});
 
 //Reducers
 export const nutritionReducer = (state = initialState, action) => {
@@ -144,77 +158,83 @@ export const nutritionReducer = (state = initialState, action) => {
       return {
         ...state,
         requesting: true,
-      }
+      };
 
     case GET_SPEECH_SUCCESS:
       return {
         ...state,
         speechState: action.data,
         requesting: false,
-      }
+      };
     case GET_SPEECH_FAILURE:
       return {
         ...state,
         speechError: action.error,
         requesting: false,
-      }
+      };
+
+    case GET_UNREAD_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        unreadCount: action.payload,
+      };
 
     case GET_FOODS_SEARCH_REQUEST:
       return {
         ...state,
         foodRequesting: true,
-      }
+      };
 
     case GET_FOODS_SEARCH_SUCCESS:
       return {
         ...state,
         foodSearchState: action.data,
         foodRequesting: false,
-      }
+      };
     case GET_FOODS_SEARCH_FAILURE:
       return {
         ...state,
         speechError: action.error,
         foodRequesting: false,
-      }
+      };
 
     case GET_COMMON_BRANDED_REQUEST:
       return {
         ...state,
         request: true,
-      }
+      };
 
     case GET_COMMON_SUCCESS:
       return {
         ...state,
         commonState: action.data,
         request: false,
-      }
+      };
     case GET_BRANDED_SUCCESS:
       return {
         ...state,
         brandedState: action.data,
         request: false,
-      }
+      };
 
     case POST_LOG_FOOD_REQUEST:
       return {
         ...state,
         loader: true,
-      }
+      };
     case POST_LOG_FOOD_SUCCESS:
       return {
         ...state,
         logFoodState: action.data,
         loader: false,
-      }
+      };
 
     case SELECTED_MEALS:
       return {
         ...state,
         selectedMeal: action.data,
         loader: false,
-      }
+      };
     case RESET_FOOD_ITEMS: {
       return {
         ...state,
@@ -231,205 +251,205 @@ export const nutritionReducer = (state = initialState, action) => {
       return {
         ...state,
         mealRequesting: true,
-      }
+      };
     case GET_MEALS_SUCCESS:
       return {
         ...state,
         getMealsFoodState: action.data,
         mealRequesting: false,
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
 //SPEECH API
 async function getSpeechAPI(data) {
-  const URL = `${API_URL}/food/speech/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/food/speech/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-    data: { query: data[0] }
-  }
+    data: { query: data[0] },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getSpeech({ data }) {
-  console.log('speech query: ', data);
   try {
-    const response = yield call(getSpeechAPI, data)
-    console.log('SPEECH RESPONSE: ', response);
-    yield put(getSpeechSuccess(response.data.foods))
+    const response = yield call(getSpeechAPI, data);
+    yield put(getSpeechSuccess(response.data.foods));
   } catch (e) {
-    console.log('SPEECH ERROR: ', e);
-    yield put(getSpeechFailure(e))
+    yield put(getSpeechFailure(e));
   }
 }
 
 //FOODS SEARCH API
 async function getFoodsSearchAPI(data) {
-  const URL = `${API_URL}/food/search/?query=${data}`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/food/search/?query=${data}`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getFoodsSearch({ data }) {
-  console.log('Food search query: ', data);
   try {
-    const response = yield call(getFoodsSearchAPI, data)
-    console.log('Foods Search RESPONSE: ', response);
-    yield put(getFoodsSearchSuccess(response.data))
+    const response = yield call(getFoodsSearchAPI, data);
+    yield put(getFoodsSearchSuccess(response.data));
   } catch (e) {
-    console.log('Foods Search ERROR: ', e);
-    yield put(getFoodsSearchFailure(e))
+    yield put(getFoodsSearchFailure(e));
   }
 }
 
 // common branded sagas
 async function commonAPI(name) {
-  const URL = `${API_URL}/food/speech/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/food/speech/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
     data: { query: name },
-  }
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 async function brandedAPI(id) {
-  const URL = `${API_URL}/products/code/?item_id=${id}`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/products/code/?item_id=${id}`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
-    }
-  }
+      Authorization: `Token  ${token}`,
+    },
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* commonBranded({ data }) {
-  console.log('common branded: ', data);
-
   try {
     if (data.item === 'common') {
-      const response = yield call(commonAPI, data.name)
-      console.log('common RESPONSE: ', response);
-      yield put(commonSuccess(response.data.foods))
+      const response = yield call(commonAPI, data.name);
+      yield put(commonSuccess(response.data.foods));
     } else {
-      const response = yield call(brandedAPI, data.id)
-      console.log('branded RESPONSE: ', response);
-      yield put(brandedSuccess(response.data))
+      const response = yield call(brandedAPI, data.id);
+      yield put(brandedSuccess(response.data));
     }
   } catch (e) {
-    console.log('common branded ERROR: ', e);
     // yield put(commonBrandedFailure(e))
   }
 }
 
 async function postLogFoodAPI(id, data) {
-  const URL = `${API_URL}/meal/${id}/add_log_food/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/meal/${id}/add_log_food/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
     data: data,
-  }
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* postLogFood({ id, data }) {
-  console.log('LoG food: ', id, data);
-
   try {
-    const response = yield call(postLogFoodAPI, id, data)
-    console.log('Log food RESPONSE: ', response);
-    yield put(brandedSuccess(response.data))
-    navigate('HomeScreen')
+    const response = yield call(postLogFoodAPI, id, data);
+    yield put(brandedSuccess(response.data));
+    navigate('HomeScreen');
   } catch (e) {
-    console.log('Log food ERROR: ', e);
     // yield put(postLogFoodFailure(e))
   }
 }
 
 async function getMealsFoodAPI(data, id) {
-  const URL = `${API_URL}/meal/get_by_date/?date=${data}&id=${id}`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/meal/get_by_date/?date=${data}&id=${id}`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
-  }
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* getMealsFood({ data, id }) {
-  console.log('LoG food: ', data, id);
   try {
-    const response = yield call(getMealsFoodAPI, data, id)
-    console.log('Meals food RESPONSE: ', response);
-    yield put(getMealFoodSuccess(response.data))
+    const response = yield call(getMealsFoodAPI, data, id);
+    yield put(getMealFoodSuccess(response.data));
   } catch (e) {
-    console.log('Meals food ERROR: ', e);
     // yield put(getMealsFoodFailure(e))
   }
 }
 
 async function deleteAllMealsReqAPI(data) {
-  const URL = `${API_URL}/meal/delete_food/`
-  const token = await AsyncStorage.getItem('authToken')
+  const URL = `${API_URL}/meal/delete_food/`;
+  const token = await AsyncStorage.getItem('authToken');
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Token  ${token}`
+      Authorization: `Token  ${token}`,
     },
     data: {
       food_id: data?.foodId,
       id: data?.mealId,
     },
-  }
+  };
 
-  return XHR(URL, options)
+  return XHR(URL, options);
 }
 
 function* deleteAllMealsReq({ data }) {
-  console.log('Delete food: ', data);
   try {
-    const response = yield call(deleteAllMealsReqAPI, data)
-    console.log('Delete food RESPONSE: ', response);
+    const response = yield call(deleteAllMealsReqAPI, data);
     // yield put(getMealFoodSuccess(response.data))
   } catch (e) {
-    console.log('Meals food ERROR: ', e);
     // yield put(deleteAllMealsReqFailure(e))
   }
+}
+
+async function getUnreadNotificationsApi() {
+  const URL = `${API_URL}/notification/unread_count/`;
+  const token = await AsyncStorage.getItem('authToken');
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token  ${token}`,
+    },
+  };
+
+  return XHR(URL, options);
+}
+
+function* getUnreadNotifications() {
+  try {
+    const response = yield call(getUnreadNotificationsApi);
+    yield put(getNotificationCountSuccess(response?.data?.unread_count));
+  } catch (e) {}
 }
 
 export default all([
@@ -439,4 +459,5 @@ export default all([
   takeLatest(GET_COMMON_BRANDED_REQUEST, commonBranded),
   takeLatest(GET_FOODS_SEARCH_REQUEST, getFoodsSearch),
   takeLatest(GET_SPEECH_REQUEST, getSpeech),
-])
+  takeLatest(GET_UNREAD_NOTIFICATIONS, getUnreadNotifications),
+]);

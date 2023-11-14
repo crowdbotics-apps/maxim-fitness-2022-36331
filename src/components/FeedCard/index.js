@@ -178,8 +178,8 @@ const FeedCard = props => {
           <View style={styles.cardHeader}>
             <Image
               source={
-                item && item.user && item.user.profile_picture_url
-                  ? item.user.profile_picture_url
+                item && item?.user && item?.user?.profile_picture
+                  ? { uri: item.user.profile_picture }
                   : Images.profile
               }
               style={styles.profileImg}
@@ -206,7 +206,7 @@ const FeedCard = props => {
                 )}
               </Menu>
 
-              <Image source={Images.etc} style={styles.profileImg} />
+              <Image source={Images.etc} style={styles.dotImg} />
             </TouchableOpacity>
           </View>
           <View style={styles.cardBody}>
@@ -382,7 +382,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  profileImg: { width: 30, height: 30 },
+  profileImg: { width: 30, height: 30, borderRadius: 50, resizeMode: 'cover' },
+  dotImg: { width: 30, height: 30 },
   socialImg: { width: 25, height: 25, resizeMode: 'contain' },
   socialImg1: { width: 25, height: 25, resizeMode: 'contain' },
   socialImg2: { width: 22, height: 22, resizeMode: 'contain' },
