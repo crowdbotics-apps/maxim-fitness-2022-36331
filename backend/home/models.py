@@ -362,8 +362,9 @@ class Post(models.Model):
             if notification:
                 notification.delete()
         else:
-            send_notification(sender=user, receiver=self.user,
-                              title="Like Post", message=f"{user.username} likes your post.")
+            if not (user == self.user):
+                send_notification(sender=user, receiver=self.user,
+                                  title="Like Post", message=f"{user.username} like your post.")
 
 
     def get_like(self, user):
