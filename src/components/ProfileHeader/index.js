@@ -54,7 +54,8 @@ const styles = StyleSheet.create({
   profileImg: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    borderRadius: 50,
+    resizeMode: 'cover',
   },
 });
 

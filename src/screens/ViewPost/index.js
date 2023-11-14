@@ -27,6 +27,7 @@ const ViewPost = props => {
     requesting,
     postData,
     feeds,
+    userDetail,
   } = props;
   const [commentData, setCommentData] = useState(false);
   const [postComments, setPostComments] = useState([]);
@@ -117,7 +118,7 @@ const ViewPost = props => {
         postData &&
           postData?.comments?.length &&
           postData.comments.map(item => ({
-            image: Images.profile,
+            image: item?.user?.profile_picture,
             text: item.content,
             userName: item.user.username,
             id: item.id,
@@ -142,7 +143,7 @@ const ViewPost = props => {
     if (showCancelOption) {
       let replyCommentData = {
         comment: focusreply.comment,
-        user: focusreply.user,
+        user: userDetail.id,
         content: commentData,
       };
       // setCommentData(false);
@@ -236,9 +237,7 @@ const ViewPost = props => {
   const addLikeAction = () => {
     let feedId = param?.id;
     likeFilter(feedId);
-    const callBack = status => {
-      console.log('status: ', status);
-    };
+    const callBack = status => {};
 
     const data = { feedId, callBack };
     props.postLikeRequest(data);
@@ -271,7 +270,7 @@ const ViewPost = props => {
             source={
               postData?.user?.profile_picture === null
                 ? Images.profile
-                : postData?.user?.profile_picture
+                : { uri: postData?.user?.profile_picture }
             }
             userName={postData?.user?.username}
             time={calculatePostTime(postData)}
@@ -322,7 +321,10 @@ const ViewPost = props => {
             <View key={i} style={{ paddingHorizontal: 10 }}>
               <View style={styles.commentStyle}>
                 <View style={styles.commentSection}>
-                  <Image source={Images.profile} style={styles.profileImg} />
+                  <Image
+                    source={comment.image ? { uri: comment.image } : Images.profile}
+                    style={styles.profileImg}
+                  />
                   <View style={styles.commentBody}>
                     <View style={styles.commentBodyStyle}>
                       <View style={styles.commentUsername}>
@@ -364,7 +366,14 @@ const ViewPost = props => {
                     <View style={styles.subCom} />
                     <View style={styles.subCom1}>
                       <View style={styles.commentSection}>
-                        <Image source={Images.profile} style={styles.profileImg} />
+                        <Image
+                          source={
+                            subComment?.user_detail?.profile_picture
+                              ? { uri: subComment?.user_detail?.profile_picture }
+                              : Images.profile
+                          }
+                          style={styles.profileImg}
+                        />
                         <View style={styles.commentBody}>
                           <View style={styles.commentBodyStyle}>
                             <View style={styles.commentUsername}>
@@ -508,7 +517,8 @@ const styles = StyleSheet.create({
   profileImg: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
+    borderRadius: 50,
   },
   likeImageStyle: {
     width: 25,

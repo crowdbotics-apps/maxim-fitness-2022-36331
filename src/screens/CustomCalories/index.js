@@ -30,9 +30,11 @@ import { TabOne, TabThree } from './components';
 import { getCustomCalRequest, getMealsRequest } from '../../ScreenRedux/customCalRedux';
 import moment from 'moment';
 import { useIsFocused } from '@react-navigation/native';
+import { getNotificationCount } from '../../ScreenRedux/nutritionRedux';
 
 const CustomCalories = props => {
-  const { meals, profile, getCalories } = props;
+  const { meals, profile, getCalories, unreadCount } = props;
+
   let refWeight = useRef('');
   const [tab, setTab] = useState(2);
   const [value, setValue] = useState(false);
@@ -52,6 +54,7 @@ const CustomCalories = props => {
 
   useEffect(() => {
     isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals());
+    props.getNotificationCount();
   }, [meals, isFocused]);
 
   useEffect(() => {
@@ -147,6 +150,7 @@ const CustomCalories = props => {
         onPressSocial={() => props.navigation.navigate('ProfileScreen')}
         // onPressMsg={() => props.navigation.navigate('MessageScreen')}
         onPressNotify={() => props.navigation.navigate('NotificationScreen')}
+        unreadCount={unreadCount ? unreadCount : false}
       />
       <View style={[row, justifyContentBetween, regularHPadding, styles.currentTabStyleMap]}>
         {data.map((item, i) => {
@@ -528,10 +532,12 @@ const mapStateToProps = state => ({
   getCalories: state.customCalReducer.getCalories,
   meals: state.customCalReducer.meals,
   profile: state.login.userDetail,
+  unreadCount: state.nutritionReducer.unreadCount,
 });
 
 const mapDispatchToProps = dispatch => ({
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsRequest: () => dispatch(getMealsRequest()),
+  getNotificationCount: () => dispatch(getNotificationCount()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories);

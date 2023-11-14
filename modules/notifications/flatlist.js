@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, FlatList, Image, ActivityIndicator } from 'react-native';
 import options from './options';
 import { fetchNotifications } from './api';
+import { getNotificationCountSuccess } from '../../src/ScreenRedux/nutritionRedux';
+import moment from 'moment';
 
 const Notifications = () => {
   const { styles, dummyImageLink } = options;
@@ -15,6 +17,9 @@ const Notifications = () => {
     const res = await fetchNotifications();
     setMessages(res);
     setLoading(false);
+    if (res?.count) {
+      getNotificationCountSuccess(0);
+    }
   };
 
   useEffect(() => {
@@ -28,8 +33,9 @@ const Notifications = () => {
    */
   const renderItem = ({ item }) => {
     const date = item?.created;
+    const timeFormate = new Date(`${item?.created}`).toLocaleString();
     const arr = date.split('T');
-    const time = arr[1].split('.');
+    const time = moment(timeFormate).format('hh:mm A');
     return (
       <View style={styles.walletCard}>
         <View style={styles.walletInner}>
@@ -48,7 +54,7 @@ const Notifications = () => {
         </View>
         <View style={styles.leftSection}>
           <Text style={styles.view}>Date: {arr[0]}</Text>
-          <Text style={styles.reject}>Time: {time[0]}</Text>
+          <Text style={styles.reject}>Time: {time}</Text>
         </View>
       </View>
     );
@@ -60,9 +66,9 @@ const Notifications = () => {
         <View style={styles.loaderStyle}>
           <ActivityIndicator color={'gray'} size="large" />
         </View>
-      ) : messages?.length > 0 ? (
+      ) : messages && messages?.results?.length > 0 ? (
         <FlatList
-          data={messages}
+          data={messages && messages?.results}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           onRefresh={getNotifications}
