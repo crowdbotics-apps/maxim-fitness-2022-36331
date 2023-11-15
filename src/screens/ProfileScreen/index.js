@@ -164,8 +164,12 @@ const ProfileScreen = props => {
           <View>
             <ImageBackground
               source={
-                userDetail?.background_picture
-                  ? { uri: userDetail?.background_picture }
+                userDetail?.id === routeDetail?.user?.id
+                  ? userDetail?.background_picture
+                    ? { uri: userDetail?.background_picture }
+                    : profileBackGround
+                  : routeDetail?.user?.background_picture
+                  ? { uri: routeDetail?.user?.background_picture }
                   : profileBackGround
               }
               style={{ height: (273 / 375) * width, width: '100%' }}
@@ -191,8 +195,10 @@ const ProfileScreen = props => {
             <View style={styles.profileImage}>
               <Image
                 source={
-                  userDetail?.profile_picture
+                  userDetail?.id === routeDetail?.user?.id || !routeDetail?.user?.id
                     ? { uri: userDetail?.profile_picture }
+                    : routeDetail?.user?.profile_picture
+                    ? { uri: routeDetail?.user?.profile_picture }
                     : profileBackGround
                 }
                 style={{
