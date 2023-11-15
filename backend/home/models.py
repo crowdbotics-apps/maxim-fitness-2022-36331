@@ -358,7 +358,7 @@ class Post(models.Model):
         like, created = Like.objects.get_or_create(post=self, user=user)
         if not created:
             like.delete()
-            notification = Notification.objects.filter(receiver=self.user, title="Like Post").first()
+            notification = Notification.objects.filter(sender=user, receiver=self.user, title="Like Post").first()
             if notification:
                 notification.delete()
         else:
