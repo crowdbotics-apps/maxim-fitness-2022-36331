@@ -1059,7 +1059,7 @@ class FollowViewSet(ViewSet):
     def remove_follow(self, request, pk=None):
         other_user = User.objects.get(id=request.data['id'])
         Follow.objects.remove_follower(request.user, other_user)
-        notification = Notification.objects.filter(receiver=other_user, title="Follow").first()
+        notification = Notification.objects.filter(sender=request.user, receiver=other_user, title="Follow").first()
         if notification:
             notification.delete()
 
