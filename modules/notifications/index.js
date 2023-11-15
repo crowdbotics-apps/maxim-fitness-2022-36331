@@ -1,7 +1,5 @@
 import React, { useEffect, useContext } from 'react';
 import { SafeAreaView } from 'react-native';
-import RemotePushController from './utils';
-import options from './options';
 import Notifications from './flatlist';
 
 const PushNotifications = () => {

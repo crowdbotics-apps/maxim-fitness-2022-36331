@@ -37,6 +37,7 @@ const RemotePushController = async (authToken, userID) => {
       authToken
     );
   }
+  messaging().onNotificationOpenedApp(remoteMessage => {});
 };
 
 export default RemotePushController;

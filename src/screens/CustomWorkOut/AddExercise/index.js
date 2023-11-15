@@ -18,57 +18,67 @@ import { Global, Gutters, Layout, Colors, Images, Fonts } from '../../../theme';
 import { connect } from 'react-redux';
 
 import { TextInput } from 'react-native-gesture-handler';
-import { getExerciseRequest, getExerciseTypeRequest } from '../../../ScreenRedux/addExerciseRedux'
-import Loader from '../../../components/Loader'
+import { getExerciseRequest, getExerciseTypeRequest } from '../../../ScreenRedux/addExerciseRedux';
+import Loader from '../../../components/Loader';
 import { useIsFocused } from '@react-navigation/native';
 
 const data = [
   { id: 1, value: 1, item: 'Super Set' },
-  { id: 2, value: 1, item: 'Glant Set' },
+  { id: 2, value: 1, item: 'Giant Set' },
   { id: 3, value: 2, item: 'Drop Set' },
   { id: 4, value: 3, item: 'Triple Set' },
 ];
 const AddExercies = props => {
   const { navigation, getExerciseState, requesting, getExerciseType } = props;
   let refDescription = useRef('');
-  let isFocused = useIsFocused()
+  let isFocused = useIsFocused();
   const [activeSet, setActiveSet] = useState(false);
   const [selectedItem, setSelectedItem] = useState([]);
+  const [desription, setDesription] = useState(false);
 
   useEffect(() => {
-    isFocused && props.getExerciseRequest()
+    isFocused && props.getExerciseRequest();
   }, [isFocused]);
 
   useEffect(() => {
-    getExerciseState && props.getExerciseTypeRequest(getExerciseState && getExerciseState[0]?.id)
-    setActiveSet(data[0])
-  }, [getExerciseState])
+    getExerciseState && props.getExerciseTypeRequest(getExerciseState && getExerciseState[0]?.id);
+    !activeSet && setActiveSet(data[0]);
+  }, [getExerciseState]);
 
-  const onSelectItem = (i) => {
+  const onSelectItem = i => {
     let array = [...selectedItem];
     if (array.includes(i)) {
-      array = array.filter((index) => index !== i);
+      array = array.filter(index => index !== i);
       setSelectedItem(array);
     } else {
-      if (selectedItem.length < activeSet.value) {
-        array.push(i);
-        setSelectedItem(array);
+      if (activeSet?.id === 1) {
+        if (selectedItem.length < 2) {
+          array.push(i);
+          setSelectedItem(array);
+        }
+      } else if (activeSet?.value === 3) {
+        if (selectedItem.length < 3) {
+          array.push(i);
+          setSelectedItem(array);
+        }
+      } else {
+        setSelectedItem([i]);
       }
     }
   };
 
   const makeDataParams = () => {
     const updatedFeeds = [...getExerciseType];
-    const exercises = []
+    const exercises = [];
     updatedFeeds.findIndex((item, ind) => {
       selectedItem.map((dd, i) => {
         if (ind === dd) {
-          exercises.push(item)
+          exercises.push(item);
         }
-      })
+      });
     });
-    navigation.navigate('CustomExercise', { exercises })
-  }
+    navigation.navigate('CustomExercise', { exercises });
+  };
 
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
   const { foodImage, iconI, circleClose } = Images;
@@ -94,42 +104,49 @@ const AddExercies = props => {
     <SafeAreaView style={[fill, { backgroundColor: 'white' }]}>
       <ScrollView>
         <View style={{ marginHorizontal: 20 }}>
-          <View style={[row, alignItemsCenter, Gutters.regularTMargin,]}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={[fill, row, alignItemsCenter]}>
-              <Image source={Images.back2} style={{ width: 30, height: 25, resizeMode: 'contain' }} />
+          <View style={[row, alignItemsCenter, Gutters.regularTMargin]}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={[fill, row, alignItemsCenter]}
+            >
+              <Image
+                source={Images.back2}
+                style={{ width: 30, height: 25, resizeMode: 'contain' }}
+              />
             </TouchableOpacity>
             <View
-              style={[
-                fill,
-                Layout.row,
-                Global.borderB,
-                Global.borderAlto,
-                Layout.alignItemsCenter
-              ]}
+              style={[fill, Layout.row, Global.borderB, Global.borderAlto, Layout.alignItemsCenter]}
             >
               <InputField
-                inputStyle={[
-                  Global.height40,
-                  Fonts.textMedium,
-                  { padding: 0 }
-                ]}
+                inputStyle={[Global.height40, Fonts.textMedium, { padding: 0 }]}
                 placeholder="search"
                 autoCapitalize="none"
               />
             </View>
             <View style={fill} />
           </View>
-          <ScrollView horizontal={true} contentContainerStyle={{ marginTop: 20, paddingBottom: 10 }}>
-            {data.map((set, i) => {
+          <ScrollView
+            horizontal={true}
+            contentContainerStyle={{ marginTop: 20, paddingBottom: 10 }}
+          >
+            {data?.map((set, i) => {
               return (
                 <TouchableOpacity
                   key={i}
                   onPress={() => {
-                    setSelectedItem([])
-                    setActiveSet(set)
+                    setSelectedItem([]);
+                    setActiveSet(set);
                   }}
-                  style={[styles.pillStyle, center, { backgroundColor: activeSet.id === set.id ? "#74ccff" : '#fff' }]}>
-                  <Text text={set.item} style={[styles.pillText, { color: activeSet.id !== set.id ? "#000" : '#fff' }]} />
+                  style={[
+                    styles.pillStyle,
+                    center,
+                    { backgroundColor: activeSet.id === set.id ? '#74ccff' : '#fff' },
+                  ]}
+                >
+                  <Text
+                    text={set.item}
+                    style={[styles.pillText, { color: activeSet.id !== set.id ? '#000' : '#fff' }]}
+                  />
                 </TouchableOpacity>
               );
             })}
@@ -137,25 +154,29 @@ const AddExercies = props => {
           <View style={[{ marginTop: 20 }]}>
             <Text text="Muscle Group" style={styles.heading} />
             <ScrollView horizontal={true} contentContainerStyle={{ paddingBottom: 10 }}>
-              {requesting ?
-                (<Loader />)
-                :
-
-                getExerciseState && getExerciseState.map((item, i) => {
+              {requesting && getExerciseState === false ? (
+                <Loader />
+              ) : (
+                getExerciseState &&
+                getExerciseState?.map((item, i) => {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        setSelectedItem([])
-                        props.getExerciseTypeRequest(item.id)
+                        setSelectedItem([]);
+                        props.getExerciseTypeRequest(item.id);
                       }}
                       key={i}
                       style={[center, { marginRight: 5 }]}
                     >
-                      <Image source={item.image === null ? Images.workout1 : { uri: item.image }} style={{ width: 80, height: 80 }} />
+                      <Image
+                        source={item.image === null ? Images.workout1 : { uri: item.image }}
+                        style={{ width: 80, height: 80 }}
+                      />
                       <Text text={item.name} style={styles.exerciseText} />
                     </TouchableOpacity>
                   );
-                })}
+                })
+              )}
             </ScrollView>
           </View>
           <View style={{ marginTop: 25 }}>
@@ -163,11 +184,11 @@ const AddExercies = props => {
           </View>
         </View>
         <View style={{ marginBottom: 20 }}>
-          {!requesting &&
-            props.request ?
+          {getExerciseType === false && !requesting && props.request ? (
             <ActivityIndicator size={'large'} color="green" />
-            :
-            getExerciseType && getExerciseType.map((item, i) => (
+          ) : (
+            getExerciseType &&
+            getExerciseType.map((item, i) => (
               <TouchableOpacity
                 style={[
                   styles.cardView,
@@ -177,17 +198,33 @@ const AddExercies = props => {
               >
                 <View style={[row, justifyContentBetween, { position: 'relative' }]}>
                   <View style={[center, styles.cardImg]}>
-                    <Image source={item?.pictures[0]?.image ? { uri: item?.pictures[0]?.image } : foodImage} style={{ width: 80, height: 40 }} />
+                    <Image
+                      source={
+                        item?.pictures[0]?.image
+                          ? { uri: item?.pictures[0]?.image }
+                          : item?.video
+                          ? { uri: item?.video }
+                          : foodImage
+                      }
+                      style={{ width: 80, height: 40 }}
+                    />
                   </View>
                   <View style={[center, { marginRight: 50 }]}>
                     <Text text={item.name} style={styles.heading1} />
                   </View>
-                  <View style={[center, {}]}>
+                  <TouchableOpacity
+                    style={[center, {}]}
+                    onPress={() => {
+                      refDescription.current.open();
+                      setDesription(item);
+                    }}
+                  >
                     <Image source={iconI} style={{ width: 20, height: 20, marginRight: 5 }} />
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </TouchableOpacity>
-            ))}
+            ))
+          )}
         </View>
       </ScrollView>
       <View style={{ alignSelf: 'center' }}>
@@ -195,6 +232,13 @@ const AddExercies = props => {
           text={'Add Exercies'}
           textStyle={[{ color: 'white' }]}
           style={styles.btn}
+          disabled={
+            activeSet?.id === 1
+              ? selectedItem?.length < 2
+              : activeSet?.value === 3
+              ? selectedItem?.length < 3
+              : selectedItem?.length < 1
+          }
           onPress={makeDataParams}
         />
       </View>
@@ -220,89 +264,33 @@ const AddExercies = props => {
           behavior="padding"
           style={[{ width: '100%', backgroundColor: Colors.athensgray }]}
         >
-          <View style={{ alignSelf: 'flex-end', marginRight: 10 }}>
+          <TouchableOpacity
+            style={{ alignSelf: 'flex-end', marginRight: 10 }}
+            onPress={() => {
+              refDescription.current.close();
+              setDesription(false);
+            }}
+          >
             <Image source={circleClose} style={{ width: 23, height: 23 }} />
-          </View>
+          </TouchableOpacity>
           <View style={{ alignSelf: 'center' }}>
             <Text
-              text="Barbell bench press"
+              text={desription?.name}
               style={[
                 { fontSize: 20, lineHeight: 25, color: 'black', fontWeight: 'bold', marginTop: 10 },
               ]}
             />
           </View>
-          <View
-            style={[
-              {
-                backgroundColor: 'white',
-                marginTop: 20,
-                height: 200,
-                marginHorizontal: 10,
-                borderRadius: 10,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 5,
-                },
-                shadowOpacity: 0.34,
-                shadowRadius: 6.27,
-
-                elevation: 5,
-                marginHorizontal: 8,
-              },
-              center,
-            ]}
-          >
-            <Image source={foodImage} style={{ width: 200, height: 140 }} />
+          <View style={[styles.dualView, center]}>
+            <Image source={{ uri: desription?.video }} style={{ width: 200, height: 140 }} />
           </View>
           <ScrollView style={{ marginTop: 40 }}>
             {dammyData.map((item, i) => {
               return (
-                <View
-                  style={{
-                    backgroundColor: 'white',
-                    height: 70,
-
-                    marginHorizontal: 8,
-                    borderRadius: 15,
-                    paddingLeft: 30,
-                    flexDirection: 'row',
-                    marginBottom: 20,
-                    shadowColor: '#000',
-                    shadowOffset: {
-                      width: 0,
-                      height: 5,
-                    },
-                    shadowOpacity: 0.34,
-                    shadowRadius: 6.27,
-
-                    elevation: 5,
-                    marginHorizontal: 8,
-                  }}
-                >
+                <View style={styles.dualList}>
                   <View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.athensgray,
-                        width: 30,
-                        height: 30,
-                        borderRadius: 5,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: 8,
-                      }}
-                    >
-                      <Text
-                        text={i + 1}
-                        style={[
-                          {
-                            fontSize: 20,
-                            lineHeight: 25,
-                            color: 'black',
-                            fontWeight: 'bold',
-                          },
-                        ]}
-                      />
+                    <View style={styles.dualCard}>
+                      <Text text={i + 1} style={styles.textStyle} />
                     </View>
                   </View>
                   <View style={{ justifyContent: 'center', marginLeft: 30, marginHorizontal: 40 }}>
@@ -320,23 +308,7 @@ const AddExercies = props => {
           <Button
             text={'Add Exercies'}
             textStyle={[{ color: 'white' }]}
-            style={{
-              backgroundColor: Colors.brightturquoisesecond,
-              borderRadius: 10,
-              paddingHorizontal: 20,
-              height: 45,
-              marginBottom: 10,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 5,
-              },
-              shadowOpacity: 0.34,
-              shadowRadius: 6.27,
-
-              elevation: 5,
-              marginHorizontal: 8,
-            }}
+            style={styles.addBtnStyle}
           />
         </View>
       </BottomSheet>
@@ -348,7 +320,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     lineHeight: 16,
-    opacity: 0.7
+    opacity: 0.7,
   },
   btn: {
     backgroundColor: Colors.brightturquoise,
@@ -417,16 +389,85 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   cardImg: { backgroundColor: 'white', width: 90, height: 60, borderRadius: 10 },
+  dualView: {
+    backgroundColor: 'white',
+    marginTop: 20,
+    height: 200,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 5,
+    marginHorizontal: 8,
+  },
+  dualList: {
+    backgroundColor: 'white',
+    height: 70,
+
+    marginHorizontal: 8,
+    borderRadius: 15,
+    paddingLeft: 30,
+    flexDirection: 'row',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 5,
+    marginHorizontal: 8,
+  },
+  dualCard: {
+    backgroundColor: Colors.athensgray,
+    width: 30,
+    height: 30,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  addBtnStyle: {
+    backgroundColor: Colors.brightturquoisesecond,
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    height: 45,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 5,
+    marginHorizontal: 8,
+  },
+  textStyle: {
+    fontSize: 20,
+    lineHeight: 25,
+    color: 'black',
+    fontWeight: 'bold',
+  },
 });
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   requesting: state.addExerciseReducer.requesting,
   request: state.addExerciseReducer.request,
   getExerciseState: state.addExerciseReducer.getExerciseState,
   getExerciseType: state.addExerciseReducer.getExerciseType,
-})
+});
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   getExerciseRequest: () => dispatch(getExerciseRequest()),
   getExerciseTypeRequest: data => dispatch(getExerciseTypeRequest(data)),
-})
+});
 export default connect(mapStateToProps, mapDispatchToProps)(AddExercies);

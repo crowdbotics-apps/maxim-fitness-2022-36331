@@ -4,9 +4,10 @@ import options from './options';
 import { fetchNotifications } from './api';
 import { getNotificationCountSuccess } from '../../src/ScreenRedux/nutritionRedux';
 import moment from 'moment';
+import { Images } from '../../src/theme';
 
 const Notifications = () => {
-  const { styles, dummyImageLink } = options;
+  const { styles } = options;
   // Contains the messages recieved from backend
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,9 +42,13 @@ const Notifications = () => {
         <View style={styles.walletInner}>
           <View style={styles.imgContainer}>
             <Image
-              source={{
-                uri: item?.image || dummyImageLink,
-              }}
+              source={
+                item?.image
+                  ? {
+                      uri: item?.image,
+                    }
+                  : Images.profile
+              }
               style={styles.image}
             />
           </View>
