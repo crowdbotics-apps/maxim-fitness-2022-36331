@@ -689,13 +689,13 @@ class SessionViewSet(ModelViewSet):
             if d_no <= 7:
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 14:
-                first_day = first_day + timedelta(days=8)
+                first_day = first_day + timedelta(days=7)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 21:
-                first_day = first_day + timedelta(days=16)
+                first_day = first_day + timedelta(days=14)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 28:
-                first_day = first_day + timedelta(days=24)
+                first_day = first_day + timedelta(days=21)
                 last_day = first_day + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[first_day, last_day])
         # if start_date:
