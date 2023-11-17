@@ -231,12 +231,10 @@ function* getAllSessions({ data }) {
   try {
     if (data) {
       const response = yield call(getWeekSessionAPI, data);
-      console.log('Week session res: ', response?.data);
       const query = sortSessionBySets(response?.data?.query);
       yield put(getWeekSessionSuccess({ ...response?.data, query }));
     } else {
       const response = yield call(getAllSessionAPI);
-      console.log('Allsession res: ', response?.data);
       const query = sortSessionBySets(response?.data?.query);
       yield put(getAllSessionSuccess({ ...response?.data, query }));
     }
@@ -260,7 +258,6 @@ async function getTodaySessionAPI(data) {
 }
 
 function* getTodaySessions({ data }) {
-  console.log('Day session: ', data);
   try {
     const response = yield call(getTodaySessionAPI, data);
     console.log('Res today session: ', response?.data);

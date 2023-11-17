@@ -40,7 +40,7 @@ const FatLoseProgram = props => {
   useEffect(() => {
     getWeekSessions?.query?.map((p, i) => {
       if (p.date_time === moment(new Date()).format('YYYY-MM-DD')) {
-        setIndex(i);
+        setIndex(p?.date_time);
       }
     });
   }, [getWeekSessions]);
@@ -66,11 +66,12 @@ const FatLoseProgram = props => {
 
   const nextExercise = () => {
     if (getWeekSessions?.week > activeIndex) {
-      setActiveIndex(prevState => prevState + 1);
+      setActiveIndex(Number(activeIndex) + 1);
       if (getWeekSessions?.query?.length) {
         const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() + 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
+        setIndex(hh);
         props.getAllSessionRequest(hh);
         props.getDaySessionRequest(hh);
       }
@@ -79,11 +80,12 @@ const FatLoseProgram = props => {
 
   const previousExercise = () => {
     if (activeIndex > 1) {
-      setActiveIndex(prevState => prevState - 1);
+      setActiveIndex(Number(activeIndex) - 1);
       if (getWeekSessions?.query?.length) {
         const today = new Date(getWeekSessions.query[0].date_time);
         const lastDay = new Date(today.setDate(today.getDate() - 7));
         const hh = moment(lastDay).format('YYYY-MM-DD');
+        setIndex(hh);
         props.getAllSessionRequest(hh);
         props.getDaySessionRequest(hh);
       }
@@ -91,8 +93,8 @@ const FatLoseProgram = props => {
   };
 
   const selectDay = (item, i) => {
-    setIndex(i);
     const newDate = moment(item.date_time).format('YYYY-MM-DD');
+    setIndex(newDate);
     props.getDaySessionRequest(newDate);
   };
 
@@ -140,26 +142,22 @@ const FatLoseProgram = props => {
     setIsModal(true);
     props.getAllSessionRequest();
   };
-  console.log(' getWeekSessions?.query', getWeekSessions?.query?.length);
   const onDayPress = date => {
     // setLoading(true)
-    getWeekSessions?.query?.map((d, i) => {
-      if (d.date_time === date?.dateString) {
-        setIndex(i);
-        const newDate = moment(d.date_time).format('YYYY-MM-DD');
-        props.getDaySessionRequest(newDate);
-        setIsModal(false);
-      } else {
-        if (getWeekSessions?.query?.length - 1) {
-          previousExercise();
-        } else {
-          nextExercise();
-          setIndex(i);
-          setIsModal(false);
-        }
-      }
-    });
-    // setLoading(false)
+    const listData = getWeekSessions?.query?.find(obj => obj.date_time === date?.dateString);
+    if (listData) {
+      setIndex(date?.dateString);
+      const newDate = moment(date?.dateString).format('YYYY-MM-DD');
+      props.getDaySessionRequest(newDate);
+      setIsModal(false);
+    }
+  };
+
+  const getLastDate = () => {
+    const keys = Object.keys(data);
+    // Get the last key
+    const lastKey = keys[keys.length - 1];
+    return lastKey;
   };
 
   return (
@@ -210,6 +208,8 @@ const FatLoseProgram = props => {
               {getWeekSessions?.query?.map((d, i) => {
                 const day = new Date(d.date_time).getDate();
                 const weekDayName = moment(d.date_time).format('dd');
+                const selectDate = moment(d.date_time).format('YYYY-MM-DD');
+
                 return (
                   <TouchableOpacity
                     key={i}
@@ -233,7 +233,7 @@ const FatLoseProgram = props => {
                         width: 28,
                         height: 28,
                         marginVertical: 5,
-                        backgroundColor: index === i ? '#00a2ff' : 'white',
+                        backgroundColor: index === selectDate ? '#00a2ff' : 'white',
                         borderRadius: 100,
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -245,7 +245,7 @@ const FatLoseProgram = props => {
                           fontSize: 15,
                           lineHeight: 18,
                           fontWeight: 'bold',
-                          color: index !== i ? '#000' : 'white',
+                          color: index !== selectDate ? '#000' : 'white',
                         }}
                       />
                     </View>
@@ -440,15 +440,13 @@ const FatLoseProgram = props => {
             <View style={[fill, center, Gutters.regularVMargin]}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('AddExercise')}
-                disabled={todaySessions?.name && todaySessions?.name !== 'Rest'}
+                disabled={todaySessions?.name !== 'Rest'}
               >
                 <LinearGradient
                   start={start}
                   end={end}
                   colors={
-                    todaySessions?.name && todaySessions?.name !== 'Rest'
-                      ? ['#dddddd', '#dddddd']
-                      : ['#00a2ff', '#00a2ff']
+                    todaySessions?.name !== 'Rest' ? ['#dddddd', '#dddddd'] : ['#00a2ff', '#00a2ff']
                   }
                   style={[
                     fill,
