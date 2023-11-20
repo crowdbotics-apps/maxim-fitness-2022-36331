@@ -32,6 +32,9 @@ const ROUTE_DATA = 'PROFILE_SCREEN/ROUTE_DATA';
 const PROFILE_DATA_REQUEST = 'PROFILE_SCREEN/PROFILE_DATA_REQUEST';
 const PROFILE_DATA_SUCCESS = 'PROFILE_SCREEN/PROFILE_DATA_SUCCESS';
 
+const UPDATE_PROFILE_MEAL_REQUEST = 'PROFILE_SCREEN/UPDATE_PROFILE_MEAL_REQUEST';
+const UPDATE_PROFILE_MEAL_SUCCESS = 'PROFILE_SCREEN/UPDATE_PROFILE_MEAL_SUCCESS';
+
 const initialState = {
   requesting: false,
   profileData: false,
@@ -39,6 +42,7 @@ const initialState = {
   editRequesting: false,
   request: false,
   profile: false,
+  mealRequest: false,
 };
 
 //Actions
@@ -101,6 +105,16 @@ export const profileDataSuccess = data => ({
   data,
 });
 
+export const editProfileMeal = (data, id) => ({
+  type: UPDATE_PROFILE_MEAL_REQUEST,
+  data,
+  id,
+});
+
+export const editProfileMealSuccess = () => ({
+  type: UPDATE_PROFILE_MEAL_SUCCESS,
+});
+
 //Reducers
 export const profileReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -132,6 +146,17 @@ export const profileReducer = (state = initialState, action) => {
       return {
         ...state,
         editRequesting: true,
+      };
+
+    case UPDATE_PROFILE_MEAL_REQUEST:
+      return {
+        ...state,
+        mealRequest: true,
+      };
+    case UPDATE_PROFILE_MEAL_SUCCESS:
+      return {
+        ...state,
+        mealRequest: false,
       };
 
     case PROFILE_DATA_REQUEST:
@@ -173,7 +198,6 @@ function* getProfileData({ data }) {
     yield put(getProfileSuccess(response.data));
   } catch (e) {
     const { response } = e;
-    console.log('get profile failure response0000', response);
   } finally {
     yield put(resetProfile());
   }
@@ -200,7 +224,6 @@ function* followuserData({ data }) {
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
     const { response } = e;
-    console.log('follow user  failure response0000', response);
   }
 }
 
@@ -222,11 +245,9 @@ async function unfollowUserAPI(data) {
 function* unfollowuserData({ data }) {
   try {
     const response = yield call(unfollowUserAPI, data);
-    console.log('unfollow user success response----', response);
     // yield put(getProfileSuccess(response.data))
   } catch (e) {
     const { response } = e;
-    console.log('unfollow user  failure response0000', response);
   }
 }
 
@@ -284,7 +305,6 @@ function* blockUserData({ data }) {
     });
   } catch (e) {
     const { response } = e;
-    console.log('block user  failure response0000', response);
   }
 }
 
@@ -312,7 +332,6 @@ function* reportUserData({ data }) {
     });
   } catch (e) {
     const { response } = e;
-    console.log('Report user  failure response0000', response);
   }
 }
 
@@ -333,12 +352,40 @@ async function profileDataAPI() {
 function* profileRequest() {
   try {
     const response = yield call(profileDataAPI);
-    console.log('Profile response: ', response);
     yield put(setUserDetail(response?.data[0]));
     // yield put(profileDataSuccess(response?.data[0]))
   } catch (e) {
     const { response } = e;
-    console.log('Profile error: ', response);
+  }
+}
+
+async function updateProfileMealAPI(data, id) {
+  const URL = `${API_URL}/profile/${id}/`;
+  const token = await AsyncStorage.getItem('authToken');
+  const options = {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Token  ${token}`,
+    },
+    data,
+  };
+
+  return XHR(URL, options);
+}
+
+function* updateProfileMeal({ data, id }) {
+  try {
+    const response = yield call(updateProfileMealAPI, data, id);
+    showMessage({ message: 'Meal updated successfully', type: 'success' });
+    goBack();
+    yield put(editProfileMealSuccess());
+    yield put(profileData());
+  } catch (e) {
+    const { response } = e;
+    showMessage({ message: 'Something went wrong', type: 'danger' });
+  } finally {
+    yield put(editProfileMealSuccess());
   }
 }
 
@@ -350,4 +397,5 @@ export default all([
   takeLatest(BLOCK_USER, blockUserData),
   takeLatest(REPORT_USER, reportUserData),
   takeLatest(PROFILE_DATA_REQUEST, profileRequest),
+  takeLatest(UPDATE_PROFILE_MEAL_REQUEST, updateProfileMeal),
 ]);

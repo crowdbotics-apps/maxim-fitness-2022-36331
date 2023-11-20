@@ -97,7 +97,7 @@ const MealPreference = props => {
 };
 
 const styles = StyleSheet.create({
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel },
 });
 const mapStateToProps = state => ({
   answers: state.questionReducer.answers,

@@ -127,7 +127,6 @@ const FatLoseProgram = props => {
         const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
           workoutItem => !workoutItem.done
         );
-
         props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout);
         refDescription.current.close();
         navigation.navigate('ExerciseScreen', {

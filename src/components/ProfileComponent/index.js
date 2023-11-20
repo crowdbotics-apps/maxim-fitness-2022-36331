@@ -12,6 +12,7 @@ const ProfileComponent = ({
   onPressMsg,
   onPressSocial,
   unreadCount,
+  profile,
 }) => {
   const {
     row,
@@ -25,11 +26,12 @@ const ProfileComponent = ({
     justifyContentBetween,
   } = Layout;
   const { regularLMargin, smallVPadding, regularHMargin } = Gutters;
-
   return (
     <View style={[row, smallVPadding, regularHMargin, alignItemsCenter, justifyContentBetween]}>
       <ProfileHeaderFeed
-        imageUrl={Images.profile}
+        imageUrl={
+          profile && profile?.profile_picture ? { uri: profile?.profile_picture } : Images.profile
+        }
         style={[fill, justifyContentStart, alignItemsStart]}
       />
       <View style={[row, justifyContentCenter, styles.currentTabStyle]}>

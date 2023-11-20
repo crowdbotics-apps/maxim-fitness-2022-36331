@@ -32,6 +32,7 @@ import SettingScreen from '../screens/SettingScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MealRegulator from '../screens/MealRegulator';
 import SelectBrand from '../screens/SelectBrand';
+import SurveyScreenMeal from '../screens/SurveyScreenMeal';
 
 import LogFoods from '../screens/LogFoods';
 import { modules } from '@modules';
@@ -220,7 +221,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="SettingScreen" component={SettingScreen} />
     <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
     <mainStack.Screen name="EditCaloriesManually" component={EditCaloriesManually} />
-    {/* <mainStack.Screen name='HomeScreen' component={HomeScreen} /> */}
+    <mainStack.Screen name="SurveyScreenMeal" component={SurveyScreenMeal} />
     <mainStack.Screen name="MealRegulator" component={MealRegulator} />
     <mainStack.Screen name="SelectBrand" component={SelectBrand} />
     <mainStack.Screen name="LogFoods" component={LogFoods} />

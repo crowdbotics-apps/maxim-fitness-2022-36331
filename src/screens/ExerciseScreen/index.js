@@ -120,7 +120,6 @@ const ExerciseScreen = props => {
         break;
     }
   };
-
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);

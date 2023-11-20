@@ -67,7 +67,7 @@ const RuningWorkout = ({ item, index, todayDayStr }) => {
         </View>
         <View style={[row, justifyContentBetween, tinyVMargin, alignItemsCenter]}>
           <View style={{ flex: 1.5 }}>
-            <Text text={'item.name'} color="nonary" style={{ fontSize: 14 }} bold />
+            <Text text={item.name} color="nonary" style={{ fontSize: 14 }} bold />
           </View>
           <View style={[fill, { justifyContent: 'flex-end', flexDirection: 'row' }]}>
             <Text text={todayDayStr} color="septenary" style={{ fontSize: 14 }} />

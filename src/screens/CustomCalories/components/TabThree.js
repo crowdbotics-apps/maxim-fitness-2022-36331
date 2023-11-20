@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { Text } from '../../../components';
 import { Layout, Gutters, Colors } from '../../../theme';
 
-const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalories }) => {
+const TabThree = ({
+  setShowModalHistory,
+  navigation,
+  profileData,
+  consumeCalories,
+  onMealUpdate,
+}) => {
   useEffect(() => {
     calculateCalories(consumeCalories);
     calculateProtein(consumeCalories);
@@ -60,11 +66,17 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
     return data;
   };
 
+  const protein = ((consumeCalories[0]?.goals_values?.protein / 20.45 / 100) * 100).toFixed(0);
+  const carbs = ((consumeCalories[0]?.goals_values?.carbs / 20.45 / 100) * 100).toFixed(0);
+  const fats = ((consumeCalories[0]?.goals_values?.fat / 20.45 / 100) * 100).toFixed(0);
+
   return (
     <>
       <View style={[row, justifyContentBetween, alignItemsCenter, small2xHMargin, smallVPadding]}>
         <Text style={styles.commingSoonWork} text="Nutrition" bold />
-        <Text style={styles.commingSoonMore} text="Meal History" onPress={setShowModalHistory} />
+        <TouchableOpacity onPress={() => setShowModalHistory(true)}>
+          <Text style={styles.commingSoonMore} text="Meal History" />
+        </TouchableOpacity>
       </View>
       <View style={[center, regularHMargin, regularVMargin]}>
         <View style={positionR}>
@@ -175,7 +187,18 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
       <View style={[fill, regularHPadding, styles.cardStyle]}>
         <View>
           <Text text="Diet Type" style={[{ fontSize: 20, opacity: 0.7 }]} bold />
-          <Text text="Standard 40:40:20" color="nonary" style={smallVPadding} />
+          <View style={styles.changeBtn}>
+            <Text
+              text={`Standard ${protein + '/' + carbs + '/' + fats}`}
+              color="nonary"
+              style={smallVPadding}
+            />
+            <Text
+              text="Change"
+              color="nonary"
+              onPress={() => navigation.navigate('EditCustomCal')}
+            />
+          </View>
         </View>
         <View style={[fill, row, justifyContentBetween, alignItemsCenter, regularVMargin]}>
           <Text
@@ -183,7 +206,9 @@ const TabThree = ({ setShowModalHistory, navigation, profileData, consumeCalorie
             style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: 'black' }}
             bold
           />
-          <Text text="Edit" color="nonary" onPress={() => navigation.navigate('EditCustomCal')} />
+          {profileData.number_of_meal > 6 && (
+            <Text text="Edit" color="nonary" onPress={onMealUpdate} />
+          )}
         </View>
         <Text text={`${profileData.number_of_meal} meals`} color="nonary" />
       </View>
@@ -222,6 +247,12 @@ const styles = StyleSheet.create({
     shadowRadius: 0.27,
 
     elevation: 15,
+  },
+
+  changeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });
 

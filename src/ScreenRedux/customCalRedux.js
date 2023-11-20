@@ -195,10 +195,8 @@ async function getMealsAPI() {
 function* getMeals() {
   try {
     const response = yield call(getMealsAPI);
-    console.log('MEALS RESPONSE: ', response);
     yield put(getMealsSuccess(response.data));
   } catch (e) {
-    console.log('MEALS ERROR: ', e);
     yield put(getMealsSuccess(false));
   }
 }
@@ -221,9 +219,7 @@ async function postRequiredCalAPI(id, data) {
 function* postRequiredCal({ id, data }) {
   try {
     const response = yield call(postRequiredCalAPI, id, data);
-    console.log('REQIRED RESPONSE: ', response);
     yield put(postRequiredCalSuccess(response.data));
-    navigate('CustomCalories');
   } catch (e) {
     console.log('REQIRED ERROR: ', e);
     yield put(postRequiredCalFailure(false));

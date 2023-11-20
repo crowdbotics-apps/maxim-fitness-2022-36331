@@ -24,6 +24,7 @@ import DashboardCard from './DashboardCard';
 import RuningCard from './RuningCard';
 import HeaderForDrawer from './HeaderForDrawer';
 import MealEmptyItem from './MealEmptyItem';
+import MealHistory from './MealHistory';
 
 export {
   Text,
@@ -52,4 +53,5 @@ export {
   RuningCard,
   HeaderForDrawer,
   MealEmptyItem,
+  MealHistory,
 };
