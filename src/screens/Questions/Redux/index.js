@@ -7,7 +7,7 @@ import { API_URL } from '../../../config/app';
 import XHR from '../../../utils/XHR';
 
 // Action
-import { profileData } from '../../../ScreenRedux/profileRedux'
+import { profileData } from '../../../ScreenRedux/profileRedux';
 
 const UPDATE_ANSWERS = 'Questions/redux/UPDATE_ANSWERS';
 const RENDER_DATA = 'Questions/redux/RENDER_DATA';
@@ -17,7 +17,7 @@ const QUESTION_DATA_SUCCESS = 'QuestionScreen/QUESTION_DATA_SUCCESS';
 const QUESTION_DATA_FAILURE = 'QuestionScreen/QUESTION_DATA_FAILURE';
 
 export const renderTabs = () => ({
-  type: RENDER_DATA
+  type: RENDER_DATA,
 });
 
 export const updateAnswer = data => ({
@@ -28,7 +28,7 @@ export const updateAnswer = data => ({
 export const submitQuestionRequest = (profile, data) => ({
   type: QUESTION_DATA_REQUEST,
   profile,
-  data
+  data,
 });
 
 export const submitQuestionSuccess = data => ({
@@ -90,7 +90,7 @@ export const questionReducer = (state = initialState, action) => {
 };
 
 async function profileDataAPI(profile, data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/profile/${profile.id}/`;
   const options = {
     headers: {
@@ -104,7 +104,7 @@ async function profileDataAPI(profile, data) {
 }
 
 async function submitQuestionAPI(data) {
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/form/set_program/`;
   const options = {
     headers: {
@@ -120,16 +120,14 @@ async function submitQuestionAPI(data) {
 function* submitQuestion({ profile, data }) {
   try {
     const res = yield call(profileDataAPI, profile, data);
-    console.log('Questions data res: ', res);
     if (res) {
       const response = yield call(submitQuestionAPI, data);
       if (response.status === 200) {
-        yield put(profileData())
+        yield put(profileData());
       }
     }
     yield put(submitQuestionSuccess(true));
   } catch (error) {
-    console.log('Questions data error: ', error);
     yield put(submitQuestionSuccess(false));
   }
 }

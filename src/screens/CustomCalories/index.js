@@ -12,7 +12,9 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from 'react-native-modal';
 import {
   Text,
@@ -22,18 +24,25 @@ import {
   ProfileComponent,
   BottomSheet,
   ModalInput,
+  MealHistory,
 } from '../../components';
 import { Content, Icon } from 'native-base';
 import { Layout, Global, Gutters, Colors, Images } from '../../theme';
 import { calculatePostTime } from '../../utils/functions';
 import { TabOne, TabThree } from './components';
 import { getCustomCalRequest, getMealsRequest } from '../../ScreenRedux/customCalRedux';
+import { submitQuestionRequest } from '../Questions/Redux';
+import { getNumberOfDayByString } from '../../utils/common';
 import moment from 'moment';
 import { useIsFocused } from '@react-navigation/native';
 import { getNotificationCount } from '../../ScreenRedux/nutritionRedux';
+import { getAllSessionRequest, getDaySessionRequest } from '../../ScreenRedux/programServices';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { setAccessToken } from '../../ScreenRedux/loginRedux';
 
 const CustomCalories = props => {
-  const { meals, profile, getCalories, unreadCount } = props;
+  const { meals, profile, getCalories, unreadCount, todaySessions, getAllSessions, navigation } =
+    props;
 
   let refWeight = useRef('');
   const [tab, setTab] = useState(2);
@@ -138,8 +147,53 @@ const CustomCalories = props => {
     'Vitals',
   ];
 
+  const dateTime = new Date();
+  const todayDayStr = moment(dateTime).format('dddd');
+  const { numberOfDayForBackend } = getNumberOfDayByString(todayDayStr);
+
   const tabSettings = i => {
     setTab(i);
+    if (i === 1) {
+      const newDate = moment(new Date()).format('YYYY-MM-DD');
+      props.getAllSessionRequest(newDate);
+      // props.getDaySessionRequest(numberOfDayForBackend);
+    }
+  };
+
+  const onMealUpdate = () => {
+    if (profile && profile.number_of_meal >= 6) {
+      return Alert.alert('Maximum add food limit exceeded');
+    } else {
+      const mealValue = 6 - profile?.number_of_meal;
+      navigation.navigate('SurveyScreenMeal', { mealValue });
+    }
+  };
+
+  const checkValue = () => {
+    const data = getAllSessions?.query?.map((item, index) => {
+      if (item.workouts[item.workouts.length - 1]?.done === true) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    const isData = data && data?.find(item => item);
+    return isData;
+  };
+
+  const logOut = async () => {
+    if (await GoogleSignin.isSignedIn()) {
+      try {
+        await GoogleSignin.signOut();
+        await AsyncStorage.clear();
+        props.setAccessToken(false);
+      } catch (e) {
+        navigation.goBack();
+      }
+    } else {
+      await AsyncStorage.clear();
+      props.setAccessToken(false);
+    }
   };
 
   return (
@@ -151,6 +205,7 @@ const CustomCalories = props => {
         // onPressMsg={() => props.navigation.navigate('MessageScreen')}
         onPressNotify={() => props.navigation.navigate('NotificationScreen')}
         unreadCount={unreadCount ? unreadCount : false}
+        profile={profile}
       />
       <View style={[row, justifyContentBetween, regularHPadding, styles.currentTabStyleMap]}>
         {data.map((item, i) => {
@@ -170,18 +225,73 @@ const CustomCalories = props => {
         })}
       </View>
       <Content showsVerticalScrollIndicator={false} contentContainerStyle={fillGrow}>
-        {tab === 0 && <TabOne setShowModal={() => refWeight.current.open()} />}
+        {tab === 0 && (
+          <TabOne
+            setShowModal={() => {
+              setValue(`${profile.weight}`);
+              refWeight.current.open();
+            }}
+            profile={profile}
+            signOut={logOut}
+          />
+        )}
         {tab === 1 && (
+          //   <View style={[fill, center]}>
+          //   {session ? (
+          //     allSessions &&
+          //     allSessions.query &&
+          //     allSessions.query.map((item, index) => {
+          //       const todayDayString = moment(item.date_time).format('MM/DD/YYYY');
+          //       if (item.workouts[item.workouts.length - 1]?.done === true) {
+          //         return (
+          //           <View key={index} style={{width: '100%'}}>
+          //             <TouchableOpacity
+          //               key={index}
+          //               onPress={() =>
+          //                 navigation.navigate('WorkoutCard', {
+          //                   summary: item.workouts,
+          //                   uppercard: item,
+          //                 })
+          //               }
+          //             >
+          //               <RuningWorkout
+          //                 item={item}
+          //                 index={index}
+          //                 todayDayStr={todayDayString}
+          //               />
+          //             </TouchableOpacity>
+          //           </View>
+          //         );
+          //       }
+          //     })
+          //   ) : (
+          //     <View style={[fill, center]}>
+          //       <Text
+          //         text="No workout available."
+          //         style={{color: 'black', fontSize: 22}}
+          //       />
+          //     </View>
+          //   )}
+          // </View>
+
           <Content contentContainerStyle={fillGrow}>
             <View
               style={[row, justifyContentBetween, alignItemsCenter, small2xHMargin, smallVPadding]}
             >
               <Text style={styles.comingSoonWork} text="Workouts" />
             </View>
-            <TouchableOpacity>
-              <RuningWorkout />
-            </TouchableOpacity>
-            {false && (
+            {checkValue() && getAllSessions?.query ? (
+              getAllSessions?.query?.map((item, index) => {
+                const todayDayString = moment(item.date_time).format('MM/DD/YYYY');
+                if (item.workouts[item.workouts.length - 1]?.done === true) {
+                  return (
+                    <TouchableOpacity>
+                      <RuningWorkout item={item} index={index} todayDayStr={todayDayString} />
+                    </TouchableOpacity>
+                  );
+                }
+              })
+            ) : (
               <View style={[fill, center]}>
                 <Text text="No workout available." style={{ color: 'black', fontSize: 22 }} />
               </View>
@@ -193,6 +303,8 @@ const CustomCalories = props => {
             navigation={props.navigation}
             profileData={profile}
             consumeCalories={getCalories}
+            setShowModalHistory={setShowModalHistory}
+            onMealUpdate={onMealUpdate}
           />
         )}
         {tab === 3 && (
@@ -336,7 +448,15 @@ const CustomCalories = props => {
             color="primary"
             text="Update"
             style={[regularHMargin, fill, center]}
-            onPress={() => refWeight.current.close()}
+            onPress={() => {
+              const data = {
+                weight: value,
+                request_type: 'weightUpdate',
+              };
+              props.submitQuestionRequest(profile, data);
+              setValue('');
+              refWeight.current.close();
+            }}
           />
         </View>
       </BottomSheet>
@@ -361,7 +481,7 @@ const CustomCalories = props => {
             <Icon type="FontAwesome5" name="times" />
           </TouchableOpacity>
         </View>
-        {/* <MealHistory mealsByDate={meals} /> */}
+        <MealHistory mealsByDate={meals} />
       </Modal>
 
       {/* Modals area ends */}
@@ -533,11 +653,17 @@ const mapStateToProps = state => ({
   meals: state.customCalReducer.meals,
   profile: state.login.userDetail,
   unreadCount: state.nutritionReducer.unreadCount,
+  todaySessions: state.programReducer.todaySessions,
+  getAllSessions: state.programReducer.getAllSessions,
 });
 
 const mapDispatchToProps = dispatch => ({
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsRequest: () => dispatch(getMealsRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),
+  submitQuestionRequest: (profile, data) => dispatch(submitQuestionRequest(profile, data)),
+  getAllSessionRequest: () => dispatch(getAllSessionRequest()),
+  getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
+  setAccessToken: data => dispatch(setAccessToken(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories);

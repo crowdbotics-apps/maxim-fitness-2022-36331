@@ -5,7 +5,7 @@ import { Text, Button, DashboardCard } from '../../../components';
 import LinearGradient from 'react-native-linear-gradient';
 
 const TabOne = props => {
-  const { setShowModal, signOut, connectAlexa } = props;
+  const { setShowModal, signOut, connectAlexa, profile } = props;
   const {
     row,
     fill,
@@ -41,15 +41,20 @@ const TabOne = props => {
             ]}
           >
             <View style={[row, justifyContentBetween]}>
-              <Text text={'Current \nWeight'} color="secondary" bold center />
+              <Text text={'Current\nWeight'} color="secondary" bold center />
               <Image source={Images.icon} style={styles.imageStyle} />
             </View>
             <TouchableOpacity
               onPress={setShowModal}
               style={[row, justifyContentCenter, alignItemsEnd, fill]}
             >
-              <Text text={'0'} color="secondary" bold center />
-              <Text text="lbs" color="secondary" center style={smallLMargin} />
+              <Text text={profile?.weight} color="secondary" bold center />
+              <Text
+                text={profile?.unit === 'Feet/Pounds' ? 'lbs' : 'kg'}
+                color="secondary"
+                center
+                style={smallLMargin}
+              />
             </TouchableOpacity>
           </LinearGradient>
         </DashboardCard>
@@ -78,9 +83,15 @@ const TabOne = props => {
                     <ActivityIndicator size="large" color="#000" />
                   )} */}
               <View>
-                {true && <Text text={'Fat Loss'} color="nonary" bold center />}
-                {false && <Text text={'Strength and Hypertropy'} color="nonary" bold center />}
-                {false && <Text text={'Maintenance'} color="nonary" bold center />}
+                {profile?.fitness_goal === 1 && (
+                  <Text text={'Fat Loss'} color="nonary" bold center />
+                )}
+                {profile?.fitness_goal === 2 && (
+                  <Text text={'Strength and Hypertropy'} color="nonary" bold center />
+                )}
+                {profile?.fitness_goal === 3 && (
+                  <Text text={'Maintenance'} color="nonary" bold center />
+                )}
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -107,7 +118,7 @@ const TabOne = props => {
               <Image source={Images.programsIcon} style={styles.imageStyle} />
             </View>
             <View style={[justifyContentStart, alignItemsStart]}>
-              <Text text={'6'} color="nonary" bold center />
+              <Text text={profile?.number_of_training_days} color="nonary" bold center />
               <Text text="Days" color="septenary" center />
             </View>
           </LinearGradient>
