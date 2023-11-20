@@ -159,7 +159,7 @@ class ProfileViewSet(ModelViewSet):
             # obj.last_update = current_date
             # obj.save()
             dob = obj.dob
-            gender = int(obj.gender)
+            gender = obj.gender
             unit = obj.unit
             activity_level = obj.activity_level
             fitness_goal = obj.fitness_goal
@@ -226,7 +226,7 @@ class ProfileViewSet(ModelViewSet):
             obj.last_update = current_date
             obj.save()
             dob = obj.dob
-            gender = int(obj.gender)
+            gender = obj.gender
             unit = obj.unit
             activity_level = obj.activity_level
             fitness_goal = obj.fitness_goal
