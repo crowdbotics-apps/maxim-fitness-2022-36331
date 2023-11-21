@@ -17,14 +17,15 @@ import { connect } from 'react-redux';
 import { Text, Button } from '../../components';
 import Modal from 'react-native-modal';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import {deleteAccount} from '../../ScreenRedux/settingScreenRedux'
-import {setAccessToken} from '../../ScreenRedux/loginRedux'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { deleteAccount } from '../../ScreenRedux/settingScreenRedux';
+import { setAccessToken } from '../../ScreenRedux/loginRedux';
+import { resetQuestions } from '../Questions/Redux';
 
 const { backImage } = Images;
 const SettingScreen = props => {
   const { navigation, profileUserData, requesting } = props;
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
   const { width } = Dimensions.get('window');
 
   const logOut = async () => {
@@ -32,13 +33,15 @@ const SettingScreen = props => {
       try {
         await GoogleSignin.signOut();
         await AsyncStorage.clear();
-        props.setAccessToken(false)
+        props.resetQuestions();
+        props.setAccessToken(false);
       } catch (e) {
         navigation.goBack();
       }
     } else {
-      await AsyncStorage.clear()
-      props.setAccessToken(false)
+      await AsyncStorage.clear();
+      props.resetQuestions();
+      props.setAccessToken(false);
     }
   };
 
@@ -59,7 +62,10 @@ const SettingScreen = props => {
             <Text text="Settings" style={{ fontSize: 22, color: '#0D5565' }} bold />
           </View>
         </View>
-        <TouchableOpacity onPress={()=> navigation.navigate('SubscriptionScreen')} style={[styles.mainHeading]}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SubscriptionScreen')}
+          style={[styles.mainHeading]}
+        >
           <Text text="SubScription Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </TouchableOpacity>
@@ -99,7 +105,11 @@ const SettingScreen = props => {
           <View style={{ flexDirection: 'row', marginTop: 20 }}>
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: '#74CCFF' }]}
-              onPress={() => [setShowModal(!showModal), props.deleteAccount(props.userDetail.id), logOut()]}
+              onPress={() => [
+                setShowModal(!showModal),
+                props.deleteAccount(props.userDetail.id),
+                logOut(),
+              ]}
             >
               <Text style={{ fontWeight: '700', color: '#000' }}>Yes</Text>
             </TouchableOpacity>
@@ -134,17 +144,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   mainText: { fontSize: 18, color: '#0D5565', paddingBottom: 15 },
-  IconStyles: { height: 20, width: 10, marginRight: 10 }
+  IconStyles: { height: 20, width: 10, marginRight: 10 },
 });
 
 const mapStateToProps = state => ({
   // requesting: state.userProfileReducer.requesting,
   userDetail: state.login.userDetail,
-
 });
 
 const mapDispatchToProps = dispatch => ({
   deleteAccount: data => dispatch(deleteAccount(data)),
   setAccessToken: data => dispatch(setAccessToken(data)),
+  resetQuestions: () => dispatch(resetQuestions()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SettingScreen);

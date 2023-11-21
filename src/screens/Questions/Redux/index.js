@@ -11,6 +11,7 @@ import { profileData } from '../../../ScreenRedux/profileRedux';
 
 const UPDATE_ANSWERS = 'Questions/redux/UPDATE_ANSWERS';
 const RENDER_DATA = 'Questions/redux/RENDER_DATA';
+const UPDATE_ANSWERS_RESET = 'Questions/redux/UPDATE_ANSWERS_RESET';
 
 const QUESTION_DATA_REQUEST = 'QuestionScreen/QUESTION_DATA_REQUEST';
 const QUESTION_DATA_SUCCESS = 'QuestionScreen/QUESTION_DATA_SUCCESS';
@@ -39,6 +40,10 @@ export const submitQuestionSuccess = data => ({
 export const submitQuestionFailure = error => ({
   type: QUESTION_DATA_FAILURE,
   error,
+});
+
+export const resetQuestions = () => ({
+  type: UPDATE_ANSWERS_RESET,
 });
 
 const initialState = {
@@ -82,6 +87,13 @@ export const questionReducer = (state = initialState, action) => {
         ...state,
         questionError: action.data,
         requesting: false,
+      };
+
+    case UPDATE_ANSWERS_RESET:
+      return {
+        ...state,
+        answers: {},
+        renderTab: false,
       };
 
     default:

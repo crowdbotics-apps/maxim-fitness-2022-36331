@@ -39,6 +39,7 @@ import { getNotificationCount } from '../../ScreenRedux/nutritionRedux';
 import { getAllSessionRequest, getDaySessionRequest } from '../../ScreenRedux/programServices';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { setAccessToken } from '../../ScreenRedux/loginRedux';
+import { resetQuestions } from '../Questions/Redux';
 
 const CustomCalories = props => {
   const { meals, profile, getCalories, unreadCount, todaySessions, getAllSessions, navigation } =
@@ -186,12 +187,14 @@ const CustomCalories = props => {
       try {
         await GoogleSignin.signOut();
         await AsyncStorage.clear();
+        props.resetQuestions();
         props.setAccessToken(false);
       } catch (e) {
         navigation.goBack();
       }
     } else {
       await AsyncStorage.clear();
+      props.resetQuestions();
       props.setAccessToken(false);
     }
   };
@@ -665,5 +668,6 @@ const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: () => dispatch(getAllSessionRequest()),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   setAccessToken: data => dispatch(setAccessToken(data)),
+  resetQuestions: () => dispatch(resetQuestions()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories);

@@ -66,9 +66,15 @@ const TabThree = ({
     return data;
   };
 
-  const protein = ((consumeCalories[0]?.goals_values?.protein / 20.45 / 100) * 100).toFixed(0);
-  const carbs = ((consumeCalories[0]?.goals_values?.carbs / 20.45 / 100) * 100).toFixed(0);
-  const fats = ((consumeCalories[0]?.goals_values?.fat / 20.45 / 100) * 100).toFixed(0);
+  const protein = consumeCalories[0]?.goals_values?.protein
+    ? ((consumeCalories[0]?.goals_values?.protein / 20.45 / 100) * 100).toFixed(0)
+    : 0;
+  const carbs = consumeCalories[0]?.goals_values?.carbs
+    ? ((consumeCalories[0]?.goals_values?.carbs / 20.45 / 100) * 100).toFixed(0)
+    : 0;
+  const fats = consumeCalories[0]?.goals_values?.fat
+    ? ((consumeCalories[0]?.goals_values?.fat / 20.45 / 100) * 100).toFixed(0)
+    : 0;
 
   return (
     <>
@@ -206,7 +212,7 @@ const TabThree = ({
             style={{ fontSize: 20, opacity: 0.7, textAlign: 'center', color: 'black' }}
             bold
           />
-          {profileData.number_of_meal > 6 && (
+          {profileData.number_of_meal < 6 && (
             <Text text="Edit" color="nonary" onPress={onMealUpdate} />
           )}
         </View>

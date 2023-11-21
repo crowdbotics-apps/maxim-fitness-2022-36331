@@ -220,8 +220,8 @@ function* postRequiredCal({ id, data }) {
   try {
     const response = yield call(postRequiredCalAPI, id, data);
     yield put(postRequiredCalSuccess(response.data));
+    navigate('CustomCalories');
   } catch (e) {
-    console.log('REQIRED ERROR: ', e);
     yield put(postRequiredCalFailure(false));
   }
 }
