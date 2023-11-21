@@ -61,7 +61,7 @@ const SubscriptionScreen = props => {
   return (
     <>
       <TouchableOpacity style={styles.leftArrow} onPress={() => navigation.goBack()}>
-        <Image source={Images.backArrow} style={styles.backArrowStyle} />
+        <Image source={Images.backImage} style={styles.backArrowStyle} />
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
         <Loader isLoading={props.requesting} />
@@ -200,6 +200,11 @@ const styles = StyleSheet.create({
   },
   gradientWrapper: {
     borderRadius: 40,
+  },
+  backArrowStyle: {
+    height: 20,
+    width: 30,
+    marginLeft: 10,
   },
 });
 const mapStateToProps = state => ({

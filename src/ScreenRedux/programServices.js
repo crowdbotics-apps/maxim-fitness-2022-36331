@@ -342,7 +342,6 @@ function* updateRepsWeight({ id, data, dd }) {
       yield put(getAllSessionRequest(newDate));
     } else {
       const response = yield call(updateRepsWeightAPI, id);
-      console.log('response: ', response);
       yield put(repsWeightSuccess(response.data));
     }
   } catch (e) {

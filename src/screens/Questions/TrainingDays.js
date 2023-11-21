@@ -25,9 +25,9 @@ const TrainingDays = props => {
     navigation: { navigate },
   } = props;
   const exerciseArray = [
-    { value: 1, text: '3 Days' },
-    { value: 2, text: '4 Days' },
-    { value: 3, text: '5 Days' }
+    { value: 1, text: '3 Days', days: 3 },
+    { value: 2, text: '4 Days', days: 4 },
+    { value: 3, text: '5 Days', days: 5 },
   ];
 
   const [exerciseLevel, setExerciseLevel] = useState(false);
@@ -74,10 +74,10 @@ const TrainingDays = props => {
                 Gutters.regularVPadding,
                 Layout.alignItemsCenter,
                 Layout.justifyContentBetween,
-                exerciseLevel === item.value ? Global.border : Global.borderB,
-                exerciseLevel !== item.value ? Global.borderAlto : { borderColor: Colors.primary },
+                exerciseLevel === item.days ? Global.border : Global.borderB,
+                exerciseLevel !== item.days ? Global.borderAlto : { borderColor: Colors.primary },
               ]}
-              onPress={() => setExerciseLevel(item.value)}
+              onPress={() => setExerciseLevel(item.days)}
             >
               <View style={[Layout.justifyContentBetween]}>
                 <Text
@@ -149,7 +149,7 @@ const TrainingDays = props => {
 
 const styles = StyleSheet.create({
   logoStyle: { height: 140, width: 140, resizeMode: 'contain' },
-  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel }
+  rightArrow: { height: 20, width: 20, resizeMode: 'contain', tintColor: Colors.nobel },
 });
 
 const mapStateToProps = state => ({
