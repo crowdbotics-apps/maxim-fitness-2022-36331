@@ -24,7 +24,7 @@ import { useIsFocused } from '@react-navigation/native';
 
 const data = [
   { id: 1, value: 1, item: 'Super Set' },
-  { id: 2, value: 1, item: 'Giant Set' },
+  { id: 2, value: 4, item: 'Giant Set' },
   { id: 3, value: 2, item: 'Drop Set' },
   { id: 4, value: 3, item: 'Triple Set' },
 ];
@@ -56,7 +56,7 @@ const AddExercies = props => {
           array.push(i);
           setSelectedItem(array);
         }
-      } else if (activeSet?.value === 3) {
+      } else if (activeSet?.value === 4) {
         if (selectedItem.length < 3) {
           array.push(i);
           setSelectedItem(array);
@@ -77,7 +77,7 @@ const AddExercies = props => {
         }
       });
     });
-    navigation.navigate('CustomExercise', { exercises });
+    navigation.navigate('CustomExercise', { exercises, activeSet });
   };
 
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
@@ -235,7 +235,7 @@ const AddExercies = props => {
           disabled={
             activeSet?.id === 1
               ? selectedItem?.length < 2
-              : activeSet?.value === 3
+              : activeSet?.value === 4
               ? selectedItem?.length < 3
               : selectedItem?.length < 1
           }

@@ -6,7 +6,8 @@ import { getNotificationCountSuccess } from '../../src/ScreenRedux/nutritionRedu
 import moment from 'moment';
 import { Images } from '../../src/theme';
 
-const Notifications = () => {
+const Notifications = props => {
+  const { navigation } = props;
   const { styles } = options;
   // Contains the messages recieved from backend
   const [messages, setMessages] = useState([]);
@@ -37,6 +38,7 @@ const Notifications = () => {
     const timeFormate = new Date(`${item?.created}`).toLocaleString();
     const arr = date.split('T');
     const time = moment(timeFormate).format('hh:mm A');
+
     return (
       <View style={styles.walletCard}>
         <View style={styles.walletInner}>

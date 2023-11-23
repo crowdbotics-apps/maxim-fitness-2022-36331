@@ -236,6 +236,7 @@ const CustomCalories = props => {
             }}
             profile={profile}
             signOut={logOut}
+            connectAlexa={() => navigation.navigate('Alexa')}
           />
         )}
         {tab === 1 && (

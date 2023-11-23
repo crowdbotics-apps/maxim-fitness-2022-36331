@@ -55,7 +55,7 @@ const ProfileScreen = props => {
 
   useEffect(() => {
     if (isFocused) {
-      if (routeDetail) {
+      if (routeDetail && route?.params?.item) {
         props.getProfile(routeDetail?.user?.id);
       } else {
         props.getProfile(props?.userDetail?.id);
@@ -146,6 +146,7 @@ const ProfileScreen = props => {
 
   const { width, height } = Dimensions.get('window');
   const refRBSheet = useRef();
+
   return (
     <>
       <SafeAreaView>
@@ -164,12 +165,14 @@ const ProfileScreen = props => {
           <View>
             <ImageBackground
               source={
-                userDetail?.id === routeDetail?.user?.id
-                  ? userDetail?.background_picture
+                routeDetail
+                  ? userDetail?.id === routeDetail?.user?.id && userDetail?.background_picture
                     ? { uri: userDetail?.background_picture }
+                    : routeDetail?.user?.background_picture
+                    ? { uri: routeDetail?.user?.background_picture }
                     : profileBackGround
-                  : routeDetail?.user?.background_picture
-                  ? { uri: routeDetail?.user?.background_picture }
+                  : !routeDetail && userDetail?.background_picture
+                  ? { uri: userDetail?.background_picture }
                   : profileBackGround
               }
               style={{ height: (273 / 375) * width, width: '100%' }}
@@ -195,10 +198,14 @@ const ProfileScreen = props => {
             <View style={styles.profileImage}>
               <Image
                 source={
-                  userDetail?.id === routeDetail?.user?.id || !routeDetail?.user?.id
+                  routeDetail
+                    ? userDetail?.id === routeDetail?.user?.id && userDetail?.profile_picture
+                      ? { uri: userDetail?.profile_picture }
+                      : routeDetail?.user?.profile_picture
+                      ? { uri: routeDetail?.user?.profile_picture }
+                      : profileBackGround
+                    : !routeDetail && userDetail?.profile_picture
                     ? { uri: userDetail?.profile_picture }
-                    : routeDetail?.user?.profile_picture
-                    ? { uri: routeDetail?.user?.profile_picture }
                     : profileBackGround
                 }
                 style={{

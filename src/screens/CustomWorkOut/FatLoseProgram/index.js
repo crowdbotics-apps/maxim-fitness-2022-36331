@@ -439,13 +439,17 @@ const FatLoseProgram = props => {
             <View style={[fill, center, Gutters.regularVMargin]}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('AddExercise')}
-                disabled={todaySessions?.name !== 'Rest'}
+                disabled={
+                  todayRequest || todaySessions?.length === 0 || todaySessions?.name === 'Rest'
+                }
               >
                 <LinearGradient
                   start={start}
                   end={end}
                   colors={
-                    todaySessions?.name !== 'Rest' ? ['#dddddd', '#dddddd'] : ['#00a2ff', '#00a2ff']
+                    todayRequest || todaySessions?.length === 0 || todaySessions?.name === 'Rest'
+                      ? ['#dddddd', '#dddddd']
+                      : ['#00a2ff', '#00a2ff']
                   }
                   style={[
                     fill,

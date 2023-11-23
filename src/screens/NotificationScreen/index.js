@@ -10,7 +10,7 @@ const NotificationScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={[fill]}>
       <CustomHeader header="Notification" navigation={navigation} />
-      <Notifications />
+      <Notifications navigation={navigation} />
     </SafeAreaView>
   );
 };

@@ -8,6 +8,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  PermissionsAndroid,
+  Linking,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { connect } from 'react-redux';
@@ -15,6 +18,7 @@ import LottieView from 'lottie-react-native';
 import Voice from '@react-native-community/voice';
 import { Images, Layout, Gutters, Global } from '../../theme';
 import { getSpeechRequest } from '../../ScreenRedux/nutritionRedux';
+import { checkAndRequestMicrophonePermission } from '../../utils/functions';
 
 const MealRegulator = props => {
   const { navigation } = props;
@@ -22,7 +26,7 @@ const MealRegulator = props => {
   const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
-    //Setting callbacks for the process status
+    Voice.onSpeechEnd = onSpeechEnd;
     Voice.onSpeechPartialResults = onSpeechPartialResults;
 
     return () => {
@@ -31,35 +35,54 @@ const MealRegulator = props => {
     };
   }, []);
 
+  const onSpeechEnd = e => {
+    onStop();
+  };
+
   const onSpeechPartialResults = e => {
-    //Invoked when any results are computed
     setPartialResults(e.value);
   };
 
   const startRecognizing = async () => {
-    //Starts listening for speech for a specific locale
     try {
       await Voice.start('en-US');
       setPartialResults([]);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) {}
   };
 
   const stopRecognizing = async () => {
     //Stops listening for speech
     try {
       await Voice.stop();
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) {}
   };
 
-  const onStart = () => {
-    setIsRecording(true);
-    setTimeout(() => {
-      startRecognizing();
-    }, 400);
+  const onStart = async () => {
+    const hasPermission = await checkAndRequestMicrophonePermission();
+    if (hasPermission) {
+      setIsRecording(true);
+      setTimeout(() => {
+        startRecognizing();
+      }, 400);
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Please grant microphone permissions in order to use this feature.',
+        [
+          {
+            text: 'Cancel',
+            onPress: undefined,
+            style: 'cancel',
+          },
+          {
+            text: 'Confirm',
+            onPress: () => {
+              Linking.openSettings();
+            },
+          },
+        ]
+      );
+    }
   };
 
   const onStop = () => {
