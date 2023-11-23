@@ -91,7 +91,7 @@ const FeedCard = props => {
 
   const movetoNextScreen = item => {
     routeData(item);
-    navigation.navigate('ProfileScreen');
+    navigation.navigate('ProfileScreen', { item });
   };
 
   const renderData = () => {

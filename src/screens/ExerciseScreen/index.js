@@ -230,7 +230,7 @@ const ExerciseScreen = props => {
 
   const setsData = (set, i) => {
     setActiveSet(i);
-    const id = set.id;
+    const id = set?.id;
     const individual = null;
     const dd = null;
     props.repsWeightRequest(id, individual, dd);
@@ -254,7 +254,7 @@ const ExerciseScreen = props => {
 
   const selectExercise = (item, i) => {
     setActive(i);
-    props.repsWeightRequest(item?.sets[0]?.id, null, null);
+    props.repsWeightRequest(item?.sets?.[0]?.id, null, null);
     setTimmer(false);
     if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
       setModal('ss');
@@ -492,7 +492,8 @@ const ExerciseScreen = props => {
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === 'cr'
                             ? 'Complete'
-                            : item?.sets[item?.sets.length - 1].id &&
+                            : item?.sets &&
+                              item?.sets[item?.sets.length - 1].id &&
                               item?.sets[item?.sets.length - 1].done
                             ? 'Done'
                             : 'Done, Start Rest'
@@ -502,11 +503,12 @@ const ExerciseScreen = props => {
                         colorsGradientDisable={['#d3d3d3', '#838383']}
                         disabled={
                           timmer ||
-                          (item?.sets[item?.sets.length - 1].id &&
-                            item?.sets[item?.sets.length - 1].done)
+                          (item?.sets &&
+                            item?.sets?.[item?.sets?.length - 1].id &&
+                            item?.sets?.[item?.sets?.length - 1].done)
                         }
                         onPress={() => {
-                          if (item.sets[activeSet].done) {
+                          if (item?.sets && item?.sets?.[activeSet].done) {
                             setTimmer(true);
                           } else {
                             setTimmer(false);

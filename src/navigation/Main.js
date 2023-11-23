@@ -33,6 +33,7 @@ import HomeScreen from '../screens/HomeScreen';
 import MealRegulator from '../screens/MealRegulator';
 import SelectBrand from '../screens/SelectBrand';
 import SurveyScreenMeal from '../screens/SurveyScreenMeal';
+import Alexa from '../screens/Alexa';
 
 import LogFoods from '../screens/LogFoods';
 import { modules } from '@modules';
@@ -225,6 +226,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="MealRegulator" component={MealRegulator} />
     <mainStack.Screen name="SelectBrand" component={SelectBrand} />
     <mainStack.Screen name="LogFoods" component={LogFoods} />
+    <mainStack.Screen name="Alexa" component={Alexa} />
     <mainStack.Screen name="SubscriptionScreen" component={SubscriptionScreen} />
     {/* <mainStack.Screen name="Chat" component={Chat} /> */}
   </mainStack.Navigator>

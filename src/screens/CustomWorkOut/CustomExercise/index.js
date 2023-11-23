@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   TextInput,
+  Pressable,
 } from 'react-native';
 import { connect } from 'react-redux';
 
@@ -44,10 +45,18 @@ const CustomExercise = props => {
   const [dualSetState, setDualSetState] = useState(1);
 
   const [currentIndex, setCurrentIndex] = useState(false);
-  const [dualReps, setDualReps] = useState({ state1: '', state2: '' });
+  const [dualReps, setDualReps] = useState({});
+  const [droupSet, setDroupSets] = useState({});
+
   const [temporaryReps, setTemporaryReps] = useState(false);
+  const [selectIndex, setSelectIndex] = useState(0);
+  const [timeData, setTimeData] = useState({
+    mints: {},
+    seconds: {},
+  });
 
   const numberOfExercise = route?.params?.exercises?.length;
+  const activeSet = route?.params?.activeSet;
 
   const ex1 = 'Exercise 1';
   const ex2 = 'Exercise 2';
@@ -83,32 +92,65 @@ const CustomExercise = props => {
     setSeconds('');
     setTemporaryReps('');
     setDualSetState(1);
-    setDualReps({
-      state1: 0,
-      state2: 0,
+    setSelectIndex(0);
+    setDroupSets({});
+    setDualReps({});
+    setTimeData({
+      mints: {},
+      seconds: {},
     });
   };
 
   const updateDualReps = val => {
-    if (dualSetState === 1) {
-      const tempObj = { ...dualReps };
-      tempObj.state1 = val;
-
-      setDualReps(tempObj);
-    } else {
-      const tempObj = { ...dualReps };
-      tempObj.state2 = val;
-      setDualReps(tempObj);
-    }
+    const tempObj = { ...dualReps };
+    const key = `state${dualSetState}`;
+    tempObj[key] = val;
+    setDualReps(tempObj);
   };
 
-  console.log('dualReps', dualReps);
+  const updateDroupSets = value => {
+    const tempObj = { ...droupSet };
+    const key = `state${selectIndex + 1}`;
+    tempObj[key] = value;
+    setDroupSets(tempObj);
+  };
+
+  const updateMintsSets = value => {
+    setTimeData(prevState => ({
+      ...prevState,
+      mints: {
+        ...prevState.mints,
+        ['mint' + dualSetState]: value,
+      },
+    }));
+  };
+
+  const updateSecondsSets = value => {
+    setTimeData(prevState => ({
+      ...prevState,
+      seconds: {
+        ...prevState.seconds,
+        ['sec' + dualSetState]: value,
+      },
+    }));
+  };
+
+  const resultArray = () => {
+    const arrayList = dualSets.map(item => {
+      return Object.values(item).map(exercise => ({ ...exercise }));
+    });
+    const flattenedArray = arrayList.flat();
+    return flattenedArray;
+  };
+
+  // Flatten the array
+
   const addDataCustomEx = () => {
     const payload = {
       title: title ? title : 'title',
       session_date: todaySessions?.date_time,
       exercise_ids: route?.params?.exercises?.map((ex, i) => ex.id),
-      set: sets,
+      set: numberOfExercise === 1 ? sets : resultArray(),
     };
     props.postCustomExRequest(payload);
   };
@@ -117,7 +159,7 @@ const CustomExercise = props => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={Layout.fillGrow}>
+      <ScrollView contentContainerStyle={Layout.fillGrow} keyboardShouldPersistTaps={'handled'}>
         <View
           style={[
             Layout.row,
@@ -225,7 +267,7 @@ const CustomExercise = props => {
                   <Text style={styles.setTextStyle} text={!item.rest ? '-' : item.rest} />
                 </TouchableOpacity>
               ))}
-            {numberOfExercise === 2 &&
+            {numberOfExercise > 1 &&
               dualSets.map((item, i) => (
                 <TouchableOpacity
                   style={[
@@ -245,13 +287,18 @@ const CustomExercise = props => {
                       style={styles.dualSetsName}
                       text={'a. ' + route?.params?.exercises[0]?.name}
                     />
-                    <Text style={styles.dualSetRepsStyle} text={item.exerciseA.reps} />
+                    <Text style={styles.dualSetRepsStyle} text={item?.exerciseA?.reps} />
                     <Text
                       style={styles.dualSetRestStyle}
-                      text={item.exerciseA.rest === 0 ? '-' : item.exerciseB.rest}
+                      text={item?.exerciseA?.rest === 0 ? '-' : item?.exerciseA?.rest}
                     />
                   </View>
-                  <View style={styles.dualSetsSecondView1}>
+                  <View
+                    style={[
+                      styles.dualSetsSecondView1,
+                      activeSet?.value === 4 && styles.borderStyle,
+                    ]}
+                  >
                     <Text
                       style={styles.dualSecondEx}
                       text={'b. ' + route?.params?.exercises[1]?.name}
@@ -259,9 +306,22 @@ const CustomExercise = props => {
                     <Text style={styles.dualSecondReps} text={item.exerciseB.reps} />
                     <Text
                       style={styles.dualSecondRest}
-                      text={item.exerciseB.rest === 0 ? '-' : item.exerciseB.rest}
+                      text={item?.exerciseB?.rest === 0 ? '-' : item?.exerciseB?.rest}
                     />
                   </View>
+                  {activeSet?.value === 4 && (
+                    <View style={styles.dualSetsSecondView1}>
+                      <Text
+                        style={styles.dualSecondEx}
+                        text={'c. ' + route?.params?.exercises[2]?.name}
+                      />
+                      <Text style={styles.dualSecondReps} text={item.exerciseC.reps} />
+                      <Text
+                        style={styles.dualSecondRest}
+                        text={item?.exerciseC?.rest === 0 ? '-' : item?.exerciseC?.rest}
+                      />
+                    </View>
+                  )}
                 </TouchableOpacity>
               ))}
           </View>
@@ -358,20 +418,69 @@ const CustomExercise = props => {
             >
               <View style={styles.secondaryBoxes}>
                 <Text style={{ color: '#00a1ff', fontWeight: '700' }} text="Enter Reps" />
+                <Text
+                  style={{ fontSize: 12, color: 'black' }}
+                  text={'Round ' + (selectIndex + 1)}
+                />
+
                 <TextInput
                   style={{
                     fontSize: 24,
                     fontWeight: '700',
                     color: '#5e5e5e',
-                    marginTop: 5,
+                    marginTop:
+                      activeSet &&
+                      (activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set')
+                        ? 0
+                        : 5,
                   }}
-                  onChangeText={val => setReps(val)}
+                  onChangeText={val => {
+                    updateDroupSets(val);
+                    setReps(val);
+                  }}
                   keyboardType="number-pad"
                   value={`${reps}`}
                 />
+                {(activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set') && (
+                  <View style={{ flexDirection: 'row', position: 'absolute', bottom: 8 }}>
+                    {Array(activeSet?.value)
+                      .fill()
+                      .map((item, index) => (
+                        <Pressable
+                          // onPress={() => {
+                          //   const entries = Object.entries(droupSet);
+                          //   const checkIndex = index < entries.length;
+                          //   checkIndex && setReps(entries?.[index][1]);
+                          //   setSelectIndex(index);
+                          // }}
+                          style={{
+                            height: 5,
+                            width: 5,
+                            borderRadius: 50,
+                            backgroundColor: 'black',
+                            marginRight: 5,
+                            opacity: index === selectIndex ? 1 : 0.5,
+                          }}
+                        />
+                      ))}
+                  </View>
+                )}
               </View>
 
-              <View style={[styles.secondaryBoxes, { width: 120 }]}>
+              <View
+                style={[
+                  styles.secondaryBoxes,
+                  {
+                    width: 120,
+                    opacity:
+                      activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set'
+                        ? activeSet?.value !== selectIndex + 1
+                          ? 0.8
+                          : 1
+                        : 1,
+                  },
+                ]}
+              >
                 <Text style={{ color: '#00a1ff', fontWeight: '700' }} text="Enter Rest" />
                 <View style={[Layout.row, Layout.alignItemsCenter]}>
                   <View>
@@ -386,6 +495,10 @@ const CustomExercise = props => {
                       }}
                       keyboardType="number-pad"
                       onChangeText={val => setMinutes(val)}
+                      editable={
+                        (activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set') &&
+                        (activeSet?.value === selectIndex + 1 ? true : false)
+                      }
                       maxLength={2}
                       value={`${minutes}`}
                     />
@@ -414,6 +527,10 @@ const CustomExercise = props => {
                       keyboardType="number-pad"
                       maxLength={3}
                       onChangeText={val => setSeconds(val)}
+                      editable={
+                        (activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set') &&
+                        (activeSet?.value === selectIndex + 1 ? true : false)
+                      }
                       value={`${seconds}`}
                     />
 
@@ -434,7 +551,13 @@ const CustomExercise = props => {
                 <TouchableOpacity
                   onPress={() => {
                     if (sets?.length) {
-                      setReps(sets[sets?.length - 1]?.reps);
+                      if (sets[sets?.length - 1]?.reps.includes('/')) {
+                        const array = sets[sets?.length - 1]?.reps.split('/');
+                        updateDroupSets(array[selectIndex]);
+                        setReps(array[selectIndex]);
+                      } else {
+                        setReps(sets[sets?.length - 1]?.reps);
+                      }
                     }
                   }}
                 >
@@ -464,25 +587,69 @@ const CustomExercise = props => {
 
             <View style={[Layout.center, Gutters.smallVMargin, Gutters.regularBPadding]}>
               <TouchableOpacity
+                style={{
+                  paddingVertical: 15,
+                  backgroundColor: '#00a1ff',
+                  borderRadius: 50,
+                  alignItems: 'center',
+                  width: 120,
+                  opacity: reps === '' ? 0.5 : 1,
+                }}
                 onPress={() => {
-                  setSets(prevValues => [
-                    ...prevValues,
-                    {
-                      ex_id: route?.params?.exercises?.map(e => e.id),
-                      set_no: 1,
-                      reps: reps,
-                      weight: 10,
-                      set_type: 'ct',
-                      rest: minutes * 60 + parseFloat(seconds),
-                      timer: minutes * 60 + parseFloat(seconds),
-                    },
-                  ]);
-                  refRBSheet.current.close();
-                  resetValues();
+                  if (activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set') {
+                    setSelectIndex(selectIndex + 1);
+                    if (
+                      activeSet?.item === 'Drop Set' ? selectIndex + 1 === 2 : selectIndex + 1 === 3
+                    ) {
+                      setSelectIndex(0);
+                      setSets(prevValues => [
+                        ...prevValues,
+                        {
+                          ex_id: route?.params?.exercises?.map(e => e.id),
+                          set_no: 1,
+                          reps:
+                            droupSet &&
+                            droupSet?.state1 +
+                              '/' +
+                              droupSet?.state2 +
+                              (droupSet?.state3 ? '/' + droupSet?.state3 : ''),
+                          weight: 10,
+                          set_type: 'ct',
+                          rest: minutes * 60 + parseFloat(seconds),
+                          timer: minutes * 60 + parseFloat(seconds),
+                        },
+                      ]);
+                      refRBSheet.current.close();
+                      resetValues();
+                    }
+
+                    setReps('');
+                  } else {
+                    setSets(prevValues => [
+                      ...prevValues,
+                      {
+                        ex_id: route?.params?.exercises?.map(e => e.id),
+                        set_no: 1,
+                        reps: reps,
+                        weight: 10,
+                        set_type: 'ct',
+                        rest: minutes * 60 + parseFloat(seconds),
+                        timer: minutes * 60 + parseFloat(seconds),
+                      },
+                    ]);
+                    refRBSheet.current.close();
+                    resetValues();
+                  }
                 }}
                 disabled={reps !== '' ? false : true}
               >
-                <Image source={doneImg} style={{ height: 45, width: 150 }} />
+                <Text style={{ color: '#ffff', fontWeight: '700' }}>
+                  {activeSet &&
+                  (activeSet?.item === 'Drop Set' || activeSet?.item === 'Triple Set') &&
+                  selectIndex + 1 < activeSet?.value
+                    ? 'Round ' + (selectIndex + 2)
+                    : 'Done'}
+                </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -523,30 +690,36 @@ const CustomExercise = props => {
                   }}
                 >
                   {/* {dualSetState === 1 ? ex1 : ex2} */}
-                  {dualSetState === 1
-                    ? route?.params?.exercises[0]?.name
-                    : route?.params?.exercises[1]?.name}
+                  {route?.params?.exercises[dualSetState - 1]?.name}
                 </Text>
                 <TouchableOpacity onPress={() => refRBSheetDual.current.close()}>
                   <Image source={circleClose} style={{ height: 20, width: 20 }} />
                 </TouchableOpacity>
               </View>
               <View style={styles.dualDotsStyle}>
-                <TouchableOpacity
-                  style={styles.dotHeight}
-                  onPress={() => {
-                    setTemporaryReps(dualReps?.state1);
-                    setDualSetState(1);
-                  }}
-                >
-                  <View
-                    style={[
-                      styles.dotStyle,
-                      { opacity: dualSetState === 1 ? 1 : 0.3, marginRight: 3 },
-                    ]}
-                  ></View>
-                </TouchableOpacity>
-                <TouchableOpacity
+                {Array(activeSet?.value === 4 ? 3 : 2)
+                  .fill()
+                  .map((item, index) => (
+                    <TouchableOpacity
+                      style={styles.dotHeight}
+                      onPress={() => {
+                        setDualSetState(index + 1);
+                        // setSelectIndex(index + 1);
+                        const entries = Object.entries(dualReps);
+                        const checkIndex = index < entries.length;
+                        checkIndex ? setTemporaryReps(entries?.[index][1]) : setTemporaryReps('');
+                      }}
+                    >
+                      <View
+                        style={[
+                          styles.dotStyle,
+                          { opacity: dualSetState === index + 1 ? 1 : 0.3, marginRight: 3 },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))}
+
+                {/* <TouchableOpacity
                   onPress={() => {
                     setTemporaryReps(dualReps?.state2);
                     setDualSetState(2);
@@ -559,7 +732,7 @@ const CustomExercise = props => {
                       { opacity: dualSetState === 2 ? 1 : 0.3, marginRight: 3 },
                     ]}
                   ></View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
 
@@ -609,14 +782,17 @@ const CustomExercise = props => {
                 <View
                   style={[
                     styles.secondaryBoxes,
-                    { width: 120, opacity: dualSetState === 1 ? 0.7 : 1 },
+                    {
+                      width: 120,
+                      //  opacity: dualSetState === 1 ? 0.7 : 1
+                    },
                   ]}
                 >
                   <Text
                     style={{
                       color: '#00a1ff',
                       fontWeight: '700',
-                      opacity: dualSetState === 1 ? 0.5 : 1,
+                      // opacity: dualSetState === 1 ? 0.5 : 1,
                     }}
                   >
                     Enter Rest
@@ -632,10 +808,14 @@ const CustomExercise = props => {
                           borderBottomWidth: 1,
                           paddingBottom: -10,
                         }}
-                        onChangeText={val => setMinutes(val)}
-                        editable={dualSetState === 1 ? false : true}
+                        onChangeText={val => {
+                          updateMintsSets(val);
+                          setMinutes(val);
+                        }}
+                        // editable={dualSetState === 1 ? false : true}
                         maxLength={2}
-                        value={`${dualSetState === 1 ? '' : minutes}`}
+                        // value={`${dualSetState === 1 ? '' : minutes}`}
+                        value={minutes}
                         keyboardType="number-pad"
                       />
                       <Text style={{ color: '#646464', fontSize: 12 }}>Min</Text>
@@ -662,9 +842,12 @@ const CustomExercise = props => {
                           marginTop: 14,
                         }}
                         maxLength={3}
-                        value={`${dualSetState === 1 ? '' : seconds}`}
-                        editable={dualSetState === 1 ? false : true}
-                        onChangeText={val => setSeconds(val)}
+                        value={seconds}
+                        // editable={dualSetState === 1 ? false : true}
+                        onChangeText={val => {
+                          updateSecondsSets(val);
+                          setSeconds(val);
+                        }}
                         keyboardType="decimal-pad"
                       />
 
@@ -701,41 +884,114 @@ const CustomExercise = props => {
               }}
             >
               <TouchableOpacity
+                style={[
+                  styles.cardStyle,
+                  {
+                    opacity: temporaryReps === '' ? 0.5 : 1,
+                  },
+                ]}
                 onPress={() => {
-                  if (dualSetState === 1) {
-                    setDualSetState(2);
+                  if (dualSetState < (activeSet?.value === 4 ? 3 : 2)) {
+                    setDualSetState(dualSetState + 1);
                     // resetValues();
                     // setTemporaryReps();
-                    setTemporaryReps(dualReps?.state2);
+                    setTemporaryReps('');
+                    setMinutes('');
+                    setSeconds('');
                   } else {
                     refRBSheetDual.current.close();
                     setDualSetState(1);
                     setReps('');
-                    setDualSets(prevValues => [
-                      ...prevValues,
-                      {
-                        exerciseA: { reps: dualReps.state1, rest: 0, name: 'ExerciseA' },
-                        exerciseB: {
-                          reps: dualReps.state2,
-                          rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
-                          name: 'ExerciseB',
+
+                    if (activeSet?.value === 4) {
+                      setDualSets(prevValues => [
+                        ...prevValues,
+                        {
+                          exerciseA: {
+                            reps: dualReps.state1,
+                            rest:
+                              (timeData?.mints?.mint1 ? timeData?.mints?.mint1 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec1 ? timeData?.seconds?.sec1 : 0),
+                            ex_id: route?.params?.exercises[0]?.id,
+                            set_no: dualSets?.length + 1,
+                            weight: 10,
+                            set_type: 'ct',
+                            timer:
+                              (timeData?.mints?.mint1 ? timeData?.mints?.mint1 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec1 ? timeData?.seconds?.sec1 : 0),
+                          },
+                          exerciseB: {
+                            reps: dualReps.state2,
+                            rest:
+                              (timeData?.mints?.mint2 ? timeData?.mints?.mint2 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec2 ? timeData?.seconds?.sec2 : 0),
+                            ex_id: route?.params?.exercises[1]?.id,
+                            set_no: dualSets?.length + 1,
+                            weight: 10,
+                            set_type: 'ct',
+                            timer:
+                              (timeData?.mints?.mint2 ? timeData?.mints?.mint2 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec2 ? timeData?.seconds?.sec2 : 0),
+                          },
+                          exerciseC: {
+                            reps: dualReps.state3,
+                            rest:
+                              (timeData?.mints?.mint3 ? timeData?.mints?.mint3 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec3 ? timeData?.seconds?.sec3 : 0),
+                            ex_id: route?.params?.exercises[2]?.id,
+                            set_no: dualSets?.length + 1,
+                            weight: 10,
+                            set_type: 'ct',
+                            timer:
+                              (timeData?.mints?.mint3 ? timeData?.mints?.mint3 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec3 ? timeData?.seconds?.sec3 : 0),
+                          },
                         },
-                      },
-                    ]);
-                    // resetValues();
+                      ]);
+                    } else {
+                      setDualSets(prevValues => [
+                        ...prevValues,
+                        {
+                          exerciseA: {
+                            reps: dualReps.state1,
+                            rest:
+                              (timeData?.mints?.mint1 ? timeData?.mints?.mint1 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec1 ? timeData?.seconds?.sec1 : 0),
+                            ex_id: route?.params?.exercises[0]?.id,
+                            set_no: dualSets?.length + 1,
+                            weight: 10,
+                            set_type: 'ct',
+                            timer:
+                              (timeData?.mints?.mint1 ? timeData?.mints?.mint1 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec1 ? timeData?.seconds?.sec1 : 0),
+                          },
+                          exerciseB: {
+                            reps: dualReps.state2,
+                            rest:
+                              (timeData?.mints?.mint2 ? timeData?.mints?.mint2 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec2 ? timeData?.seconds?.sec2 : 0),
+                            ex_id: route?.params?.exercises[1].id,
+                            set_no: dualSets?.length + 1,
+                            weight: 10,
+                            set_type: 'ct',
+                            timer:
+                              (timeData?.mints?.mint2 ? timeData?.mints?.mint2 : 0) * 60 +
+                              parseFloat(timeData?.seconds?.sec2 ? timeData?.seconds?.sec2 : 0),
+                          },
+                        },
+                      ]);
+                    }
+
+                    resetValues();
                   }
                 }}
-                disabled={
-                  dualSetState === 1
-                    ? dualReps.state1 === ''
-                      ? true
-                      : false
-                    : dualSetState === 2 && dualReps.state2 !== '' && !minutes
-                    ? true
-                    : false
-                }
+                disabled={temporaryReps === '' ? true : false}
               >
-                <Image
+                <Text style={{ color: '#ffff', fontWeight: '700' }}>
+                  {activeSet && dualSetState < (activeSet?.value === 4 ? 3 : 2) ? 'Next' : 'Done'}
+                </Text>
+
+                {/* <Image
                   source={dualSetState === 1 ? greyNext : doneImg}
                   style={{
                     height: 45,
@@ -746,7 +1002,7 @@ const CustomExercise = props => {
                         ? 0.5
                         : 1,
                   }}
-                />
+                /> */}
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -939,6 +1195,11 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     justifyContent: 'space-around',
   },
+  borderStyle: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#bababa',
+    paddingBottom: 10,
+  },
   dualSetsSecondView1: {
     flexDirection: 'row',
     marginTop: 10,
@@ -971,6 +1232,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  cardStyle: {
+    paddingVertical: 15,
+    backgroundColor: '#00a1ff',
+    borderRadius: 50,
+    alignItems: 'center',
+    width: 140,
   },
 });
 

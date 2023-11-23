@@ -153,7 +153,7 @@ const TabOne = props => {
           color="secondary"
           onPress={connectAlexa}
           text={'Connect with Alexa'}
-          disabled
+          disabled={false}
           style={[
             // border,
             center,
