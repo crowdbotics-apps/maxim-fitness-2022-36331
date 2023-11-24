@@ -9,6 +9,7 @@ import XHR from 'src/utils/XHR';
 import moment from 'moment';
 
 import { sortSessionBySets } from '../utils/common';
+import { goBack } from '../navigation/NavigationService';
 
 const ALL_SESSIONS_REQUEST = 'ProgramScreen/ALL_SESSIONS_REQUEST';
 const ALL_SESSIONS_SUCCESS = 'ProgramScreen/ALL_SESSIONS_SUCCESS';
@@ -24,6 +25,12 @@ const PICK_SESSION = 'ProgramScreen/PICK_SESSION';
 
 const SETS_DONE_REQUEST = 'ProgramScreen/SETS_DONE_REQUEST';
 const SETS_DONE_SUCCESS = 'ProgramScreen/SETS_DONE_SUCCESS';
+
+const SESSION_DONE_REQUEST = 'ProgramScreen/SESSION_DONE_REQUEST';
+const SESSION_DONE_SUCCESS = 'ProgramScreen/SESSION_DONE_SUCCESS';
+
+const WORKOUT_DONE_REQUEST = 'ProgramScreen/WORKOUT_DONE_REQUEST';
+const WORKOUT_DONE_SUCCESS = 'ProgramScreen/WORKOUT_DONE_SUCCESS';
 
 const EXERCISE_DONE_REQUEST = 'ProgramScreen/EXERCISE_DONE_REQUEST';
 const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
@@ -72,9 +79,28 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   nextWorkout,
 });
 
-export const setDoneRequest = id => ({
+export const setDoneRequest = (id, data) => ({
   type: SETS_DONE_REQUEST,
   id,
+  data,
+});
+
+export const workoutDone = id => ({
+  type: WORKOUT_DONE_REQUEST,
+  id,
+});
+export const workoutDoneSuccess = data => ({
+  type: WORKOUT_DONE_SUCCESS,
+  data,
+});
+
+export const sessionDone = id => ({
+  type: SESSION_DONE_REQUEST,
+  id,
+});
+export const sessionDoneSuccess = data => ({
+  type: SESSION_DONE_SUCCESS,
+  data,
 });
 
 export const setDoneSuccess = data => ({
@@ -176,10 +202,17 @@ export const programReducer = (state = initialState, action) => {
         setLoading: true,
       };
 
-    case SETS_DONE_SUCCESS:
+    case WORKOUT_DONE_SUCCESS:
       return {
         ...state,
         setDone: action.data,
+        setLoading: false,
+      };
+
+    case SETS_DONE_SUCCESS:
+      return {
+        ...state,
+        // setDone: action.data,
         setLoading: false,
       };
 
@@ -239,7 +272,6 @@ function* getAllSessions({ data }) {
       yield put(getAllSessionSuccess({ ...response?.data, query }));
     }
   } catch (e) {
-    console.log('eee:', e);
     yield put(getAllSessionSuccess(false));
   }
 }
@@ -260,11 +292,9 @@ async function getTodaySessionAPI(data) {
 function* getTodaySessions({ data }) {
   try {
     const response = yield call(getTodaySessionAPI, data);
-    console.log('Res today session: ', response?.data);
     // const query = sortSessionBySets(response?.data?.query);
     yield put(getDaySessionSuccess(response.data));
   } catch (e) {
-    console.log('Err today session:', e);
     yield put(getDaySessionSuccess(false));
   }
 }
@@ -328,15 +358,15 @@ function* updateRepsWeight({ id, data, dd }) {
   try {
     if (dd === 'reps') {
       const response = yield call(updateRepsAPI, id, data);
-      console.log('reps response: ', response);
+
       yield put(repsWeightSuccess(response.data));
     } else if (dd === 'weight') {
       const response = yield call(updateWeightAPI, id, data);
-      console.log('weight response: ', response);
+
       yield put(repsWeightSuccess(response.data));
     } else if (dd === true) {
       const response = yield call(updateSetDoneAPI, id, data);
-      console.log('done response: ', response);
+
       yield put(repsWeightSuccess(response.data));
       const newDate = moment(new Date()).format('YYYY-MM-DD');
       yield put(getAllSessionRequest(newDate));
@@ -345,12 +375,49 @@ function* updateRepsWeight({ id, data, dd }) {
       yield put(repsWeightSuccess(response.data));
     }
   } catch (e) {
-    console.log(' error:', e);
     yield put(repsWeightSuccess(false));
   }
 }
 
 async function setDoneAPI(id) {
+  const token = await AsyncStorage.getItem('authToken');
+  const URL = `${API_URL}/session/mark_set_done/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'POST',
+    data: { id: id },
+  };
+  return XHR(URL, options);
+}
+
+function* setDoneAction({ id, data }) {
+  try {
+    const { activeSet, active, selectedSession } = data;
+    const response = yield call(setDoneAPI, id);
+    yield put(setDoneSuccess(response.data));
+    selectedSession[active].sets[activeSet]['done'] = true;
+    const isAllDOne = selectedSession[active]?.sets?.every(set => set.done);
+    if (isAllDOne) {
+      selectedSession[active]['done'] = true;
+      yield put(workoutDone(selectedSession[active]?.id));
+    }
+    const [itemWorkoutUndone, nextWorkout] = selectedSession.filter(
+      workoutItem => !workoutItem.done
+    );
+
+    yield put(pickSession(itemWorkoutUndone, selectedSession, nextWorkout));
+    yield put(repsWeightRequest(id, null, null));
+    const newDate = moment(new Date()).format('YYYY-MM-DD');
+    yield put(getAllSessionRequest(newDate));
+  } catch (e) {
+    yield put(setDoneSuccess(false));
+  }
+}
+
+async function workoutDoneAPI(id) {
   const token = await AsyncStorage.getItem('authToken');
   const URL = `${API_URL}/session/mark_workout_done/`;
   const options = {
@@ -364,22 +431,47 @@ async function setDoneAPI(id) {
   return XHR(URL, options);
 }
 
-function* setDoneAction({ id }) {
+function* workoutDoneCompleted({ id }) {
   try {
-    const response = yield call(setDoneAPI, id);
-    console.log('Set Done res: ', response);
-    yield put(setDoneSuccess(response.data));
+    const response = yield call(workoutDoneAPI, id);
+    yield put(workoutDoneSuccess(response.data));
     const newDate = moment(new Date()).format('YYYY-MM-DD');
     yield put(getAllSessionRequest(newDate));
   } catch (e) {
-    console.log('Set Done error:', e);
-    yield put(setDoneSuccess(false));
+    yield put(workoutDoneSuccess(false));
   }
 }
 
+async function sessionDoneAPI(id) {
+  const token = await AsyncStorage.getItem('authToken');
+  const URL = `${API_URL}/session/mark_session_done/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'POST',
+    data: { id: id },
+  };
+  return XHR(URL, options);
+}
+
+function* sessionDoneCompleted({ id }) {
+  try {
+    const response = yield call(sessionDoneAPI, id);
+    yield put(sessionDoneSuccess(response.data));
+    const newDate = moment(new Date()).format('YYYY-MM-DD');
+    yield put(getAllSessionRequest(newDate));
+    goBack();
+  } catch (e) {
+    yield put(sessionDoneSuccess(false));
+  }
+}
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
   takeLatest(SETS_DONE_REQUEST, setDoneAction),
   takeLatest(TODAY_SESSIONS_REQUEST, getTodaySessions),
+  takeLatest(WORKOUT_DONE_REQUEST, workoutDoneCompleted),
+  takeLatest(SESSION_DONE_REQUEST, sessionDoneCompleted),
 ]);
