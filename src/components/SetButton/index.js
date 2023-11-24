@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
-import { Images } from '../../theme'
+import { Images } from '../../theme';
 
 const SetButton = ({ onPress, disabled, mainContainer, item, index, bg }) => (
   <View style={[styles.scrollContainer, mainContainer]}>

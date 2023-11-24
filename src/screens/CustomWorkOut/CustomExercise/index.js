@@ -605,7 +605,7 @@ const CustomExercise = props => {
                       setSets(prevValues => [
                         ...prevValues,
                         {
-                          ex_id: route?.params?.exercises?.map(e => e.id),
+                          ex_id: route?.params?.exercises?.[0]?.id,
                           set_no: 1,
                           reps:
                             droupSet &&
@@ -614,9 +614,9 @@ const CustomExercise = props => {
                               droupSet?.state2 +
                               (droupSet?.state3 ? '/' + droupSet?.state3 : ''),
                           weight: 10,
-                          set_type: 'ct',
-                          rest: minutes * 60 + parseFloat(seconds),
-                          timer: minutes * 60 + parseFloat(seconds),
+                          set_type: selectIndex + 1 === 3 ? 'tds' : 'ds',
+                          rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
+                          timer: minutes * 60 + parseFloat(seconds ? seconds : 0),
                         },
                       ]);
                       refRBSheet.current.close();
@@ -633,8 +633,8 @@ const CustomExercise = props => {
                         reps: reps,
                         weight: 10,
                         set_type: 'ct',
-                        rest: minutes * 60 + parseFloat(seconds),
-                        timer: minutes * 60 + parseFloat(seconds),
+                        rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
+                        timer: minutes * 60 + parseFloat(seconds ? seconds : 0),
                       },
                     ]);
                     refRBSheet.current.close();

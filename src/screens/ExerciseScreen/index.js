@@ -33,6 +33,7 @@ import {
   getAllSessionRequest,
   repsWeightRequest,
   setDoneRequest,
+  sessionDone,
 } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
@@ -238,22 +239,36 @@ const ExerciseScreen = props => {
     setWeightColor(false);
   };
 
-  const submitData = dd => {
-    const [findFirstNotDoneSet] = exerciseObj.sets.filter(item => !item.done);
-    const arrayHowManyDone = dd.sets.filter(countSetsDone => countSetsDone.done);
+  const submitData = data => {
+    const findSetId = data?.sets[activeSet];
+    const allDone = data.sets.every(set => set.done);
+    const arrayHowManyDone = data.sets.filter(countSetsDone => countSetsDone.done);
     const countHowManyDone = arrayHowManyDone.length;
-    setIncrement(countHowManyDone + 1);
 
-    if (countHowManyDone === exerciseObj.sets.length - 1) {
-      props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
-      props.setDoneRequest(dd.id);
-    } else {
-      props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
+    setIncrement(countHowManyDone + 1);
+    if (!allDone) {
+      if (!findSetId?.done) {
+        const data = {
+          activeSet,
+          active,
+          selectedSession,
+        };
+        props.setDoneRequest(findSetId.id, data);
+      }
     }
+
+    // if (countHowManyDone === exerciseObj.sets.length - 1) {
+    //   props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
+
+    //   props.setDoneRequest(dd.id);
+    // } else {
+    //   props.repsWeightRequest(findFirstNotDoneSet.id, true, true);
+    // }
   };
 
   const selectExercise = (item, i) => {
     setActive(i);
+    setActiveSet(0);
     props.repsWeightRequest(item?.sets?.[0]?.id, null, null);
     setTimmer(false);
     if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
@@ -522,9 +537,9 @@ const ExerciseScreen = props => {
                       startRest={timmer}
                       activeSet={activeSet}
                       onPress={() => {
+                        props.sessionDone(params?.item?.id);
                         setStartTimer(false);
                         setTimmer(false);
-                        Alert.alert('App is in Working please hold!');
                       }}
                       onFinish={() => setTimmer(false)}
                     />
@@ -544,8 +559,8 @@ const ExerciseScreen = props => {
           style={[fill, { width: '100%', marginTop: 20 }]}
         >
           <View style={[center, regularHMargin]}>
-            {exerciseObj?.exercise?.description ? (
-              <Text text={exerciseObj?.exercise?.description} />
+            {selectedSession?.[active]?.exercise?.description ? (
+              <Text text={selectedSession?.[active]?.exercise.description} />
             ) : (
               <Text text={'No Description is available!'} />
             )}
@@ -783,12 +798,16 @@ const ExerciseScreen = props => {
             ) : (
               <>
                 <View style={[row, fill, regularVMargin]}>
-                  <Text regularTitle color="quinary" text={`1. ${exerciseObj?.exercise?.name}`} />
+                  <Text
+                    regularTitle
+                    color="quinary"
+                    text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                  />
                 </View>
                 <View style={center}>
                   <Image
                     source={{
-                      uri: exerciseObj?.exercise?.pictures[0]?.image_url,
+                      uri: selectedSession?.[active]?.exercise?.pictures[0]?.image_url,
                     }}
                     style={styles.modalImageStyle}
                   />
@@ -879,7 +898,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   repsWeightRequest: (id, data, dd) => dispatch(repsWeightRequest(id, data, dd)),
-  setDoneRequest: id => dispatch(setDoneRequest(id)),
+  setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
+  sessionDone: id => dispatch(sessionDone(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen);
