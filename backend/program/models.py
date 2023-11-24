@@ -49,6 +49,10 @@ class Session(models.Model):
             sets.extend(workout.sets.all())
         return sets
 
+    def mark_done_completely(self):
+        self.done = True
+        self.save()
+
 
 class ExerciseImages(models.Model):
     exercise = models.ForeignKey('Exercise', related_name='pictures', on_delete=models.CASCADE)

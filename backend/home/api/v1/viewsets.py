@@ -779,6 +779,17 @@ class SessionViewSet(ModelViewSet):
             return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'])
+    def mark_session_done(self, request):
+        id = request.data.get('id')  # session  id
+        if id:
+            session = Session.objects.filter(id=id).first()
+            if session:
+                session.mark_done_completely()
+                return Response("Session marked done")
+            return Response({'error': "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=['get'])
     def list_exercises(self, request):
         id = request.GET.get('id')
