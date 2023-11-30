@@ -252,6 +252,7 @@ const ExerciseScreen = props => {
           activeSet,
           active,
           selectedSession,
+          setTimmer,
         };
         props.setDoneRequest(findSetId.id, data);
       }
@@ -471,7 +472,7 @@ const ExerciseScreen = props => {
                           loadingReps={props.loader}
                           repsColor={repsColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader}
+                          disabled={props.loader || timmer}
                         />
                         <FatExerciseButton
                           weight
@@ -489,7 +490,7 @@ const ExerciseScreen = props => {
                           loadingWeight={props.loader}
                           weightColor={weightColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader}
+                          disabled={props.loader || timmer}
                         />
                       </View>
                     )}
@@ -498,30 +499,30 @@ const ExerciseScreen = props => {
                         buttonText="Exercise Description"
                         buttonIcon={Images.detailIcon}
                         onPress={() => refDescription.current.open()}
+                        disabled={timmer}
                       />
                       <FatExerciseIconButton
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
+                        onPress={() =>
+                          navigation.navigate('SwapExerciseScreen', {
+                            // ScreenData: 'exerciseContainer',
+                          })
+                        }
+                        disabled={timmer}
                       />
                       <FatGradientIconButton
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === 'cr'
                             ? 'Complete'
-                            : item?.sets &&
-                              item?.sets[item?.sets.length - 1].id &&
-                              item?.sets[item?.sets.length - 1].done
+                            : item?.sets && item?.sets[activeSet].done
                             ? 'Done'
                             : 'Done, Start Rest'
                         }
                         buttonIcon={Images.iconDoneStartRest}
                         colorsGradient={['#3180BD', '#6EC2FA']}
                         colorsGradientDisable={['#d3d3d3', '#838383']}
-                        disabled={
-                          timmer ||
-                          (item?.sets &&
-                            item?.sets?.[item?.sets?.length - 1].id &&
-                            item?.sets?.[item?.sets?.length - 1].done)
-                        }
+                        disabled={timmer || (item?.sets && item?.sets[activeSet].done)}
                         onPress={() => {
                           if (item?.sets && item?.sets?.[activeSet].done) {
                             setTimmer(true);
@@ -541,7 +542,9 @@ const ExerciseScreen = props => {
                         setStartTimer(false);
                         setTimmer(false);
                       }}
+                      resetTime={item?.sets && item?.sets?.[activeSet].timer}
                       onFinish={() => setTimmer(false)}
+                      isDisable={timmer}
                     />
                   </ScrollView>
                 </View>

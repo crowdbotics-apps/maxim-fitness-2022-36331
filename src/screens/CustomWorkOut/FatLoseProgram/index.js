@@ -33,17 +33,21 @@ const FatLoseProgram = props => {
   const [index, setIndex] = useState(false);
   const [isModal, setIsModal] = useState(false);
   const [data, setData] = useState({});
-
   const vacation = { key: 'vacation', color: 'red', selectedDotColor: 'blue' };
   const massage = { key: 'massage', color: 'blue', selectedDotColor: 'blue' };
 
   useEffect(() => {
     getWeekSessions?.query?.map((p, i) => {
       if (p.date_time === moment(new Date()).format('YYYY-MM-DD')) {
-        setIndex(p?.date_time);
+        !index && setIndex(p?.date_time);
       }
     });
   }, [getWeekSessions]);
+  useEffect(() => {
+    if (getWeekSessions?.week) {
+      setActiveIndex(getWeekSessions?.week);
+    }
+  }, [getWeekSessions?.week]);
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
@@ -56,6 +60,7 @@ const FatLoseProgram = props => {
       const newDate = moment(new Date()).format('YYYY-MM-DD');
       props.getAllSessionRequest(newDate);
       props.getDaySessionRequest(newDate);
+      setIndex(false);
     });
     return unsubscribe;
   }, [navigation]);
@@ -65,30 +70,27 @@ const FatLoseProgram = props => {
   const { smallVMargin, regularHMargin, tinyLMargin } = Gutters;
 
   const nextExercise = () => {
-    if (getWeekSessions?.week > activeIndex) {
-      setActiveIndex(Number(activeIndex) + 1);
-      if (getWeekSessions?.query?.length) {
-        const today = new Date(getWeekSessions.query[0].date_time);
-        const lastDay = new Date(today.setDate(today.getDate() + 7));
-        const hh = moment(lastDay).format('YYYY-MM-DD');
-        setIndex(hh);
-        props.getAllSessionRequest(hh);
-        props.getDaySessionRequest(hh);
-      }
+    setActiveIndex(Number(activeIndex) + 1);
+    if (getWeekSessions?.query?.length) {
+      const today = new Date(getWeekSessions?.query[0].date_time);
+      const lastDay = new Date(today.setDate(today.getDate() + 7));
+      const hh = moment(lastDay).format('YYYY-MM-DD');
+      setIndex(hh);
+      props.getAllSessionRequest(hh);
+      props.getDaySessionRequest(hh);
     }
   };
 
   const previousExercise = () => {
-    if (activeIndex > 1) {
-      setActiveIndex(Number(activeIndex) - 1);
-      if (getWeekSessions?.query?.length) {
-        const today = new Date(getWeekSessions.query[0].date_time);
-        const lastDay = new Date(today.setDate(today.getDate() - 7));
-        const hh = moment(lastDay).format('YYYY-MM-DD');
-        setIndex(hh);
-        props.getAllSessionRequest(hh);
-        props.getDaySessionRequest(hh);
-      }
+    setActiveIndex(Number(activeIndex) - 1);
+    if (getWeekSessions?.query?.length) {
+      const today = new Date(getWeekSessions.query[0].date_time);
+
+      const lastDay = new Date(today.setDate(today.getDate() - 7));
+      const hh = moment(lastDay).format('YYYY-MM-DD');
+      setIndex(hh);
+      props.getAllSessionRequest(hh);
+      props.getDaySessionRequest(hh);
     }
   };
 
@@ -142,12 +144,31 @@ const FatLoseProgram = props => {
     props.getAllSessionRequest();
   };
   const onDayPress = date => {
-    // setLoading(true)
-    const listData = getWeekSessions?.query?.find(obj => obj.date_time === date?.dateString);
+    const dateList = Object.keys(data);
+    const listData = dateList?.find(obj => obj === date?.dateString);
+    const checkWeek = getWeekSessions?.query?.find(obj => obj.date_time === date?.dateString);
+
     if (listData) {
+      const index = dateList.indexOf(date?.dateString);
+      const isDateInFirstWeek = index <= dateList.length / 2;
+      setActiveIndex(isDateInFirstWeek ? 1 : 2);
       setIndex(date?.dateString);
-      const newDate = moment(date?.dateString).format('YYYY-MM-DD');
-      props.getDaySessionRequest(newDate);
+
+      if (!checkWeek) {
+        const today = new Date(getWeekSessions.query[0].date_time);
+        const lastDay = new Date(
+          today.setDate(isDateInFirstWeek ? today.getDate() - 7 : today.getDate() + 7)
+        );
+        const hh = moment(lastDay).format('YYYY-MM-DD');
+        props.getAllSessionRequest(hh);
+
+        const newDate = moment(date?.dateString).format('YYYY-MM-DD');
+        props.getDaySessionRequest(newDate);
+      } else {
+        const newDate = moment(date?.dateString).format('YYYY-MM-DD');
+        props.getDaySessionRequest(newDate);
+      }
+
       setIsModal(false);
     }
   };
@@ -168,7 +189,7 @@ const FatLoseProgram = props => {
             <View style={[row, alignItemsCenter, justifyContentBetween, Gutters.small2xTMargin]}>
               <TouchableOpacity
                 style={row}
-                onPress={getWeekSessions?.week > activeIndex ? nextExercise : previousExercise}
+                onPress={activeIndex === 1 ? nextExercise : previousExercise}
               >
                 {getWeekSessions?.week > 0 && activeIndex > 1 ? (
                   <Icon type="FontAwesome5" name={'chevron-left'} style={styles.IconStyle} />
@@ -176,7 +197,7 @@ const FatLoseProgram = props => {
                 <Text
                   color="primary"
                   text={`Week ${
-                    getWeekSessions?.week > 0 && activeIndex > 1
+                    activeIndex > 1
                       ? getWeekSessions?.week - 1
                       : getWeekSessions?.week === undefined
                       ? ''
@@ -184,7 +205,7 @@ const FatLoseProgram = props => {
                   }`}
                   style={[tinyLMargin, styles.smallText]}
                 />
-                {getWeekSessions?.week > 0 && activeIndex > 1 ? null : (
+                {activeIndex > 1 ? null : (
                   <Icon type="FontAwesome5" name={'chevron-right'} style={styles.IconStyle} />
                 )}
               </TouchableOpacity>
