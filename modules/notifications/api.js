@@ -7,7 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const BASE_URL = API_URL;
 
 export const registerDeviceInfoAPI = async (data, authToken) => {
-  const response = await fetch(`${BASE_URL}/device/fcm/`, {
+  const iosUrl = `${BASE_URL}/device/apns/`;
+  const androidUrl = `${BASE_URL}/device/fcm/`;
+  const response = await fetch(Platform.OS === 'android' ? androidUrl : iosUrl, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'token ' + authToken,
