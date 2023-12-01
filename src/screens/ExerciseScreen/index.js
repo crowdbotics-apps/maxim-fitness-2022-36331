@@ -504,11 +504,9 @@ const ExerciseScreen = props => {
                       <FatExerciseIconButton
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
-                        onPress={() =>
-                          navigation.navigate('SwapExerciseScreen', {
-                            // ScreenData: 'exerciseContainer',
-                          })
-                        }
+                        // onPress={() =>
+                        //   navigation.navigate('SwapExerciseScreen')
+                        // }
                         disabled={timmer}
                       />
                       <FatGradientIconButton
