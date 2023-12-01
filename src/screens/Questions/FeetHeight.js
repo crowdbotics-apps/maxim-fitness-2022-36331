@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { View, ScrollView, SafeAreaView, Platform } from 'react-native';
 import { connect } from 'react-redux';
 
 //Components
@@ -7,7 +7,7 @@ import { Text, Button, InputField } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Global, Layout, Gutters, Fonts } from '../../theme';
+import { Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -47,16 +47,25 @@ const FeetHeight = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto
+              Global.borderAlto,
             ]}
           >
             <InputField
-              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              inputStyle={[
+                Fonts.titleRegular,
+                Layout.fill,
+                {
+                  paddingHorizontal: 0,
+                  height: Platform.OS === 'android' ? 0 : 60,
+                  color: Colors.black,
+                },
+              ]}
               value={feet}
               onChangeText={val => setFeet(val)}
               placeholder="Feet"
               autoCapitalize="none"
               keyboardType="numeric"
+              placeholderTextColor={Colors.black}
             />
           </View>
           <View
@@ -66,16 +75,24 @@ const FeetHeight = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto
+              Global.borderAlto,
             ]}
           >
             <InputField
-              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              inputStyle={[
+                Fonts.titleRegular,
+                Layout.fill,
+                {
+                  paddingHorizontal: 0,
+                  height: Platform.OS === 'android' ? 0 : 60,
+                },
+              ]}
               value={inches}
               onChangeText={val => setInches(val)}
               placeholder="Inches"
               autoCapitalize="none"
               keyboardType="numeric"
+              placeholderTextColor={Colors.black}
             />
           </View>
         </View>

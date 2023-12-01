@@ -7,7 +7,7 @@ import { Text, Button, InputField } from '../../components';
 import HeaderTitle from './Components/HeaderTitle';
 
 //Themes
-import { Global, Layout, Gutters, Fonts } from '../../theme';
+import { Global, Layout, Gutters, Fonts, Colors } from '../../theme';
 
 //Actions
 import { updateAnswer } from './Redux';
@@ -46,15 +46,23 @@ const WeightPounds = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto
+              Global.borderAlto,
             ]}
           >
             <InputField
-              inputStyle={[Fonts.titleRegular, Layout.fill, { paddingHorizontal: 0 }]}
+              inputStyle={[
+                Fonts.titleRegular,
+                Layout.fill,
+                {
+                  paddingHorizontal: 0,
+                  height: Platform.OS === 'android' ? 0 : 60,
+                },
+              ]}
               value={pound}
               onChangeText={val => setPounds(val)}
               placeholder="Pounds"
               autoCapitalize="none"
+              placeholderTextColor={Colors.black}
               keyboardType="numeric"
             />
           </View>

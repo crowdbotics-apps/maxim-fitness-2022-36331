@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, SafeAreaView, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  SafeAreaView,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { connect } from 'react-redux';
 import SwipeListSelectBrand from '../../components/SwipeListSelectBrand';
 import { Icon } from 'native-base';
 import { InputField } from '../../components';
-import { Images, Layout, Gutters, Global } from '../../theme'
-import { getFoodsSearchRequest, commonBrandedRequest } from '../../ScreenRedux/nutritionRedux'
+import { Images, Layout, Gutters, Global } from '../../theme';
+import { getFoodsSearchRequest, commonBrandedRequest } from '../../ScreenRedux/nutritionRedux';
 
-const SelectBrand = (props) => {
-  const {
-    navigation,
-    foodSearchState,
-    foodRequesting,
-  } = props
+const SelectBrand = props => {
+  const { navigation, foodSearchState, foodRequesting } = props;
   const [value, setValue] = useState('');
   const [filterData, setFilterData] = useState([]);
   const [filterCommon, setFilterCommon] = useState([]);
@@ -50,7 +55,7 @@ const SelectBrand = (props) => {
             <TouchableOpacity
               key={index}
               onPress={() => {
-                const data = { name: item.food_name, item: 'common' }
+                const data = { name: item.food_name, item: 'common' };
                 props.commonBrandedRequest(data);
                 navigation.navigate('LogFoods', { item, index, partialResults: [] });
                 setValue('');
@@ -86,7 +91,7 @@ const SelectBrand = (props) => {
             <TouchableOpacity
               key={index}
               onPress={() => {
-                const data = { id: item.nix_item_id, item: 'branded' }
+                const data = { id: item.nix_item_id, item: 'branded' };
                 props.commonBrandedRequest(data);
                 navigation.navigate('LogFoods', { item, index, partialResults: [] });
               }}
@@ -115,11 +120,29 @@ const SelectBrand = (props) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={[Layout.row, Layout.alignItemsCenter, Layout.justifyContentBetween, Global.height65, Gutters.regularHMargin]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsStart]} >
+      <View
+        style={[
+          Layout.row,
+          Layout.alignItemsCenter,
+          Layout.justifyContentBetween,
+          Global.height65,
+          Gutters.regularHMargin,
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsStart]}
+        >
           <Image style={styles.leftArrowStyle} source={Images.leftArrow} />
         </TouchableOpacity>
-        <View style={{ flex: 4, alignItems: 'flex-start', borderBottomWidth: 1, borderBottomColor: 'gray' }}>
+        <View
+          style={{
+            flex: 4,
+            alignItems: 'flex-start',
+            borderBottomWidth: 1,
+            borderBottomColor: 'gray',
+          }}
+        >
           <InputField
             inputStyle={Layout.fullWidth}
             value={value}
@@ -130,7 +153,7 @@ const SelectBrand = (props) => {
         </View>
         <TouchableOpacity
           style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsEnd]}
-        // onPress={() => navigation.navigate('SelectBrand')}
+          // onPress={() => navigation.navigate('SelectBrand')}
         >
           <Image style={styles.barCodeStyle} source={Images.barCode} />
         </TouchableOpacity>
@@ -159,19 +182,16 @@ const SelectBrand = (props) => {
               Use the search box above to search for foods to add to your log
             </Text>
           </View>
-        ) : foodRequesting ?
-          (
-            <View style={styles.loaderStyle}>
-              <ActivityIndicator size="large" color="green" />
-            </View>
-          )
-          :
-          (
-            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
-              <View>{filterCommon && renderedData()}</View>
-              <View>{filterBranded && renderFilterData()}</View>
-            </ScrollView>
-          )}
+        ) : foodRequesting ? (
+          <View style={styles.loaderStyle}>
+            <ActivityIndicator size="large" color="green" />
+          </View>
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
+            <View>{filterCommon && renderedData()}</View>
+            <View>{filterBranded && renderFilterData()}</View>
+          </ScrollView>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -189,16 +209,16 @@ const styles = StyleSheet.create({
   barCodeStyle: {
     height: 40,
     width: 40,
-    resizeMode: 'cover'
+    resizeMode: 'cover',
   },
 });
 const mapStateToProps = state => ({
   foodRequesting: state.nutritionReducer.foodRequesting,
-  foodSearchState: state.nutritionReducer.foodSearchState
+  foodSearchState: state.nutritionReducer.foodSearchState,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getFoodsSearchRequest: (data) => dispatch(getFoodsSearchRequest(data)),
-  commonBrandedRequest: (data) => dispatch(commonBrandedRequest(data)),
+  getFoodsSearchRequest: data => dispatch(getFoodsSearchRequest(data)),
+  commonBrandedRequest: data => dispatch(commonBrandedRequest(data)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SelectBrand);

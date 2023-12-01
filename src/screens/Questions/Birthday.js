@@ -23,6 +23,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { updateAnswer } from './Redux';
 import RemotePushController from '../../../modules/notifications/utils';
 
+// Must be outside of any component LifeCycle (such as `componentDidMount`).
+
 const Birthday = props => {
   const {
     profile,
@@ -97,7 +99,9 @@ const Birthday = props => {
           <DatePicker
             date={date}
             mode="date"
-            onDateChange={val => {
+            is24Hour={true}
+            display="spinner"
+            onChange={(val, isDate) => {
               const dob = moment(val).format('YYYY-MM-DD');
               setNavState(dob);
             }}

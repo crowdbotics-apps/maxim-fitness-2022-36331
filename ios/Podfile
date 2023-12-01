@@ -1,6 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
+
 platform :ios, '14.0'
 
 target 'maxim_fitness_2022_36331' do
@@ -12,7 +13,11 @@ target 'maxim_fitness_2022_36331' do
     :hermes_enabled => false
   )
 
+  pod 'Firebase/Core'
+  pod 'Firebase/Messaging'
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
 
   target 'maxim_fitness_2022_36331Tests' do
     inherit! :complete
@@ -24,7 +29,8 @@ target 'maxim_fitness_2022_36331' do
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable the next line.
   # use_flipper!()
-
+  
+  
   post_install do |installer|
     react_native_post_install(installer)
   end
