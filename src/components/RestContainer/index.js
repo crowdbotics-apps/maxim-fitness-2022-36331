@@ -10,14 +10,14 @@ import {
 import * as Progress from 'react-native-progress';
 import Timer from '../Timer';
 
-const RestContainer = ({ onPress, startRest, loading, isDisable, onFinish }) => {
+const RestContainer = ({ onPress, startRest, loading, isDisable, onFinish, resetTime }) => {
   const widthProgress = Dimensions.get('screen').width;
   const [increment, setIncrement] = useState(0);
 
   useEffect(() => {
     if (startRest) {
       setTimeout(() => {
-        setIncrement(increment + 1 / 90);
+        setIncrement(increment + 1 / (resetTime ? resetTime : 90));
       }, 1000);
     } else {
       setIncrement(0);
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: { fontSize: 18, color: 'white', fontWeight: 'bold', textAlign: 'center' },
-})
+});
 
 export default RestContainer;

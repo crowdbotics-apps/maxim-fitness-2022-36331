@@ -35,6 +35,10 @@ const WORKOUT_DONE_SUCCESS = 'ProgramScreen/WORKOUT_DONE_SUCCESS';
 const EXERCISE_DONE_REQUEST = 'ProgramScreen/EXERCISE_DONE_REQUEST';
 const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
 
+const SAVE_SWIPE_DATE = 'ProgramScreen/SAVE_SWIPE_DATE';
+const SWAP_EXERCISE = 'ProgramScreen/SWAP_EXERCISE';
+const ALL_SWAP_EXERCISE = 'ProgramScreen/ALL_SWAP_EXERCISE';
+
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
   data,
@@ -116,6 +120,27 @@ export const exerciseDoneRequest = data => ({
 export const exerciseDoneSuccess = data => ({
   type: EXERCISE_DONE_SUCCESS,
   data,
+});
+
+export const saveSwipeDateAction = (weekDate, date, activeIndex) => ({
+  type: SAVE_SWIPE_DATE,
+  payload: {
+    weekDate,
+    date,
+    activeIndex,
+  },
+});
+
+export const swapExercises = (workout_id, exercise_id, rest_of_program) => ({
+  type: SWAP_EXERCISE,
+  workout_id,
+  exercise_id,
+  rest_of_program,
+});
+
+export const allSwapExercise = exerciseId => ({
+  type: ALL_SWAP_EXERCISE,
+  exerciseId,
 });
 
 const initialState = {
@@ -395,7 +420,7 @@ async function setDoneAPI(id) {
 
 function* setDoneAction({ id, data }) {
   try {
-    const { activeSet, active, selectedSession } = data;
+    const { activeSet, active, selectedSession, setTimmer } = data;
     const response = yield call(setDoneAPI, id);
     yield put(setDoneSuccess(response.data));
     selectedSession[active].sets[activeSet]['done'] = true;
@@ -403,6 +428,8 @@ function* setDoneAction({ id, data }) {
     if (isAllDOne) {
       selectedSession[active]['done'] = true;
       yield put(workoutDone(selectedSession[active]?.id));
+    } else {
+      setTimmer(true);
     }
     const [itemWorkoutUndone, nextWorkout] = selectedSession.filter(
       workoutItem => !workoutItem.done
