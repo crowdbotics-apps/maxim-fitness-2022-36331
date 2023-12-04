@@ -121,6 +121,7 @@ const AddExercies = props => {
                 inputStyle={[Global.height40, Fonts.textMedium, { padding: 0 }]}
                 placeholder="search"
                 autoCapitalize="none"
+                placeholderTextColor={Colors.black}
               />
             </View>
             <View style={fill} />
