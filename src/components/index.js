@@ -25,6 +25,8 @@ import RuningCard from './RuningCard';
 import HeaderForDrawer from './HeaderForDrawer';
 import MealEmptyItem from './MealEmptyItem';
 import MealHistory from './MealHistory';
+import CustomModal from './CustomModal';
+import ExerciseCard from './ExerciseCard';
 
 export {
   Text,
@@ -54,4 +56,6 @@ export {
   HeaderForDrawer,
   MealEmptyItem,
   MealHistory,
+  CustomModal,
+  ExerciseCard,
 };

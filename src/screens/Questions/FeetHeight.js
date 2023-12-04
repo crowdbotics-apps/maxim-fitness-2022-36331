@@ -65,7 +65,6 @@ const FeetHeight = props => {
               placeholder="Feet"
               autoCapitalize="none"
               keyboardType="numeric"
-              placeholderTextColor={Colors.black}
             />
           </View>
           <View
@@ -92,7 +91,6 @@ const FeetHeight = props => {
               placeholder="Inches"
               autoCapitalize="none"
               keyboardType="numeric"
-              placeholderTextColor={Colors.black}
             />
           </View>
         </View>

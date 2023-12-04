@@ -234,8 +234,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
-  pickSession: (exerciseObj, selectedSession, nextWorkout) =>
-    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
+  pickSession: (exerciseObj, selectedSession, nextWorkout, item) =>
+    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout, item)),
   // pickSessionAction: (data) => dispatch(pickSession(data)),
   // saveSwipeDateAction: () => dispatch(saveSwipeDateAction()),
   // resetSwipeDateAction: () => dispatch(resetSwipeDateAction()),

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
@@ -9,30 +10,25 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import HeaderForDrawer from '../../components/HeaderForDrawer';
 import { Images } from '../../theme';
 
+import { CustomModal } from '../../components';
+
+//actions
+import { swapExercises } from '../../ScreenRedux/programServices';
+
+const windowHeight = Dimensions.get('window').height;
+
 const SwapExerciseContainer = props => {
-  const {
-    navigation,
-    navigation: { toggleDrawer },
-    selectedSwapObj,
-    swapExercisesAction,
-    allExerciseSwapped,
-    route,
-    saveSwipeDateAction,
-  } = props;
+  const { navigation, swapExercises, allExerciseSwapped, route, requesting } = props;
+
   const [loading, setLoading] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
-
-  // useEffect(() => {
-  //   // if (route?.params?.ScreenData?.id) {
-  //   //   getAllSwapExercise(route.params.ScreenData.id);
-  //   // } else {
-  //   // getAllSwapExercise(selectedSwapObj.id);
-  //   // }
-  // }, []);
+  const [selectItem, setSelectItem] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     setLoading([]);
@@ -42,26 +38,30 @@ const SwapExerciseContainer = props => {
   }, []);
 
   const onPress = item => {
-    saveSwipeDateAction(
-      route?.params?.ScreenData?.weekDate,
-      route?.params?.ScreenData?.dateTime,
-      route?.params?.ScreenData?.activeIndex
-    );
-    let rest_of_program = item.id;
-    if (route?.params?.ScreenData?.data?.id) {
-      swapExercisesAction(
-        route?.params?.ScreenData?.data?.id,
-        route?.params?.ScreenData?.data?.exercise.id,
-        rest_of_program
-      );
-    } else {
-      swapExercisesAction(selectedSwapObj.id, selectedSwapObj.exercise.id, rest_of_program);
+    setShowModal(true);
+    setSelectItem(item.id);
+  };
+  const swapDone = () => {
+    if (selectItem) {
+      const swapData = {
+        workout_id: route?.params?.ScreenData?.data?.id,
+        exercise_id: route?.params?.ScreenData?.data?.exercise.id,
+        rest_of_program: selectItem,
+      };
+      swapExercises(swapData, route?.params?.ScreenData?.date_time);
     }
   };
 
   const renderItem = ({ item, index }) => {
     return (
-      <TouchableOpacity key={index} onPress={() => onPress(item)} style={styles.mainContainer}>
+      <TouchableOpacity
+        key={index}
+        onPress={() => onPress(item)}
+        style={[
+          styles.mainContainer,
+          { backgroundColor: item?.id === selectItem ? '#74ccff' : '#f0f0f0' },
+        ]}
+      >
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <Image
             source={{
@@ -97,11 +97,7 @@ const SwapExerciseContainer = props => {
           }),
         }}
         onPress={() => {
-          if (route && route.params.ScreenData === 'exerciseContainer') {
-            navigation.goBack();
-          } else {
-            navigation.navigate('ProgramScreen');
-          }
+          navigation.goBack();
         }}
       >
         <Image style={{ width: 30, height: 30 }} source={Images.leftArrow} />
@@ -114,28 +110,40 @@ const SwapExerciseContainer = props => {
         }}
       />
       <View style={{ flex: 1 }}>
-        <>
-          {allExerciseSwapped?.length > 0 && allExerciseSwapped !== 'no exercise available' ? (
-            <FlatList
-              data={allExerciseSwapped || []}
-              keyExtractor={index => index.toString()}
-              renderItem={renderItem}
-            />
-          ) : allExerciseSwapped === 'no exercise available' ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: 'black', fontSize: 20 }}>
-                {loadingData ? 'No exercises found!' : null}
-              </Text>
-            </View>
-          ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: 'black', fontSize: 20 }}>
-                {loadingData ? 'No exercises found!' : null}
-              </Text>
-            </View>
-          )}
-        </>
+        {requesting ? (
+          <View style={styles.loaderStyle}>
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : (
+          <>
+            {allExerciseSwapped?.length > 0 && allExerciseSwapped !== 'no exercise available' ? (
+              <FlatList
+                data={allExerciseSwapped || []}
+                keyExtractor={index => index.toString()}
+                renderItem={renderItem}
+              />
+            ) : allExerciseSwapped === 'no exercise available' ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: 'black', fontSize: 20 }}>
+                  {loadingData ? 'No exercises found!' : null}
+                </Text>
+              </View>
+            ) : (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: 'black', fontSize: 20 }}>
+                  {loadingData ? 'No exercises found!' : null}
+                </Text>
+              </View>
+            )}
+          </>
+        )}
       </View>
+      <CustomModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        text={'Are you sure you want to swap this exercise?'}
+        action={swapDone}
+      />
     </SafeAreaView>
   );
 };
@@ -155,6 +163,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 20,
   },
+  loaderStyle: {
+    height: windowHeight * 0.6,
+    justifyContent: 'center',
+  },
 });
 
-export default SwapExerciseContainer;
+const mapState = state => ({
+  allExerciseSwapped: state.programReducer && state.programReducer.allExerciseSwapped,
+  requesting: state.programReducer && state.programReducer.loading,
+});
+
+const mapDispatchToProps = dispatch => ({
+  swapExercises: (data, date_time) => dispatch(swapExercises(data, date_time)),
+});
+
+export default connect(mapState, mapDispatchToProps)(SwapExerciseContainer);

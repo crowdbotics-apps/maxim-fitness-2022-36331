@@ -64,7 +64,6 @@ const WeightKg = props => {
               placeholder="Kilograms"
               autoCapitalize="none"
               keyboardType="numeric"
-              placeholderTextColor={Colors.black}
             />
           </View>
         </View>
