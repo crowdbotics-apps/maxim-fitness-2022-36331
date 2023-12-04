@@ -1,4 +1,4 @@
-rootProject.name = 'demo'
+rootProject.name = 'maxim_fitness_2022_36331'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
 includeBuild('../node_modules/react-native-gradle-plugin')

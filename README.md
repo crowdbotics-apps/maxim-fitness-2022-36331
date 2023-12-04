@@ -1,17 +1,15 @@
-# demo
+# maxim_fitness_2022_36331
 
 Welcome to your new Crowdbotics app.
 
 ## What is Crowdbotics?
-
-Crowdbotics is an easy way to build software applications of all kinds. You can build production, high-caliber software applications in minutes, rather than weeks or months, even if you're not a software developer.
+Crowdbotics is an easy way to build software applications of all kinds.  You can build production, high-caliber software applications in minutes, rather than weeks or months, even if you're not a software developer.
 
 The reason this works is that most software applications and features we want to build are similar to applications that have been built before. We've crawled hundreds of thousands of public code repositories to teach the Crowdbotics engine how to create software.
 
 As a result, Crowdbotics can generate new applications automatically in a standardized way.
 
 ### Useful Links
-
 [App Dashboard](https://app.crowdbotics.com/)
 ·
 [Knowledgebase](https://knowledge.crowdbotics.com/)
@@ -23,7 +21,6 @@ As a result, Crowdbotics can generate new applications automatically in a standa
 [Tech Support](https://crowdbotics.slack.com/archives/CGSAV319V)
 
 ## Table of Contents
-
 1. [Project Description](#project-description)
 2. [Project Structure](#project-structure)
 3. [Modules](#modules)
@@ -38,7 +35,7 @@ As a result, Crowdbotics can generate new applications automatically in a standa
 
 ## Project Description
 
-
+This react_native application was built with Crowdbotics www.crowdbotics.com
 
 ## Project Structure
 
@@ -48,8 +45,8 @@ As a result, Crowdbotics can generate new applications automatically in a standa
     ├── backend                 # Django backend REST API
     ├── ios                     # iOS native files
     ├── modules                 # Modules
-    ├── public
-    ├── screens
+    ├── public                  
+    ├── screens                 
     ├── store                   # Application state storage
     ├── ...
     ├── README.md
@@ -136,26 +133,14 @@ to setup your certificates.
 
 ## React Native Web
 
-You can build and deploy your React Native app in the web too!
+It is to build and deploy your app as web platform which run on browser
 
-To get started run:
+Please follow the steps
 
-```sh
-yarn run web
-```
-
-This will start a local development server so that you can iterate and preview your changes. Visit it at [localhost:8080](http://localhost:8080).
-
-To build the web version of the project you can run:
-
-```sh
-yarn run web:build
-```
-
-And then commit/push the output created at `backend/web_build` to the git repository.
+- please run `yarn web-build`
+- the web_build folder is generated and copied to backend/ automatically. please commit/push the web_build folder to git
 
 # License
-
 The use of code in this repository is governed by Crowdbotics [Terms and Conditions](https://www.crowdbotics.com/terms-of-service).
 
 Created with ❤️ by [Crowdbotics](https://www.crowdbotics.com/)

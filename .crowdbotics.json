@@ -1,14 +1,6 @@
 {
   "scaffold": {
     "type": "react-native",
-    "version": "2.2.0",
-    "cookiecutter_context": {
-      "project_name": "demo",
-      "project_slug": "demo",
-      "project_dash_slug": "demo",
-      "project_description": "",
-      "owner_email": "demo@crowdbotics.com",
-      "ssh_key_fingerprint": ""
-    }
+    "version": "1.0.0"
   }
 }

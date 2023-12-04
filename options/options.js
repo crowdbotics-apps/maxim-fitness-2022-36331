@@ -1,15 +1,12 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from 'react-native';
 
 export const globalOptions = {
-  name: "demo",
-  url: "https://demo.botics.co",
-  api: "https://demo.botics.co/api/v1",
-  screenOptions: {
-    headerShown: false
-  }
+  name: 'maxim_fitness_2022_36331',
+  url: 'https://maxim_fitness_2022_36331.botics.co',
+  api: 'https://maxim_fitness_2022_36331.botics.co/api/v1',
 }
 export const modulesOptions = {
-  "@modules/app-menu": {
-    copy: "Routes available!"
+  '@modules/app-menu': {
+    copy: 'Routes available!',
   }
 }

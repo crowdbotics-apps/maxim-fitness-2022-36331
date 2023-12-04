@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "maxim-fitness-2022-36331",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -44,6 +44,7 @@
     "react-native-date-picker": "^4.3.3",
     "react-native-device-info": "^10.12.0",
     "react-native-dotenv": "^3.4.8",
+    "react-native-eject": "^0.2.0",
     "react-native-emoji-selector": "^0.2.0",
     "react-native-fbsdk": "^3.0.0",
     "react-native-flash-message": "^0.4.2",

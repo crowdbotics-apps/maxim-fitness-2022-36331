@@ -21,7 +21,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'demo' do
+target 'maxim_fitness_2022_36331' do
   config = use_native_modules!
 
   # Flags change depending on the env values.
@@ -43,14 +43,7 @@ target 'demo' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'Firebase', :modular_headers => true
-  pod 'FirebaseCoreInternal', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'FirebaseCore', :modular_headers => true
-  permissions_path = '../node_modules/react-native-permissions/ios'
-  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
-
-  target 'demoTests' do
+  target 'maxim_fitness_2022_36331Tests' do
     inherit! :complete
     # Pods for testing
   end
