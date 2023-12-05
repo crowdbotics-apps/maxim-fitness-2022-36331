@@ -19,7 +19,6 @@ import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import useForm from '../../utils/useForm';
 import validator from '../../utils/validation';
-import { createThumbnail } from "react-native-create-thumbnail";
 
 //action
 import { AddPostData } from '../../ScreenRedux/addPostRequest';

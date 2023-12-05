@@ -1,14 +1,20 @@
 module.exports = {
   root: true,
-  extends: '@react-native-community',
+  extends: "@react-native-community",
   rules: {
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
         semi: false,
-        parser: 'babel',
-        trailingComma: 'none',
-        arrowParens: 'avoid',
+        parser: "babel",
+        trailingComma: "none",
+        arrowParens: "avoid"
+      }
+    ],
+    "react-hooks/exhaustive-deps": [
+      "error",
+      {
+        additionalHooks: "(useAnimatedStyle|useDerivedValue|useAnimatedProps)"
       }
     ]
   }

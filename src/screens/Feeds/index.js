@@ -13,7 +13,6 @@ import { Text, Header, FeedCard } from '../../components';
 import { Images } from 'src/theme';
 import Video from 'react-native-video';
 import { connect } from 'react-redux';
-import { useNetInfo } from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import Modal from 'react-native-modal';
@@ -34,7 +33,6 @@ const Feeds = props => {
 
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
-  let netInfo = useNetInfo();
   useEffect(() => {
     props.getFeedsRequest(page);
   }, []);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { CheckBox } from 'react-native-elements';
 import {
   View,
   StyleSheet,
