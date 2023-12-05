@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "750002418089",
+    "firebase_url": "https://orum-training-23610-default-rtdb.firebaseio.com",
+    "project_id": "orum-training-23610",
+    "storage_bucket": "orum-training-23610.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750002418089:android:5846940519c21714b754b8",
+        "android_client_info": {
+          "package_name": "com.maxim_fitness_2022_36331"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750002418089-37ld7o7spro39do9m0mf42j8i6hs6ufq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSG_rLf8n-UZAaw0OppJ6c-Y10_eu8JO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750002418089-37ld7o7spro39do9m0mf42j8i6hs6ufq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750002418089-9dcd92drg12iknifgkju4ojb49dcr98p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.orumtraining"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
