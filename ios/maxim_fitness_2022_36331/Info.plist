@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>maxim_fitness_2022_36331</string>
+	<string>Orum Training</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,8 +20,35 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1123564435225618</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.146444618570-57mrfdva3ths48nhte71f12l7lqbu7t1</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>1123564435225618</string>
+	<key>FacebookDisplayName</key>
+	<string>Orum Training</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -35,8 +62,24 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Orum Training application need access of camera for Bar code scanner</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need to use for login via facebook and google</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Need to use for login via facebook and google</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Orum Training application need access of microphone for Bar code scanner or Speech Recognition</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Orum Training application need access of photo library for Bar code scanner</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Orum Training application need access of the speech recognition for adding meals</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,5 +94,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+	</array>
 </dict>
 </plist>
