@@ -5,7 +5,7 @@ import { theme } from '@options'
 import FlashMessage from 'react-native-flash-message'
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
-import { NativeBaseProvider } from 'native-base';
+import { NativeBaseProvider } from 'native-base'
 import Navigation from 'src/navigation'
 
 import { store } from 'src/redux/store'
