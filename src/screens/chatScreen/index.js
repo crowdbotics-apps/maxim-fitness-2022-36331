@@ -13,16 +13,113 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
+import { connect } from 'react-redux';
+
 import { Images } from 'src/theme';
 import { Text, Header } from '../../components';
 
+import { useFocusEffect } from '@react-navigation/native';
+import { usePubNub } from 'pubnub-react';
+import { fetchChannels, useStore } from '../../utils/chat';
+
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images;
 const ChatScreen = props => {
-  const { navigation, profileUserData, requesting } = props;
+  const { navigation, profileUserData, requesting, userProfile } = props;
   const { width } = Dimensions.get('window');
   const [followUser, setFollowUser] = useState([]);
+  const pubnub = usePubNub();
+
+  const { state, dispatch } = useStore();
+  const [loading, setLoading] = useState(true);
+  const [conversationList, setConversationList] = useState([]);
 
   let scrollOffsetY = useRef(new Animated.Value(100)).current;
+
+  const bootstrap = () => {
+    setLoading(true);
+    fetchChannels(pubnub, state.user.id).then(channels => {
+      dispatch({ channels });
+      setLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    if (!dispatch) {
+      return;
+    }
+    bootstrap();
+  }, []);
+
+  // useEffect(() => {
+  //   const DATA = makeChannelsList(state.channels);
+  //   setConversationList(DATA);
+  // }, [state.channels]);
+
+  // useEffect(() => {
+  //   if (search !== '') {
+  //     const channels = Object.entries(state.channels).map(([id, rest]) => ({
+  //       id,
+  //       ...rest,
+  //     }));
+  //     const filterChannels = channels.filter(channel =>
+  //       channel.name.toLowerCase().includes(search.toLowerCase())
+  //     );
+  //     const DATA = makeChannelsList(filterChannels);
+  //     setConversationList(DATA);
+  //   } else {
+  //     const DATA = makeChannelsList(state.channels);
+  //     setConversationList(DATA);
+  //   }
+  // }, [search]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getLastSeen();
+  //   }, [state.channels])
+  // );
+
+  // const getLastSeen = () => {
+  //   if (Object.keys(state.channels).length > 0) {
+  //     const channels = Object.entries(state.channels).map(([id, rest]) => ({
+  //       id,
+  //       ...rest,
+  //     }));
+  //     Object.keys(state.channels).forEach(channel => {
+  //       pubnub.hereNow(
+  //         {
+  //           channels: [channel],
+  //           includeUUIDs: true,
+  //           includeState: true,
+  //         },
+  //         (status, response) => {
+  //           const tmp = getByValue(channels, channel);
+  //           if (tmp) {
+  //             tmp.last_seen = response.channels[channel]?.occupants[0]?.state?.last_seen;
+  //             const DATA = [
+  //               {
+  //                 title: 'Channels',
+  //                 data: channels
+  //                   .filter(item => {
+  //                     return item.custom.type === 1;
+  //                   })
+  //                   .map(obj => ({ ...obj })),
+  //               },
+  //               {
+  //                 title: 'Direct Chats',
+  //                 data: channels
+  //                   .filter(item => {
+  //                     return item.custom.type === 0;
+  //                   })
+  //                   .map(obj => ({ ...obj })),
+  //               },
+  //             ];
+  //             setConversationList(DATA);
+  //           }
+  //         }
+  //       );
+  //     });
+  //   }
+  // };
 
   return (
     <>
@@ -213,4 +310,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+const mapStateToProps = state => ({
+  userProfile: state.login.userDetail,
+});
+
+export default connect(mapStateToProps, null)(ChatScreen);

@@ -62,7 +62,6 @@ const WeightPounds = props => {
               onChangeText={val => setPounds(val)}
               placeholder="Pounds"
               autoCapitalize="none"
-              placeholderTextColor={Colors.black}
               keyboardType="numeric"
             />
           </View>

@@ -15,6 +15,8 @@ import {
 import { Images } from 'src/theme';
 import { connect } from 'react-redux';
 import { Text } from '../../components';
+import { usePubNub } from 'pubnub-react';
+import { createDirectChannel, useStore, ChannelType } from '../../utils/chat';
 
 //action
 import { getUserProfile, userChat } from '../../ScreenRedux/searchProfileRedux';
@@ -23,9 +25,13 @@ import { followUser, unFollowUser } from '../../ScreenRedux/profileRedux';
 const { backImage, searchImage, profileBackGround, followButton, profile, followingButton } =
   Images;
 const SearchProfile = props => {
-  const { navigation, profileUserData, requesting } = props;
+  const pubnub = usePubNub();
+  const { state, dispatch } = useStore();
+
+  const { navigation, profileUserData, requesting, userProfile } = props;
   const { width } = Dimensions.get('window');
   const [followUser, setFollowUser] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   let newArray = [];
   useEffect(() => {
@@ -59,6 +65,35 @@ const SearchProfile = props => {
     }
   };
 
+  const createChat = async item => {
+    try {
+      const res = await createDirectChannel(pubnub, userProfile?.id, item?.user_detail?.id, {
+        name: userProfile?.username + ' - ' + item?.user_detail?.username,
+        custom: { type: 0, owner: userProfile?.id },
+      });
+
+      dispatch({
+        channels: {
+          ...state.channels,
+          [res.channel]: {
+            id: res.channel,
+            name: userProfile?.username + ' - ' + item?.user_detail?.username,
+            custom: { type: ChannelType.Direct, owner: userProfile?.id },
+          },
+        },
+      });
+      setLoading(false);
+      navigation.replace('ChatScreen', {
+        item: {
+          id: res.channel,
+          name: userProfile?.username + ' - ' + item?.user_detail?.username,
+          custom: { type: ChannelType.Direct, owner: userProfile?.id },
+        },
+      });
+    } catch (err) {
+      console.log('errrrrr', err);
+    }
+  };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <ScrollView
@@ -107,7 +142,10 @@ const SearchProfile = props => {
         ) : profileUserData?.length ? (
           profileUserData?.map(item => (
             <TouchableOpacity
-              onPress={() => [navigation.navigate('Chat'), props.userChat(item)]}
+              onPress={() => [
+                createChat(item),
+                // navigation.navigate('ChatScreen'), props.userChat(item)
+              ]}
               style={{
                 marginTop: 25,
                 paddingHorizontal: 20,
@@ -164,6 +202,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   requesting: state.userProfileReducer.requesting,
   profileUserData: state.userProfileReducer.profileUserData,
+  userProfile: state.login.userDetail,
 });
 
 const mapDispatchToProps = dispatch => ({
