@@ -1,5 +1,6 @@
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigate } from '../navigation/NavigationService';
 
 // config
 import { API_URL } from '../config/app';
@@ -37,7 +38,11 @@ const EXERCISE_DONE_SUCCESS = 'ProgramScreen/EXERCISE_DONE_SUCCESS';
 
 const SAVE_SWIPE_DATE = 'ProgramScreen/SAVE_SWIPE_DATE';
 const SWAP_EXERCISE = 'ProgramScreen/SWAP_EXERCISE';
+const SWAP_EXERCISE_ISTRUE = 'ProgramScreen/SWAP_EXERCISE_ISTRUE';
+
 const ALL_SWAP_EXERCISE = 'ProgramScreen/ALL_SWAP_EXERCISE';
+const ALL_SWAP_EXERCISE_SUCCESS = 'ProgramScreen/ALL_SWAP_EXERCISE_SUCCESS';
+const ALL_SWAP_EXERCISE_ERROR = 'ProgramScreen/ALL_SWAP_EXERCISE_ERROR';
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -54,9 +59,10 @@ export const getWeekSessionSuccess = data => ({
   data,
 });
 
-export const getDaySessionRequest = data => ({
+export const getDaySessionRequest = (data, isTrue) => ({
   type: TODAY_SESSIONS_REQUEST,
   data,
+  isTrue,
 });
 
 export const getDaySessionSuccess = data => ({
@@ -124,23 +130,33 @@ export const exerciseDoneSuccess = data => ({
 
 export const saveSwipeDateAction = (weekDate, date, activeIndex) => ({
   type: SAVE_SWIPE_DATE,
-  payload: {
-    weekDate,
-    date,
-    activeIndex,
-  },
+  weekDate,
+  date,
+  activeIndex,
 });
 
-export const swapExercises = (workout_id, exercise_id, rest_of_program) => ({
+export const swapExercises = (data, date_time) => ({
   type: SWAP_EXERCISE,
-  workout_id,
-  exercise_id,
-  rest_of_program,
+  data,
+  date_time,
+});
+
+export const swapExerciseisTrue = () => ({
+  type: SWAP_EXERCISE_ISTRUE,
 });
 
 export const allSwapExercise = exerciseId => ({
   type: ALL_SWAP_EXERCISE,
   exerciseId,
+});
+
+export const allSwapExerciseSuccess = data => ({
+  type: ALL_SWAP_EXERCISE_SUCCESS,
+  payload: data,
+});
+
+export const allSwapExerciseError = () => ({
+  type: ALL_SWAP_EXERCISE_ERROR,
 });
 
 const initialState = {
@@ -149,6 +165,8 @@ const initialState = {
   getWeekSessions: false,
 
   loader: false,
+  loading: false,
+
   repsWeight: false,
 
   exerciseObj: false,
@@ -162,6 +180,8 @@ const initialState = {
 
   todayRequest: false,
   todaySessions: false,
+
+  allExerciseSwapped: false,
 };
 
 export const programReducer = (state = initialState, action) => {
@@ -205,6 +225,27 @@ export const programReducer = (state = initialState, action) => {
         loader: true,
       };
 
+    case ALL_SWAP_EXERCISE: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
+    case ALL_SWAP_EXERCISE_SUCCESS: {
+      return {
+        ...state,
+        allExerciseSwapped: action.payload,
+        loading: false,
+      };
+    }
+    case ALL_SWAP_EXERCISE_ERROR: {
+      return {
+        ...state,
+        loading: false,
+      };
+    }
+
     case REPS_WEIGHT_SUCCESS:
       return {
         ...state,
@@ -239,19 +280,6 @@ export const programReducer = (state = initialState, action) => {
         ...state,
         // setDone: action.data,
         setLoading: false,
-      };
-
-    case EXERCISE_DONE_REQUEST:
-      return {
-        ...state,
-        exeLoading: true,
-      };
-
-    case EXERCISE_DONE_SUCCESS:
-      return {
-        ...state,
-        exerciseDone: action.data,
-        exeLoading: false,
       };
 
     default:
@@ -314,11 +342,18 @@ async function getTodaySessionAPI(data) {
   return XHR(URL, options);
 }
 
-function* getTodaySessions({ data }) {
+function* getTodaySessions({ data, isTrue }) {
   try {
     const response = yield call(getTodaySessionAPI, data);
     // const query = sortSessionBySets(response?.data?.query);
     yield put(getDaySessionSuccess(response.data));
+    if (isTrue) {
+      yield put(pickSession(null, response?.data?.workouts, null));
+      navigate('ExerciseScreen', {
+        workouts: response?.data?.workouts,
+        item: response?.data,
+      });
+    }
   } catch (e) {
     yield put(getDaySessionSuccess(false));
   }
@@ -489,11 +524,60 @@ function* sessionDoneCompleted({ id }) {
     yield put(sessionDoneSuccess(response.data));
     const newDate = moment(new Date()).format('YYYY-MM-DD');
     yield put(getAllSessionRequest(newDate));
-    goBack();
+    // goBack();
   } catch (e) {
     yield put(sessionDoneSuccess(false));
   }
 }
+
+async function swapExercisesAPI(data) {
+  const token = await AsyncStorage.getItem('authToken');
+  const URL = `${API_URL}/session/swap_exercise/`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'POST',
+    data,
+  };
+  return XHR(URL, options);
+}
+
+function* swapExercisesData({ data, date_time }) {
+  try {
+    const response = yield call(swapExercisesAPI, data);
+    yield put(swapExerciseisTrue());
+
+    const newDate = moment(date_time).format('YYYY-MM-DD');
+    yield put(getDaySessionRequest(newDate, true));
+  } catch (e) {
+    yield put(swapExerciseisTrue());
+  }
+}
+
+async function allSwapExerciseAPI(exerciseId) {
+  const token = await AsyncStorage.getItem('authToken');
+  const URL = `${API_URL}/session/list_exercises/?id=${exerciseId}`;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${token}`,
+    },
+    method: 'GET',
+  };
+  return XHR(URL, options);
+}
+
+function* allSwapExerciseData({ exerciseId }) {
+  try {
+    const response = yield call(allSwapExerciseAPI, exerciseId);
+    yield put(allSwapExerciseSuccess(response.data));
+  } catch (e) {
+    yield put(allSwapExerciseError());
+  }
+}
+
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
@@ -501,4 +585,6 @@ export default all([
   takeLatest(TODAY_SESSIONS_REQUEST, getTodaySessions),
   takeLatest(WORKOUT_DONE_REQUEST, workoutDoneCompleted),
   takeLatest(SESSION_DONE_REQUEST, sessionDoneCompleted),
+  takeLatest(SWAP_EXERCISE, swapExercisesData),
+  takeLatest(ALL_SWAP_EXERCISE, allSwapExerciseData),
 ]);

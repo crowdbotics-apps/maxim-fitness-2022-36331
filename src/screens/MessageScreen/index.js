@@ -71,7 +71,7 @@ const MessageScreen = props => {
             <Image source={searchImage} style={{ height: 30, width: 30 }} />
           </View>
         </View>
-        <View
+        <TouchableOpacity
           style={{
             marginTop: 25,
             paddingHorizontal: 20,
@@ -96,7 +96,7 @@ const MessageScreen = props => {
           <View style={{ justifyContent: 'center' }}>
             <Text text="2 days" style={{ color: '#D3D3D3', fontSize: 12 }} />
           </View>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

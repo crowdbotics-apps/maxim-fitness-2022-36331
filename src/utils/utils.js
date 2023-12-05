@@ -1,13 +1,13 @@
 export const getDisplayNameFromFieldName = name => {
   switch (name) {
     case 'password':
-      return 'password'
+      return 'password';
     case 'old_password':
-      return 'Old password'
+      return 'Old password';
     case 'confirm_password':
-      return 'Confirm password'
+      return 'Confirm password';
     case 'last_name':
-      return 'last name'
+      return 'last name';
     default:
       return name;
   }

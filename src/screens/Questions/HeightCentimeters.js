@@ -64,7 +64,6 @@ const HeightCentimeters = props => {
               placeholder="Height"
               autoCapitalize="none"
               keyboardType="numeric"
-              placeholderTextColor={Colors.black}
             />
           </View>
         </View>

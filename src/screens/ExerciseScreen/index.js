@@ -34,6 +34,7 @@ import {
   repsWeightRequest,
   setDoneRequest,
   sessionDone,
+  allSwapExercise,
 } from '../../ScreenRedux/programServices';
 import { connect } from 'react-redux';
 
@@ -297,6 +298,16 @@ const ExerciseScreen = props => {
     }
   };
 
+  const swipeFunc = () => {
+    props.allSwapExercise(selectedSession?.[active]?.id);
+    navigation.navigate('SwapExerciseScreen', {
+      ScreenData: {
+        data: selectedSession?.[active],
+        date_time: params?.item?.date_time,
+      },
+    });
+  };
+
   return (
     <SafeAreaView style={[fill, { backgroundColor: '#F2F2F2' }]}>
       <View style={[row, alignItemsCenter, justifyContentCenter, smallVMargin, regularHMargin]}>
@@ -332,6 +343,7 @@ const ExerciseScreen = props => {
               selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
+                    disabled={timmer}
                     onPress={() => selectExercise(item, i)}
                     style={[
                       row,
@@ -446,6 +458,7 @@ const ExerciseScreen = props => {
                             mainContainer={{ marginHorizontal: 5 }}
                             bg={repsWeightState?.id === set?.id && increment && '#d3d3d3'}
                             repsWeightState={repsWeightState}
+                            disabled={timmer}
                           />
                         ))}
                       </ScrollView>
@@ -499,14 +512,12 @@ const ExerciseScreen = props => {
                         buttonText="Exercise Description"
                         buttonIcon={Images.detailIcon}
                         onPress={() => refDescription.current.open()}
-                        disabled={timmer}
+                        // disabled={timmer}
                       />
                       <FatExerciseIconButton
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
-                        // onPress={() =>
-                        //   navigation.navigate('SwapExerciseScreen')
-                        // }
+                        onPress={swipeFunc}
                         disabled={timmer}
                       />
                       <FatGradientIconButton
@@ -536,6 +547,10 @@ const ExerciseScreen = props => {
                       startRest={timmer}
                       activeSet={activeSet}
                       onPress={() => {
+                        // navigation.navigate('WorkoutCard', {
+                        //   item: selectedSession,
+                        //   uppercard: route,
+                        // });
                         props.sessionDone(params?.item?.id);
                         setStartTimer(false);
                         setTimmer(false);
@@ -901,6 +916,7 @@ const mapDispatchToProps = dispatch => ({
   repsWeightRequest: (id, data, dd) => dispatch(repsWeightRequest(id, data, dd)),
   setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
   sessionDone: id => dispatch(sessionDone(id)),
+  allSwapExercise: id => dispatch(allSwapExercise(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen);

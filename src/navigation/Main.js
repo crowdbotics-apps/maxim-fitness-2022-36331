@@ -35,6 +35,7 @@ import SelectBrand from '../screens/SelectBrand';
 import SurveyScreenMeal from '../screens/SurveyScreenMeal';
 import Alexa from '../screens/Alexa';
 import SwapExerciseScreen from '../screens/SwapExerciseScreen';
+import WorkoutCard from '../screens/WorkoutCard';
 
 import LogFoods from '../screens/LogFoods';
 import { modules } from '@modules';
@@ -229,6 +230,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="LogFoods" component={LogFoods} />
     <mainStack.Screen name="Alexa" component={Alexa} />
     <mainStack.Screen name="SwapExerciseScreen" component={SwapExerciseScreen} />
+    <mainStack.Screen name="WorkoutCard" component={WorkoutCard} />
 
     <mainStack.Screen name="SubscriptionScreen" component={SubscriptionScreen} />
     {/* <mainStack.Screen name="Chat" component={Chat} /> */}
