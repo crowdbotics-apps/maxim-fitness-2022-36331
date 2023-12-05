@@ -31,7 +31,7 @@ const RestContainer = ({ onPress, startRest, loading, isDisable, onFinish, reset
           <View style={styles.showBarText}>
             <Text style={styles.showBarTextStyle}>Rest:</Text>
             <View>
-              <Timer until={90} onFinish={onFinish} />
+              <Timer until={resetTime ? resetTime : 90} onFinish={onFinish} />
             </View>
           </View>
           <Progress.Bar
