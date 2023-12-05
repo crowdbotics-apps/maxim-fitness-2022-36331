@@ -74,6 +74,13 @@
 	<string>Orum Training application need access of photo library for Bar code scanner</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Orum Training application need access of the speech recognition for adding meals</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -94,12 +101,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>FontAwesome.ttf</string>
-		<string>FontAwesome5_Brands.ttf</string>
-		<string>FontAwesome5_Regular.ttf</string>
-		<string>FontAwesome5_Solid.ttf</string>
-	</array>
 </dict>
 </plist>

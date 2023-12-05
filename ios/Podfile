@@ -43,8 +43,10 @@ target 'maxim_fitness_2022_36331' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'Firebase/Core'
-  pod 'Firebase/Messaging'
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
   permissions_path = '../node_modules/react-native-permissions/ios'
   pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
