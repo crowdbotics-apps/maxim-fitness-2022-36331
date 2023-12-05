@@ -8,12 +8,23 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { NativeBaseProvider } from 'native-base'
 import Navigation from 'src/navigation'
 
+import PubNub from 'pubnub';
+import { PubNubProvider } from 'pubnub-react';
+import { PUBNUB_PUBLISH_KEY, PUBNUB_SUBSCRIBE_KEY } from '@env';
+
 import { store } from 'src/redux/store'
 
 const App = () => {
   const persistor = persistStore(store);
 
+  const pubnub = new PubNub({
+    publishKey: PUBNUB_PUBLISH_KEY,
+    subscribeKey: PUBNUB_SUBSCRIBE_KEY,
+    uuid: 'myUniqueUUIDDD',
+  });
+
   return (
+    <PubNubProvider client={pubnub}>
     <ReduxProvider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <NativeBaseProvider theme={theme}>
@@ -22,6 +33,7 @@ const App = () => {
         </NativeBaseProvider>
       </PersistGate>
     </ReduxProvider>
+    </PubNubProvider>
   )
 }
 
