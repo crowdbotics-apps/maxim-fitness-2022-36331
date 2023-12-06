@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
-import { connect } from 'react-redux';
+import React, { useState } from "react"
+import { View, ScrollView, SafeAreaView } from "react-native"
+import { connect } from "react-redux"
 
 //Components
-import { Text, Button, InputField } from '../../components';
-import HeaderTitle from './Components/HeaderTitle';
+import { Text, Button, InputField } from "../../components"
+import HeaderTitle from "./Components/HeaderTitle"
 
 //Themes
-import { Global, Layout, Gutters, Fonts, Colors } from '../../theme';
+import { Global, Layout, Gutters, Fonts, Colors } from "../../theme"
 
 //Actions
-import { updateAnswer } from './Redux';
+import { updateAnswer } from "./Redux"
 
 const WeightPounds = props => {
   const {
-    navigation: { navigate },
-  } = props;
-  const [pound, setPounds] = useState('');
+    navigation: { navigate }
+  } = props
+  const [pound, setPounds] = useState("")
 
   const onNext = () => {
-    const tempData = props.answers;
-    tempData.weight = pound;
-    props.updateAnswers(tempData);
-    navigate('FitnessGoal');
-  };
+    const tempData = props.answers
+    tempData.weight = pound
+    props.updateAnswers(tempData)
+    navigate("FitnessGoal")
+  }
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
@@ -32,13 +32,24 @@ const WeightPounds = props => {
         contentContainerStyle={[
           Layout.fillGrow,
           Gutters.small2xHPadding,
-          Layout.justifyContentBetween,
+          Layout.justifyContentBetween
         ]}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={Gutters.mediumTMargin}>
-          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your Weight?'} />
+          <Text
+            color="commonCol"
+            style={Fonts.titleRegular}
+            text={"What is your Weight?"}
+          />
         </View>
-        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+        <View
+          style={[
+            Layout.justifyContentStart,
+            Layout.fill,
+            Gutters.mediumTMargin
+          ]}
+        >
           <View
             style={[
               Layout.row,
@@ -46,7 +57,7 @@ const WeightPounds = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto,
+              Global.borderAlto
             ]}
           >
             <InputField
@@ -55,8 +66,8 @@ const WeightPounds = props => {
                 Layout.fill,
                 {
                   paddingHorizontal: 0,
-                  height: Platform.OS === 'android' ? 0 : 60,
-                },
+                  height: 60
+                }
               ]}
               value={pound}
               onChangeText={val => setPounds(val)}
@@ -69,7 +80,7 @@ const WeightPounds = props => {
         <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
           <Button
             block
-            text={'Next'}
+            text={"Next"}
             color="primary"
             onPress={onNext}
             disabled={!pound}
@@ -78,14 +89,14 @@ const WeightPounds = props => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const mapStateToProps = state => ({
-  answers: state.questionReducer.answers,
-});
+  answers: state.questionReducer.answers
+})
 
 const mapDispatchToProps = dispatch => ({
-  updateAnswers: data => dispatch(updateAnswer(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(WeightPounds);
+  updateAnswers: data => dispatch(updateAnswer(data))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(WeightPounds)
