@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react"
 import {
   View,
   StyleSheet,
@@ -6,10 +6,7 @@ import {
   ScrollView,
   TextInput,
   Image,
-  StatusBar,
   TouchableOpacity,
-  ActivityIndicator,
-  FlatList,
   Dimensions,
   Animated
 } from "react-native"
@@ -18,14 +15,78 @@ import { connect } from "react-redux"
 import { Images } from "src/theme"
 import { Text, Header } from "../../components"
 import { usePubNub } from "pubnub-react"
+import {
+  useStore,
+  loadHistory,
+  cloneArray,
+  sendMessages
+} from "../../utils/chat"
 
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images
 const ChatScreen = props => {
-  const { navigation, profileUserData, requesting, userProfile } = props
+  const { navigation, profileUserData, requesting, userProfile, route } = props
   const { width } = Dimensions.get("window")
   const pubnub = usePubNub()
 
+  const { state, dispatch } = useStore()
+  const { item } = route.params
+  const [messages, setMessages] = useState([])
+  const channel = state.channels[route.params.item.id]
+  const [actionSheet, setActionSheet] = useState(false)
+
+  const [textInput, setTextInput] = useState("")
+
+  useEffect(() => {
+    pubnub.fetchMessages(
+      {
+        channels: [item.id],
+        includeMessageActions: true,
+        count: 25
+      },
+      (_, response) => {
+        if (response) {
+          const messages = response.channels[item.id].map(obj => obj.message)
+          state.messages[item.id] = loadHistory(messages)
+
+          dispatch({ messages: state.messages })
+        }
+      }
+    )
+  }, [channel])
+  useEffect(() => {
+    pubnub.setState({
+      state: {
+        last_seen: new Date().getTime()
+      },
+      channels: [item.id]
+    })
+  })
+
+  const handleMessage = event => {
+    const message = event.message
+    setMessages(messages => [...messages, message])
+  }
+
+  useEffect(() => {
+    subscribePubNub()
+  }, [pubnub, channel])
+
+  const subscribePubNub = () => {
+    if (channel && channel.length !== 0) {
+      pubnub.addListener({ message: handleMessage })
+      pubnub.subscribe({ channel })
+    }
+  }
+
   let scrollOffsetY = useRef(new Animated.Value(100)).current
+
+  const onSend = () => {
+    if (textInput) {
+      setActionSheet(false)
+      sendMessages(pubnub, item.id, textInput).then(res => console.log(res))
+      setTextInput("")
+    }
+  }
 
   return (
     <>
@@ -197,6 +258,8 @@ const ChatScreen = props => {
             height: 40
           }}
           placeholder="Write Message"
+          onChangeText={val => setTextInput(val)}
+          value={textInput}
         />
         <View
           style={{
@@ -213,13 +276,15 @@ const ChatScreen = props => {
               marginLeft: 10
             }}
           />
-          <Image
-            source={sendMessage}
-            style={{
-              height: (35 / 375) * width,
-              width: (35 / 375) * width
-            }}
-          />
+          <TouchableOpacity onPress={onSend}>
+            <Image
+              source={sendMessage}
+              style={{
+                height: (35 / 375) * width,
+                width: (35 / 375) * width
+              }}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </>

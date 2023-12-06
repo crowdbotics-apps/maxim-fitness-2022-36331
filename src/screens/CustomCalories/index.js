@@ -220,7 +220,7 @@ const CustomCalories = props => {
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         onPressSocial={() => props.navigation.navigate("ProfileScreen")}
-        onPressMsg={() => props.navigation.navigate("MessageScreen")}
+        // onPressMsg={() => props.navigation.navigate("MessageScreen")}
         onPressNotify={() => props.navigation.navigate("NotificationScreen")}
         unreadCount={unreadCount ? unreadCount : false}
         profile={profile}

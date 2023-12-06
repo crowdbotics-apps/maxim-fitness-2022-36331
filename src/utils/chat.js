@@ -260,7 +260,7 @@ export const leavePubnubChannel = (pubnub, userId, channelId) => {
   ])
 }
 
-export const sendMessage = (pubnub, channelId, message) => {
+export const sendMessages = (pubnub, channelId, message) => {
   return new Promise((resolve, reject) => {
     pubnub.publish(
       { channel: channelId, message: message },

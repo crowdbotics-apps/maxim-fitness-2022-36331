@@ -192,6 +192,20 @@ const FatLoseProgram = props => {
     return lastKey
   }
 
+  const secondsToMinutes = seconds => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+
+    // Format the result
+    let formattedResult = `${minutes}`
+    if (remainingSeconds > 0) {
+      formattedResult += `:${
+        remainingSeconds < 10 ? "0" : ""
+      }${remainingSeconds}`
+    }
+
+    return formattedResult
+  }
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -379,6 +393,7 @@ const FatLoseProgram = props => {
                       style={{ width: 60, height: 60 }}
                     />
                   </View>
+
                   <View>
                     <Text
                       text={todaySessions?.name}
@@ -390,7 +405,7 @@ const FatLoseProgram = props => {
                       }}
                     />
                     <Text
-                      text={`8 exercies`}
+                      text={`${todaySessions?.workouts?.length} exercies`}
                       style={{
                         fontSize: 12,
                         lineHeight: 12,
@@ -412,7 +427,9 @@ const FatLoseProgram = props => {
                     style={[row, fill, alignItemsCenter, { marginLeft: "18%" }]}
                   >
                     <Text
-                      text="8 exercies"
+                      text={`${secondsToMinutes(
+                        todaySessions?.workouts?.length * 90
+                      )} minutes`}
                       style={{
                         fontSize: 12,
                         lineHeight: 12,

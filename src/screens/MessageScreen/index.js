@@ -125,6 +125,7 @@ const MessageScreen = props => {
   const ListItem = item => {
     return (
       <TouchableOpacity
+        onPress={() => navigation.navigate("ChatScreen", { item: item })}
         style={{
           marginTop: 25,
           paddingHorizontal: 20,
