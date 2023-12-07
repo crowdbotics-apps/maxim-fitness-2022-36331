@@ -150,7 +150,7 @@ const SelectBrand = props => {
             Layout.alignItemsStart
           ]}
         >
-          <Image style={styles.leftArrowStyle} source={Images.leftArrow} />
+          <Image style={styles.leftArrowStyle} source={Images.backImage} />
         </TouchableOpacity>
         <View
           style={{
@@ -193,6 +193,7 @@ const SelectBrand = props => {
             <Icon
               type="FontAwesome5"
               name="arrow-up"
+              size={25}
               style={{ color: "gray" }}
             />
             <Text
@@ -238,6 +239,11 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     resizeMode: "cover"
+  },
+  leftArrowStyle: {
+    height: 30,
+    width: 30,
+    resizeMode: "contain"
   }
 })
 const mapStateToProps = state => ({

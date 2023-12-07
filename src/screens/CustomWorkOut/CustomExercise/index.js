@@ -12,6 +12,7 @@ import {
   Pressable
 } from "react-native"
 import { connect } from "react-redux"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 //Components
 import { Text, InputField, BottomSheet, Button } from "../../../components"
@@ -161,7 +162,7 @@ const CustomExercise = props => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={Layout.fillGrow}
         keyboardShouldPersistTaps={"handled"}
       >
@@ -429,7 +430,7 @@ const CustomExercise = props => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <RBSheet
         ref={refRBSheet}
@@ -1405,9 +1406,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 7,
     height: 22,
-    width: 80
+    width: 80,
+    alignItems: "center"
   },
-  addSetsText: { fontWeight: "500", color: "#7e7e7e" },
+  addSetsText: {
+    fontWeight: "500",
+    color: "#7e7e7e",
+    marginTop: 2
+  },
   deleteText: { fontSize: 24, fontWeight: "700", textAlign: "center" },
   yesNoButton: { fontWeight: "700", color: "#000" },
   setOneTextStyle: { color: "#636363", fontSize: 20, fontWeight: "700" },

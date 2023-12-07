@@ -336,10 +336,11 @@ const ExerciseScreen = props => {
   }
 
   const screenNavigation = () => {
-    navigation.navigate("WorkoutCard", {
-      item: selectedSession,
-      uppercard: route
-    })
+    navigation.goBack()
+    // navigation.navigate("WorkoutCard", {
+    //   item: selectedSession,
+    //   uppercard: route
+    // })
   }
 
   return (
@@ -354,6 +355,7 @@ const ExerciseScreen = props => {
         ]}
       >
         <TouchableOpacity
+          disabled={timmer}
           onPress={() => navigation.goBack()}
           style={styles.leftIconStyle}
         >
