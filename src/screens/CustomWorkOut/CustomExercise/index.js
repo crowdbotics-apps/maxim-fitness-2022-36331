@@ -182,13 +182,20 @@ const CustomExercise = props => {
           </TouchableOpacity>
           <TouchableOpacity
             disabled={
-              title === "" && (dualSets?.length === 0 || sets?.length === 0)
+              title === "" || (dualSets?.length === 0 && sets?.length === 0)
             }
             onPress={addDataCustomEx}
-            style={styles.doneStyle}
-            s
+            style={[
+              styles.doneStyle,
+              {
+                opacity:
+                  title === "" || (dualSets?.length === 0 && sets?.length === 0)
+                    ? 0.5
+                    : 1
+              }
+            ]}
           >
-            <Text text="Done" />
+            <Text text="Done" bold />
           </TouchableOpacity>
         </View>
 

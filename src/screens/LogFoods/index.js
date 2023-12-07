@@ -33,12 +33,13 @@ import {
   resetFoodItems,
   deleteAllMeals,
   productUnitAction
+  // updateFoodItems
 } from "../../ScreenRedux/nutritionRedux"
 
 const LogFoods = props => {
   const {
     removeAllSelectedProductsAction,
-    updateFoodItems,
+    // updateFoodItems,
     food,
     navigation,
     scannedProduct,
@@ -271,7 +272,7 @@ const LogFoods = props => {
   const onDeleteVoice = item => {
     let newData = speechData.filter(c => c.food_name !== item.food_name)
     setSpeechData(newData)
-    updateFoodItems(newData)
+    // updateFoodItems(newData)
 
     resetFoodItems()
     setValue("")
@@ -289,7 +290,7 @@ const LogFoods = props => {
   const onDeleteCommon = item => {
     let newData = commonData.filter(c => c.food_name !== item.food_name)
     setCommonData(newData)
-    updateFoodItems(newData)
+    // updateFoodItems(newData)
 
     resetFoodItems()
     setValue("")
@@ -1039,5 +1040,6 @@ const mapDispatchToProps = dispatch => ({
   deleteAllMeals: (data, screenName) =>
     dispatch(deleteAllMeals(data, screenName)),
   productUnitAction: (itemId, data) => dispatch(productUnitAction(itemId, data))
+  // updateFoodItems: data => dispatch(updateFoodItems(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(LogFoods)

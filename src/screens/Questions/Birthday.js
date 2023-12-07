@@ -109,7 +109,7 @@ const Birthday = props => {
             date={date}
             mode="date"
             is24Hour={true}
-            onChange={val => {
+            onDateChange={val => {
               const dob = moment(val).format("YYYY-MM-DD")
               setNavState(dob)
             }}
