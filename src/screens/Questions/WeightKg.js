@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { connect } from 'react-redux';
+import React, { useState } from "react"
+import { View, StyleSheet, ScrollView, SafeAreaView } from "react-native"
+import { connect } from "react-redux"
 
 //Components
-import { Text, Button, InputField } from '../../components';
-import HeaderTitle from './Components/HeaderTitle';
+import { Text, Button, InputField } from "../../components"
+import HeaderTitle from "./Components/HeaderTitle"
 
 //Themes
-import { Global, Layout, Gutters, Fonts, Colors } from '../../theme';
+import { Global, Layout, Gutters, Fonts, Colors } from "../../theme"
 
 //Actions
-import { updateAnswer } from './Redux';
+import { updateAnswer } from "./Redux"
 
 const WeightKg = props => {
   const {
-    navigation: { navigate },
-  } = props;
-  const [kilograms, setKilograms] = useState(false);
+    navigation: { navigate }
+  } = props
+  const [kilograms, setKilograms] = useState(false)
 
   const onNext = () => {
-    const tempData = props.answers;
-    tempData.weight = kilograms;
-    props.updateAnswers(tempData);
-    navigate('FitnessGoal');
-  };
+    const tempData = props.answers
+    tempData.weight = kilograms
+    props.updateAnswers(tempData)
+    navigate("FitnessGoal")
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,13 +33,24 @@ const WeightKg = props => {
         contentContainerStyle={[
           Layout.fillGrow,
           Gutters.small2xHPadding,
-          Layout.justifyContentBetween,
+          Layout.justifyContentBetween
         ]}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={Gutters.mediumTMargin}>
-          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your Weight?'} />
+          <Text
+            color="commonCol"
+            style={Fonts.titleRegular}
+            text={"What is your Weight?"}
+          />
         </View>
-        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+        <View
+          style={[
+            Layout.justifyContentStart,
+            Layout.fill,
+            Gutters.mediumTMargin
+          ]}
+        >
           <View
             style={[
               Layout.row,
@@ -47,7 +58,7 @@ const WeightKg = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto,
+              Global.borderAlto
             ]}
           >
             <InputField
@@ -56,8 +67,8 @@ const WeightKg = props => {
                 Layout.fill,
                 {
                   paddingHorizontal: 0,
-                  height: Platform.OS === 'android' ? 0 : 60,
-                },
+                  height: 60
+                }
               ]}
               value={kilograms}
               onChangeText={val => setKilograms(val)}
@@ -70,7 +81,7 @@ const WeightKg = props => {
         <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
           <Button
             block
-            text={'Next'}
+            text={"Next"}
             color="primary"
             onPress={onNext}
             disabled={!kilograms}
@@ -79,36 +90,36 @@ const WeightKg = props => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white"
   },
   centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center"
   },
   logInButton: {
     height: 53,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center"
   },
   loginText: {
     fontSize: 16,
-    color: 'white',
-    fontWeight: '700',
-  },
-});
+    color: "white",
+    fontWeight: "700"
+  }
+})
 
 const mapStateToProps = state => ({
-  answers: state.questionReducer.answers,
-});
+  answers: state.questionReducer.answers
+})
 
 const mapDispatchToProps = dispatch => ({
-  updateAnswers: data => dispatch(updateAnswer(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(WeightKg);
+  updateAnswers: data => dispatch(updateAnswer(data))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(WeightKg)

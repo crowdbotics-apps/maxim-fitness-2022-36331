@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import { View, ScrollView, SafeAreaView, Platform } from 'react-native';
-import { connect } from 'react-redux';
+import React, { useState } from "react"
+import { View, ScrollView, SafeAreaView, Platform } from "react-native"
+import { connect } from "react-redux"
 
 //Components
-import { Text, Button, InputField } from '../../components';
-import HeaderTitle from './Components/HeaderTitle';
+import { Text, Button, InputField } from "../../components"
+import HeaderTitle from "./Components/HeaderTitle"
 
 //Themes
-import { Global, Layout, Gutters, Fonts, Colors } from '../../theme';
+import { Global, Layout, Gutters, Fonts, Colors } from "../../theme"
 
 //Actions
-import { updateAnswer } from './Redux';
+import { updateAnswer } from "./Redux"
 
 const FeetHeight = props => {
   const {
-    navigation: { navigate },
-  } = props;
-  const [feet, setFeet] = useState('');
-  const [inches, setInches] = useState('');
+    navigation: { navigate }
+  } = props
+  const [feet, setFeet] = useState("")
+  const [inches, setInches] = useState("")
 
   const onNext = () => {
-    const tempData = props.answers;
-    tempData.height = `${feet}.${inches}`;
-    props.updateAnswers(tempData);
-    navigate('WeightPounds');
-  };
+    const tempData = props.answers
+    tempData.height = `${feet}.${inches}`
+    props.updateAnswers(tempData)
+    navigate("WeightPounds")
+  }
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
@@ -33,13 +33,24 @@ const FeetHeight = props => {
         contentContainerStyle={[
           Layout.fillGrow,
           Gutters.small2xHPadding,
-          Layout.justifyContentBetween,
+          Layout.justifyContentBetween
         ]}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={Gutters.mediumTMargin}>
-          <Text color="commonCol" style={Fonts.titleRegular} text={'What is your height?'} />
+          <Text
+            color="commonCol"
+            style={Fonts.titleRegular}
+            text={"What is your height?"}
+          />
         </View>
-        <View style={[Layout.justifyContentStart, Layout.fill, Gutters.mediumTMargin]}>
+        <View
+          style={[
+            Layout.justifyContentStart,
+            Layout.fill,
+            Gutters.mediumTMargin
+          ]}
+        >
           <View
             style={[
               Layout.row,
@@ -47,7 +58,7 @@ const FeetHeight = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto,
+              Global.borderAlto
             ]}
           >
             <InputField
@@ -56,9 +67,9 @@ const FeetHeight = props => {
                 Layout.fill,
                 {
                   paddingHorizontal: 0,
-                  height: Platform.OS === 'android' ? 0 : 60,
-                  color: Colors.black,
-                },
+                  height: 60,
+                  color: Colors.black
+                }
               ]}
               value={feet}
               onChangeText={val => setFeet(val)}
@@ -74,7 +85,7 @@ const FeetHeight = props => {
               Layout.alignItemsCenter,
               Layout.justifyContentBetween,
               Global.borderB,
-              Global.borderAlto,
+              Global.borderAlto
             ]}
           >
             <InputField
@@ -83,8 +94,8 @@ const FeetHeight = props => {
                 Layout.fill,
                 {
                   paddingHorizontal: 0,
-                  height: Platform.OS === 'android' ? 0 : 60,
-                },
+                  height: 60
+                }
               ]}
               value={inches}
               onChangeText={val => setInches(val)}
@@ -97,7 +108,7 @@ const FeetHeight = props => {
         <View style={[Layout.justifyContentEnd, Gutters.mediumTMargin]}>
           <Button
             block
-            text={'Next'}
+            text={"Next"}
             color="primary"
             onPress={onNext}
             disabled={!feet}
@@ -106,14 +117,14 @@ const FeetHeight = props => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const mapStateToProps = state => ({
-  answers: state.questionReducer.answers,
-});
+  answers: state.questionReducer.answers
+})
 
 const mapDispatchToProps = dispatch => ({
-  updateAnswers: data => dispatch(updateAnswer(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(FeetHeight);
+  updateAnswers: data => dispatch(updateAnswer(data))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(FeetHeight)

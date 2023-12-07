@@ -1,79 +1,103 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react"
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Content, Icon } from 'native-base';
-import { Text, Button, Loader } from '../../components';
-import Card from './component/Card';
-import Card1 from './component/Card1';
-import Card2 from './component/Card2';
-import { connect } from 'react-redux';
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native"
+import { Content, Icon } from "native-base"
+import { Text, Button, Loader } from "../../components"
+import Card from "./component/Card"
+import Card1 from "./component/Card1"
+import Card2 from "./component/Card2"
+import { connect } from "react-redux"
 import {
   // getSubscriptionRequest,
   getPlanRequest,
-  getCustomerIdRequest,
-} from '../../ScreenRedux/subscriptionRedux';
+  getCustomerIdRequest
+} from "../../ScreenRedux/subscriptionRedux"
 
-import { Gutters, Layout, Global, Images } from '../../theme';
-import Modal from 'react-native-modal';
+import { Gutters, Layout, Global, Images } from "../../theme"
+import Modal from "react-native-modal"
 
 const SubscriptionScreen = props => {
-  const { navigation, getPlans, userDetail, subscriptionData } = props;
-  const [curentTab, setCurentTab] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [active, setActive] = useState(true);
+  const { navigation, getPlans, userDetail, subscriptionData } = props
+  const [curentTab, setCurentTab] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const [active, setActive] = useState(true)
 
   useEffect(() => {
-    props.getPlanRequest();
-    props.getCustomerIdRequest();
-  }, []);
+    props.getPlanRequest()
+    props.getCustomerIdRequest()
+  }, [])
 
   const card = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[0]?.id;
-    let product = getPlans?.length > 0 && getPlans && getPlans[0]?.product;
-    navigation.navigate('CreditCard', { plan_id, product });
-  };
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans[0]?.id
+    let product = getPlans?.length > 0 && getPlans && getPlans[0]?.product
+    navigation.navigate("CreditCard", { plan_id, product })
+  }
   const card1 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[1]?.id;
-    let product = getPlans?.length > 0 && getPlans && getPlans[1]?.product;
-    navigation.navigate('CreditCard', { plan_id, product });
-  };
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans[1]?.id
+    let product = getPlans?.length > 0 && getPlans && getPlans[1]?.product
+    navigation.navigate("CreditCard", { plan_id, product })
+  }
 
   const card2 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans[2]?.id;
-    let product = getPlans?.length > 0 && getPlans[2]?.product;
-    navigation.navigate('CreditCard', { plan_id, product });
-  };
+    let plan_id = getPlans?.length > 0 && getPlans[2]?.id
+    let product = getPlans?.length > 0 && getPlans[2]?.product
+    navigation.navigate("CreditCard", { plan_id, product })
+  }
 
-  const { largeHMargin, mediumTMargin } = Gutters;
-  const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout;
-  const { border } = Global;
-  const { leftArrow, iconWrapper } = styles;
+  const { largeHMargin, mediumTMargin } = Gutters
+  const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
+  const { border } = Global
+  const { leftArrow, iconWrapper } = styles
 
   const setData = item => {
-    if (item === 'No') {
-      navigation.navigate('CreditCard');
-      setIsVisible(false);
-    } else if (item === 'Yes') {
-      setActive(!active);
+    if (item === "No") {
+      navigation.navigate("CreditCard")
+      setIsVisible(false)
+    } else if (item === "Yes") {
+      setActive(!active)
     }
-  };
+  }
   return (
     <>
-      <TouchableOpacity style={styles.leftArrow} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.leftArrow}
+        onPress={() => navigation.goBack()}
+      >
         <Image source={Images.backImage} style={styles.backArrowStyle} />
       </TouchableOpacity>
       <View style={[row, largeHMargin, justifyContentBetween]}>
         <Loader isLoading={props.requesting} />
 
-        <TouchableOpacity onPress={() => setCurentTab(0)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Free" style={curentTab === 0 && { fontWeight: 'bold' }} smallTitle />
+        <TouchableOpacity
+          onPress={() => setCurentTab(0)}
+          style={[center, alignItemsCenter, fill]}
+        >
+          <Text
+            text="Free"
+            style={curentTab === 0 && { fontWeight: "bold" }}
+            smallTitle
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setCurentTab(1)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Modal1" style={curentTab === 1 && { fontWeight: 'bold' }} smallTitle />
+        <TouchableOpacity
+          onPress={() => setCurentTab(1)}
+          style={[center, alignItemsCenter, fill]}
+        >
+          <Text
+            text="Modal1"
+            style={curentTab === 1 && { fontWeight: "bold" }}
+            smallTitle
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setCurentTab(2)} style={[center, alignItemsCenter, fill]}>
-          <Text text="Modal2" style={curentTab === 2 && { fontWeight: 'bold' }} smallTitle />
+        <TouchableOpacity
+          onPress={() => setCurentTab(2)}
+          style={[center, alignItemsCenter, fill]}
+        >
+          <Text
+            text="Modal2"
+            style={curentTab === 2 && { fontWeight: "bold" }}
+            smallTitle
+          />
         </TouchableOpacity>
       </View>
       <Content>
@@ -111,13 +135,17 @@ const SubscriptionScreen = props => {
         onBackButtonPress={() => setIsVisible(false)}
       >
         <View style={center}>
-          <Text text="Do you have an Access Code?" color="secondary" smallTitle />
+          <Text
+            text="Do you have an Access Code?"
+            color="secondary"
+            smallTitle
+          />
           <>
             {active ? (
               <View style={center}>
                 <Button
                   color="primary"
-                  text={'Yes'}
+                  text={"Yes"}
                   style={[
                     border,
                     center,
@@ -125,15 +153,15 @@ const SubscriptionScreen = props => {
                     {
                       height: 40,
                       width: 100,
-                      backgroundColor: 'transparent',
-                      borderColor: 'white',
-                    },
+                      backgroundColor: "transparent",
+                      borderColor: "white"
+                    }
                   ]}
-                  onPress={() => setData('Yes')}
+                  onPress={() => setData("Yes")}
                 />
                 <Button
                   color="primary"
-                  text={'No'}
+                  text={"No"}
                   style={[
                     border,
                     center,
@@ -141,11 +169,11 @@ const SubscriptionScreen = props => {
                     {
                       height: 40,
                       width: 100,
-                      backgroundColor: 'transparent',
-                      borderColor: 'white',
-                    },
+                      backgroundColor: "transparent",
+                      borderColor: "white"
+                    }
                   ]}
-                  onPress={() => setData('No')}
+                  onPress={() => setData("No")}
                 />
               </View>
             ) : (
@@ -153,8 +181,13 @@ const SubscriptionScreen = props => {
                 <View>
                   <Button
                     color="secondary"
-                    text={'Orum 50 off'}
-                    style={[border, center, mediumTMargin, { height: 40, width: 150 }]}
+                    text={"Orum 50 off"}
+                    style={[
+                      border,
+                      center,
+                      mediumTMargin,
+                      { height: 40, width: 150 }
+                    ]}
                     onPress={() => setIsVisible(false)}
                     center
                   />
@@ -162,7 +195,7 @@ const SubscriptionScreen = props => {
                 <View>
                   <Button
                     color="primary"
-                    text={'Enter'}
+                    text={"Enter"}
                     style={[
                       border,
                       center,
@@ -170,9 +203,9 @@ const SubscriptionScreen = props => {
                       {
                         height: 40,
                         width: 100,
-                        backgroundColor: 'transparent',
-                        borderColor: 'white',
-                      },
+                        backgroundColor: "transparent",
+                        borderColor: "white"
+                      }
                     ]}
                     onPress={() => setIsVisible(false)}
                     center
@@ -184,42 +217,42 @@ const SubscriptionScreen = props => {
         </View>
       </Modal>
     </>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   leftArrow: {
     marginTop: 20,
     zIndex: 22,
     left: 10,
     width: 50,
-    height: 50,
+    height: 50
   },
   iconWrapper: {
     fontSize: 50,
-    lineHeight: 50,
+    lineHeight: 50
   },
   gradientWrapper: {
-    borderRadius: 40,
+    borderRadius: 40
   },
   backArrowStyle: {
     height: 20,
     width: 30,
-    marginLeft: 10,
-  },
-});
+    marginLeft: 10
+  }
+})
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
   customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.requesting,
-  userDetail: state.login.userDetail,
+  userDetail: state.login.userDetail
   // subscription: state.subscription.subscription,
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   getPlanRequest: () => dispatch(getPlanRequest()),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
-  getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
-});
+  getCustomerIdRequest: () => dispatch(getCustomerIdRequest())
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionScreen)

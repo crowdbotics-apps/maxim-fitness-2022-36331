@@ -1,27 +1,27 @@
-import React from 'react';
-import { View } from 'react-native';
-import RBSheet from 'react-native-raw-bottom-sheet';
-const BottomSheet = ({ children, reff, h, Iconbg, bg }) => {
+import React from "react"
+import { View } from "react-native"
+import RBSheet from "react-native-raw-bottom-sheet"
+const BottomSheet = ({ children, reff, h, Iconbg, bg, isDrage }) => {
   return (
     <RBSheet
       ref={reff}
-      closeOnDragDown={true}
+      closeOnDragDown={!isDrage}
       closeOnPressMask={true}
       customStyles={{
         draggableIcon: {
-          backgroundColor: Iconbg ? Iconbg : 'lightgrey',
+          backgroundColor: Iconbg ? Iconbg : "lightgrey"
         },
         container: {
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
-          backgroundColor: bg ? bg : '#F3F5F6',
-        },
+          backgroundColor: bg ? bg : "#F3F5F6"
+        }
       }}
       height={h ? h : 250}
       openDuration={250}
     >
       {children}
     </RBSheet>
-  );
-};
-export default BottomSheet;
+  )
+}
+export default BottomSheet
