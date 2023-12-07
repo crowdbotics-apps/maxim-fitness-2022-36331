@@ -1,32 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, FlatList, Image, ActivityIndicator } from 'react-native';
-import options from './options';
-import { fetchNotifications } from './api';
-import { getNotificationCountSuccess } from '../../src/ScreenRedux/nutritionRedux';
-import moment from 'moment';
-import { Images } from '../../src/theme';
+import React, { useEffect, useState } from "react"
+import { Text, View, FlatList, Image, ActivityIndicator } from "react-native"
+import options from "./options"
+import { fetchNotifications } from "./api"
+import { getNotificationCountSuccess } from "../../src/ScreenRedux/nutritionRedux"
+import moment from "moment"
+import { Images } from "../../src/theme"
 
 const Notifications = props => {
-  const { navigation } = props;
-  const { styles } = options;
+  const { navigation } = props
+  const { styles } = options
   // Contains the messages recieved from backend
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const getNotifications = async () => {
-    setLoading(true);
+    setLoading(true)
     // Api to fetch recent list of notifications
-    const res = await fetchNotifications();
-    setMessages(res);
-    setLoading(false);
+    const res = await fetchNotifications()
+    setMessages(res)
+    setLoading(false)
     if (res?.count) {
-      getNotificationCountSuccess(0);
+      getNotificationCountSuccess(0)
     }
-  };
+  }
 
   useEffect(() => {
-    getNotifications();
-  }, []);
+    getNotifications()
+  }, [])
 
   /**
    * Notification component that will be rendered in Flatlist
@@ -34,10 +34,11 @@ const Notifications = props => {
    * @return {React.ReactNode}
    */
   const renderItem = ({ item }) => {
-    const date = item?.created;
-    const timeFormate = new Date(`${item?.created}`).toLocaleString();
-    const arr = date.split('T');
-    const time = moment(timeFormate).format('hh:mm A');
+    const date = item?.created
+
+    const timeFormate = item?.created.toLocaleString()
+    const arr = date.split("T")
+    const time = moment(timeFormate).format("hh:mm A")
 
     return (
       <View style={styles.walletCard}>
@@ -47,7 +48,7 @@ const Notifications = props => {
               source={
                 item?.image
                   ? {
-                      uri: item?.image,
+                      uri: item?.image
                     }
                   : Images.profile
               }
@@ -64,14 +65,14 @@ const Notifications = props => {
           <Text style={styles.reject}>Time: {time}</Text>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   return (
     <View style={{ flex: 1 }}>
       {loading ? (
         <View style={styles.loaderStyle}>
-          <ActivityIndicator color={'gray'} size="large" />
+          <ActivityIndicator color={"gray"} size="large" />
         </View>
       ) : messages && messages?.results?.length > 0 ? (
         <FlatList
@@ -87,7 +88,7 @@ const Notifications = props => {
         </View>
       )}
     </View>
-  );
-};
+  )
+}
 
-export default Notifications;
+export default Notifications
