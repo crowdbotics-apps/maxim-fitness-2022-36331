@@ -115,7 +115,7 @@ const Birthday = props => {
             }}
             androidVariant="iosClone"
             style={Global.secondaryBg}
-            maximumDate={new Date()}
+            // maximumDate={new Date()}
           />
 
           <TouchableOpacity
