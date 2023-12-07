@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -10,122 +10,140 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
-  Alert,
-} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import { connect } from 'react-redux';
-import LottieView from 'lottie-react-native';
-import Voice from '@react-native-community/voice';
-import { Images, Layout, Gutters, Global } from '../../theme';
-import { getSpeechRequest } from '../../ScreenRedux/nutritionRedux';
-import { checkAndRequestMicrophonePermission } from '../../utils/functions';
+  Alert
+} from "react-native"
+import LinearGradient from "react-native-linear-gradient"
+import { connect } from "react-redux"
+import LottieView from "lottie-react-native"
+import Voice from "@react-native-community/voice"
+import { Images, Layout, Gutters, Global } from "../../theme"
+import { getSpeechRequest } from "../../ScreenRedux/nutritionRedux"
+import { checkAndRequestMicrophonePermission } from "../../utils/functions"
 
 const MealRegulator = props => {
-  const { navigation } = props;
-  const [partialResults, setPartialResults] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
+  const { navigation } = props
+  const [partialResults, setPartialResults] = useState([])
+  const [isRecording, setIsRecording] = useState(false)
 
   useEffect(() => {
-    Voice.onSpeechEnd = onSpeechEnd;
-    Voice.onSpeechPartialResults = onSpeechPartialResults;
+    Voice.onSpeechEnd = onSpeechEnd
+    Voice.onSpeechPartialResults = onSpeechPartialResults
 
     return () => {
       //destroy the process after switching the screen
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
+      Voice.destroy().then(Voice.removeAllListeners)
+    }
+  }, [])
 
   const onSpeechEnd = e => {
-    onStop();
-  };
+    onStop()
+  }
 
   const onSpeechPartialResults = e => {
-    setPartialResults(e.value);
-  };
+    setPartialResults(e.value)
+  }
 
   const startRecognizing = async () => {
     try {
-      await Voice.start('en-US');
-      setPartialResults([]);
+      await Voice.start("en-US")
+      setPartialResults([])
     } catch (e) {}
-  };
+  }
 
   const stopRecognizing = async () => {
     //Stops listening for speech
     try {
-      await Voice.stop();
+      await Voice.stop()
     } catch (e) {}
-  };
+  }
 
   const onStart = async () => {
-    const hasPermission = await checkAndRequestMicrophonePermission();
+    const hasPermission = await checkAndRequestMicrophonePermission()
     if (hasPermission) {
-      setIsRecording(true);
+      setIsRecording(true)
       setTimeout(() => {
-        startRecognizing();
-      }, 400);
+        startRecognizing()
+      }, 400)
     } else {
       Alert.alert(
-        'Permission Required',
-        'Please grant microphone permissions in order to use this feature.',
+        "Permission Required",
+        "Please grant microphone permissions in order to use this feature.",
         [
           {
-            text: 'Cancel',
+            text: "Cancel",
             onPress: undefined,
-            style: 'cancel',
+            style: "cancel"
           },
           {
-            text: 'Confirm',
+            text: "Confirm",
             onPress: () => {
-              Linking.openSettings();
-            },
-          },
+              Linking.openSettings()
+            }
+          }
         ]
-      );
+      )
     }
-  };
+  }
 
   const onStop = () => {
-    stopRecognizing();
-    setIsRecording(false);
-  };
+    stopRecognizing()
+    setIsRecording(false)
+  }
 
   const reviewFood = () => {
-    props.getSpeechRequest(partialResults);
-    navigation.navigate('LogFoods');
-    setPartialResults([]);
-  };
+    props.getSpeechRequest(partialResults)
+    navigation.navigate("LogFoods")
+    setPartialResults([])
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: 'space-between', backgroundColor: 'white' }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        justifyContent: "space-between",
+        backgroundColor: "white"
+      }}
+    >
       <View
         style={[
           Layout.row,
           Layout.alignItemsCenter,
           Layout.justifyContentBetween,
           Global.height65,
-          Gutters.regularHMargin,
+          Gutters.regularHMargin
         ]}
       >
-        <View style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsStart]}>
+        <View
+          style={[
+            Layout.fill,
+            Layout.justifyContentCenter,
+            Layout.alignItemsStart
+          ]}
+        >
           <Image style={styles.leftArrowStyle} />
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('SelectBrand')}
+          onPress={() => navigation.navigate("SelectBrand")}
           style={{
             flex: 4,
-            alignItems: 'flex-start',
+            alignItems: "flex-start",
             paddingHorizontal: 15,
             paddingVertical: 15,
             borderBottomWidth: 1,
-            borderBottomColor: 'gray',
+            borderBottomColor: "gray"
           }}
         >
-          <Text style={{ fontSize: 15, color: 'gray' }}>Search Foods and Products</Text>
+          <Text style={{ fontSize: 15, color: "gray" }}>
+            Search Foods and Products
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[Layout.fill, Layout.justifyContentCenter, Layout.alignItemsEnd]}
-          onPress={() => navigation.navigate('SelectBrand')}
+          style={[
+            Layout.fill,
+            Layout.justifyContentCenter,
+            Layout.alignItemsEnd
+          ]}
+          onPress={() => navigation.navigate("SelectBrand")}
         >
           <Image style={styles.barCodeStyle} source={Images.barCode} />
         </TouchableOpacity>
@@ -137,14 +155,14 @@ const MealRegulator = props => {
               <Text key={`partial-result-${index}`} style={styles.textStyle}>
                 {result}
               </Text>
-            );
+            )
           })}
         </ScrollView>
       </View>
       <View>
         {isRecording && (
           <LottieView
-            source={require('./High_amplitude_code.json')}
+            source={require("./High_amplitude_code.json")}
             autoPlay
             loop
             style={{ height: 265 }}
@@ -152,7 +170,7 @@ const MealRegulator = props => {
         )}
         {!isRecording && (
           <LottieView
-            source={require('./Low_amplitude_code.json')}
+            source={require("./Low_amplitude_code.json")}
             autoPlay
             loop
             style={{ height: 265 }}
@@ -163,110 +181,118 @@ const MealRegulator = props => {
         <TouchableOpacity
           onPressIn={onStart}
           onPressOut={onStop}
-          style={[styles.recordButtonWrapper, { borderColor: isRecording ? 'red' : 'green' }]}
+          style={[
+            styles.recordButtonWrapper,
+            { borderColor: isRecording ? "red" : "green" }
+          ]}
         />
       </View>
       <View
         style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1
         }}
       >
-        <Text style={{ fontSize: 15, color: 'gray' }}>Press and hold to record your food.</Text>
+        <Text style={{ fontSize: 15, color: "gray" }}>
+          Press and hold to record your food.
+        </Text>
       </View>
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: "row",
           marginHorizontal: 20,
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginVertical: 30,
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginVertical: 30
         }}
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack();
-            setPartialResults([]);
+            navigation.goBack()
+            setPartialResults([])
           }}
         >
-          <Image style={styles.leftArrowStyle} source={Images.leftArrow} />
+          <Image style={styles.leftArrowStyle} source={Images.backImage} />
         </TouchableOpacity>
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          colors={['#5daffe', '#5daffe']}
+          colors={["#5daffe", "#5daffe"]}
           style={[
             styles.linearGradient,
             styles.shadowStyle,
-            { opacity: partialResults.length ? 1 : 0.5 },
+            { opacity: partialResults.length ? 1 : 0.5 }
           ]}
         >
-          <TouchableOpacity disabled={partialResults.length ? false : true} onPress={reviewFood}>
-            <Text style={{ color: '#fff' }}>Review Foods</Text>
+          <TouchableOpacity
+            disabled={partialResults.length ? false : true}
+            onPress={reviewFood}
+          >
+            <Text style={{ color: "#fff" }}>Review Foods</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1.2,
-    alignItems: 'center',
-    backgroundColor: 'white',
-    justifyContent: 'center',
+    alignItems: "center",
+    backgroundColor: "white",
+    justifyContent: "center"
     // paddingBottom: 30,
   },
   textWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 20,
     height: 100,
-    marginHorizontal: 20,
+    marginHorizontal: 20
   },
   textStyle: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold"
   },
   linearGradient: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 15,
     paddingHorizontal: 15,
     marginHorizontal: 5,
-    borderRadius: 5,
+    borderRadius: 5
   },
   recordButtonWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 3,
     borderRadius: 30,
     width: 50,
-    height: 50,
+    height: 50
   },
   leftArrowStyle: {
     width: 30,
     height: 30,
-    resizeMode: 'contain',
+    resizeMode: "contain"
   },
   barCodeStyle: {
     height: 40,
     width: 40,
-    resizeMode: 'cover',
+    resizeMode: "cover"
   },
   onSearchDiv: {
-    width: '52%',
+    width: "52%",
     height: 70,
     zIndex: 222,
-    position: 'absolute',
-  },
-});
+    position: "absolute"
+  }
+})
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({})
 
 const mapDispatchToProps = dispatch => ({
-  getSpeechRequest: data => dispatch(getSpeechRequest(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(MealRegulator);
+  getSpeechRequest: data => dispatch(getSpeechRequest(data))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(MealRegulator)

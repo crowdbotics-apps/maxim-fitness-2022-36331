@@ -181,7 +181,7 @@ const HomeScreen = props => {
               ]}
             >
               <TouchableOpacity
-                onPress={() => navigation.navigate("Exercise")}
+                onPress={() => navigation.navigate("FatLoseProgram")}
                 style={[fullWidth, center, { height: 70 }]}
               >
                 <Text style={styles.startWorkoutWrapper}>

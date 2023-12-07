@@ -13,6 +13,7 @@ import {
   Pressable
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import {
   GoogleSignin,
   statusCodes
@@ -134,11 +135,14 @@ const SignUp = props => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollViewStyle}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <Image source={backIcon} style={styles.backIconStyle} />
+        <TouchableOpacity onPress={() => props.navigation.goBack()}>
+          <Image source={backIcon} style={styles.backIconStyle} />
+        </TouchableOpacity>
         <View style={{ marginHorizontal: 22 }}>
           <View style={{ alignItems: "center" }}>
             <Image source={orumIcon} style={styles.orumIcon} />
@@ -268,7 +272,7 @@ const SignUp = props => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   )
 }
@@ -278,13 +282,13 @@ const styles = StyleSheet.create({
   backIconStyle: {
     height: 16,
     width: 8,
-    marginTop: 46,
+    marginTop: 25,
     marginLeft: 22
   },
   orumIcon: {
     height: 80,
     width: 260,
-    marginTop: 47,
+    marginTop: 20,
     marginBottom: 16
   },
   mainTextStyle: {
