@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from push_notifications.models import APNSDevice, GCMDevice
+from fcm_django.models import FCMDevice
 User = get_user_model()
 # Create your models here.
 
@@ -24,16 +24,16 @@ def send_notification(sender, instance, created, **kwargs):
     # from users.tasks import send_user_custom_notification
     if created:
         if instance.receiver:
-            # devices = FCMDevice.objects.filter(user_id=instance.receiver)
-            devices = GCMDevice.objects.filter(user=instance.receiver)
-            apns_devices = APNSDevice.objects.filter(user=instance.receiver)
+            devices = FCMDevice.objects.filter(user=instance.receiver)
+            # devices = GCMDevice.objects.filter(user=instance.receiver)
+            # apns_devices = APNSDevice.objects.filter(user=instance.receiver)
         else:
-            # devices = FCMDevice.objects.all()
-            devices = GCMDevice.objects.all()
-            apns_devices = APNSDevice.objects.all()
+            devices = FCMDevice.objects.all()
+            # devices = GCMDevice.objects.all()
+            # apns_devices = APNSDevice.objects.all()
 
         if devices:
             # devices.send_message(title=instance.title, body=instance.message)
             devices.send_message(title=instance.title, message=instance.message)
-        if apns_devices:
-            apns_devices.send_message(message={"body": instance.message})
+        # if apns_devices:
+        #     apns_devices.send_message(message={"body": instance.message})
