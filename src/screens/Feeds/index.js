@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react"
 import {
   View,
   StyleSheet,
@@ -7,56 +7,56 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Image,
-} from 'react-native';
-import { Text, Header, FeedCard } from '../../components';
-import { Images } from 'src/theme';
-import Video from 'react-native-video';
-import { connect } from 'react-redux';
-import ImagePicker from 'react-native-image-crop-picker';
-import ImageView from 'react-native-image-viewing';
-import Modal from 'react-native-modal';
+  Image
+} from "react-native"
+import { Text, Header, FeedCard } from "../../components"
+import { Images } from "src/theme"
+import Video from "react-native-video"
+import { connect } from "react-redux"
+import ImagePicker from "react-native-image-crop-picker"
+import ImageView from "react-native-image-viewing"
+import Modal from "react-native-modal"
 
 //actions
-import { getFeedsRequest, postLikeRequest } from '../../ScreenRedux/feedRedux';
+import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile } = props;
-  const [feedsState, setFeedsState] = useState([]);
-  const [page, setPage] = useState(1);
-  const [visible, setIsVisible] = useState(false);
-  const [images, setImages] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [videoUri, setVideoUri] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
+  const { feeds, requesting, navigation, profile } = props
+  const [feedsState, setFeedsState] = useState([])
+  const [page, setPage] = useState(1)
+  const [visible, setIsVisible] = useState(false)
+  const [images, setImages] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [videoUri, setVideoUri] = useState(false)
+  const [imageIndex, setImageIndex] = useState(0)
 
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   useEffect(() => {
-    props.getFeedsRequest(page);
-  }, []);
-  const flatList = useRef();
+    props.getFeedsRequest(page)
+  }, [])
+  const flatList = useRef()
   const moveToTop = () => {
-    props.getFeedsRequest(1);
-    flatList?.current?.scrollToIndex({ index: 0, animated: true });
-  };
+    props.getFeedsRequest(1)
+    flatList?.current?.scrollToIndex({ index: 0, animated: true })
+  }
 
   useEffect(() => {
     if (feeds?.results?.length) {
       if (feedsState.length && page > 1) {
-        setFeedsState([...feedsState, ...feeds.results]);
+        setFeedsState([...feedsState, ...feeds.results])
       } else {
-        setFeedsState(feeds?.results);
+        setFeedsState(feeds?.results)
       }
     }
-  }, [feeds]);
+  }, [feeds])
 
   const renderImages = () => {
     if (images?.length) {
-      return images?.map(item => ({ uri: item.image }));
+      return images?.map(item => ({ uri: item.image }))
     }
-  };
+  }
 
   const renderItem = ({ item, index }) => {
     return (
@@ -76,14 +76,14 @@ const Feeds = props => {
         setImageIndex={setImageIndex}
       />
       // </TouchableOpacity>
-    );
-  };
+    )
+  }
 
   const onPullToRefresh = () => {
-    setPage(1);
-    props.getFeedsRequest(page);
-    moveToTop();
-  };
+    setPage(1)
+    props.getFeedsRequest(page)
+    moveToTop()
+  }
 
   // const onAvatarChange = () => {
   //   ImagePicker.openPicker({
@@ -114,9 +114,9 @@ const Feeds = props => {
             ? Images.profile
             : { uri: profile?.profile_picture }
         }
-        onPressPlus={() => navigation.navigate('AddPost')}
-        onPressSearch={() => navigation.navigate('SearchProfile')}
-        onAvatarChange={() => navigation.navigate('SettingScreen')}
+        onPressPlus={() => navigation.navigate("AddPost")}
+        onPressSearch={() => navigation.navigate("SearchProfile")}
+        onAvatarChange={() => navigation.navigate("SettingScreen")}
       />
       <Text style={styles.content} text="Latest" />
 
@@ -129,7 +129,7 @@ const Feeds = props => {
           ref={flatList}
           refreshControl={
             <RefreshControl
-              colors={['#9Bd35A', '#689F38']}
+              colors={["#9Bd35A", "#689F38"]}
               refreshing={requesting}
               onRefresh={() => onPullToRefresh()}
               progressViewOffset={20}
@@ -143,7 +143,7 @@ const Feeds = props => {
           windowSize={250}
           // onViewableItemsChanged={onViewRef.current}
           // viewabilityConfig={viewConfigRef.current}
-          keyboardShouldPersistTaps={'handled'}
+          keyboardShouldPersistTaps={"handled"}
         />
       ) : null}
       {renderImages() && (
@@ -162,29 +162,32 @@ const Feeds = props => {
       >
         <View
           style={{
-            backgroundColor: 'black',
+            backgroundColor: "black",
             paddingHorizontal: 5,
             flex: 1,
-            paddingTop: 20,
+            paddingTop: 20
           }}
         >
-          <TouchableOpacity onPress={() => setShowModal(false)} style={{ alignItems: 'flex-end' }}>
+          <TouchableOpacity
+            onPress={() => setShowModal(false)}
+            style={{ alignItems: "flex-end" }}
+          >
             <Image
               source={Images.circleClose}
               style={{
                 height: 40,
                 width: 40,
-                borderWidth: 1,
+                borderWidth: 1
               }}
             />
           </TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: 'center' }}>
+          <View style={{ flex: 1, justifyContent: "center" }}>
             {loading && <ActivityIndicator size="large" color="white" />}
             <Video
               source={{
-                uri: videoUri?.video,
+                uri: videoUri?.video
               }}
-              style={{ height: 300, width: '100%' }}
+              style={{ height: 300, width: "100%" }}
               muted={false}
               repeat={true}
               // onEnd={() => setStart(false)}
@@ -195,7 +198,7 @@ const Feeds = props => {
               playWhenInactive={true}
               ignoreSilentSwitch="ignore"
               disableFocus={true}
-              mixWithOthers={'mix'}
+              mixWithOthers={"mix"}
               controls={true}
               onLoadStart={() => setLoading(true)}
               onLoad={() => setLoading(false)}
@@ -204,32 +207,32 @@ const Feeds = props => {
         </View>
       </Modal>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white"
   },
   content: {
     fontSize: 15,
-    color: 'gray',
+    color: "gray",
     paddingHorizontal: 15,
-    marginTop: 10,
+    marginTop: 10
   },
-  loaderStyle: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  comingSoon: { fontSize: 20, lineHeight: 18, color: 'black' },
-});
+  loaderStyle: { flex: 1, justifyContent: "center", alignItems: "center" },
+  comingSoon: { fontSize: 20, lineHeight: 18, color: "black" }
+})
 
 const mapStateToProps = state => ({
   requesting: state.feedsReducer.requesting,
   feeds: state.feedsReducer.feeds,
-  profile: state.login.userDetail,
-});
+  profile: state.login.userDetail
+})
 
 const mapDispatchToProps = dispatch => ({
   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
-  postLikeRequest: data => dispatch(postLikeRequest(data)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(Feeds);
+  postLikeRequest: data => dispatch(postLikeRequest(data))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Feeds)

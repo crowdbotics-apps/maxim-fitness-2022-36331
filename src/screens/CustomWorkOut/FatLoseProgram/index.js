@@ -160,8 +160,8 @@ const FatLoseProgram = props => {
 
     if (listData) {
       const index = dateList.indexOf(date?.dateString)
-      const isDateInFirstWeek = index <= dateList.length / 2
-      setActiveIndex(isDateInFirstWeek ? 1 : 2)
+      const isDateInFirstWeek = index <= 6 ? true : false
+      setActiveIndex(index <= 6 ? 2 : 1)
       setIndex(date?.dateString)
 
       if (!checkWeek) {
@@ -222,9 +222,13 @@ const FatLoseProgram = props => {
             >
               <TouchableOpacity
                 style={row}
-                onPress={activeIndex === 1 ? nextExercise : previousExercise}
+                onPress={
+                  activeIndex === getWeekSessions?.week
+                    ? nextExercise
+                    : previousExercise
+                }
               >
-                {getWeekSessions?.week > 0 && activeIndex > 1 ? (
+                {activeIndex !== getWeekSessions?.week ? (
                   <Icon
                     type="FontAwesome5"
                     name={"chevron-left"}
@@ -234,21 +238,21 @@ const FatLoseProgram = props => {
                 <Text
                   color="primary"
                   text={`Week ${
-                    activeIndex > 1
-                      ? getWeekSessions?.week - 1
+                    activeIndex === getWeekSessions?.week
+                      ? getWeekSessions?.week
                       : getWeekSessions?.week === undefined
                       ? ""
-                      : getWeekSessions?.week
+                      : getWeekSessions?.week - 1
                   }`}
                   style={[tinyLMargin, styles.smallText]}
                 />
-                {activeIndex > 1 ? null : (
+                {activeIndex === getWeekSessions?.week ? (
                   <Icon
                     type="FontAwesome5"
                     name={"chevron-right"}
                     style={styles.IconStyle}
                   />
-                )}
+                ) : null}
               </TouchableOpacity>
               <TouchableOpacity style={row} onPress={openModal}>
                 <Text
@@ -668,11 +672,11 @@ const FatLoseProgram = props => {
                 text={"View Workout"}
                 style={{
                   fontSize: 20,
-                  lineHeight: 18,
+                  lineHeight: 22,
                   fontWeight: "bold",
                   opacity: 0.7,
                   color: "black",
-                  marginLeft: 50
+                  marginLeft: 30
                 }}
               />
             </TouchableOpacity>
@@ -682,11 +686,12 @@ const FatLoseProgram = props => {
                 text={"Resechedule Workout"}
                 style={{
                   fontSize: 20,
-                  lineHeight: 18,
+                  lineHeight: 22,
                   fontWeight: "bold",
                   opacity: 0.7,
                   color: "black",
-                  marginLeft: 50
+                  marginLeft: 30
+                  // flex: 1
                 }}
               />
             </View>

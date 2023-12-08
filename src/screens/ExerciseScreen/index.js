@@ -22,7 +22,6 @@ import {
   FatGradientIconButton,
   RestContainer,
   BottomSheet,
-  StaticTimer,
   InputField,
   Button,
   ModalInput
@@ -649,7 +648,10 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                       }}
                       resetTime={item?.sets && item?.sets?.[activeSet].timer}
-                      onFinish={() => setTimmer(false)}
+                      onFinish={() => {
+                        setTimmer(false)
+                        setStartTimer(false)
+                      }}
                       isDisable={timmer}
                     />
                   </ScrollView>

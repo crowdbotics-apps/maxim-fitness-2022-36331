@@ -39,11 +39,12 @@ const EditCustomCal = props => {
     textAlign: "center",
     flexWrap: "wrap"
   }
+  const data = consumeCalories[0]?.goals_values?.protein / 100
 
   useEffect(() => {
     if (consumeCalories[0]?.goals_values) {
       consumeCalories[0]?.goals_values?.protein &&
-        setProtein(consumeCalories[0]?.goals_values?.protein / 20.45 / 100)
+        setProtein(consumeCalories[0]?.goals_values?.protein / 100 / 20.45)
       consumeCalories[0]?.goals_values?.carbs &&
         setCarbs(consumeCalories[0]?.goals_values?.carbs / 20.45 / 100)
       consumeCalories[0]?.goals_values?.fat &&
@@ -82,24 +83,29 @@ const EditCustomCal = props => {
       })
     } else {
       const data = {
-        calories:
-          Number(calories).toFixed(0).length > 1
-            ? Number(calories).toFixed(0)
-            : Number(consumeCalories[0]?.goals_values?.calories),
-        protein: Number((protein.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(
-          0
-        ),
-        carbs: Number((carbs.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0),
-        fat: Number((fat.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0)
+        calories: countCalories(),
+        // Number(calories).toFixed(0).length > 1
+        //   ? Number(calories).toFixed(0)
+        //   : Number(consumeCalories[0]?.goals_values?.calories),
+        protein: Math.round(protein * 100 * 20.45),
+        carbs: Math.round(carbs * 100 * 20.45),
+        fat: Math.round(fat * 100 * 20.45)
       }
       props.navigation.navigate("EditCaloriesManually", data)
     }
   }
 
   const calculateCalories = val => {
-    const persentage = val.toFixed(2) * 100
+    const persentage = val * 100
     const dd = persentage * 20.45
-    return dd.toFixed(2)
+    return Math.round(dd)
+  }
+
+  const countCalories = () => {
+    const proteins = protein && calculateCalories(protein)
+    const carbes = carbs && calculateCalories(carbs)
+    const fates = fat && calculateCalories(fat)
+    return parseFloat(proteins) + parseFloat(carbes) + parseFloat(fates)
   }
 
   return (
@@ -155,10 +161,22 @@ const EditCustomCal = props => {
               <View
                 style={{ borderBottomWidth: 1, borderBottomColor: "#929292" }}
               >
-                <TextInput
+                <Text
+                  style={{
+                    fontSize: 20,
+                    lineHeight: 25,
+                    fontWeight: "600",
+                    paddingVertical: 5
+                    // margin: 0
+                  }}
+                >
+                  {countCalories()}
+                </Text>
+                {/* <TextInput
                   value={`${calories}`}
                   placeholderTextColor={"#000"}
                   autoFocus={false}
+                  editable={false}
                   // placeholder={Number(consumeCalories[0]?.goals_values?.calories).toLocaleString()}
                   style={{
                     fontSize: 20,
@@ -168,7 +186,7 @@ const EditCustomCal = props => {
                     // margin: 0
                   }}
                   onChangeText={val => setCalories(val)}
-                />
+                /> */}
               </View>
               {/* <Text text={(consumeCalories[0]?.goals_values?.calories).toLocaleString() || 0} color="nonary" bold large underlined /> */}
               <Text
@@ -242,9 +260,9 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={(
+                    text={Math.round(
                       calculateCalories(protein) / profile?.number_of_meal
-                    ).toFixed(2)}
+                    )}
                     color="nonary"
                     bold
                     medium
@@ -322,9 +340,9 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={(
+                    text={Math.round(
                       calculateCalories(carbs) / profile?.number_of_meal
-                    ).toFixed(2)}
+                    )}
                     style={{ color: "#f0bc40" }}
                     bold
                     medium
@@ -402,9 +420,9 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={(
+                    text={Math.round(
                       calculateCalories(fat) / profile?.number_of_meal
-                    ).toFixed(2)}
+                    )}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium
@@ -487,9 +505,9 @@ const EditCustomCal = props => {
                   }}
                 />
                 <Text
-                  text={(
+                  text={Math.round(
                     calculateCalories(protein) / profile?.number_of_meal
-                  ).toFixed(2)}
+                  )}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,
@@ -519,9 +537,9 @@ const EditCustomCal = props => {
                   }}
                 />
                 <Text
-                  text={(
+                  text={Math.round(
                     calculateCalories(carbs) / profile?.number_of_meal
-                  ).toFixed(2)}
+                  )}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,
@@ -551,9 +569,9 @@ const EditCustomCal = props => {
                   }}
                 />
                 <Text
-                  text={(
+                  text={Math.round(
                     calculateCalories(fat) / profile?.number_of_meal
-                  ).toFixed(2)}
+                  )}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,

@@ -1,5 +1,5 @@
-import React from 'react';
-import CountDown from 'react-native-countdown-component';
+import React from "react"
+import CountDown from "react-native-countdown-component"
 
 const Timer = ({ until, running, onFinish }) => {
   return (
@@ -9,16 +9,16 @@ const Timer = ({ until, running, onFinish }) => {
       digitStyle={{
         margin: 0,
         padding: 0,
-        height: 20,
+        height: 20
       }}
-      digitTxtStyle={{ fontWeight: 'bold', color: 'black', fontSize: 15 }}
-      timeToShow={['M', 'S']}
+      digitTxtStyle={{ fontWeight: "bold", color: "black", fontSize: 15 }}
+      timeToShow={["M", "S"]}
       timeLabels={{ m: null, s: null }}
       running={{ running }}
       showSeparator
       onFinish={onFinish}
     />
-  );
-};
+  )
+}
 
-export default Timer;
+export default Timer
