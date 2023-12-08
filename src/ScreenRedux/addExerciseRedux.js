@@ -1,50 +1,52 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { all, call, put, takeLatest } from "redux-saga/effects"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 // config
-import { API_URL } from '../config/app';
+import { API_URL } from "../config/app"
 
 // utils
-import XHR from 'src/utils/XHR';
-import { navigate } from '../navigation/NavigationService';
+import XHR from "src/utils/XHR"
+import { navigate } from "../navigation/NavigationService"
 
-const GET_EXERCISE_REQUEST = 'AddExerciseScreen/GET_EXERCISE_REQUEST';
-const GET_EXERCISE_SUCCESS = 'AddExerciseScreen/GET_EXERCISE_SUCCESS';
+const GET_EXERCISE_REQUEST = "AddExerciseScreen/GET_EXERCISE_REQUEST"
+const GET_EXERCISE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_SUCCESS"
 
-const GET_EXERCISE_TYPE_REQUEST = 'AddExerciseScreen/GET_EXERCISE_TYPE_REQUEST';
-const GET_EXERCISE_TYPE_SUCCESS = 'AddExerciseScreen/GET_EXERCISE_TYPE_SUCCESS';
+const GET_EXERCISE_TYPE_REQUEST = "AddExerciseScreen/GET_EXERCISE_TYPE_REQUEST"
+const GET_EXERCISE_TYPE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_TYPE_SUCCESS"
 
-const POST_CUSTOM_EXERCISE_REQUEST = 'AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST';
-const POST_CUSTOM_EXERCISE_SUCCESS = 'AddExerciseScreen/POST_CUSTOM_EXERCISE_SUCCESS';
+const POST_CUSTOM_EXERCISE_REQUEST =
+  "AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST"
+const POST_CUSTOM_EXERCISE_SUCCESS =
+  "AddExerciseScreen/POST_CUSTOM_EXERCISE_SUCCESS"
 
 export const getExerciseRequest = () => ({
-  type: GET_EXERCISE_REQUEST,
-});
+  type: GET_EXERCISE_REQUEST
+})
 
 export const getExerciseSuccess = data => ({
   type: GET_EXERCISE_SUCCESS,
-  data,
-});
+  data
+})
 
 export const getExerciseTypeRequest = data => ({
   type: GET_EXERCISE_TYPE_REQUEST,
-  data,
-});
+  data
+})
 
 export const getExerciseTypeSuccess = data => ({
   type: GET_EXERCISE_TYPE_SUCCESS,
-  data,
-});
+  data
+})
 
 export const postCustomExRequest = data => ({
   type: POST_CUSTOM_EXERCISE_REQUEST,
-  data,
-});
+  data
+})
 
 export const postCustomExSuccess = data => ({
   type: POST_CUSTOM_EXERCISE_SUCCESS,
-  data,
-});
+  data
+})
 
 const initialState = {
   requesting: false,
@@ -54,131 +56,125 @@ const initialState = {
   getExerciseType: false,
 
   cRequesting: false,
-  getCustomExState: false,
-};
+  getCustomExState: false
+}
 
 export const addExerciseReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_EXERCISE_REQUEST:
       return {
         ...state,
-        requesting: true,
-      };
+        requesting: true
+      }
 
     case GET_EXERCISE_SUCCESS:
       return {
         ...state,
         getExerciseState: action.data,
-        requesting: false,
-      };
+        requesting: false
+      }
 
     case GET_EXERCISE_TYPE_REQUEST:
       return {
         ...state,
-        request: true,
-      };
+        request: true
+      }
 
     case GET_EXERCISE_TYPE_SUCCESS:
       return {
         ...state,
         getExerciseType: action.data,
-        request: false,
-      };
+        request: false
+      }
 
     case POST_CUSTOM_EXERCISE_REQUEST:
       return {
         ...state,
-        cRequesting: true,
-      };
+        cRequesting: true
+      }
 
     case POST_CUSTOM_EXERCISE_SUCCESS:
       return {
         ...state,
         getCustomExState: action.data,
-        cRequesting: false,
-      };
+        cRequesting: false
+      }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 async function getExerciseAPI() {
-  const token = await AsyncStorage.getItem('authToken');
-  const URL = `${API_URL}/exercise-type/`;
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/exercise-type/`
   const options = {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
     },
-    method: 'GET',
-  };
-  return XHR(URL, options);
+    method: "GET"
+  }
+  return XHR(URL, options)
 }
 
 function* getExercise() {
   try {
-    const response = yield call(getExerciseAPI);
-    console.log('Exercise type res: ', response);
-    yield put(getExerciseSuccess(response.data));
+    const response = yield call(getExerciseAPI)
+    yield put(getExerciseSuccess(response.data))
   } catch (e) {
-    console.log('Exercise type err:', e);
-    yield put(getExerciseSuccess(false));
+    yield put(getExerciseSuccess(false))
   }
 }
 
 async function getExerciseTypeAPI(data) {
-  const token = await AsyncStorage.getItem('authToken');
-  const URL = `${API_URL}/exercise/?exercise_type=${data}`;
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/exercise/?exercise_type=${data}`
   const options = {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
     },
-    method: 'GET',
-  };
-  return XHR(URL, options);
+    method: "GET"
+  }
+  return XHR(URL, options)
 }
 
 function* getExerciseType({ data }) {
   try {
-    const response = yield call(getExerciseTypeAPI, data);
-    yield put(getExerciseTypeSuccess(response.data));
+    const response = yield call(getExerciseTypeAPI, data)
+    yield put(getExerciseTypeSuccess(response.data))
   } catch (e) {
-    console.log('Exercise err:', e);
-    yield put(getExerciseTypeSuccess(false));
+    yield put(getExerciseTypeSuccess(false))
   }
 }
 
 async function postCustomExAPI(data) {
-  const token = await AsyncStorage.getItem('authToken');
-  const URL = `${API_URL}/session/create_custom_workout/`;
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/session/create_custom_workout/`
   const options = {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
     },
-    method: 'POST',
-    data: data,
-  };
-  return XHR(URL, options);
+    method: "POST",
+    data: data
+  }
+  return XHR(URL, options)
 }
 
 function* postCustomEx({ data }) {
-  console.log('data: ', data);
   try {
-    const response = yield call(postCustomExAPI, data);
-    console.log('Custom Ex res: ', response);
-    yield put(postCustomExSuccess(response.data));
-    navigate('FatLoseProgram');
+    const response = yield call(postCustomExAPI, data)
+    yield put(postCustomExSuccess(response.data))
+    navigate("FatLoseProgram")
   } catch (e) {
-    console.log('Custom Ex err:', e);
-    yield put(postCustomExSuccess(false));
+    yield put(postCustomExSuccess(false))
   }
 }
 
 export default all([
   takeLatest(POST_CUSTOM_EXERCISE_REQUEST, postCustomEx),
   takeLatest(GET_EXERCISE_TYPE_REQUEST, getExerciseType),
-  takeLatest(GET_EXERCISE_REQUEST, getExercise),
-]);
+  takeLatest(GET_EXERCISE_REQUEST, getExercise)
+])

@@ -139,7 +139,7 @@ const AddPost = props => {
           <TextInput
             onChangeText={value => setContent(value)}
             autoFocus={true}
-            style={{ color: 'black', paddingHorizontal: 30 }}
+            style={{ color: 'black', paddingHorizontal: 30 ,paddingVertical:10,}}
           />
         ) : (
           <TouchableOpacity

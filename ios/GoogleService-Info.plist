@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>750002418089-vhb64sk5laqkfecdt6c2o74q2kum0r0t.apps.googleusercontent.com</string>
+	<string>750002418089-9dcd92drg12iknifgkju4ojb49dcr98p.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.750002418089-vhb64sk5laqkfecdt6c2o74q2kum0r0t</string>
+	<string>com.googleusercontent.apps.750002418089-9dcd92drg12iknifgkju4ojb49dcr98p</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>750002418089-76ho025581hduqo7pnq66gn9m1ffca4i.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.crowdbotics.maximfitness5250</string>
+	<string>com.orumtraining</string>
 	<key>PROJECT_ID</key>
 	<string>orum-training-23610</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:750002418089:ios:fea1e11396d696cbb754b8</string>
+	<string>1:750002418089:ios:877fefbb4a09adc7b754b8</string>
 	<key>DATABASE_URL</key>
 	<string>https://orum-training-23610-default-rtdb.firebaseio.com</string>
 </dict>
