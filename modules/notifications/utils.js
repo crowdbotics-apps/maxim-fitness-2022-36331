@@ -1,8 +1,7 @@
-import { Platform } from "react-native"
-import { getUniqueId, getAndroidId, getModel } from "react-native-device-info"
-import { registerDeviceInfoAPI } from "./api"
-import messaging from "@react-native-firebase/messaging"
-import PushNotificationIOS from "@react-native-community/push-notification-ios"
+import { Platform } from "react-native";
+import { getUniqueId, getAndroidId, getModel } from "react-native-device-info";
+import { registerDeviceInfoAPI } from "./api";
+import messaging from "@react-native-firebase/messaging";
 
 /**
  * Request and generate Firebase Messaging token and store it in the DB via REST API
@@ -10,66 +9,34 @@ import PushNotificationIOS from "@react-native-community/push-notification-ios"
  * @param  {String} userID User Backend identifier
  * @return {Promise}
  */
-
-const getIosDeviceToken = () => {
-  PushNotificationIOS.requestPermissions()
-  const token = PushNotificationIOS.addEventListener(
-    "register",
-    async token => {
-      return token
-    }
-  )
-  return token
-}
 const RemotePushController = async (authToken, userID) => {
-  const authStatus = await messaging().requestPermission()
+  const authStatus = await messaging().requestPermission();
   const ENABLED_STATUSES = [
     messaging.AuthorizationStatus.AUTHORIZED,
     messaging.AuthorizationStatus.PROVISIONAL
-  ]
-  const isEnabled = ENABLED_STATUSES.includes(authStatus)
+  ];
+  const isEnabled = ENABLED_STATUSES.includes(authStatus);
   // Checks if required permissions are allowed or not
 
   if (isEnabled) {
-    const registrationToken = await messaging().getToken()
-    const androidId = await getAndroidId()
-    if (Platform.OS === "android") {
-      await registerDeviceInfoAPI(
-        {
-          user: userID,
-          authToken: authToken,
-          registration_id: registrationToken,
-          type: Platform.OS,
-          name: getModel(),
-          active: true,
-          device_id: androidId,
-          cloud_message_type: "FCM"
-        },
-        authToken
-      )
-    } else {
-      PushNotificationIOS.requestPermissions()
-      // const token = await messaging().getAPNSToken()
-      PushNotificationIOS.addEventListener("register", async token => {
-        const iosId = await getUniqueId()
-        await registerDeviceInfoAPI(
-          {
-            user: userID,
-            authToken: authToken,
-            registration_id: token,
-            type: Platform.OS,
-            name: getModel(),
-            active: true,
-            device_id: iosId,
-            cloud_message_type: "FCM"
-          },
-          authToken
-        )
-      })
-    }
+    const registrationToken = await messaging().getToken();
+    const androidId = await getAndroidId();
+    const iosId = await getUniqueId();
     // API which registers the device details and FCM token in backend
+    await registerDeviceInfoAPI(
+      {
+        user: userID,
+        authToken: authToken,
+        registration_id: registrationToken,
+        type: Platform.OS,
+        name: getModel(),
+        active: true,
+        device_id: Platform.OS === "android" ? androidId : iosId,
+        cloud_message_type: "FCM"
+      },
+      authToken
+    );
   }
-  messaging().onNotificationOpenedApp(remoteMessage => {})
-}
+};
 
-export default RemotePushController
+export default RemotePushController;
