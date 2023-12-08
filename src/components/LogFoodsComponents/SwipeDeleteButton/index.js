@@ -1,6 +1,7 @@
 import React from "react"
 import Icon from "react-native-vector-icons/MaterialIcons"
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TouchableOpacity, StyleSheet, Image } from "react-native"
+import { Images } from "../../../theme"
 
 const SwipeDeleteButton = ({ onDeleteClicked }) => {
   return (
@@ -11,11 +12,7 @@ const SwipeDeleteButton = ({ onDeleteClicked }) => {
       }}
     >
       <View style={styles.iconStyle}>
-        <Icon
-          type="MaterialIcons"
-          name="close"
-          style={{ color: "white", fontSize: 40 }}
-        />
+        <Image source={Images.close} style={{ width: 75, height: 65 }} />
       </View>
     </TouchableOpacity>
   )
@@ -31,10 +28,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end"
   },
   iconStyle: {
-    width: 75,
-    height: 65,
-    borderRadius: 10,
-    backgroundColor: "red",
     justifyContent: "center",
     alignItems: "center"
   }

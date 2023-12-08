@@ -39,10 +39,12 @@ const AddExercies = props => {
   const [activeSet, setActiveSet] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
   const [desription, setDesription] = useState(false)
+  const [selectMuscle, setSelectMuscle] = useState(0)
 
   useEffect(() => {
-    isFocused && props.getExerciseRequest()
-  }, [isFocused])
+    // isFocused && props.getExerciseRequest()
+    props.getExerciseRequest()
+  }, [])
 
   useEffect(() => {
     getExerciseState &&
@@ -167,10 +169,18 @@ const AddExercies = props => {
                     <TouchableOpacity
                       onPress={() => {
                         setSelectedItem([])
+                        setSelectMuscle(i)
                         props.getExerciseTypeRequest(item.id)
                       }}
                       key={i}
-                      style={[center, { marginRight: 5 }]}
+                      style={[
+                        center,
+                        {
+                          marginRight: 5,
+                          backgroundColor:
+                            selectMuscle === i ? "#74ccff" : "white"
+                        }
+                      ]}
                     >
                       <Image
                         source={

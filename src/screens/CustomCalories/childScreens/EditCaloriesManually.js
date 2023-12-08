@@ -38,7 +38,8 @@ const EditCaloriesManually = props => {
     smallVPadding,
     regularHMargin,
     regularVMargin,
-    regularVPadding
+    regularVPadding,
+    smallTMargin
   } = Gutters
   const fontSize15TextCenter = {
     fontSize: 14,
@@ -124,21 +125,22 @@ const EditCaloriesManually = props => {
                 justifyContentBetween,
                 alignItemsCenter,
                 smallVPadding,
+                smallTMargin,
                 Global.borderB,
                 Global.borderAlto
               ]}
             >
               <Text text="Protein" bold />
-              <View style={[row, regularHMargin, Gutters.smallTMargin]}>
+              <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Number(param?.protein).toFixed(2)}
+                    text={Math.round(param?.protein / profile?.number_of_meal)}
                     color="nonary"
                     bold
                     medium
                   />
                   <Text
-                    text={"calories"}
+                    text={"grams per day"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
@@ -151,13 +153,13 @@ const EditCaloriesManually = props => {
                   ]}
                 >
                   <Text
-                    text={(param?.protein / profile?.number_of_meal).toFixed(2)}
+                    text={Number(param?.protein)}
                     color="nonary"
                     bold
                     medium
                   />
                   <Text
-                    text={"g per day"}
+                    text={"calories"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
@@ -171,21 +173,22 @@ const EditCaloriesManually = props => {
                 justifyContentBetween,
                 alignItemsCenter,
                 smallVPadding,
+                smallTMargin,
                 Global.borderB,
                 Global.borderAlto
               ]}
             >
               <Text text="Carbs" bold />
-              <View style={[row, regularHMargin, Gutters.smallTMargin]}>
+              <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Number(param?.carbs).toFixed(2)}
+                    text={Math.round(param?.carbs / profile?.number_of_meal)}
                     style={{ color: "#f0bc40" }}
                     bold
                     medium
                   />
                   <Text
-                    text={"calories"}
+                    text={"grams per day"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
@@ -198,13 +201,13 @@ const EditCaloriesManually = props => {
                   ]}
                 >
                   <Text
-                    text={(param?.carbs / profile?.number_of_meal).toFixed(2)}
+                    text={Number(param?.carbs)}
                     style={{ color: "#f0bc40" }}
                     bold
                     medium
                   />
                   <Text
-                    text={"g per day"}
+                    text={"calories"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
@@ -217,20 +220,21 @@ const EditCaloriesManually = props => {
                 regularHMargin,
                 justifyContentBetween,
                 alignItemsCenter,
-                smallVPadding
+                smallVPadding,
+                smallTMargin
               ]}
             >
               <Text text="Fats" bold />
-              <View style={[row, regularHMargin, Gutters.smallTMargin]}>
+              <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Number(param?.fat).toFixed(2)}
+                    text={Math.round(param?.fat / profile?.number_of_meal)}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium
                   />
                   <Text
-                    text={"calories"}
+                    text={"grams per day"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
@@ -243,13 +247,13 @@ const EditCaloriesManually = props => {
                   ]}
                 >
                   <Text
-                    text={(param?.fat / profile?.number_of_meal).toFixed(2)}
+                    text={Number(param?.fat)}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium
                   />
                   <Text
-                    text={"g per day"}
+                    text={"calories"}
                     style={[fontSize15TextCenter, Gutters.tinyLMargin]}
                   />
                 </View>
