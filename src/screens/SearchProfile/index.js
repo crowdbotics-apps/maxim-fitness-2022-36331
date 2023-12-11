@@ -13,10 +13,11 @@ import {
   Dimensions
 } from "react-native"
 import { Images } from "src/theme"
+import Modal from "react-native-modal"
 import { connect } from "react-redux"
 import { Text } from "../../components"
-// import { usePubNub } from "pubnub-react"
-// import { createDirectChannel, useStore, ChannelType } from "../../utils/chat"
+import { usePubNub } from "pubnub-react"
+import { createDirectChannel, useStore, ChannelType } from "../../utils/chat"
 
 //action
 import { getUserProfile, userChat } from "../../ScreenRedux/searchProfileRedux"
@@ -31,13 +32,13 @@ const {
   followingButton
 } = Images
 const SearchProfile = props => {
-  // const pubnub = usePubNub();
-  // const { state, dispatch } = useStore()
+  const pubnub = usePubNub()
+  const { state, dispatch } = useStore()
 
   const { navigation, profileUserData, requesting, userProfile } = props
   const { width } = Dimensions.get("window")
   const [followUser, setFollowUser] = useState([])
-  // const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   let newArray = []
   useEffect(() => {
@@ -73,35 +74,53 @@ const SearchProfile = props => {
     }
   }
 
-  // const createChat = async item => {
-  //   try {
-  //     const res = await createDirectChannel(pubnub, userProfile?.id, item?.user_detail?.id, {
-  //       name: userProfile?.username + ' - ' + item?.user_detail?.username,
-  //       custom: { type: 0, owner: userProfile?.id },
-  //     });
-
-  //     dispatch({
-  //       channels: {
-  //         ...state.channels,
-  //         [res.channel]: {
-  //           id: res.channel,
-  //           name: userProfile?.username + ' - ' + item?.user_detail?.username,
-  //           custom: { type: ChannelType.Direct, owner: userProfile?.id },
-  //         },
-  //       },
-  //     });
-  //     setLoading(false);
-  //     navigation.replace('ChatScreen', {
-  //       item: {
-  //         id: res.channel,
-  //         name: userProfile?.username + ' - ' + item?.user_detail?.username,
-  //         custom: { type: ChannelType.Direct, owner: userProfile?.id },
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.log('errrrrr', err);
-  //   }
-  // };
+  const createChat = async item => {
+    try {
+      setLoading(true)
+      const res = await createDirectChannel(
+        pubnub,
+        userProfile?.id,
+        item?.user_detail?.id,
+        {
+          name: userProfile?.username + " - " + item?.user_detail?.username,
+          custom: {
+            type: 0,
+            owner: userProfile?.id,
+            otherUserImage: item?.user_detail?.profile_picture,
+            otherUserName: item?.username
+          }
+        }
+      )
+      dispatch({
+        channels: {
+          ...state.channels,
+          [res.channel]: {
+            id: res.channel,
+            name: userProfile?.username + " - " + item?.user_detail?.username,
+            custom: {
+              type: ChannelType.Direct,
+              owner: userProfile?.id,
+              otherUserImage: item?.user_detail?.profile_picture,
+              otherUserName: item?.username
+            }
+          }
+        }
+      })
+      setLoading(false)
+      navigation.replace("ChatScreen", {
+        item: {
+          id: res.channel,
+          name: userProfile?.username + " - " + item?.user_detail?.username,
+          custom: {
+            type: ChannelType.Direct,
+            owner: userProfile?.id,
+            otherUserImage: item?.user_detail?.profile_picture,
+            otherUserName: item?.username
+          }
+        }
+      })
+    } catch (err) {}
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <ScrollView
@@ -155,10 +174,11 @@ const SearchProfile = props => {
           profileUserData?.map(item => (
             <TouchableOpacity
               onPress={() => [
-                // createChat(item)
-                // navigation.navigate('ChatScreen'), props.userChat(item)
+                createChat(item)
+                // navigation.navigate("ChatScreen"),
+                // props.userChat(item)
               ]}
-              disabled={true}
+              // disabled={true}
               style={{
                 marginTop: 25,
                 paddingHorizontal: 20,
@@ -214,6 +234,29 @@ const SearchProfile = props => {
           </View>
         )}
       </ScrollView>
+      <Modal
+        coverScreen={true}
+        // animationType="slide"
+        visible={loading}
+        onRequestClose={() => {
+          setLoading(!loading)
+        }}
+        style={{
+          padding: 0,
+          margin: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <ActivityIndicator size={"large"} color={"white"} />
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }

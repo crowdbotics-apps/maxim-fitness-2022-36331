@@ -62,7 +62,7 @@ const MessageScreen = props => {
         ...rest
       }))
       const filterChannels = channels.filter(channel =>
-        channel.name.toLowerCase().includes(search.toLowerCase())
+        channel.name.split("-")[1].toLowerCase().includes(search.toLowerCase())
       )
       const DATA = makeChannelsList(filterChannels)
       setConversationList(DATA)
@@ -74,7 +74,7 @@ const MessageScreen = props => {
 
   useFocusEffect(
     useCallback(() => {
-      getLastSeen()
+      // getLastSeen()
     }, [state.channels])
   )
 
@@ -97,14 +97,6 @@ const MessageScreen = props => {
               tmp.last_seen =
                 response.channels[channel]?.occupants[0]?.state?.last_seen
               const DATA = [
-                {
-                  title: "Channels",
-                  data: channels
-                    .filter(item => {
-                      return item.custom.type === 1
-                    })
-                    .map(obj => ({ ...obj }))
-                },
                 {
                   title: "Direct Chats",
                   data: channels
@@ -143,8 +135,12 @@ const MessageScreen = props => {
             }}
           />
           <View style={{ justifyContent: "center", marginLeft: 15 }}>
-            <Text text={item.name} bold style={{ fontSize: 12 }} />
-            <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} />
+            <Text
+              text={item.name?.split("-")[1]}
+              bold
+              style={{ fontSize: 12 }}
+            />
+            {/* <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
           </View>
         </View>
         {item.last_seen && (
@@ -200,7 +196,7 @@ const MessageScreen = props => {
               position: "relative"
             }}
             placeholder="Search People"
-            // onChangeText={e => props.getUserProfile(e)}
+            onChangeText={e => setSearch(e)}
           />
           <View
             style={{
