@@ -1,5 +1,6 @@
 import create from "zustand"
 import RNFS from "react-native-fs"
+import moment from "moment"
 
 export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -269,4 +270,11 @@ export const sendMessages = (pubnub, channelId, message) => {
       }
     )
   })
+}
+
+export const pubnubTimeTokenToDatetime = timestamp => {
+  var momentObj = moment(timestamp)
+  var formattedDateTime = momentObj.format("MMM D h:mm a")
+
+  return formattedDateTime
 }

@@ -8,7 +8,8 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Animated
+  Animated,
+  ActivityIndicator
 } from "react-native"
 import { connect } from "react-redux"
 
@@ -19,7 +20,8 @@ import {
   useStore,
   loadHistory,
   cloneArray,
-  sendMessages
+  sendMessages,
+  pubnubTimeTokenToDatetime
 } from "../../utils/chat"
 
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images
@@ -32,49 +34,51 @@ const ChatScreen = props => {
   const { item } = route.params
   const [messages, setMessages] = useState([])
   const channel = state.channels[route.params.item.id]
-  const [actionSheet, setActionSheet] = useState(false)
+
+  const [loading, setLoading] = useState(false)
 
   const [textInput, setTextInput] = useState("")
 
   useEffect(() => {
-    pubnub.fetchMessages(
-      {
-        channels: [item.id],
-        includeMessageActions: true,
-        count: 25
-      },
-      (_, response) => {
-        if (response) {
-          const messages = response.channels[item.id].map(obj => obj.message)
-          state.messages[item.id] = loadHistory(messages)
-
-          dispatch({ messages: state.messages })
+    setLoading(true)
+    try {
+      pubnub.fetchMessages(
+        {
+          channels: [item.id],
+          count: 100
+        },
+        (_, response) => {
+          if (response) {
+            const messages = response.channels[item.id].map(obj => obj)
+            state.messages[item.id] = loadHistory(messages)
+            setLoading(false)
+            setMessages(messages)
+            dispatch({ messages: state.messages })
+          }
         }
-      }
-    )
+      )
+    } catch (err) {
+      setLoading(false)
+    }
   }, [channel])
-  useEffect(() => {
-    pubnub.setState({
-      state: {
-        last_seen: new Date().getTime()
-      },
-      channels: [item.id]
-    })
-  })
 
   const handleMessage = event => {
-    const message = event.message
+    const message = event
     setMessages(messages => [...messages, message])
   }
 
   useEffect(() => {
     subscribePubNub()
+
+    return () => {
+      pubnub.unsubscribe({ channels: [`${channel?.id}`] })
+    }
   }, [pubnub, channel])
 
   const subscribePubNub = () => {
-    if (channel && channel.length !== 0) {
+    if (channel && channel?.id) {
       pubnub.addListener({ message: handleMessage })
-      pubnub.subscribe({ channel })
+      pubnub.subscribe({ channels: [`${channel?.id}`] })
     }
   }
 
@@ -82,8 +86,7 @@ const ChatScreen = props => {
 
   const onSend = () => {
     if (textInput) {
-      setActionSheet(false)
-      sendMessages(pubnub, item.id, textInput).then(res => console.log(res))
+      sendMessages(pubnub, item.id, textInput).then(res => setTextInput(""))
       setTextInput("")
     }
   }
@@ -117,7 +120,11 @@ const ChatScreen = props => {
             </TouchableOpacity>
             <View style={{ flex: 1.5 }}>
               <Image
-                source={profile}
+                source={
+                  item?.custom?.otherUserImage
+                    ? { uri: item?.custom?.otherUserImage }
+                    : profile
+                }
                 style={{
                   height: (61 / 375) * width,
                   width: (61 / 375) * width,
@@ -127,15 +134,56 @@ const ChatScreen = props => {
             </View>
           </View>
           <View style={{ alignItems: "center", marginTop: 10 }}>
-            <Text text="Test User" bold style={{ fontSize: 20 }} />
-            <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} />
             <Text
-              text="june 12 5:6 am"
-              style={{ color: "#D3D3D3", fontSize: 14, marginTop: 20 }}
+              text={item?.name?.split("-")[1]}
+              bold
+              style={{ fontSize: 20 }}
             />
+            {/* <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
+            {item?.updated && (
+              <Text
+                text={pubnubTimeTokenToDatetime(item?.updated)}
+                style={{ color: "#D3D3D3", fontSize: 14, marginTop: 20 }}
+              />
+            )}
           </View>
           <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
-            <View style={{ flexDirection: "row" }}>
+            {loading ? (
+              <View
+                style={{
+                  marginTop: 30
+                }}
+              >
+                <ActivityIndicator size={"large"} color={"black"} />
+              </View>
+            ) : (
+              messages.map(item => (
+                <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                  <Image
+                    source={profile}
+                    style={{
+                      height: (40 / 375) * width,
+                      width: (40 / 375) * width,
+                      borderRadius: (20 / 375) * width
+                    }}
+                  />
+                  <View
+                    style={{
+                      backgroundColor: "#D3D3D3",
+                      paddingVertical: 20,
+                      paddingHorizontal: 10,
+                      width: "85%",
+                      marginLeft: 10,
+                      borderRadius: 10
+                    }}
+                  >
+                    <Text text={item?.message} bold style={{ fontSize: 14 }} />
+                  </View>
+                </View>
+              ))
+            )}
+
+            {/* <View style={{ flexDirection: "row" }}>
               <Image
                 source={profile}
                 style={{
@@ -161,6 +209,8 @@ const ChatScreen = props => {
                 />
               </View>
             </View>
+           
+           
             <View style={{ flexDirection: "row", marginTop: 20 }}>
               <View
                 style={{
@@ -185,57 +235,7 @@ const ChatScreen = props => {
                   borderRadius: (20 / 375) * width
                 }}
               />
-            </View>
-            <View style={{ flexDirection: "row", marginTop: 20 }}>
-              <View
-                style={{
-                  backgroundColor: "#add8e6",
-                  paddingVertical: 20,
-                  paddingHorizontal: 10,
-                  width: "85%",
-                  marginRight: 10,
-                  borderRadius: 10
-                }}
-              >
-                <Text
-                  text="hy orum hope you are doing well this is our first conversation on orum app"
-                  style={{ fontSize: 16, color: "white" }}
-                />
-              </View>
-              <Image
-                source={profile}
-                style={{
-                  height: (40 / 375) * width,
-                  width: (40 / 375) * width,
-                  borderRadius: (20 / 375) * width
-                }}
-              />
-            </View>
-            <View style={{ flexDirection: "row", marginTop: 20 }}>
-              <View
-                style={{
-                  backgroundColor: "#add8e6",
-                  paddingVertical: 20,
-                  paddingHorizontal: 10,
-                  width: "85%",
-                  marginRight: 10,
-                  borderRadius: 10
-                }}
-              >
-                <Text
-                  text="hy orum hope you are doing well this is our first conversation on orum app"
-                  style={{ fontSize: 16, color: "white" }}
-                />
-              </View>
-              <Image
-                source={profile}
-                style={{
-                  height: (40 / 375) * width,
-                  width: (40 / 375) * width,
-                  borderRadius: (20 / 375) * width
-                }}
-              />
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       </SafeAreaView>

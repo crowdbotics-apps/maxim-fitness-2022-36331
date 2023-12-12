@@ -78,7 +78,7 @@ const FatLoseProgram = props => {
   const { smallVMargin, regularHMargin, tinyLMargin } = Gutters
 
   const nextExercise = () => {
-    setActiveIndex(Number(activeIndex) + 1)
+    setActiveIndex(Number(activeIndex) - 1)
     if (getWeekSessions?.query?.length) {
       const today = new Date(getWeekSessions?.query[0].date_time)
       const lastDay = new Date(today.setDate(today.getDate() + 7))
@@ -90,7 +90,7 @@ const FatLoseProgram = props => {
   }
 
   const previousExercise = () => {
-    setActiveIndex(Number(activeIndex) - 1)
+    setActiveIndex(Number(activeIndex) + 1)
     if (getWeekSessions?.query?.length) {
       const today = new Date(getWeekSessions.query[0].date_time)
 
@@ -163,7 +163,6 @@ const FatLoseProgram = props => {
       const isDateInFirstWeek = index <= 6 ? true : false
       setActiveIndex(index <= 6 ? 2 : 1)
       setIndex(date?.dateString)
-
       if (!checkWeek) {
         const today = new Date(getWeekSessions.query[0].date_time)
         const lastDay = new Date(
@@ -211,151 +210,153 @@ const FatLoseProgram = props => {
       <ScrollView>
         <View style={[smallVMargin, regularHMargin]}>
           <Text style={styles.heading}>Max's Fat Loss Program</Text>
-          {getWeekSessions?.query?.length > 0 && (
-            <View
-              style={[
-                row,
-                alignItemsCenter,
-                justifyContentBetween,
-                Gutters.small2xTMargin
-              ]}
-            >
-              <TouchableOpacity
-                style={row}
-                onPress={
-                  activeIndex === getWeekSessions?.week
-                    ? nextExercise
-                    : previousExercise
-                }
+          {!todayRequest && getWeekSessions?.query?.length > 0 && (
+            <>
+              <View
+                style={[
+                  row,
+                  alignItemsCenter,
+                  justifyContentBetween,
+                  Gutters.small2xTMargin
+                ]}
               >
-                {activeIndex !== getWeekSessions?.week ? (
-                  <Icon
-                    type="FontAwesome5"
-                    name={"chevron-left"}
-                    style={styles.IconStyle}
-                  />
-                ) : null}
-                <Text
-                  color="primary"
-                  text={`Week ${
+                <TouchableOpacity
+                  style={row}
+                  onPress={
                     activeIndex === getWeekSessions?.week
-                      ? getWeekSessions?.week
-                      : getWeekSessions?.week === undefined
-                      ? ""
-                      : getWeekSessions?.week - 1
-                  }`}
-                  style={[tinyLMargin, styles.smallText]}
-                />
-                {activeIndex === getWeekSessions?.week ? (
+                      ? nextExercise
+                      : previousExercise
+                  }
+                >
+                  {activeIndex !== getWeekSessions?.week ? (
+                    <Icon
+                      type="FontAwesome5"
+                      name={"chevron-left"}
+                      style={styles.IconStyle}
+                    />
+                  ) : null}
+                  <Text
+                    color="primary"
+                    text={`Week ${
+                      activeIndex === getWeekSessions?.week
+                        ? getWeekSessions?.week
+                        : getWeekSessions?.week === undefined
+                        ? ""
+                        : getWeekSessions?.week - 1
+                    }`}
+                    style={[tinyLMargin, styles.smallText]}
+                  />
+                  {activeIndex === getWeekSessions?.week ? (
+                    <Icon
+                      type="FontAwesome5"
+                      name={"chevron-right"}
+                      style={styles.IconStyle}
+                    />
+                  ) : null}
+                </TouchableOpacity>
+                <TouchableOpacity style={row} onPress={openModal}>
+                  <Text
+                    text={"Calendar"}
+                    style={[tinyLMargin, styles.CalenderText]}
+                  />
                   <Icon
                     type="FontAwesome5"
-                    name={"chevron-right"}
-                    style={styles.IconStyle}
+                    name="chevron-right"
+                    style={[styles.IconStyle, { color: "gray" }]}
                   />
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity style={row} onPress={openModal}>
-                <Text
-                  text={"Calendar"}
-                  style={[tinyLMargin, styles.CalenderText]}
-                />
-                <Icon
-                  type="FontAwesome5"
-                  name="chevron-right"
-                  style={[styles.IconStyle, { color: "gray" }]}
-                />
-              </TouchableOpacity>
-            </View>
+                </TouchableOpacity>
+              </View>
+              <View style={Layout.alignItemsCenter}>
+                <ScrollView
+                  horizontal
+                  contentContainerStyle={[
+                    Layout.fillGrow,
+                    Layout.justifyContentBetween
+                  ]}
+                >
+                  {getWeekSessions?.query?.map((d, i) => {
+                    const day = new Date(d.date_time).getDate()
+                    const weekDayName = moment(d.date_time).format("dd")
+                    const selectDate = moment(d.date_time).format("YYYY-MM-DD")
+
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        onPress={() => selectDay(d, i)}
+                        style={{
+                          marginHorizontal: 8,
+                          marginVertical: 10,
+                          alignItems: "center"
+                        }}
+                      >
+                        <Text
+                          text={
+                            (weekDayName === "Tu" && "T") ||
+                            (weekDayName === "We" && "W") ||
+                            (weekDayName === "Th" && "T") ||
+                            (weekDayName === "Fr" && "F") ||
+                            (weekDayName === "Sa" && "S") ||
+                            (weekDayName === "Su" && "S") ||
+                            (weekDayName === "Mo" && "M")
+                          }
+                          style={{
+                            fontSize: 15,
+                            lineHeight: 18,
+                            fontWeight: "bold",
+                            opacity: 0.7
+                          }}
+                        />
+                        <View
+                          style={{
+                            width: 28,
+                            height: 28,
+                            marginVertical: 5,
+                            backgroundColor:
+                              index === selectDate ? "#00a2ff" : "white",
+                            borderRadius: 100,
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                        >
+                          <Text
+                            text={day}
+                            style={{
+                              fontSize: 15,
+                              lineHeight: 18,
+                              fontWeight: "bold",
+                              color: index !== selectDate ? "#000" : "white"
+                            }}
+                          />
+                        </View>
+                        {d?.name !== "Rest" ? (
+                          <View style={row}>
+                            <View
+                              style={{
+                                backgroundColor: "red",
+                                height: 7,
+                                width: 8,
+                                borderRadius: 10
+                              }}
+                            />
+                            <View
+                              style={{
+                                backgroundColor: "green",
+                                left: -2,
+                                height: 7,
+                                width: 8,
+                                borderRadius: 10
+                              }}
+                            />
+                          </View>
+                        ) : null}
+                      </TouchableOpacity>
+                    )
+                  })}
+                </ScrollView>
+              </View>
+            </>
           )}
 
-          <View style={Layout.alignItemsCenter}>
-            <ScrollView
-              horizontal
-              contentContainerStyle={[
-                Layout.fillGrow,
-                Layout.justifyContentBetween
-              ]}
-            >
-              {getWeekSessions?.query?.map((d, i) => {
-                const day = new Date(d.date_time).getDate()
-                const weekDayName = moment(d.date_time).format("dd")
-                const selectDate = moment(d.date_time).format("YYYY-MM-DD")
-
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => selectDay(d, i)}
-                    style={{
-                      marginHorizontal: 8,
-                      marginVertical: 10,
-                      alignItems: "center"
-                    }}
-                  >
-                    <Text
-                      text={
-                        (weekDayName === "Tu" && "T") ||
-                        (weekDayName === "We" && "W") ||
-                        (weekDayName === "Th" && "T") ||
-                        (weekDayName === "Fr" && "F") ||
-                        (weekDayName === "Sa" && "S") ||
-                        (weekDayName === "Su" && "S") ||
-                        (weekDayName === "Mo" && "M")
-                      }
-                      style={{
-                        fontSize: 15,
-                        lineHeight: 18,
-                        fontWeight: "bold",
-                        opacity: 0.7
-                      }}
-                    />
-                    <View
-                      style={{
-                        width: 28,
-                        height: 28,
-                        marginVertical: 5,
-                        backgroundColor:
-                          index === selectDate ? "#00a2ff" : "white",
-                        borderRadius: 100,
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    >
-                      <Text
-                        text={day}
-                        style={{
-                          fontSize: 15,
-                          lineHeight: 18,
-                          fontWeight: "bold",
-                          color: index !== selectDate ? "#000" : "white"
-                        }}
-                      />
-                    </View>
-                    {d?.name !== "Rest" ? (
-                      <View style={row}>
-                        <View
-                          style={{
-                            backgroundColor: "red",
-                            height: 7,
-                            width: 8,
-                            borderRadius: 10
-                          }}
-                        />
-                        <View
-                          style={{
-                            backgroundColor: "green",
-                            left: -2,
-                            height: 7,
-                            width: 8,
-                            borderRadius: 10
-                          }}
-                        />
-                      </View>
-                    ) : null}
-                  </TouchableOpacity>
-                )
-              })}
-            </ScrollView>
-          </View>
           {todayRequest ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
