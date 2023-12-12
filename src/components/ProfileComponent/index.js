@@ -95,9 +95,17 @@ const ProfileComponent = ({
       </View>
       <View style={[row, fill, alignItemsCenter, justifyContentEnd]}>
         <TouchableOpacity onPress={onPressNotify}>
-          <Icon type="FontAwesome5" name="bell" style={{ fontSize: 25 }} />
+          <Icon type="FontAwesome5" name="bell" size={25} />
           {true && unreadCount && (
-            <View style={true ? styles.notificationStyle : ""}>
+            <View
+              style={[
+                styles.notificationStyle,
+                {
+                  width: unreadCount > 99 ? 25 : 21,
+                  height: unreadCount > 99 ? 23 : 21
+                }
+              ]}
+            >
               <Text
                 text={unreadCount > 99 ? "+99" : unreadCount}
                 style={styles.notificationStyleText}
@@ -147,9 +155,9 @@ const styles = StyleSheet.create({
   },
   messageStyle: {
     top: -10,
-    width: 21,
+    width: 23,
     right: -10,
-    height: 21,
+    height: 23,
     borderRadius: 100,
     position: "absolute",
     backgroundColor: "red"
@@ -162,8 +170,6 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   notificationStyle: {
-    width: 21,
-    height: 21,
     borderRadius: 100,
     backgroundColor: "red",
     position: "absolute",

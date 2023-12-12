@@ -154,8 +154,10 @@ const FeedCard = props => {
   const callback = () => {
     hideMenu()
     setState(stateSchema)
-    setModalVisible(false)
     setItemData("")
+    setTimeout(() => {
+      setModalVisible(false)
+    }, 500)
   }
 
   const showConfirmDialog = id => {
