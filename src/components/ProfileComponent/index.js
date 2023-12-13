@@ -95,7 +95,12 @@ const ProfileComponent = ({
       </View>
       <View style={[row, fill, alignItemsCenter, justifyContentEnd]}>
         <TouchableOpacity onPress={onPressNotify}>
-          <Icon type="FontAwesome5" name="bell" size={25} />
+          <Icon
+            type="FontAwesome5"
+            name="bell"
+            size={25}
+            // color="black"
+          />
           {true && unreadCount && (
             <View
               style={[
@@ -119,7 +124,7 @@ const ProfileComponent = ({
             name="comment-alt"
             // style={{ fontSize: 25, color: "black" }}
             size={25}
-            color="#000"
+            // color="#000"
           />
           {true && (
             <View style={styles.messageStyle}>
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
   },
   messageStyleText: {
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 3,
     color: "white",
     fontWeight: "bold",
     textAlign: "center"
@@ -181,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     color: "white",
-    marginTop: 2
+    marginTop: 3
   }
 })
 

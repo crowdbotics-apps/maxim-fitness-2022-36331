@@ -16,7 +16,8 @@ import { store } from "src/redux/store"
 const pubnub = new PubNub({
   publishKey: PUBNUB_PUBLISH_KEY,
   subscribeKey: PUBNUB_SUBSCRIBE_KEY,
-  userId: "myUniqueUUIDDD"
+  userId: "myUniqueUUIDDD",
+  restore: true
   // logVerbosity: true
 })
 

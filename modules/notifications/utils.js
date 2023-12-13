@@ -1,7 +1,7 @@
-import { Platform } from "react-native";
-import { getUniqueId, getAndroidId, getModel } from "react-native-device-info";
-import { registerDeviceInfoAPI } from "./api";
-import messaging from "@react-native-firebase/messaging";
+import { Platform } from "react-native"
+import { getUniqueId, getAndroidId, getModel } from "react-native-device-info"
+import { registerDeviceInfoAPI } from "./api"
+import messaging from "@react-native-firebase/messaging"
 
 /**
  * Request and generate Firebase Messaging token and store it in the DB via REST API
@@ -10,18 +10,18 @@ import messaging from "@react-native-firebase/messaging";
  * @return {Promise}
  */
 const RemotePushController = async (authToken, userID) => {
-  const authStatus = await messaging().requestPermission();
+  const authStatus = await messaging().requestPermission()
   const ENABLED_STATUSES = [
     messaging.AuthorizationStatus.AUTHORIZED,
     messaging.AuthorizationStatus.PROVISIONAL
-  ];
-  const isEnabled = ENABLED_STATUSES.includes(authStatus);
+  ]
+  const isEnabled = ENABLED_STATUSES.includes(authStatus)
   // Checks if required permissions are allowed or not
 
   if (isEnabled) {
-    const registrationToken = await messaging().getToken();
-    const androidId = await getAndroidId();
-    const iosId = await getUniqueId();
+    const registrationToken = await messaging().getToken()
+    const androidId = await getAndroidId()
+    const iosId = await getUniqueId()
     // API which registers the device details and FCM token in backend
     await registerDeviceInfoAPI(
       {
@@ -35,8 +35,8 @@ const RemotePushController = async (authToken, userID) => {
         cloud_message_type: "FCM"
       },
       authToken
-    );
+    )
   }
-};
+}
 
-export default RemotePushController;
+export default RemotePushController

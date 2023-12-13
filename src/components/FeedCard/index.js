@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  Alert
+  Alert,
+  SafeAreaView
 } from "react-native"
 import Text from "../Text"
 import { Images } from "src/theme"
@@ -21,11 +22,8 @@ import {
   postReportRequest,
   postDeleteRequest
 } from "../../ScreenRedux/feedRedux"
-import Carousel from "react-native-snap-carousel"
-import Video from "react-native-video"
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
 import Modal from "react-native-modal"
-import useForm from "../../utils/useForm"
 
 let deviceWidth = Dimensions.get("window").width
 let deviceHeight = Dimensions.get("window").height
@@ -49,11 +47,9 @@ const FeedCard = props => {
   const [showMore, setShowMore] = useState(false)
   const [isModalVisible, setModalVisible] = useState(false)
   const [itemData, setItemData] = useState("")
+  const [reason, setReason] = useState("")
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible)
-    hideMenu()
-  }
+  console.log("isModalVisibleisModalVisible", isModalVisible)
 
   const [visible, setVisible] = useState(false)
 
@@ -97,17 +93,6 @@ const FeedCard = props => {
     navigation.navigate("ProfileScreen", { item })
   }
 
-  const renderData = () => {
-    return (
-      <Video
-        source={{
-          uri: "https://maxim-fitness-2022-36331.s3.amazonaws.com/media/post_video/video/mixkit-baby-on-the-belly-of-his-mother-plays-and-smiles-4042-large_am3NaY6.mp4"
-        }}
-        style={{ height: 200, width: 200 }}
-      />
-    )
-  }
-
   const action = (item, type) => {
     setItemData(item)
     hideMenu()
@@ -126,34 +111,16 @@ const FeedCard = props => {
   const handleButtonPress = () => {
     let data = {
       user: profile?.id,
-      reason: state.reason.value,
+      reason: reason,
       comment: "",
       post: itemData?.id
     }
     props.postReportRequest(data, callback)
   }
 
-  const stateSchema = {
-    reason: {
-      value: "",
-      error: ""
-    }
-  }
-
-  const validationStateSchema = {
-    reason: {
-      required: true
-    }
-  }
-
-  const { state, handleOnChange, disable, setState } = useForm(
-    stateSchema,
-    validationStateSchema
-  )
-
   const callback = () => {
     hideMenu()
-    setState(stateSchema)
+    setReason("")
     setItemData("")
     setTimeout(() => {
       setModalVisible(false)
@@ -184,7 +151,7 @@ const FeedCard = props => {
   }
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.mainContainer}>
         <TouchableOpacity
           style={styles.card}
@@ -213,8 +180,8 @@ const FeedCard = props => {
               />
               <Text text={calculatePostTime(item)} style={styles.text2} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={showMenu}>
-              <Menu visible={visible} onRequestClose={hideMenu}>
+            <TouchableOpacity onPress={() => showMenu()}>
+              <Menu visible={visible} onRequestClose={() => hideMenu()}>
                 {profile?.id === item?.user?.id ? (
                   <MenuItem
                     textStyle={{ color: "red" }}
@@ -328,13 +295,11 @@ const FeedCard = props => {
           <View style={styles.reportStyle}>
             <Text style={styles.reportText}>Report on post</Text>
             <TextInput
-              value={state.reason.value}
-              onChangeText={value => handleOnChange("reason", value)}
+              value={reason}
+              onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
             />
-
-            <Text style={{ color: "red" }}>{state.reason.error}</Text>
 
             <View style={styles.btnStyles}>
               <TouchableOpacity
@@ -346,7 +311,7 @@ const FeedCard = props => {
               <TouchableOpacity
                 style={[styles.smallBtnStyle, { backgroundColor: "gray" }]}
                 onPress={handleButtonPress}
-                disabled={loading || disable}
+                disabled={loading || reason === ""}
               >
                 {loading ? (
                   <ActivityIndicator color={"white"} />
@@ -358,7 +323,7 @@ const FeedCard = props => {
           </View>
         </View>
       </Modal>
-    </>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({

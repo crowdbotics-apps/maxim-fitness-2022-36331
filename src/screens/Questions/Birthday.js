@@ -10,7 +10,6 @@ import {
 } from "react-native"
 import moment from "moment"
 import { connect } from "react-redux"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 //Components
 import { Text, Button } from "../../components"
@@ -21,7 +20,6 @@ import { Global, Layout, Gutters, Fonts } from "../../theme"
 import DatePicker from "react-native-date-picker"
 import LinearGradient from "react-native-linear-gradient"
 import { updateAnswer } from "./Redux"
-import RemotePushController from "../../../modules/notifications/utils"
 
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 
@@ -41,11 +39,6 @@ const Birthday = props => {
     tempData.dob = navState
     navigate("Gender")
   }
-
-  useEffect(async () => {
-    const token = await AsyncStorage.getItem("authToken")
-    RemotePushController(token, profile?.id)
-  }, [])
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
