@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { Text, View, FlatList, Image, ActivityIndicator } from "react-native"
+import {
+  Text,
+  View,
+  FlatList,
+  Image,
+  ActivityIndicator,
+  RefreshControl
+} from "react-native"
 import options from "./options"
 import { fetchNotifications } from "./api"
 import { getNotificationCountSuccess } from "../../src/ScreenRedux/nutritionRedux"
@@ -10,23 +17,33 @@ const Notifications = props => {
   const { navigation } = props
   const { styles } = options
   // Contains the messages recieved from backend
-  const [messages, setMessages] = useState([])
+  const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [nextPage, setNextPage] = useState("")
 
-  const getNotifications = async () => {
+  const getNotifications = async page => {
     setLoading(true)
-    // Api to fetch recent list of notifications
-    const res = await fetchNotifications()
-    setMessages(res)
+    const res = await fetchNotifications(page)
+    setNotifications(prevNotifications => [
+      ...prevNotifications,
+      ...res?.results
+    ])
+
     setLoading(false)
     if (res?.count) {
       getNotificationCountSuccess(0)
     }
+
+    setNextPage(res?.next ? res?.next?.split("?page=")[1] : res?.next)
   }
 
   useEffect(() => {
-    getNotifications()
+    getNotifications(1)
   }, [])
+
+  const onEndReached = () => {
+    nextPage !== null && getNotifications(nextPage)
+  }
 
   /**
    * Notification component that will be rendered in Flatlist
@@ -70,22 +87,33 @@ const Notifications = props => {
 
   return (
     <View style={{ flex: 1 }}>
-      {loading ? (
+      {loading && !nextPage ? (
         <View style={styles.loaderStyle}>
           <ActivityIndicator color={"gray"} size="large" />
         </View>
-      ) : messages && messages?.results?.length > 0 ? (
+      ) : (
         <FlatList
-          data={messages && messages?.results}
+          data={notifications && notifications}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          onRefresh={getNotifications}
+          onRefresh={() => {
+            setNextPage("")
+            getNotifications(1)
+          }}
+          removeClippedSubviews={true}
+          initialNumToRender={5}
+          numColumns={1}
           refreshing={loading}
+          onEndReachedThreshold={0.5}
+          onEndReached={onEndReached}
+          windowSize={250}
+          ListEmptyComponent={() => (
+            <View style={styles.loaderStyle}>
+              <Text style={{ fontSize: 18 }}>No record found</Text>
+            </View>
+          )}
         />
-      ) : (
-        <View style={styles.loaderStyle}>
-          <Text style={{ fontSize: 18 }}>No record found</Text>
-        </View>
       )}
     </View>
   )

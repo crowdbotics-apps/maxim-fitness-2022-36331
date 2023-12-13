@@ -15,7 +15,7 @@ import {
 import LinearGradient from "react-native-linear-gradient"
 import { connect } from "react-redux"
 import LottieView from "lottie-react-native"
-import Voice from "@react-native-community/voice"
+import Voice from "@react-native-voice/voice"
 import { Images, Layout, Gutters, Global } from "../../theme"
 import { getSpeechRequest } from "../../ScreenRedux/nutritionRedux"
 import { checkAndRequestMicrophonePermission } from "../../utils/functions"

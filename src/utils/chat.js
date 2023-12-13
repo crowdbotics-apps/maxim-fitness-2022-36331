@@ -278,3 +278,9 @@ export const pubnubTimeTokenToDatetime = timestamp => {
 
   return formattedDateTime
 }
+
+export const getPubNubTimetoken = () => {
+  const now = Math.floor(Date.now() / 1000)
+  const currentDate = new Date(now * 1000)
+  const timetoken = currentDate.getTime() * 10000
+}

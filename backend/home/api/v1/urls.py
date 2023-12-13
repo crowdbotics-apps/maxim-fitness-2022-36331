@@ -28,7 +28,7 @@ from home.api.v1.viewsets import (
     CheckUserViewSet,
     ReportAPostViewSet,
     BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
-    ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet
+    ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet
 )
 
 from rest_framework import permissions
@@ -54,6 +54,7 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 router.register('signup', SignupViewSet, basename='signup')
 router.register('login', LoginViewSet, basename='login')
+router.register('logout', LogOutViewSet, basename='logout')
 router.register('profile', ProfileViewSet, basename='profile')
 router.register('photos', UserPhotoViewSet, basename='profile')
 router.register('videos', UserVideoViewSet, basename='profile')
