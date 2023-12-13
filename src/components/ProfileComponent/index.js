@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   messageStyleText: {
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 3,
     color: "white",
     fontWeight: "bold",
     textAlign: "center"
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     color: "white",
-    marginTop: 2
+    marginTop: 3
   }
 })
 
