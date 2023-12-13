@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  Alert
+  Alert,
+  SafeAreaView
 } from "react-native"
 import Text from "../Text"
 import { Images } from "src/theme"
@@ -97,17 +98,6 @@ const FeedCard = props => {
     navigation.navigate("ProfileScreen", { item })
   }
 
-  const renderData = () => {
-    return (
-      <Video
-        source={{
-          uri: "https://maxim-fitness-2022-36331.s3.amazonaws.com/media/post_video/video/mixkit-baby-on-the-belly-of-his-mother-plays-and-smiles-4042-large_am3NaY6.mp4"
-        }}
-        style={{ height: 200, width: 200 }}
-      />
-    )
-  }
-
   const action = (item, type) => {
     setItemData(item)
     hideMenu()
@@ -184,7 +174,7 @@ const FeedCard = props => {
   }
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.mainContainer}>
         <TouchableOpacity
           style={styles.card}
@@ -358,7 +348,7 @@ const FeedCard = props => {
           </View>
         </View>
       </Modal>
-    </>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({
