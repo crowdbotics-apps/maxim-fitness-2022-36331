@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.db.models import Prefetch, Q, Exists, OuterRef
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from fcm_django.models import FCMDevice
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -1340,3 +1341,20 @@ class CommentLikeViewSet(ModelViewSet):
         serializer.is_valid()
         serializer.save()
         return Response("like")
+
+
+class LogOutViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['post']
+
+    def create(self, request, *args, **kwargs):
+        try:
+            user = self.request.user
+            registration_id = request.data.get('registration_id')
+            FCMDevice.objects.filter(user=request.user, registration_id=registration_id).delete()
+            Token.objects.filter(user=user).delete()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"success": True})

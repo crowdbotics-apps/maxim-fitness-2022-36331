@@ -9,7 +9,7 @@ User = get_user_model()
 
 class Notification(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender_notification",)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver_notification",)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver_notification", null=True, blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -21,19 +21,15 @@ class Notification(models.Model):
 
 @receiver(post_save, sender=Notification)
 def send_notification(sender, instance, created, **kwargs):
-    # from users.tasks import send_user_custom_notification
     if created:
         if instance.receiver:
-            devices = FCMDevice.objects.filter(user=instance.receiver)
-            # devices = GCMDevice.objects.filter(user=instance.receiver)
-            # apns_devices = APNSDevice.objects.filter(user=instance.receiver)
+            devices = FCMDevice.objects.filter(user=instance.receiver, active=True)
+
         else:
-            devices = FCMDevice.objects.all()
-            # devices = GCMDevice.objects.all()
-            # apns_devices = APNSDevice.objects.all()
+            devices = FCMDevice.objects.filter(active=True)
+
 
         if devices:
-            # devices.send_message(title=instance.title, body=instance.message)
-            devices.send_message(title=instance.title, message=instance.message)
-        # if apns_devices:
-        #     apns_devices.send_message(message={"body": instance.message})
+            devices.send_message(title=instance.title, body=instance.message)
+
+
