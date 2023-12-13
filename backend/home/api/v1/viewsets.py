@@ -552,6 +552,12 @@ class MealViewSet(ModelViewSet):
     @action(detail=False, methods=['post'])
     def delete_food(self, request):
         id = request.data.get('food_id')
+        list_of_ids = request.data.get('list_of_ids', [])
+        if list_of_ids:
+            deleted, _ = FoodItem.objects.filter(id__in=list_of_ids).delete()
+            return Response(
+                {'message': f'Successfully deleted {deleted} items'}
+            )
         FoodItem.objects.get(id=id).delete()
         return Response('Food deleted from the meal.')
 
