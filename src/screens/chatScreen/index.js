@@ -48,13 +48,15 @@ const ChatScreen = props => {
           count: 100
         },
         (_, response) => {
-          if (response) {
-            const messages = response.channels[item.id].map(obj => obj)
+          if (response?.channels) {
+            const messages =
+              response?.channels && response?.channels[item.id]?.map(obj => obj)
             state.messages[item.id] = loadHistory(messages)
             setLoading(false)
             setMessages(messages)
             dispatch({ messages: state.messages })
           }
+          setLoading(false)
         }
       )
     } catch (err) {
@@ -139,7 +141,7 @@ const ChatScreen = props => {
               bold
               style={{ fontSize: 20 }}
             />
-            {/* <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
+            {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
             {item?.updated && (
               <Text
                 text={pubnubTimeTokenToDatetime(item?.updated)}
@@ -157,7 +159,8 @@ const ChatScreen = props => {
                 <ActivityIndicator size={"large"} color={"black"} />
               </View>
             ) : (
-              messages.map(item => (
+              messages &&
+              messages?.map(item => (
                 <View style={{ flexDirection: "row", marginBottom: 10 }}>
                   <Image
                     source={profile}

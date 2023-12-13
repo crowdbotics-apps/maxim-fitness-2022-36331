@@ -738,7 +738,7 @@ const CustomExercise = props => {
                               "/" +
                               droupSet?.state2 +
                               (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
-                          weight: 10,
+                          weight: "",
                           set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                           rest:
                             minutes * 60 + parseFloat(seconds ? seconds : 0),
@@ -758,7 +758,7 @@ const CustomExercise = props => {
                         ex_id: route?.params?.exercises?.map(e => e.id),
                         set_no: 1,
                         reps: reps,
-                        weight: 10,
+                        weight: "",
                         set_type: "ct",
                         rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
                         timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
@@ -1112,7 +1112,7 @@ const CustomExercise = props => {
                               ),
                             ex_id: route?.params?.exercises[0]?.id,
                             set_no: dualSets?.length + 1,
-                            weight: 10,
+                            weight: "",
                             set_type: "ct",
                             timer:
                               (timeData?.mints?.mint1
@@ -1139,7 +1139,7 @@ const CustomExercise = props => {
                               ),
                             ex_id: route?.params?.exercises[1]?.id,
                             set_no: dualSets?.length + 1,
-                            weight: 10,
+                            weight: "",
                             set_type: "ct",
                             timer:
                               (timeData?.mints?.mint2
@@ -1166,7 +1166,7 @@ const CustomExercise = props => {
                               ),
                             ex_id: route?.params?.exercises[2]?.id,
                             set_no: dualSets?.length + 1,
-                            weight: 10,
+                            weight: "",
                             set_type: "ct",
                             timer:
                               (timeData?.mints?.mint3
@@ -1199,7 +1199,7 @@ const CustomExercise = props => {
                               ),
                             ex_id: route?.params?.exercises[0]?.id,
                             set_no: dualSets?.length + 1,
-                            weight: 10,
+                            weight: "",
                             set_type: "ct",
                             timer:
                               (timeData?.mints?.mint1
@@ -1226,7 +1226,7 @@ const CustomExercise = props => {
                               ),
                             ex_id: route?.params?.exercises[1].id,
                             set_no: dualSets?.length + 1,
-                            weight: 10,
+                            weight: "",
                             set_type: "ct",
                             timer:
                               (timeData?.mints?.mint2

@@ -145,6 +145,7 @@ const ViewPost = props => {
   }
 
   const addAComment = () => {
+    setCommentData("")
     if (showCancelOption) {
       let replyCommentData = {
         comment: focusreply.comment,

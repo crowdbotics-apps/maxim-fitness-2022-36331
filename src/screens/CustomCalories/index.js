@@ -48,6 +48,7 @@ import {
 } from "@react-native-google-signin/google-signin"
 import { setAccessToken } from "../../ScreenRedux/loginRedux"
 import { resetQuestions } from "../Questions/Redux"
+import { useStore } from "../../utils/chat"
 
 const CustomCalories = props => {
   const {
@@ -61,6 +62,7 @@ const CustomCalories = props => {
   } = props
 
   let refWeight = useRef("")
+  const { state, dispatch } = useStore()
   const [tab, setTab] = useState(2)
   const [value, setValue] = useState(false)
   const [currentTab, setCurrentTab] = useState(0)
