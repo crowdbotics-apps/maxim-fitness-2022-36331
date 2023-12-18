@@ -82,9 +82,9 @@ export const forgetPassWord = data => ({
   data
 })
 
-export const forgetPassWordConfirm = token => ({
+export const forgetPassWordConfirm = data => ({
   type: FORGOT_PASSWORD_CONFIRM,
-  token
+  data
 })
 
 //Reducers
@@ -319,9 +319,9 @@ async function forgetPassWordConfirmAPI(data) {
 function* forgetPassWordConfirmRequest({ data }) {
   try {
     const res = yield call(forgetPassWordConfirmAPI, data)
-    navigate("Login")
+    navigate("SignIn")
     showMessage({
-      message: "New password  successfully reset.",
+      message: "New password successfully reset.",
       type: "success"
     })
     yield put(reset())
