@@ -307,17 +307,21 @@ const SignIn = props => {
               placeholder="Password"
             />
             <Text style={{ color: "red" }}>{state.password.error}</Text>
-            <Text
-              style={{
-                color: "#0460BB",
-                fontWeight: "700",
-                fontSize: 14,
-                textAlign: "right",
-                marginTop: 12
-              }}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ForgetPassWordScreen")}
             >
-              Forgot Password ?
-            </Text>
+              <Text
+                style={{
+                  color: "#0460BB",
+                  fontWeight: "700",
+                  fontSize: 14,
+                  textAlign: "right",
+                  marginTop: 12
+                }}
+              >
+                Forgot Password ?
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => OnLogInPress()}
               disabled={disable}

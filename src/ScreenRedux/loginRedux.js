@@ -22,6 +22,9 @@ const SET_USER_DETAIL = "SCREEN/SET_USER_DETAIL"
 const SUBSCRIPTION_DATA = "SCREEN/SUBSCRIPTION_DATA"
 const LOGOUT_USER = "SCREEN/LOGOUT_USER"
 
+const FORGOT_PASSWORD = "SCREEN/FORGOT_PASSWORD"
+const FORGOT_PASSWORD_CONFIRM = "SCREEN/FORGOT_PASSWORD_CONFIRM"
+
 const RESET = "SCREEN/RESET"
 
 const initialState = {
@@ -30,7 +33,8 @@ const initialState = {
   accessToken: false,
   googleRequesting: false,
   faceBookRequesting: false,
-  subscriptionData: false
+  subscriptionData: false,
+  forgotRequest: false
 }
 
 //Actions
@@ -73,6 +77,16 @@ export const logOutActiveUser = token => ({
   token
 })
 
+export const forgetPassWord = data => ({
+  type: FORGOT_PASSWORD,
+  data
+})
+
+export const forgetPassWordConfirm = token => ({
+  type: FORGOT_PASSWORD_CONFIRM,
+  token
+})
+
 //Reducers
 export const loginReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -111,12 +125,20 @@ export const loginReducer = (state = initialState, action) => {
         subscriptionData: action.data
       }
 
+    case FORGOT_PASSWORD:
+    case FORGOT_PASSWORD_CONFIRM:
+      return {
+        ...state,
+        forgotRequest: true
+      }
+
     case RESET:
       return {
         ...state,
         requesting: false,
         googleRequesting: false,
-        faceBookRequesting: false
+        faceBookRequesting: false,
+        forgotRequest: false
       }
 
     default:
@@ -249,9 +271,76 @@ function* logoutUser({ token }) {
     const { response } = e
   }
 }
+
+async function forgetPassWordAPI(data) {
+  const URL = `${API_URL}/forgot-password/`
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    data
+  }
+  return XHR(URL, options)
+}
+
+function* forgetPassWordRequest({ data }) {
+  try {
+    const res = yield call(forgetPassWordAPI, data)
+    navigate("SetForgetPassword")
+    showMessage({
+      message: "Token has been sent on your email.",
+      type: "success"
+    })
+    yield put(reset())
+  } catch (e) {
+    const { response } = e
+    showMessage({
+      message: "Unable to forgot in with provided credentials.",
+      type: "danger"
+    })
+  } finally {
+    yield put(reset())
+  }
+}
+
+async function forgetPassWordConfirmAPI(data) {
+  const URL = `${API_URL}/forgot-password/confirm/`
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    data
+  }
+  return XHR(URL, options)
+}
+
+function* forgetPassWordConfirmRequest({ data }) {
+  try {
+    const res = yield call(forgetPassWordConfirmAPI, data)
+    navigate("Login")
+    showMessage({
+      message: "New password  successfully reset.",
+      type: "success"
+    })
+    yield put(reset())
+  } catch (e) {
+    const { response } = e
+    showMessage({
+      message: "Unable to forgot in with provided credentials.",
+      type: "danger"
+    })
+  } finally {
+    yield put(reset())
+  }
+}
+
 export default all([
   takeLatest(LOGIN, login),
   takeLatest(FACEBOOK_LOGIN, facebookLogin),
   takeLatest(GOOGLE_LOGIN, googleLogin),
-  takeLatest(LOGOUT_USER, logoutUser)
+  takeLatest(LOGOUT_USER, logoutUser),
+  takeLatest(FORGOT_PASSWORD, forgetPassWordRequest),
+  takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest)
 ])
