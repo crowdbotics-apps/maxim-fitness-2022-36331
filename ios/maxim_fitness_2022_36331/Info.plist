@@ -26,17 +26,17 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<string>com.orumtraining</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb1123564435225618</string>
+				<string>fb1573573096805401</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>org.reactjs.native.example.maxim-fitness-2022-36331</string>
+			<string>com.orumtraining</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.146444618570-57mrfdva3ths48nhte71f12l7lqbu7t1</string>
@@ -46,7 +46,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>1123564435225618</string>
+	<string>1573573096805401</string>
 	<key>FacebookDisplayName</key>
 	<string>Orum Training</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -64,6 +64,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Orum Training application need access of camera for Bar code scanner</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Orum Training application need access of your while you are doing cardio or running.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Need to use for login via facebook and google</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -74,8 +76,6 @@
 	<string>Orum Training application need access of photo library for Bar code scanner</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Orum Training application need access of the speech recognition for adding meals</string>
-  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-  <string>Orum Training application need access of your while you are doing cardio or running.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>FontAwesome.ttf</string>
