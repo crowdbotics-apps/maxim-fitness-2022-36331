@@ -10,7 +10,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Pressable
+  Linking
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -86,6 +86,7 @@ const SignUp = props => {
       await GoogleSignin.hasPlayServices()
       const userInfo = await GoogleSignin.signIn()
       const myToken = await GoogleSignin.getTokens()
+
         .then(res => {
           return res.accessToken
         })
@@ -131,6 +132,14 @@ const SignUp = props => {
     } catch (err) {
       err
     }
+  }
+
+  const openPrivacyPolicy = () => {
+    // Linking.canOpenURL('https://orumtraining-23610.botics.co/privacy-policy/').then((supported) => {
+    //   if (supported) {
+    Linking.openURL("https://orumtraining-23610.botics.co/privacy-policy/")
+    // }
+    // });
   }
 
   return (
@@ -225,7 +234,7 @@ const SignUp = props => {
                 {check ? (
                   <Image
                     source={Images.check}
-                    style={{ width: 13, height: 13 }}
+                    style={{ width: 18, height: 18 }}
                   />
                 ) : null}
               </TouchableOpacity>
@@ -235,6 +244,7 @@ const SignUp = props => {
                   marginLeft: 10,
                   fontStyle: "italic"
                 }}
+                onPress={() => openPrivacyPolicy()}
               >
                 {"I have accept terms & conditions"}
               </Text>

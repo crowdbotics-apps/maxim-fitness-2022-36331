@@ -49,8 +49,6 @@ const FeedCard = props => {
   const [itemData, setItemData] = useState("")
   const [reason, setReason] = useState("")
 
-  console.log("isModalVisibleisModalVisible", isModalVisible)
-
   const [visible, setVisible] = useState(false)
 
   const hideMenu = () => setVisible(false)
