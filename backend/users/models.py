@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django_rest_passwordreset.signals import reset_password_token_created
 
-
+from django.conf import settings
 class User(AbstractUser):
     # WARNING!
     """
@@ -157,7 +157,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         # message:
         email_plaintext_message,
         # from:
-        "noreply@maxim-fitness.com",
+        settings.DEFAULT_FROM_EMAIL,
         # to:
         [reset_password_token.user.email]
     )
