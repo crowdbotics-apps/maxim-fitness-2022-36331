@@ -31,6 +31,7 @@ import {
   googleLoginUser,
   facebookLoginUser
 } from "../../ScreenRedux/loginRedux"
+import { API_URL } from "../../config/app"
 
 const { backIcon, orumIcon, smallGoogleIcon, faceBookIcon } = Images
 const SignUp = props => {
@@ -137,7 +138,7 @@ const SignUp = props => {
   const openPrivacyPolicy = () => {
     // Linking.canOpenURL('https://orumtraining-23610.botics.co/privacy-policy/').then((supported) => {
     //   if (supported) {
-    Linking.openURL("https://orumtraining-23610.botics.co/privacy-policy/")
+    Linking.openURL(`${API_URL}/privacy-policy/`)
     // }
     // });
   }

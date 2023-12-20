@@ -210,6 +210,27 @@ const MessageScreen = props => {
             <Image source={searchImage} style={{ height: 30, width: 30 }} />
           </View>
         </View>
+
+        {!conversationList[1]?.data?.length && !loading && (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                marginBottom: 10
+              }}
+            >
+              No User Found
+            </Text>
+          </View>
+        )}
+
         <SectionList
           refreshing={loading}
           onRefresh={async () => {
@@ -229,6 +250,14 @@ const styles = StyleSheet.create({
     width: 8,
     marginTop: 46,
     marginLeft: 22
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  emptyText: {
+    fontSize: 20
   }
 })
 

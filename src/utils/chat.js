@@ -88,6 +88,7 @@ export const fetchChannels = (pubnub, userId) => {
       filter: `id LIKE "*${userId}*"`,
       include: { customFields: true }
     })
+    console.log("sssssssssssssssss", metadata.data)
     metadata.data.forEach(({ id, name, updated, custom }) => {
       channels[id] = {
         id,
