@@ -1358,27 +1358,3 @@ class LogOutViewSet(ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({"success": True})
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db import connection
-
-class DatabasePermissionAPIView(APIView):
-    authentication_classes = []
-    permission_classes = []
-    def post(self, request):
-        # Assuming you have a valid authentication mechanism in place
-
-        # Get data from the request
-        username = request.data.get('username')
-        db = request.data.get('db')
-
-        # Validate data, perform additional checks as needed
-
-        # Perform database operations to grant permissions
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute(f"GRANT ALL PRIVILEGES ON DATABASE {db} TO {username};")
-            except Exception as e:
-                return Response({'error': str(e)}, status=500)
-
-        return Response({'success': True})
