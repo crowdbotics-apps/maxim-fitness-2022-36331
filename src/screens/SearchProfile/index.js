@@ -87,7 +87,7 @@ const SearchProfile = props => {
             type: 0,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.username
+            otherUserName: item?.user_detail?.username
           }
         }
       )
@@ -101,7 +101,7 @@ const SearchProfile = props => {
               type: ChannelType.Direct,
               owner: userProfile?.id,
               otherUserImage: item?.user_detail?.profile_picture,
-              otherUserName: item?.username
+              otherUserName: item?.user_detail?.username
             }
           }
         }
@@ -115,7 +115,7 @@ const SearchProfile = props => {
             type: ChannelType.Direct,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.username
+            otherUserName: item?.user_detail?.username
           }
         }
       })

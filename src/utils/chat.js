@@ -6,7 +6,9 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const channel = `${userId}-${chatWithId}`
+      const channel = `${userId > chatWithId ? userId : chatWithId}-${
+        chatWithId > userId ? chatWithId : userId
+      }`
 
       // Set channel metadata
       await pubnub.objects.setChannelMetadata({
@@ -20,11 +22,11 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
         uuids: [{ id: `${userId}` }, { id: `${chatWithId}` }]
       })
 
-      //   // Add channel to channel group
-      await pubnub.channelGroups.addChannels({
-        channels: [channel],
-        channelGroup: userId
-      })
+      //  Add channel to channel group
+      // await pubnub.channelGroups.addChannels({
+      //   channels: [channel],
+      //   channelGroup: userId
+      // })
 
       resolve({ channel: channel })
     } catch (error) {
@@ -88,7 +90,7 @@ export const fetchChannels = (pubnub, userId) => {
       filter: `id LIKE "*${userId}*"`,
       include: { customFields: true }
     })
-    console.log("sssssssssssssssss", metadata.data)
+
     metadata.data.forEach(({ id, name, updated, custom }) => {
       channels[id] = {
         id,
