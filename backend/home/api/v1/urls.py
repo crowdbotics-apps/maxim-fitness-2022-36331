@@ -30,7 +30,6 @@ from home.api.v1.viewsets import (
     ReportAPostViewSet,
     BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
     ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet,
-    DatabasePermissionAPIView
 )
 
 from rest_framework import permissions
@@ -109,5 +108,4 @@ urlpatterns = [
 
     path('forgot-password/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html')),
-    path("grant_permission/", DatabasePermissionAPIView.as_view())
 ]
