@@ -349,12 +349,13 @@ class UserVideoViewSet(
 
 class UserSearchViewSet(ModelViewSet):
     serializer_class = UserSerializer
+    pagination_class = PostPagination
 
     def get_queryset(self):
         queryset = User.objects.all()
         search = self.request.query_params.get("search")
         if search:
-            queryset = User.objects.filter(username__icontains=search)
+            queryset = User.objects.filter(username__icontains=search).exclude(id=self.request.user.id)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -665,8 +666,11 @@ class ExerciseViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         exercise_type = self.request.query_params.get("exercise_type")
+        exercise_type_name = self.request.query_params.get("search") # search on the bases of exercise_type name
         if exercise_type:
             queryset = queryset.filter(exercise_type__id=exercise_type)
+        if exercise_type_name:
+            queryset = queryset.filter(exercise_type__name__icontains=exercise_type_name)
         return queryset
 
 
