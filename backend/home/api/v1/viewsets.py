@@ -349,26 +349,39 @@ class UserVideoViewSet(
 
 class UserSearchViewSet(ModelViewSet):
     serializer_class = UserSerializer
+    pagination_class = PostPagination
 
     def get_queryset(self):
         queryset = User.objects.all()
         search = self.request.query_params.get("search")
         if search:
-            queryset = User.objects.filter(username__icontains=search)
+            queryset = User.objects.filter(username__icontains=search).exclude(id=self.request.user.id)
         return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+
+        # Use pagination
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            data = []
+            for i in page:
+                a = Follow.objects.followers(i)
+                f = True if a else False
+                serializer = UserSerializer(i, context={"request": request})
+                data_dic = {"user_detail": serializer.data, "follow": f}
+                data.append(data_dic)
+            return self.get_paginated_response(data)
+
+        # If pagination is not applied
         data = []
-        f = False
         for i in queryset:
             a = Follow.objects.followers(i)
-            if a:
-                f = True
+            f = True if a else False
             serializer = UserSerializer(i, context={"request": request})
             data_dic = {"user_detail": serializer.data, "follow": f}
-            f = False
             data.append(data_dic)
+
         return Response(data)
 
 
@@ -665,8 +678,11 @@ class ExerciseViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         exercise_type = self.request.query_params.get("exercise_type")
+        exercise_type_name = self.request.query_params.get("search") # search on the bases of exercise_type name
         if exercise_type:
             queryset = queryset.filter(exercise_type__id=exercise_type)
+        if exercise_type_name:
+            queryset = queryset.filter(exercise_type__name__icontains=exercise_type_name)
         return queryset
 
 
