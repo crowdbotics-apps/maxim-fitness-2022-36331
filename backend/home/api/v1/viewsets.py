@@ -360,16 +360,28 @@ class UserSearchViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+
+        # Use pagination
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            data = []
+            for i in page:
+                a = Follow.objects.followers(i)
+                f = True if a else False
+                serializer = UserSerializer(i, context={"request": request})
+                data_dic = {"user_detail": serializer.data, "follow": f}
+                data.append(data_dic)
+            return self.get_paginated_response(data)
+
+        # If pagination is not applied
         data = []
-        f = False
         for i in queryset:
             a = Follow.objects.followers(i)
-            if a:
-                f = True
+            f = True if a else False
             serializer = UserSerializer(i, context={"request": request})
             data_dic = {"user_detail": serializer.data, "follow": f}
-            f = False
             data.append(data_dic)
+
         return Response(data)
 
 
