@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
     RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
-    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo
+    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo, ReportAComment
 import nested_admin
 
 
@@ -160,6 +160,7 @@ admin.site.register(PostImage, PostImageVideoAdmin)
 admin.site.register(PostCommentReply)
 admin.site.register(PostCommentLike)
 admin.site.register(PostVideo)
+admin.site.register(ReportAComment)
 
 
 # admin.site.register(Settings, SingletonModelAdmin)
