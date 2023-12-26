@@ -28,9 +28,10 @@ export const getExerciseSuccess = data => ({
   data
 })
 
-export const getExerciseTypeRequest = data => ({
+export const getExerciseTypeRequest = (data, search) => ({
   type: GET_EXERCISE_TYPE_REQUEST,
-  data
+  data,
+  search
 })
 
 export const getExerciseTypeSuccess = data => ({
@@ -127,9 +128,9 @@ function* getExercise() {
   }
 }
 
-async function getExerciseTypeAPI(data) {
+async function getExerciseTypeAPI(data, search) {
   const token = await AsyncStorage.getItem("authToken")
-  const URL = `${API_URL}/exercise/?exercise_type=${data}`
+  const URL = `${API_URL}/exercise/?exercise_type=${data}&search=${search}`
   const options = {
     headers: {
       "Content-Type": "application/json",
@@ -140,9 +141,9 @@ async function getExerciseTypeAPI(data) {
   return XHR(URL, options)
 }
 
-function* getExerciseType({ data }) {
+function* getExerciseType({ data, search }) {
   try {
-    const response = yield call(getExerciseTypeAPI, data)
+    const response = yield call(getExerciseTypeAPI, data, search)
     yield put(getExerciseTypeSuccess(response.data))
   } catch (e) {
     yield put(getExerciseTypeSuccess(false))

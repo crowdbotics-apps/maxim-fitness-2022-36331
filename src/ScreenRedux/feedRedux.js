@@ -20,6 +20,11 @@ const LIKE_FAILURE = "FEEDS_SCREEN/LIKE_FAILURE"
 const REPORT_REQUEST = "FEEDS_SCREEN/REPORT_REQUEST"
 const REPORT_SUCCESS = "FEEDS_SCREEN/REPORT_SUCCESS"
 
+const COMMENT_REPORT_REQUEST = "FEEDS_SCREEN/COMMENT_REPORT_REQUEST"
+const COMMENT_DELETE_REQUEST = "FEEDS_SCREEN/COMMENT_DELETE_REQUEST"
+
+const COMMENT_REPLY_DELETE_REQUEST = "FEEDS_SCREEN/COMMENT_REPLY_DELETE_REQUEST"
+
 const POST_DELETE_REQUEST = "FEEDS_SCREEN/POST_DELETE_REQUEST"
 const POST_DELETE_SUCCESS = "FEEDS_SCREEN/POST_DELETE_SUCCESS"
 
@@ -74,6 +79,25 @@ export const postReportSuccess = () => ({
   type: REPORT_SUCCESS
 })
 
+export const postCommentReportRequest = (data, callback, isReply) => ({
+  type: COMMENT_REPORT_REQUEST,
+  data,
+  callback,
+  isReply
+})
+
+export const postCommentDelete = (data, callBack, isReply) => ({
+  type: COMMENT_DELETE_REQUEST,
+  data,
+  callBack,
+  isReply
+})
+export const postCommentReplyDelete = (id, callBack) => ({
+  type: COMMENT_REPLY_DELETE_REQUEST,
+  id,
+  callBack
+})
+
 export const postDeleteRequest = id => ({
   type: POST_DELETE_REQUEST,
   id
@@ -89,6 +113,7 @@ export const feedsReducer = (state = initialState, action) => {
       }
 
     case REPORT_REQUEST:
+    case COMMENT_REPORT_REQUEST:
       return {
         ...state,
         loading: true
@@ -182,11 +207,9 @@ function* postLike({ data }) {
   let feedId = data.feedId
   try {
     const response = yield call(postLikeAPI, feedId)
-    console.log("Like RESPONSE: ", response)
     yield put(postLikeSuccess(response))
     data.callBack(true)
   } catch (error) {
-    console.log("Like Error: ", error)
     yield put(postLikeFailure(error))
   }
 }
@@ -249,9 +272,76 @@ function* postDelete({ id }) {
   }
 }
 
+async function postCommentReportAPI(data, isReply) {
+  const token = await AsyncStorage.getItem("authToken")
+  const replyURL = `${API_URL}/report-reply-comment/`
+  const commentURL = `${API_URL}/report-comment/`
+  const options = {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST",
+    data
+  }
+  return XHR(isReply ? replyURL : commentURL, options)
+}
+
+function* postCommentReport({ data, callback, isReply }) {
+  try {
+    const response = yield call(postCommentReportAPI, data, isReply)
+    if (callback) {
+      callback()
+    }
+    if (response?.data?.is_report) {
+      showMessage({
+        message: `This ${isReply ? "reply" : "comment"} is already reported`,
+        type: "danger"
+      })
+    } else {
+      showMessage({ message: "Report successfully submitted", type: "success" })
+    }
+
+    yield put(postReportSuccess())
+  } catch (error) {
+    yield put(postReportSuccess())
+    // yield put(postLikeFailure(error));
+  }
+}
+
+async function commentDeleteAPI(data, isReply) {
+  const token = await AsyncStorage.getItem("authToken")
+  const repyURL = `${API_URL}/comment-reply/${data}/`
+  const commentURL = `${API_URL}/comment/${data?.id}/`
+  const options = {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "DELETE",
+    data
+  }
+  return XHR(isReply ? repyURL : commentURL, options)
+}
+
+function* commentDelete({ data, callBack, isReply }) {
+  try {
+    const response = yield call(commentDeleteAPI, data, isReply)
+    showMessage({
+      message: `${isReply ? "Reply" : "Comment"} remove successfully`,
+      type: "success"
+    })
+    callBack()
+  } catch (error) {
+    yield put(postReportSuccess())
+  }
+}
+
 export default all([
   takeLatest(FEEDS_REQUEST, getFeeds),
   takeLatest(LIKE_REQUEST, postLike),
   takeLatest(REPORT_REQUEST, postReport),
-  takeLatest(POST_DELETE_REQUEST, postDelete)
+  takeLatest(POST_DELETE_REQUEST, postDelete),
+  takeLatest(COMMENT_REPORT_REQUEST, postCommentReport),
+  takeLatest(COMMENT_DELETE_REQUEST, commentDelete)
 ])

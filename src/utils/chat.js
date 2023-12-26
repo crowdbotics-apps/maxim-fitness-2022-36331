@@ -7,7 +7,7 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
   return new Promise(async (resolve, reject) => {
     try {
       const channel = `${userId > chatWithId ? userId : chatWithId}-${
-        chatWithId > userId ? chatWithId : userId
+        chatWithId < userId ? chatWithId : userId
       }`
 
       // Set channel metadata
@@ -30,7 +30,6 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
 
       resolve({ channel: channel })
     } catch (error) {
-      console.log("errorrrr", error)
       reject(error)
     }
   })

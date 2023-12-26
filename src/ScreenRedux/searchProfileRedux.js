@@ -16,19 +16,22 @@ const CHAT_USER_DATA = "SEARCH_SCREEN/CHAT_USER_DATA"
 
 const initialState = {
   requesting: false,
-  profileUserData: false,
+  profileUserData: [],
   chatUserData: false
 }
 
 //Actions
-export const getUserProfile = data => ({
+export const getUserProfile = (data, nextPage, setNextPage) => ({
   type: GET_USER,
-  data
+  data,
+  nextPage,
+  setNextPage
 })
 
-export const getUserProfileSuccess = data => ({
+export const getUserProfileSuccess = (data, nextPage) => ({
   type: GET_USER_SUCCESS,
-  data
+  data,
+  nextPage
 })
 
 export const resetUserProfile = () => ({
@@ -51,7 +54,10 @@ export const userProfileReducer = (state = initialState, action) => {
     case GET_USER_SUCCESS:
       return {
         ...state,
-        profileUserData: action.data,
+        profileUserData:
+          action.nextPage === 1
+            ? action.data.results
+            : [...state.profileUserData, ...action.data.results],
         requesting: false
       }
     case GET_USER_RESET:
@@ -71,8 +77,8 @@ export const userProfileReducer = (state = initialState, action) => {
 }
 
 //Saga
-async function getUserProfileAPI(data) {
-  const URL = `${API_URL}/user-search/?search=${data}`
+async function getUserProfileAPI(data, page) {
+  const URL = `${API_URL}/user-search/?search=${data}&page=${page ? page : 1}`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "GET",
@@ -85,10 +91,16 @@ async function getUserProfileAPI(data) {
   return XHR(URL, options)
 }
 
-function* getProfileData({ data }) {
+function* getProfileData({ data, nextPage, setNextPage }) {
   try {
-    const response = yield call(getUserProfileAPI, data)
-    yield put(getUserProfileSuccess(response.data))
+    const response = yield call(getUserProfileAPI, data, nextPage)
+    yield put(getUserProfileSuccess(response.data, nextPage))
+
+    setNextPage(
+      response?.data.next
+        ? response?.data.next?.split("?page=")[1].split("&")[0]
+        : response?.data.next
+    )
   } catch (e) {
     const { response } = e
   } finally {

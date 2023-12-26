@@ -13,7 +13,7 @@ import {
 } from "react-native"
 import { Text, BottomSheet, Button } from "../../components"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { Images } from "src/theme"
+import { Images, Colors } from "src/theme"
 import { connect } from "react-redux"
 import ImagePicker from "react-native-image-crop-picker"
 import { editProfile } from "../../ScreenRedux/profileRedux"
@@ -56,10 +56,10 @@ const EditProfile = props => {
 
   const validationStateSchema = {
     firstName: {
-      required: false
+      required: true
     },
     lastName: {
-      required: false
+      required: true
     },
     userName: {
       required: true,
@@ -335,7 +335,7 @@ const EditProfile = props => {
                 height: 40,
                 width: 150,
                 borderRadius: 40,
-                backgroundColor: "#635eff",
+                backgroundColor: Colors.azureradiance,
                 borderColor: "white",
                 justifyContent: "center",
                 alignItems: "center"

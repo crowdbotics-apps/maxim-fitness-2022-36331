@@ -134,9 +134,14 @@ const MessageScreen = props => {
               borderRadius: (31 / 375) * width
             }}
           />
+
           <View style={{ justifyContent: "center", marginLeft: 15 }}>
             <Text
-              text={item.name?.split("-")[1]}
+              text={
+                item.name?.split("-")[
+                  userProfile?.id === item.custom.owner ? 1 : 0
+                ]
+              }
               bold
               style={{ fontSize: 12 }}
             />
@@ -177,7 +182,9 @@ const MessageScreen = props => {
           </TouchableOpacity>
           <Text text="Messages" style={{ fontSize: 22 }} bold />
           <TouchableOpacity
-            onPress={() => navigation.navigate("SearchProfile")}
+            onPress={() =>
+              navigation.navigate("SearchProfile", { isFeed: true })
+            }
           >
             <Image source={messageImage} style={{ height: 30, width: 30 }} />
           </TouchableOpacity>

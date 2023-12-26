@@ -13,7 +13,7 @@ import {
 } from "react-native"
 import Text from "../Text"
 import { Images } from "src/theme"
-import { calculatePostTime } from "src/utils/functions"
+import { calculatePostTime, letterCapitalize } from "src/utils/functions"
 import { SliderBox } from "react-native-image-slider-box"
 import Share from "react-native-share"
 import { connect } from "react-redux"
@@ -51,9 +51,9 @@ const FeedCard = props => {
 
   const [visible, setVisible] = useState(false)
 
-  const hideMenu = () => setVisible(false)
+  const hideMenu = () => setVisible("")
 
-  const showMenu = () => setVisible(true)
+  const showMenu = item => setVisible(item)
 
   const addLikeAction = () => {
     let feedId = item.id
@@ -169,6 +169,7 @@ const FeedCard = props => {
               onPress={() => movetoNextScreen(item)}
             >
               <Text
+                bold
                 text={
                   item && item.user && item.user.username
                     ? item.user.username
@@ -178,8 +179,11 @@ const FeedCard = props => {
               />
               <Text text={calculatePostTime(item)} style={styles.text2} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => showMenu()}>
-              <Menu visible={visible} onRequestClose={() => hideMenu()}>
+            <TouchableOpacity onPress={() => showMenu(item)}>
+              <Menu
+                visible={visible.id === item.id}
+                onRequestClose={() => hideMenu()}
+              >
                 {profile?.id === item?.user?.id ? (
                   <MenuItem
                     textStyle={{ color: "red" }}

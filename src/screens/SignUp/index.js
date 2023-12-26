@@ -44,6 +44,14 @@ const SignUp = props => {
     password: {
       value: "",
       error: ""
+    },
+    firstName: {
+      value: "",
+      error: ""
+    },
+    lastName: {
+      value: "",
+      error: ""
     }
   }
 
@@ -55,6 +63,12 @@ const SignUp = props => {
     password: {
       required: true,
       validator: validator.password
+    },
+    firstName: {
+      required: true
+    },
+    lastName: {
+      required: true
     }
   }
 
@@ -66,7 +80,9 @@ const SignUp = props => {
   const OnSignUpPress = () => {
     let signUpData = {
       email: state.email.value,
-      password: state.password.value
+      password: state.password.value,
+      first_name: state.firstName.value,
+      last_name: state.lastName.value
     }
     props.signUpUser(signUpData)
   }
@@ -199,15 +215,38 @@ const SignUp = props => {
           <Text style={styles.loginTextStyle}>Or Register with</Text>
           <View style={{ marginHorizontal: 3 }}>
             <TextInput
-              keyboardType="email-address"
+              keyboardType="text"
               style={[styles.inputStyle, { marginTop: 9 }]}
+              onChangeText={value => handleOnChange("firstName", value)}
+              placeholder="First Name"
+            />
+            <Text style={{ color: "red" }}>{state.firstName.error}</Text>
+            <TextInput
+              keyboardType="text"
+              style={[
+                styles.inputStyle,
+                { marginTop: state.firstName.error ? 9 : 0 }
+              ]}
+              onChangeText={value => handleOnChange("lastName", value)}
+              placeholder="Last Name"
+            />
+            <Text style={{ color: "red" }}>{state.lastName.error}</Text>
+            <TextInput
+              keyboardType="email-address"
+              style={[
+                styles.inputStyle,
+                { marginTop: state.lastName.error ? 9 : 0 }
+              ]}
               onChangeText={value => handleOnChange("email", value)}
               placeholder="Email"
             />
             <Text style={{ color: "red" }}>{state.email.error}</Text>
             <TextInput
               secureTextEntry={true}
-              style={[styles.inputStyle, { marginTop: 18 }]}
+              style={[
+                styles.inputStyle,
+                { marginTop: state.email.error ? 9 : 0 }
+              ]}
               onChangeText={value => handleOnChange("password", value)}
               placeholder="Password"
             />

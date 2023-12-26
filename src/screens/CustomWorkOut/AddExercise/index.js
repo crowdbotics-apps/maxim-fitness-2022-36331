@@ -13,6 +13,7 @@ import {
 } from "react-native"
 import { Text, BottomSheet, Button, InputField } from "../../../components"
 import Video from "react-native-video"
+import Modal from "react-native-modal"
 
 import { Global, Gutters, Layout, Colors, Images, Fonts } from "../../../theme"
 
@@ -40,6 +41,10 @@ const AddExercies = props => {
   const [selectedItem, setSelectedItem] = useState([])
   const [desription, setDesription] = useState(false)
   const [selectMuscle, setSelectMuscle] = useState(0)
+  const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState("")
+  const [selectItem, setSelectItem] = useState("")
 
   useEffect(() => {
     // isFocused && props.getExerciseRequest()
@@ -48,7 +53,10 @@ const AddExercies = props => {
 
   useEffect(() => {
     getExerciseState &&
-      props.getExerciseTypeRequest(getExerciseState && getExerciseState[0]?.id)
+      props.getExerciseTypeRequest(
+        getExerciseState && getExerciseState[0]?.id,
+        ""
+      )
     !activeSet && setActiveSet(data[0])
   }, [getExerciseState])
 
@@ -91,6 +99,20 @@ const AddExercies = props => {
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
   const { foodImage, iconI, circleClose } = Images
 
+  const onChange = value => {
+    props.getExerciseTypeRequest(
+      selectItem ? selectItem : getExerciseState[0]?.id,
+      value
+    )
+  }
+  const onHandlePress = (i, item) => {
+    setSelectedItem([])
+    setSelectMuscle(i)
+    setSelectItem(item.id)
+    setSearch("")
+    props.getExerciseTypeRequest(item.id, "")
+  }
+
   return (
     <SafeAreaView style={[fill, { backgroundColor: "white" }]}>
       <ScrollView>
@@ -118,6 +140,11 @@ const AddExercies = props => {
                 inputStyle={[Global.height40, Fonts.textMedium, { padding: 0 }]}
                 placeholder="search"
                 autoCapitalize="none"
+                value={search}
+                onChangeText={val => {
+                  onChange(val)
+                  setSearch(val)
+                }}
               />
             </View>
             <View style={fill} />
@@ -167,11 +194,7 @@ const AddExercies = props => {
                 getExerciseState?.map((item, i) => {
                   return (
                     <TouchableOpacity
-                      onPress={() => {
-                        setSelectedItem([])
-                        setSelectMuscle(i)
-                        props.getExerciseTypeRequest(item.id)
-                      }}
+                      onPress={() => onHandlePress(i, item)}
                       key={i}
                       style={[
                         center,
@@ -204,8 +227,7 @@ const AddExercies = props => {
         <View style={{ marginBottom: 20 }}>
           {getExerciseType === false && !requesting && props.request ? (
             <ActivityIndicator size={"large"} color="green" />
-          ) : (
-            getExerciseType &&
+          ) : getExerciseType && getExerciseType?.length ? (
             getExerciseType.map((item, i) => (
               <TouchableOpacity
                 style={[
@@ -251,6 +273,10 @@ const AddExercies = props => {
                 </View>
               </TouchableOpacity>
             ))
+          ) : (
+            <View style={styles.notFound}>
+              <Text bold>No exercise found</Text>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -272,10 +298,19 @@ const AddExercies = props => {
       <View
         style={[row, { alignSelf: "center", marginTop: 20, marginBottom: 10 }]}
       >
-        <Text
-          text="Watch This"
-          style={[styles.heading1, { color: Colors.brightturquoise }]}
-        />
+        <TouchableOpacity onPress={() => setShowModal(true)}>
+          <Text
+            text="Watch This"
+            style={[
+              styles.heading1,
+              {
+                color: Colors.brightturquoise,
+                borderBottomWidth: 1,
+                borderBottomColor: Colors.brightturquoise
+              }
+            ]}
+          />
+        </TouchableOpacity>
         <Text text=" to create your workout" style={[styles.heading1]} />
       </View>
 
@@ -380,6 +415,57 @@ const AddExercies = props => {
           />
         </View>
       </BottomSheet>
+      <Modal
+        isVisible={showModal}
+        onBackdropPress={() => setShowModal(false)}
+        style={{ flex: 1, margin: 0 }}
+      >
+        <View
+          style={{
+            backgroundColor: "black",
+            paddingHorizontal: 5,
+            flex: 1,
+            paddingTop: 20
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setShowModal(false)}
+            style={{ alignItems: "flex-end" }}
+          >
+            <Image
+              source={Images.circleClose}
+              style={{
+                height: 40,
+                width: 40,
+                borderWidth: 1
+              }}
+            />
+          </TouchableOpacity>
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            {loading && <ActivityIndicator size="large" color="white" />}
+            <Video
+              source={{
+                uri: "https://assets.mixkit.co/videos/preview/mixkit-man-exercising-with-a-kettlebell-4506-large.mp4"
+              }}
+              style={{ height: 300, width: "100%" }}
+              muted={false}
+              repeat={true}
+              // onEnd={() => setStart(false)}
+              resizeMode="cover"
+              rate={1}
+              posterResizeMode="cover"
+              playInBackground={true}
+              playWhenInactive={true}
+              ignoreSilentSwitch="ignore"
+              disableFocus={true}
+              mixWithOthers={"mix"}
+              controls={true}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => setLoading(false)}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -433,7 +519,11 @@ const styles = StyleSheet.create({
     color: "white"
   },
   heading: { fontSize: 16, lineHeight: 20, fontWeight: "700", opacity: 0.5 },
-  heading1: { fontSize: 16, lineHeight: 20, fontWeight: "700" },
+  heading1: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: "700"
+  },
   smallText: { fontSize: 15, lineHeight: 18 },
   IconStyle: { color: Colors.primary, fontSize: 15, marginLeft: 3 },
   CalenderText: { fontSize: 15, lineHeight: 18, color: "gray" },
@@ -535,6 +625,12 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     color: "black",
     fontWeight: "bold"
+  },
+  notFound: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20
   }
 })
 const mapStateToProps = state => ({
@@ -546,6 +642,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getExerciseRequest: () => dispatch(getExerciseRequest()),
-  getExerciseTypeRequest: data => dispatch(getExerciseTypeRequest(data))
+  getExerciseTypeRequest: (data, search) =>
+    dispatch(getExerciseTypeRequest(data, search))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddExercies)

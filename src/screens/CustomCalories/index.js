@@ -152,7 +152,7 @@ const CustomCalories = props => {
     smallHMargin
   } = Gutters
 
-  const data = ["Home", "Exercise", "Nutrition"]
+  const data = ["Home", "Exercise", "Dashboard"]
 
   const myHealthData = [
     "Disease",

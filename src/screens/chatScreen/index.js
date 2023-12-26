@@ -255,7 +255,11 @@ const ChatScreen = props => {
 
           <View style={{ alignItems: "center", marginTop: 10 }}>
             <Text
-              text={item?.name?.split("-")[1]}
+              text={
+                item?.name?.split("-")[
+                  userProfile?.id === item.custom.owner ? 1 : 0
+                ]
+              }
               bold
               style={{ fontSize: 20 }}
             />
@@ -344,7 +348,7 @@ const ChatScreen = props => {
           <TextInput
             style={{
               borderWidth: 1,
-              width: "70%",
+              width: "74%",
               borderRadius: 20,
               borderColor: "gray",
               paddingLeft: 30,
@@ -367,7 +371,7 @@ const ChatScreen = props => {
                 style={{
                   height: (35 / 375) * width,
                   width: (35 / 375) * width,
-                  marginLeft: 10
+                  marginLeft: 15
                 }}
               />
             </TouchableOpacity>
@@ -391,6 +395,16 @@ const ChatScreen = props => {
               setImageUrl("")
               setIsVisible(false)
             }}
+            HeaderComponent={() => (
+              <View style={styles.closeBtn}>
+                <TouchableOpacity onPress={() => setIsVisible(false)}>
+                  <Image
+                    source={Images.closeBtn}
+                    style={{ width: 35, height: 35 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           />
         )}
       </SafeAreaView>
@@ -431,6 +445,12 @@ const styles = StyleSheet.create({
   ImageContainer: {
     width: "100%",
     height: 150
+  },
+  closeBtn: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: 10,
+    marginTop: Platform.OS === "android" ? 0 : 10
   }
 })
 

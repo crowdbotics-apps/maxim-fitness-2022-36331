@@ -7,7 +7,8 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Image
+  Image,
+  Platform
 } from "react-native"
 import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
@@ -152,6 +153,16 @@ const Feeds = props => {
           imageIndex={imageIndex}
           visible={visible}
           onRequestClose={() => setIsVisible(false)}
+          HeaderComponent={() => (
+            <View style={styles.closeBtn}>
+              <TouchableOpacity onPress={() => setIsVisible(false)}>
+                <Image
+                  source={Images.closeBtn}
+                  style={{ width: 35, height: 35 }}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         />
       )}
 
@@ -160,24 +171,16 @@ const Feeds = props => {
         onBackdropPress={() => setShowModal(false)}
         style={{ flex: 1, margin: 0 }}
       >
-        <View
-          style={{
-            backgroundColor: "black",
-            paddingHorizontal: 5,
-            flex: 1,
-            paddingTop: 20
-          }}
-        >
+        <View style={styles.imageModal}>
           <TouchableOpacity
             onPress={() => setShowModal(false)}
             style={{ alignItems: "flex-end" }}
           >
             <Image
-              source={Images.circleClose}
+              source={Images.closeBtn}
               style={{
-                height: 40,
-                width: 40,
-                borderWidth: 1
+                height: 35,
+                width: 35
               }}
             />
           </TouchableOpacity>
@@ -222,7 +225,19 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   loaderStyle: { flex: 1, justifyContent: "center", alignItems: "center" },
-  comingSoon: { fontSize: 20, lineHeight: 18, color: "black" }
+  comingSoon: { fontSize: 20, lineHeight: 18, color: "black" },
+  closeBtn: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: 10,
+    marginTop: Platform.OS === "android" ? 0 : 10
+  },
+  imageModal: {
+    backgroundColor: "black",
+    paddingHorizontal: 5,
+    flex: 1,
+    paddingTop: 20
+  }
 })
 
 const mapStateToProps = state => ({
