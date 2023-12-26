@@ -273,7 +273,7 @@ class ProfileViewSet(ModelViewSet):
         follower = UserSerializer(Follow.objects.followers(instance), context={"request": request}, many=True)
         following = UserSerializer(Follow.objects.following(instance), context={'request': request}, many=True)
         # post = PostSerializer(Post.objects.filter(user=instance, hide=False).order_by('-id'), context={"request": request}, many=True)
-        post = Post.objects.filter(user=instance, hide=False).order_by('-id')
+        post = Post.objects.filter(user=instance).order_by('-id')
         for i in post:
             post_ids.append(i.id)
         post_image = PostImageSerializer(PostImage.objects.filter(post_id__in=post_ids), many=True, context={"request": request})
