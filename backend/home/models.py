@@ -20,7 +20,6 @@ from django.core.files import File
 from home.utils import send_notification
 from maxim_fitness_2022_36331.settings import MEDIA_URL, MEDIA_ROOT
 
-
 from program.models import Program, Session
 from users.models import AnswerProgram
 
@@ -366,7 +365,6 @@ class Post(models.Model):
                 send_notification(sender=user, receiver=self.user,
                                   title="Like Post", message=f"{user.username} like your post.")
 
-
     def get_like(self, user):
         like = Like.objects.filter(post=self, user=user)
         if like:
@@ -428,6 +426,15 @@ class Comment(models.Model):
     def likes_count(self):
         return self.comment_like.all().count()
 
+
+class ReportAComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="report_comment_user")
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="report_comments")
+    reason = models.CharField(max_length=300, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user}>>{self.comment.id}"
 
 
 class Like(models.Model):
@@ -514,7 +521,7 @@ def program_assign_user(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=UserProgram)
 def program_assign_user_delete(sender, instance, **kwargs):
-     Session.objects.filter(user=instance.user).delete()
+    Session.objects.filter(user=instance.user).delete()
 
 
 @receiver(post_save, sender=PostVideo)
@@ -613,7 +620,7 @@ class Chat(models.Model):
 
 
 @receiver(post_save, sender=ReportAPost)
-def resolve_post(sender, instance, created,  **kwargs):
+def resolve_post(sender, instance, created, **kwargs):
     from notification.models import Notification
     if instance.resolved:
         post = Post.objects.get(id=instance.post_id)
@@ -646,5 +653,6 @@ class PostCommentReply(models.Model):
 
 class PostCommentLike(models.Model):
     comment = models.ForeignKey('Comment', related_name='comment_like', on_delete=models.CASCADE, null=True, blank=True)
-    comment_reply = models.ForeignKey('PostCommentReply', related_name='comment_like_reply', on_delete=models.CASCADE, null=True, blank=True)
+    comment_reply = models.ForeignKey('PostCommentReply', related_name='comment_like_reply', on_delete=models.CASCADE,
+                                      null=True, blank=True)
     user = models.ForeignKey(User, related_name='user_like_comment', on_delete=models.CASCADE)

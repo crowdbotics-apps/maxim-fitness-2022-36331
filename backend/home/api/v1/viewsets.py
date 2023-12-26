@@ -30,7 +30,7 @@ from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Chat, PostImage, PostCommentReply, PostCommentLike, \
-    PostVideo, ReportAUser
+    PostVideo, ReportAUser, ReportAComment
 from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -55,7 +55,7 @@ from home.api.v1.serializers import (
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
-    ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer
+    ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -355,7 +355,10 @@ class UserSearchViewSet(ModelViewSet):
         queryset = User.objects.all()
         search = self.request.query_params.get("search")
         if search:
-            queryset = User.objects.filter(username__icontains=search).exclude(id=self.request.user.id)
+            queryset = User.objects.filter(
+                Q(username__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)).exclude(id=self.request.user.id)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -1269,6 +1272,29 @@ class ReportAPostViewSet(ModelViewSet):
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
                           message=f"Your post is reported by { self.request.user.username}")
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
+
+
+class ReportACommentViewSet(ModelViewSet):
+    serializer_class = ReportACommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ReportAComment.objects.filter(user=self.request.user)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        comment_id = request.data.get("comment")
+        user = request.data.get('user')
+        queryset = ReportAComment.objects.filter(user=user, comment_id=comment_id)
+        if queryset:
+            return Response({"is_report": True}, status=status.HTTP_200_OK)
+        serializer = ReportACommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        comment = Comment.objects.filter(id=comment_id).first()
+        send_notification(sender=self.request.user, receiver=comment.user, title="Report Comment",
+                          message=f"Your comment is reported by { self.request.user.username}")
+        return Response({"data": "Comment Reported successfully"}, status=status.HTTP_201_CREATED)
 
 
 class ReportAUserViewSet(ModelViewSet):
