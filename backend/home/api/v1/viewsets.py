@@ -682,7 +682,7 @@ class ExerciseViewSet(ModelViewSet):
         if exercise_type:
             queryset = queryset.filter(exercise_type__id=exercise_type)
         if exercise_type_name:
-            queryset = queryset.filter(exercise_type__name__icontains=exercise_type_name)
+            queryset = queryset.filter(name__icontains=exercise_type_name)
         return queryset
 
 
