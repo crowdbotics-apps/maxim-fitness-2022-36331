@@ -23,7 +23,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
-    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment
+    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings, UserPhoto, UserVideo
@@ -609,3 +609,11 @@ class UserVideoSerializer(serializers.ModelSerializer):
                 )
 
         return user_video
+
+
+
+class ReportCommentReplySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReportCommentReply
+        fields = "__all__"

@@ -30,7 +30,7 @@ from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Chat, PostImage, PostCommentReply, PostCommentLike, \
-    PostVideo, ReportAUser, ReportAComment
+    PostVideo, ReportAUser, ReportAComment, ReportCommentReply
 from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -55,7 +55,8 @@ from home.api.v1.serializers import (
     ConsumeCaloriesSerializer,
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
-    ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer
+    ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer,
+    ReportCommentReplySerializer
 )
 from .permissions import (
     RecipePermission,
@@ -1199,6 +1200,7 @@ class ConsumeCaloriesViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
+    queryset = Comment.objects.all()
     # http_method_names = ['delete']
 
     def destroy(self, request, *args, **kwargs):
@@ -1349,16 +1351,17 @@ class ChatViewSet(ModelViewSet):
 class CommentReplyViewSet(ModelViewSet):
     queryset = PostCommentReply.objects.all()
     serializer_class = CommentReplySerializer
+    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        queryset = self.queryset
-        return queryset
-
-    def create(self, request, *args, **kwargs):
-        serializer = CommentReplySerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+    def destroy(self, request, *args, **kwargs):
+        comment_reply_id = kwargs["pk"]
+        comment_reply = PostCommentReply.objects.filter(id=comment_reply_id).first()
+        if comment_reply:
+            if comment_reply.user.id == self.request.user.id or self.request.user.is_superuser:
+                comment_reply.delete()
+                return Response("Comment Reply deleted successfully")
+            return Response({'error': {'comment': 'you can not delete comment'}}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'id': 'cannot find comment_reply'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentLikeViewSet(ModelViewSet):
@@ -1400,3 +1403,23 @@ class LogOutViewSet(ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({"success": True})
+
+
+class ReportCommentReplyViewSet(ModelViewSet):
+    serializer_class = ReportCommentReplySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ReportCommentReply.objects.filter(user=self.request.user)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        comment_reply_id = request.data.get("comment_reply")
+        user = request.data.get("user")
+        queryset = ReportCommentReply.objects.filter(user=user, comment_reply=comment_reply_id)
+        if queryset:
+            return Response({"is_report": True}, status=status.HTTP_200_OK)
+        serializer = ReportCommentReplySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)

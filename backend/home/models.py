@@ -656,3 +656,14 @@ class PostCommentLike(models.Model):
     comment_reply = models.ForeignKey('PostCommentReply', related_name='comment_like_reply', on_delete=models.CASCADE,
                                       null=True, blank=True)
     user = models.ForeignKey(User, related_name='user_like_comment', on_delete=models.CASCADE)
+
+
+class ReportCommentReply(models.Model):
+    """Report a reply of a comment"""
+    comment_reply = models.ForeignKey('PostCommentReply', related_name='report_post_comment_reply', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_report_comment_reply', on_delete=models.CASCADE, null=True, blank=True)
+    reason = models.CharField(max_length=500)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user}--{self.comment_reply}"
