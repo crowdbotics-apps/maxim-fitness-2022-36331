@@ -129,7 +129,7 @@ class RestSocialLoginSerializer(SocialLoginSerializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password')
+        fields = ('id', 'name', 'email', 'password', "first_name","last_name")
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -138,6 +138,14 @@ class SignupSerializer(serializers.ModelSerializer):
                 }
             },
             'email': {
+                'required': True,
+                'allow_blank': False,
+            },
+            'first_name': {
+                'required': True,
+                'allow_blank': False,
+            },
+            'last_name': {
                 'required': True,
                 'allow_blank': False,
             }
@@ -161,6 +169,8 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User(
             email=validated_data.get('email'),
             name=validated_data.get('name'),
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
             username=generate_unique_username([
                 validated_data.get('name'),
                 validated_data.get('email'),
