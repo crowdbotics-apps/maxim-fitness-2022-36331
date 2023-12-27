@@ -638,7 +638,7 @@ class PostCommentReply(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return str(self.comment)
+        return str(self.content)
 
     def get_like(self, user):
         comment_like = PostCommentLike.objects.filter(comment_reply=self, user=user)
