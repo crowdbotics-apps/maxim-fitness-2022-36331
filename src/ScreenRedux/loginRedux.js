@@ -296,7 +296,7 @@ function* forgetPassWordRequest({ data }) {
   } catch (e) {
     const { response } = e
     showMessage({
-      message: "Unable to forgot in with provided credentials.",
+      message: "Email does not exist.",
       type: "danger"
     })
   } finally {
@@ -328,7 +328,7 @@ function* forgetPassWordConfirmRequest({ data }) {
   } catch (e) {
     const { response } = e
     showMessage({
-      message: "Unable to forgot in with provided credentials.",
+      message: "Invalid token.",
       type: "danger"
     })
   } finally {

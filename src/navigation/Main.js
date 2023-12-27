@@ -154,7 +154,7 @@ const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Nutrition</Text>
+              <Text style={styles.text}>Dashboard</Text>
               <View
                 style={[
                   styles.bottom,

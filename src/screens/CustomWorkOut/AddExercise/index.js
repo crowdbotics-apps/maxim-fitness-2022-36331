@@ -115,7 +115,7 @@ const AddExercies = props => {
 
   return (
     <SafeAreaView style={[fill, { backgroundColor: "white" }]}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View style={{ marginHorizontal: 20 }}>
           <View style={[row, alignItemsCenter, Gutters.regularTMargin]}>
             <TouchableOpacity
@@ -152,6 +152,7 @@ const AddExercies = props => {
           <ScrollView
             horizontal={true}
             contentContainerStyle={{ marginTop: 20, paddingBottom: 10 }}
+            keyboardShouldPersistTaps="handled"
           >
             {data?.map((set, i) => {
               return (
@@ -186,6 +187,7 @@ const AddExercies = props => {
             <ScrollView
               horizontal={true}
               contentContainerStyle={{ paddingBottom: 10 }}
+              keyboardShouldPersistTaps="handled"
             >
               {requesting && getExerciseState === false ? (
                 <Loader />
@@ -327,78 +329,73 @@ const AddExercies = props => {
           }
         }}
       >
-        <KeyboardAvoidingView
-          enabled
-          behavior="padding"
-          style={[{ width: "100%", backgroundColor: Colors.athensgray }]}
+        <TouchableOpacity
+          style={{ alignSelf: "flex-end", marginRight: 10, top: 15 }}
+          onPress={() => {
+            refDescription.current.close()
+            setDesription(false)
+          }}
         >
-          <TouchableOpacity
-            style={{ alignSelf: "flex-end", marginRight: 10, top: 15 }}
-            onPress={() => {
-              refDescription.current.close()
-              setDesription(false)
-            }}
-          >
-            <Image source={circleClose} style={{ width: 23, height: 23 }} />
-          </TouchableOpacity>
-          <View style={{ alignSelf: "center" }}>
-            <Text
-              text={desription?.name}
-              style={[
-                {
-                  fontSize: 20,
-                  lineHeight: 25,
-                  color: "black",
-                  fontWeight: "bold",
-                  marginTop: 10
-                }
-              ]}
-            />
-          </View>
-          <View style={[styles.dualView, center]}>
-            <Video
-              resizeMode="contain"
-              source={{ uri: desription?.video }}
-              style={{ width: 200, height: 140 }}
-            />
-          </View>
-          <ScrollView
-            style={{ marginTop: 40 }}
-            contentContainerStyle={{ flexGrow: 1 }}
-          >
-            {desription &&
-              desription?.description?.split("\n").map((item, i) => {
-                return (
-                  <View style={styles.dualList}>
-                    <View>
-                      <View style={styles.dualCard}>
-                        <Text text={i + 1} style={styles.textStyle} />
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        marginLeft: 30,
-                        marginHorizontal: 40
-                      }}
-                    >
-                      <Text
-                        text={item}
-                        style={[
-                          {
-                            fontSize: 14,
-                            lineHeight: 25,
-                            color: "black",
-                            fontWeight: "bold"
-                          }
-                        ]}
-                      />
+          <Image source={circleClose} style={{ width: 23, height: 23 }} />
+        </TouchableOpacity>
+        <View style={{ alignSelf: "center" }}>
+          <Text
+            text={desription?.name}
+            style={[
+              {
+                fontSize: 20,
+                lineHeight: 25,
+                color: "black",
+                fontWeight: "bold",
+                marginTop: 10
+              }
+            ]}
+          />
+        </View>
+        <View style={[styles.dualView, center]}>
+          <Video
+            resizeMode="contain"
+            source={{ uri: desription?.video }}
+            style={{ width: 200, height: 140 }}
+          />
+        </View>
+        <ScrollView
+          style={{ marginTop: 40 }}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {desription &&
+            desription?.description?.split("\n").map((item, i) => {
+              return (
+                <View style={styles.dualList}>
+                  <View>
+                    <View style={styles.dualCard}>
+                      <Text text={i + 1} style={styles.textStyle} />
                     </View>
                   </View>
-                )
-              })}
-          </ScrollView>
-        </KeyboardAvoidingView>
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      marginLeft: 30,
+                      marginHorizontal: 40
+                    }}
+                  >
+                    <Text
+                      text={item}
+                      style={[
+                        {
+                          fontSize: 14,
+                          lineHeight: 25,
+                          color: "black",
+                          fontWeight: "bold"
+                        }
+                      ]}
+                    />
+                  </View>
+                </View>
+              )
+            })}
+        </ScrollView>
         <View style={{ position: "absolute", bottom: 0, alignSelf: "center" }}>
           <Button
             text={"Add Exercies"}

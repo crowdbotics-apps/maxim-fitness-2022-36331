@@ -17,6 +17,9 @@ const LIKE_REQUEST = "FEEDS_SCREEN/LIKE_REQUEST"
 const LIKE_SUCCESS = "FEEDS_SCREEN/LIKE_SUCCESS"
 const LIKE_FAILURE = "FEEDS_SCREEN/LIKE_FAILURE"
 
+const ADD_COMMENT = "FEEDS_SCREEN/ADD_COMMENT"
+const ADD_COMMENT_SUCCESS = "FEEDS_SCREEN/ADD_COMMENT_SUCCESS"
+
 const REPORT_REQUEST = "FEEDS_SCREEN/REPORT_REQUEST"
 const REPORT_SUCCESS = "FEEDS_SCREEN/REPORT_SUCCESS"
 
@@ -34,8 +37,7 @@ const initialState = {
   feedError: false,
   loading: false,
   likeSuccess: false,
-  feedError: false,
-  loading: false
+  feedError: false
 }
 
 //Actions
@@ -67,6 +69,18 @@ export const postLikeSuccess = data => ({
 export const postLikeFailure = error => ({
   type: LIKE_FAILURE,
   error
+})
+
+export const addComment = (data, postData, callBack) => ({
+  type: ADD_COMMENT,
+  data,
+  postData,
+  callBack
+})
+
+export const addCommentSuccess = data => ({
+  type: ADD_COMMENT_SUCCESS,
+  data
 })
 
 export const postReportRequest = (data, callback) => ({
@@ -150,6 +164,11 @@ export const feedsReducer = (state = initialState, action) => {
         likeSuccess: action.data,
         loading: false
       }
+    case ADD_COMMENT_SUCCESS:
+      return {
+        ...state,
+        loading: false
+      }
     case LIKE_FAILURE:
       return {
         ...state,
@@ -226,6 +245,34 @@ async function postReportAPI(data) {
     data
   }
   return XHR(URL, options)
+}
+
+async function addCommentAPI(data) {
+  const URL = `${API_URL}/post/${data.id}/add_comment/`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token  ${token}`
+    },
+    data
+  }
+
+  return XHR(URL, options)
+}
+
+function* addCommentData({ data, postData, callBack }) {
+  try {
+    const response = yield call(addCommentAPI, data)
+    postData.comments = [response.data, ...postData.comments]
+    yield put(addCommentSuccess(response?.data))
+    callBack(true)
+  } catch (e) {
+    const { response } = e
+  } finally {
+    yield put(addCommentSuccess(""))
+  }
 }
 
 function* postReport({ data, callback }) {
@@ -339,6 +386,7 @@ function* commentDelete({ data, callBack, isReply }) {
 
 export default all([
   takeLatest(FEEDS_REQUEST, getFeeds),
+  takeLatest(ADD_COMMENT, addCommentData),
   takeLatest(LIKE_REQUEST, postLike),
   takeLatest(REPORT_REQUEST, postReport),
   takeLatest(POST_DELETE_REQUEST, postDelete),

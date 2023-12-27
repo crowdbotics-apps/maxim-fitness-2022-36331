@@ -52,7 +52,7 @@ const ChatScreen = props => {
       pubnub.fetchMessages(
         {
           channels: [item.id],
-          count: 100
+          count: 1000
         },
         (_, response) => {
           if (response?.channels) {

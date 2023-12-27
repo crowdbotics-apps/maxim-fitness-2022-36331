@@ -35,17 +35,18 @@ const Feeds = props => {
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   useEffect(() => {
-    props.getFeedsRequest(page)
-  }, [])
-  const flatList = useRef()
-  const moveToTop = () => {
     props.getFeedsRequest(1)
-    flatList?.current?.scrollToIndex({ index: 0, animated: true })
+  }, [])
+
+  const renderImages = () => {
+    if (images?.length) {
+      return images?.map(item => ({ uri: item.image }))
+    }
   }
 
   useEffect(() => {
     if (feeds?.results?.length) {
-      if (feedsState.length && page > 1) {
+      if (feedsState?.length && page > 1) {
         setFeedsState([...feedsState, ...feeds.results])
       } else {
         setFeedsState(feeds?.results)
@@ -53,9 +54,12 @@ const Feeds = props => {
     }
   }, [feeds])
 
-  const renderImages = () => {
-    if (images?.length) {
-      return images?.map(item => ({ uri: item.image }))
+  const onEnd = () => {
+    if (feeds?.next) {
+      setPage(feeds.next?.split("&page=")[1])
+      props.getFeedsRequest(feeds.next?.split("&page=")[1])
+    } else {
+      setPage(1)
     }
   }
 
@@ -65,7 +69,7 @@ const Feeds = props => {
       <FeedCard
         item={item}
         index={index}
-        feeds={feeds}
+        feeds={feedsState}
         profile={profile}
         postLikeRequest={props.postLikeRequest}
         setFeedsState={setFeedsState}
@@ -82,30 +86,8 @@ const Feeds = props => {
 
   const onPullToRefresh = () => {
     setPage(1)
-    props.getFeedsRequest(page)
-    moveToTop()
+    props.getFeedsRequest(1)
   }
-
-  // const onAvatarChange = () => {
-  //   ImagePicker.openPicker({
-  //     width: 300,
-  //     height: 400,
-  //     cropping: true,
-  //     includeBase64: true,
-  //   }).then(image => {
-  //     const img = {
-  //       uri: image.path,
-  //       name: image.path,
-  //       type: image.mime,
-  //     };
-  //     const data = {
-  //       image: `data:${img.type};base64, ${image.data}`,
-  //     };
-
-  //     setUploadAvatar(image?.path);
-  //     // props.changeAvatarImage(data);
-  //   });
-  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,26 +103,26 @@ const Feeds = props => {
       />
       <Text style={styles.content} text="Latest" />
 
-      {requesting ? (
+      {requesting && !feedsState?.length ? (
         <View style={styles.loaderStyle}>
           <ActivityIndicator size="large" color="green" />
         </View>
       ) : feedsState.length > 0 ? (
         <FlatList
-          ref={flatList}
+          // ref={flatList}
           refreshControl={
             <RefreshControl
               colors={["#9Bd35A", "#689F38"]}
               refreshing={requesting}
               onRefresh={() => onPullToRefresh()}
-              progressViewOffset={20}
+              // progressViewOffset={20}
             />
           }
           data={feedsState}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           extraData={feedsState}
-          // onEndReached={onEnd}
+          onEndReached={onEnd}
           windowSize={250}
           // onViewableItemsChanged={onViewRef.current}
           // viewabilityConfig={viewConfigRef.current}

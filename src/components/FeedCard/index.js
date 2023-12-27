@@ -15,6 +15,7 @@ import Text from "../Text"
 import { Images } from "src/theme"
 import { calculatePostTime, letterCapitalize } from "src/utils/functions"
 import { SliderBox } from "react-native-image-slider-box"
+import { API_URL } from "../../config/app"
 import Share from "react-native-share"
 import { connect } from "react-redux"
 import { routeData } from "../../ScreenRedux/profileRedux"
@@ -65,9 +66,11 @@ const FeedCard = props => {
   }
 
   const filterData = feedId => {
-    const updatedFeeds = [...feeds.results]
+    const updatedFeeds = [...feeds]
+
     const index = updatedFeeds.findIndex(item => item.id === feedId)
     const objToUpdate = updatedFeeds[index]
+
     if (objToUpdate.liked) {
       objToUpdate.liked = !objToUpdate.liked
       objToUpdate.likes = objToUpdate.likes - 1
@@ -79,8 +82,8 @@ const FeedCard = props => {
     setFeedsState(updatedFeeds)
   }
 
-  const sharePost = async () => {
-    const data = { message: "hello" }
+  const sharePost = async item => {
+    const data = { message: `${API_URL + "/" + item?.id}/` }
     await Share.open(data)
       .then(res => {})
       .catch(err => {})
@@ -280,7 +283,10 @@ const FeedCard = props => {
                 style={styles.text2}
               />
             </Pressable>
-            <Pressable style={styles.socialIcons} onPress={sharePost}>
+            <Pressable
+              style={styles.socialIcons}
+              onPress={() => sharePost(item)}
+            >
               <Image source={Images.shareIcon} style={styles.socialImg2} />
             </Pressable>
           </View>
@@ -310,6 +316,8 @@ const FeedCard = props => {
               >
                 <Text>Cancel</Text>
               </TouchableOpacity>
+
+              <View style={{ paddingHorizontal: 5 }} />
               <TouchableOpacity
                 style={[styles.smallBtnStyle, { backgroundColor: "gray" }]}
                 onPress={handleButtonPress}
@@ -411,7 +419,7 @@ const styles = StyleSheet.create({
   },
   contentStyle: { flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16 },
   modalStyle: {
-    height: deviceHeight * 0.35,
+    height: deviceHeight * 0.3,
     borderRadius: 20,
     backgroundColor: "white"
   },
@@ -438,8 +446,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 10,
-    borderRadius: 10,
-    marginRight: 10
+    borderRadius: 10
   },
   reportStyle: {
     paddingHorizontal: 20,

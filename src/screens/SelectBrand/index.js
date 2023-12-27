@@ -18,6 +18,7 @@ import {
   getFoodsSearchRequest,
   commonBrandedRequest
 } from "../../ScreenRedux/nutritionRedux"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 const SelectBrand = props => {
   const { navigation, foodSearchState, foodRequesting } = props
@@ -213,13 +214,13 @@ const SelectBrand = props => {
             <ActivityIndicator size="large" color="green" />
           </View>
         ) : (
-          <ScrollView
+          <KeyboardAwareScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps={"handled"}
           >
             <View>{filterCommon && renderedData()}</View>
             <View>{filterBranded && renderFilterData()}</View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         )}
       </View>
     </SafeAreaView>
