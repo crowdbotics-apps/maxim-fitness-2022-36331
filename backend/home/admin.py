@@ -6,7 +6,8 @@ from django.utils.safestring import mark_safe
 
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
     RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
-    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo, ReportAComment
+    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo, ReportAComment, \
+    ReportCommentReply
 import nested_admin
 
 
@@ -134,7 +135,7 @@ class ReportAPostAdmin(admin.ModelAdmin):
     #
     # image_tag.short_description = 'Post Image'
 
-    list_display = ["user", "post", "comment", "reason", "resolved",  "created"]
+    list_display = ["user", "post", "comment", "reason", "resolved", "created"]
     # readonly_fields = ["post_image"]
 
 
@@ -144,6 +145,22 @@ class BlockUserAdmin(admin.ModelAdmin):
 
 class PostImageVideoAdmin(admin.ModelAdmin):
     list_display = ["id", "post", "image", "created"]
+
+
+class ReportCommentReplyAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment_reply", "user", "reason", "created"]
+
+
+class PostCommentReplyAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "content", "created"]
+
+
+class PostCommentLikeAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "comment_reply"]
+
+
+class ReportACommentAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "reason", "created"]
 
 
 admin.site.register(Form, FormAdmin)
@@ -157,10 +174,10 @@ admin.site.register(ProductUnit)
 admin.site.register(ReportAPost, ReportAPostAdmin)
 admin.site.register(BlockUser, BlockUserAdmin)
 admin.site.register(PostImage, PostImageVideoAdmin)
-admin.site.register(PostCommentReply)
-admin.site.register(PostCommentLike)
+admin.site.register(ReportCommentReply, ReportCommentReplyAdmin)
+admin.site.register(PostCommentReply, PostCommentReplyAdmin)
+admin.site.register(PostCommentLike, PostCommentLikeAdmin)
 admin.site.register(PostVideo)
-admin.site.register(ReportAComment)
-
+admin.site.register(ReportAComment, ReportACommentAdmin)
 
 # admin.site.register(Settings, SingletonModelAdmin)

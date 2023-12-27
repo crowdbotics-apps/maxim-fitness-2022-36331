@@ -342,7 +342,7 @@ class Post(models.Model):
     hide = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.user)
+        return str(self.content)
 
     def add_comment(self, user, comment):
         comm = Comment.objects.create(
@@ -411,7 +411,7 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return str(self.post)
+        return f"{self.content}"
 
     class Meta:
         ordering = ('-created',)
@@ -434,7 +434,7 @@ class ReportAComment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user}>>{self.comment.id}"
+        return f"{self.reason}"
 
 
 class Like(models.Model):
