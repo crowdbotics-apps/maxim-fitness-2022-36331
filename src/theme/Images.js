@@ -89,5 +89,6 @@ export default {
   addMealIcon: require("src/assets/images/add_icon_meal.png"),
   leftArrow: require("src/assets/images/left-arrow.png"),
   barCode: require("src/assets/images/barcode.png"),
-  close: require("src/assets/images/close.png")
+  close: require("src/assets/images/close.png"),
+  closeBtn: require("src/assets/images/closeBtn.png")
 }

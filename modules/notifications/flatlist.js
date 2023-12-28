@@ -19,22 +19,26 @@ const Notifications = props => {
   // Contains the messages recieved from backend
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
-  const [nextPage, setNextPage] = useState("")
+  const [nextPage, setNextPage] = useState(1)
 
   const getNotifications = async page => {
     setLoading(true)
     const res = await fetchNotifications(page)
-    setNotifications(prevNotifications => [
-      ...prevNotifications,
-      ...res?.results
-    ])
+    if (page === 1) {
+      setNotifications(res?.results)
+    } else {
+      setNotifications(prevNotifications => [
+        ...prevNotifications,
+        ...res?.results
+      ])
+    }
 
     setLoading(false)
     if (res?.count) {
       getNotificationCountSuccess(0)
     }
 
-    setNextPage(res?.next ? res?.next?.split("?page=")[1] : res?.next)
+    setNextPage(res?.next ? res?.next?.split("?page=")[1] : 1)
   }
 
   useEffect(() => {
@@ -42,7 +46,9 @@ const Notifications = props => {
   }, [])
 
   const onEndReached = () => {
-    nextPage !== null && getNotifications(nextPage)
+    if (nextPage > 1) {
+      getNotifications(nextPage)
+    }
   }
 
   /**
@@ -98,7 +104,7 @@ const Notifications = props => {
           renderItem={renderItem}
           keyExtractor={item => item.id}
           onRefresh={() => {
-            setNextPage("")
+            setNextPage(1)
             getNotifications(1)
           }}
           removeClippedSubviews={true}

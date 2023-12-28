@@ -7,7 +7,8 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Image
+  Image,
+  Platform
 } from "react-native"
 import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
@@ -34,17 +35,18 @@ const Feeds = props => {
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   useEffect(() => {
-    props.getFeedsRequest(page)
-  }, [])
-  const flatList = useRef()
-  const moveToTop = () => {
     props.getFeedsRequest(1)
-    flatList?.current?.scrollToIndex({ index: 0, animated: true })
+  }, [])
+
+  const renderImages = () => {
+    if (images?.length) {
+      return images?.map(item => ({ uri: item.image }))
+    }
   }
 
   useEffect(() => {
     if (feeds?.results?.length) {
-      if (feedsState.length && page > 1) {
+      if (feedsState?.length && page > 1) {
         setFeedsState([...feedsState, ...feeds.results])
       } else {
         setFeedsState(feeds?.results)
@@ -52,9 +54,12 @@ const Feeds = props => {
     }
   }, [feeds])
 
-  const renderImages = () => {
-    if (images?.length) {
-      return images?.map(item => ({ uri: item.image }))
+  const onEnd = () => {
+    if (feeds?.next) {
+      setPage(feeds.next?.split("&page=")[1])
+      props.getFeedsRequest(feeds.next?.split("&page=")[1])
+    } else {
+      setPage(1)
     }
   }
 
@@ -64,7 +69,7 @@ const Feeds = props => {
       <FeedCard
         item={item}
         index={index}
-        feeds={feeds}
+        feeds={feedsState}
         profile={profile}
         postLikeRequest={props.postLikeRequest}
         setFeedsState={setFeedsState}
@@ -81,30 +86,8 @@ const Feeds = props => {
 
   const onPullToRefresh = () => {
     setPage(1)
-    props.getFeedsRequest(page)
-    moveToTop()
+    props.getFeedsRequest(1)
   }
-
-  // const onAvatarChange = () => {
-  //   ImagePicker.openPicker({
-  //     width: 300,
-  //     height: 400,
-  //     cropping: true,
-  //     includeBase64: true,
-  //   }).then(image => {
-  //     const img = {
-  //       uri: image.path,
-  //       name: image.path,
-  //       type: image.mime,
-  //     };
-  //     const data = {
-  //       image: `data:${img.type};base64, ${image.data}`,
-  //     };
-
-  //     setUploadAvatar(image?.path);
-  //     // props.changeAvatarImage(data);
-  //   });
-  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -120,26 +103,26 @@ const Feeds = props => {
       />
       <Text style={styles.content} text="Latest" />
 
-      {requesting ? (
+      {requesting && !feedsState?.length ? (
         <View style={styles.loaderStyle}>
           <ActivityIndicator size="large" color="green" />
         </View>
       ) : feedsState.length > 0 ? (
         <FlatList
-          ref={flatList}
+          // ref={flatList}
           refreshControl={
             <RefreshControl
               colors={["#9Bd35A", "#689F38"]}
               refreshing={requesting}
               onRefresh={() => onPullToRefresh()}
-              progressViewOffset={20}
+              // progressViewOffset={20}
             />
           }
           data={feedsState}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           extraData={feedsState}
-          // onEndReached={onEnd}
+          onEndReached={onEnd}
           windowSize={250}
           // onViewableItemsChanged={onViewRef.current}
           // viewabilityConfig={viewConfigRef.current}
@@ -152,6 +135,16 @@ const Feeds = props => {
           imageIndex={imageIndex}
           visible={visible}
           onRequestClose={() => setIsVisible(false)}
+          HeaderComponent={() => (
+            <View style={styles.closeBtn}>
+              <TouchableOpacity onPress={() => setIsVisible(false)}>
+                <Image
+                  source={Images.closeBtn}
+                  style={{ width: 35, height: 35 }}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         />
       )}
 
@@ -160,24 +153,16 @@ const Feeds = props => {
         onBackdropPress={() => setShowModal(false)}
         style={{ flex: 1, margin: 0 }}
       >
-        <View
-          style={{
-            backgroundColor: "black",
-            paddingHorizontal: 5,
-            flex: 1,
-            paddingTop: 20
-          }}
-        >
+        <View style={styles.imageModal}>
           <TouchableOpacity
             onPress={() => setShowModal(false)}
             style={{ alignItems: "flex-end" }}
           >
             <Image
-              source={Images.circleClose}
+              source={Images.closeBtn}
               style={{
-                height: 40,
-                width: 40,
-                borderWidth: 1
+                height: 35,
+                width: 35
               }}
             />
           </TouchableOpacity>
@@ -222,7 +207,19 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   loaderStyle: { flex: 1, justifyContent: "center", alignItems: "center" },
-  comingSoon: { fontSize: 20, lineHeight: 18, color: "black" }
+  comingSoon: { fontSize: 20, lineHeight: 18, color: "black" },
+  closeBtn: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    padding: 10,
+    marginTop: Platform.OS === "android" ? 0 : 10
+  },
+  imageModal: {
+    backgroundColor: "black",
+    paddingHorizontal: 5,
+    flex: 1,
+    paddingTop: 20
+  }
 })
 
 const mapStateToProps = state => ({

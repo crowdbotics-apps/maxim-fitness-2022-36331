@@ -14,9 +14,6 @@ const VIEW_POST = "FEEDS_SCREEN/VIEW_POST"
 const VIEW_POST_SUCCESS = "FEEDS_SCREEN/VIEW_POST_SUCCESS"
 const RESET_VIEW_POST = "FEEDS_SCREEN/RESET_VIEW_POST"
 
-const ADD_COMMENT = "FEEDS_SCREEN/ADD_COMMENT"
-const ADD_COMMENT_SUCCESS = "FEEDS_SCREEN/ADD_COMMENT_SUCCESS"
-
 const REPLY_COMMENT = "FEEDS_SCREEN/REPLY_COMMENT"
 const LIKE_COMMENT = "FEEDS_SCREEN/LIKE_COMMENT"
 
@@ -26,9 +23,10 @@ const initialState = {
 }
 
 //Actions
-export const getPost = data => ({
+export const getPost = (data, isLoader) => ({
   type: VIEW_POST,
-  data
+  data,
+  isLoader
 })
 
 export const getPostSuccess = data => ({
@@ -39,18 +37,6 @@ export const getPostSuccess = data => ({
 export const resetViewPost = error => ({
   type: RESET_VIEW_POST,
   error
-})
-
-export const addComment = (data, postData, callBack) => ({
-  type: ADD_COMMENT,
-  data,
-  postData,
-  callBack
-})
-
-export const addCommentSuccess = data => ({
-  type: ADD_COMMENT_SUCCESS,
-  data
 })
 
 export const replyComment = (data, subCommentData, callBack) => ({
@@ -71,7 +57,7 @@ export const postReducer = (state = initialState, action) => {
     case VIEW_POST:
       return {
         ...state,
-        requesting: true
+        requesting: action?.isLoader ? false : true
       }
 
     case VIEW_POST_SUCCESS:
@@ -110,34 +96,6 @@ function* getPostData({ data }) {
   try {
     const response = yield call(getPostAPI, data)
     yield put(getPostSuccess(response.data))
-  } catch (e) {
-    const { response } = e
-  } finally {
-    yield put(resetViewPost())
-  }
-}
-
-async function addCommentAPI(data) {
-  const URL = `${API_URL}/post/${data.id}/add_comment/`
-  const token = await AsyncStorage.getItem("authToken")
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token  ${token}`
-    },
-    data
-  }
-
-  return XHR(URL, options)
-}
-
-function* addCommentData({ data, postData, callBack }) {
-  try {
-    const response = yield call(addCommentAPI, data)
-    postData.comments = [response.data, ...postData.comments]
-    callBack(true)
-    // setNewCommentData(response.data)
   } catch (e) {
     const { response } = e
   } finally {
@@ -200,7 +158,7 @@ function* likeCommentData({ data }) {
 
 export default all([
   takeLatest(VIEW_POST, getPostData),
-  takeLatest(ADD_COMMENT, addCommentData),
+
   takeLatest(REPLY_COMMENT, replyCommentData),
   takeLatest(LIKE_COMMENT, likeCommentData)
 ])

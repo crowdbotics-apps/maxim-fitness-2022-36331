@@ -18,6 +18,8 @@ import { connect } from "react-redux"
 import { Text } from "../../components"
 import { usePubNub } from "pubnub-react"
 import { createDirectChannel, useStore, ChannelType } from "../../utils/chat"
+import { letterCapitalize } from "../../utils/functions"
+import { routeData } from "../../ScreenRedux/profileRedux"
 
 //action
 import { getUserProfile, userChat } from "../../ScreenRedux/searchProfileRedux"
@@ -35,10 +37,19 @@ const SearchProfile = props => {
   const pubnub = usePubNub()
   const { state, dispatch } = useStore()
 
-  const { navigation, profileUserData, requesting, userProfile } = props
+  const {
+    navigation,
+    profileUserData,
+    requesting,
+    userProfile,
+    route,
+    routeData
+  } = props
   const { width } = Dimensions.get("window")
   const [followUser, setFollowUser] = useState([])
   const [loading, setLoading] = useState(false)
+  const [nextPage, setNextPage] = useState(1)
+  const [searchText, setSearchText] = useState("")
 
   let newArray = []
   useEffect(() => {
@@ -53,7 +64,7 @@ const SearchProfile = props => {
   }, [profileUserData])
 
   useEffect(() => {
-    props.getUserProfile("")
+    props.getUserProfile("", 1, setNextPage)
   }, [])
 
   const followUnfollowUser = item => {
@@ -87,7 +98,7 @@ const SearchProfile = props => {
             type: 0,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.username
+            otherUserName: item?.user_detail?.username
           }
         }
       )
@@ -101,7 +112,7 @@ const SearchProfile = props => {
               type: ChannelType.Direct,
               owner: userProfile?.id,
               otherUserImage: item?.user_detail?.profile_picture,
-              otherUserName: item?.username
+              otherUserName: item?.user_detail?.username
             }
           }
         }
@@ -115,24 +126,108 @@ const SearchProfile = props => {
             type: ChannelType.Direct,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.username
+            otherUserName: item?.user_detail?.username
           }
         }
       })
     } catch (err) {}
   }
+
+  const movetoNextScreen = item => {
+    const newData = {
+      follow: item.follow,
+      user: item.user_detail
+    }
+
+    routeData(newData)
+    navigation.navigate("ProfileScreen", {
+      item: newData,
+      backScreenName: "SearchProfile"
+    })
+  }
+
+  const onEndReached = () => {
+    nextPage !== null &&
+      props.getUserProfile(searchText ? searchText : "", nextPage, setNextPage)
+  }
+
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => [
+          route.params?.isFeed ? createChat(item) : movetoNextScreen(item)
+        ]}
+        style={{
+          marginTop: 20,
+          paddingHorizontal: 20,
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <View style={{ flexDirection: "row" }}>
+          <Image
+            source={
+              item?.user_detail?.profile_picture
+                ? { uri: item?.user_detail?.profile_picture }
+                : profile
+            }
+            style={{
+              height: (61 / 375) * width,
+              width: (61 / 375) * width,
+              borderRadius: (31 / 375) * width
+            }}
+          />
+          <View style={{ justifyContent: "center", marginLeft: 15 }}>
+            {/* letterCapitalize */}
+            <Text
+              text={
+                item?.user_detail?.first_name
+                  ? letterCapitalize(item?.user_detail?.first_name) +
+                    " " +
+                    letterCapitalize(item?.user_detail?.last_name)
+                  : letterCapitalize(item?.user_detail?.username)
+              }
+              bold
+              style={{ fontSize: 12 }}
+            />
+            {item?.user_detail?.first_name && (
+              <Text
+                text={item?.user_detail?.username}
+                style={{ color: "#D3D3D3", fontSize: 12 }}
+              />
+            )}
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => [followUnfollowUser(item)]}>
+          <Image
+            source={
+              followUser.includes(item?.user_detail?.id)
+                ? followingButton
+                : followButton
+            }
+            style={{
+              height: (60 / 375) * width,
+              width: (110 / 375) * width
+            }}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={{ flex: 1 }}>
         <View
           style={{ paddingHorizontal: 20, flexDirection: "row", marginTop: 20 }}
         >
           <TouchableOpacity
             style={{ flex: 1, justifyContent: "center" }}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              route.params?.isFeed
+                ? navigation.goBack()
+                : navigation.navigate("Feeds")
+            }}
           >
             <Image source={backImage} style={{ height: 20, width: 30 }} />
           </TouchableOpacity>
@@ -141,7 +236,12 @@ const SearchProfile = props => {
           </View>
         </View>
         <View
-          style={{ paddingHorizontal: 20, marginTop: 30, flexDirection: "row" }}
+          style={{
+            paddingHorizontal: 20,
+            paddingBottom: 8,
+            marginTop: 30,
+            flexDirection: "row"
+          }}
         >
           <TextInput
             style={{
@@ -154,7 +254,10 @@ const SearchProfile = props => {
               position: "relative"
             }}
             placeholder="Search People"
-            onChangeText={e => props.getUserProfile(e)}
+            onChangeText={e => {
+              setSearchText(e)
+              props.getUserProfile(e, 1, setNextPage)
+            }}
           />
           <View
             style={{
@@ -168,72 +271,41 @@ const SearchProfile = props => {
             <Image source={searchImage} style={{ height: 30, width: 30 }} />
           </View>
         </View>
-        {requesting ? (
+        {requesting && !profileUserData?.length ? (
           <ActivityIndicator size="large" color="#000" style={{ flex: 1 }} />
         ) : profileUserData?.length ? (
-          profileUserData?.map(item => (
-            <TouchableOpacity
-              onPress={() => [
-                createChat(item)
-                // navigation.navigate("ChatScreen"),
-                // props.userChat(item)
-              ]}
-              // disabled={true}
-              style={{
-                marginTop: 25,
-                paddingHorizontal: 20,
-                flexDirection: "row",
-                justifyContent: "space-between"
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <Image
-                  source={
-                    item?.user_detail?.profile_picture
-                      ? { uri: item?.user_detail?.profile_picture }
-                      : profile
-                  }
-                  style={{
-                    height: (61 / 375) * width,
-                    width: (61 / 375) * width,
-                    borderRadius: (31 / 375) * width
-                  }}
-                />
-                <View style={{ justifyContent: "center", marginLeft: 15 }}>
-                  <Text
-                    text={item?.user_detail?.username}
-                    bold
-                    style={{ fontSize: 12 }}
-                  />
-                  <Text
-                    text="THE ROCK"
-                    style={{ color: "#D3D3D3", fontSize: 12 }}
-                  />
-                </View>
+          <FlatList
+            nestedScrollEnabled={false}
+            data={profileUserData && profileUserData}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            onRefresh={() => {
+              setNextPage("")
+              props.getUserProfile("", 1, setNextPage)
+            }}
+            removeClippedSubviews={true}
+            initialNumToRender={10}
+            numColumns={1}
+            refreshing={requesting}
+            onEndReachedThreshold={0.5}
+            onEndReached={onEndReached}
+            windowSize={250}
+            ListEmptyComponent={() => (
+              <View style={styles.loaderStyle}>
+                <Text style={{ fontSize: 18 }}>No record found</Text>
               </View>
-              <TouchableOpacity onPress={() => [followUnfollowUser(item)]}>
-                <Image
-                  source={
-                    followUser.includes(item?.user_detail?.id)
-                      ? followingButton
-                      : followButton
-                  }
-                  style={{
-                    height: (60 / 375) * width,
-                    width: (110 / 375) * width
-                  }}
-                />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          ))
+            )}
+          />
         ) : (
+          // </View>
           <View
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
             <Text text="No Record Found" />
           </View>
         )}
-      </ScrollView>
+      </View>
       <Modal
         coverScreen={true}
         // animationType="slide"
@@ -276,9 +348,11 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getUserProfile: data => dispatch(getUserProfile(data)),
+  getUserProfile: (data, nextPage, setNextPage) =>
+    dispatch(getUserProfile(data, nextPage, setNextPage)),
   followUser: data => dispatch(followUser(data)),
   unFollowUser: data => dispatch(unFollowUser(data)),
-  userChat: data => dispatch(userChat(data))
+  userChat: data => dispatch(userChat(data)),
+  routeData: data => dispatch(routeData(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(SearchProfile)
