@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     padding: 10,
-    marginTop: Platform.OS === "android" ? 0 : 10
+    marginTop: Platform.OS === "android" ? 0 : 30
   }
 })
 

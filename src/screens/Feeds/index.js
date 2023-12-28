@@ -156,7 +156,10 @@ const Feeds = props => {
         <View style={styles.imageModal}>
           <TouchableOpacity
             onPress={() => setShowModal(false)}
-            style={{ alignItems: "flex-end" }}
+            style={{
+              alignItems: "flex-end",
+              marginTop: Platform.OS === "android" ? 0 : 20
+            }}
           >
             <Image
               source={Images.closeBtn}
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     padding: 10,
-    marginTop: Platform.OS === "android" ? 0 : 10
+    marginTop: Platform.OS === "android" ? 0 : 30
   },
   imageModal: {
     backgroundColor: "black",
