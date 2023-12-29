@@ -115,8 +115,12 @@ class ConsumeCaloriesAdmin(admin.ModelAdmin):
 
 
 class ReportAPostAdmin(admin.ModelAdmin):
-    # list_display = ["user", "post", "comment", "reason", "resolved",  "created"]
-    # change_form_template = "home/resolve.html"
+    list_display = ["user", "post", "post_owner", "comment", "reason", "resolved", "created"]
+
+    def post_owner(self, obj):
+        return obj.post.user.username if obj.post else None
+
+    post_owner.short_description = "Post Owner"
 
     def response_change(self, request, obj):
         if "resolve" in request.POST:
@@ -125,18 +129,6 @@ class ReportAPostAdmin(admin.ModelAdmin):
             self.message_user(request, "This post is know resolve")
             # return HttpResponseRedirect(".")
         return super().response_change(request, obj)
-
-    # def image_tag(self, obj):
-    #     if obj.post.image:
-    #         return mark_safe('<img src="%s" style="width: 45px; height:45px;" />' % obj.post.image_url)
-    #
-    # def post_image(self, obj):
-    #     return mark_safe('<img src="%s" style="width: 400px; height:400px;" />' % obj.post.image_url)
-    #
-    # image_tag.short_description = 'Post Image'
-
-    list_display = ["user", "post", "comment", "reason", "resolved", "created"]
-    # readonly_fields = ["post_image"]
 
 
 class BlockUserAdmin(admin.ModelAdmin):
