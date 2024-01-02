@@ -623,12 +623,10 @@ class Chat(models.Model):
 def resolve_post(sender, instance, created, **kwargs):
     from notification.models import Notification
     if instance.resolved:
-        post = Post.objects.get(id=instance.post_id)
+        post = Post.objects.get(id=instance.post.id)
         post.hide = True
         post.save()
-        notification = Notification.objects.filter(post_id=instance.post_id)
-        if notification:
-            notification.delete()
+        Notification.objects.filter(post_id=post.id).delete()
 
 
 class PostCommentReply(models.Model):
