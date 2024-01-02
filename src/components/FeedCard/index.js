@@ -19,10 +19,7 @@ import { API_URL } from "../../config/app"
 import Share from "react-native-share"
 import { connect } from "react-redux"
 import { routeData } from "../../ScreenRedux/profileRedux"
-import {
-  postReportRequest,
-  postDeleteRequest
-} from "../../ScreenRedux/feedRedux"
+import { postDeleteRequest } from "../../ScreenRedux/feedRedux"
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
 import Modal from "react-native-modal"
 
@@ -42,19 +39,15 @@ const FeedCard = props => {
     profile,
     setShowModal,
     setVideoUri,
-    setImageIndex
+    setImageIndex,
+    visibleMenu,
+    hideMenu,
+    showMenu,
+    setModalVisible,
+    setItemData
   } = props
 
   const [showMore, setShowMore] = useState(false)
-  const [isModalVisible, setModalVisible] = useState(false)
-  const [itemData, setItemData] = useState("")
-  const [reason, setReason] = useState("")
-
-  const [visible, setVisible] = useState(false)
-
-  const hideMenu = () => setVisible("")
-
-  const showMenu = item => setVisible(item)
 
   const addLikeAction = () => {
     let feedId = item.id
@@ -103,29 +96,20 @@ const FeedCard = props => {
       }, 500)
     } else {
       hideMenu()
-      setTimeout(() => {
-        setModalVisible(true)
-      }, 500)
+      setModalVisible(true)
+      // setTimeout(() => {
+      //   setModalVisible(true)
+      // }, 500)
     }
-  }
-
-  const handleButtonPress = () => {
-    let data = {
-      user: profile?.id,
-      reason: reason,
-      comment: "",
-      post: itemData?.id
-    }
-    props.postReportRequest(data, callback)
   }
 
   const callback = () => {
     hideMenu()
-    setReason("")
     setItemData("")
-    setTimeout(() => {
-      setModalVisible(false)
-    }, 500)
+    setModalVisible(false)
+    // setTimeout(() => {
+    //   setModalVisible(false)
+    // }, 500)
   }
 
   const showConfirmDialog = id => {
@@ -184,7 +168,7 @@ const FeedCard = props => {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => showMenu(item)}>
               <Menu
-                visible={visible.id === item.id}
+                visible={visibleMenu?.id === item.id}
                 onRequestClose={() => hideMenu()}
               >
                 {profile?.id === item?.user?.id ? (
@@ -292,47 +276,6 @@ const FeedCard = props => {
           </View>
         </TouchableOpacity>
       </View>
-
-      <Modal
-        isVisible={isModalVisible}
-        animationIn="zoomIn"
-        animationOut={"zoomOut"}
-        // onBackdropPress={() => toggleModal(false)}
-      >
-        <View style={styles.modalStyle}>
-          <View style={styles.reportStyle}>
-            <Text style={styles.reportText}>Report on post</Text>
-            <TextInput
-              value={reason}
-              onChangeText={value => setReason(value)}
-              style={styles.inputStyle}
-              placeholder="Reason"
-            />
-
-            <View style={styles.btnStyles}>
-              <TouchableOpacity
-                style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
-                onPress={callback}
-              >
-                <Text>Cancel</Text>
-              </TouchableOpacity>
-
-              <View style={{ paddingHorizontal: 5 }} />
-              <TouchableOpacity
-                style={[styles.smallBtnStyle, { backgroundColor: "gray" }]}
-                onPress={handleButtonPress}
-                disabled={loading || reason === ""}
-              >
-                {loading ? (
-                  <ActivityIndicator color={"white"} />
-                ) : (
-                  <Text style={{ color: "white" }}>Submit</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   )
 }
@@ -460,8 +403,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   routeData: data => dispatch(routeData(data)),
-  postReportRequest: (data, callback) =>
-    dispatch(postReportRequest(data, callback)),
   postDeleteRequest: id => dispatch(postDeleteRequest(id))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FeedCard)

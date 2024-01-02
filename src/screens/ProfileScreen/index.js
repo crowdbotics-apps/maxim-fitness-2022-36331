@@ -9,7 +9,8 @@ import {
   Dimensions,
   ScrollView,
   RefreshControl,
-  ActivityIndicator
+  ActivityIndicator,
+  BackHandler
 } from "react-native"
 import { Text, BottomSheet, Loader } from "../../components"
 import { Images, Colors } from "src/theme"
@@ -166,6 +167,25 @@ const ProfileScreen = props => {
     const index = profileData?.post_image.findIndex(item => item.id === i.id)
     setImageIndex(index)
   }
+
+  function handleBackButtonClick() {
+    navigation.navigate({
+      name: route?.params?.backScreenName
+        ? route?.params?.backScreenName
+        : "Feeds"
+    })
+    return true
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        "hardwareBackPress",
+        handleBackButtonClick
+      )
+    }
+  }, [])
 
   return (
     <>

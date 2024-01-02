@@ -19,6 +19,8 @@ import LinearGradient from "react-native-linear-gradient"
 
 import { Text, BottomSheet } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
+import { letterCapitalize } from "../../../utils/functions"
+import { exerciseArray } from "../../../utils/utils"
 import {
   getDaySessionRequest,
   getAllSessionRequest,
@@ -31,7 +33,8 @@ const FatLoseProgram = props => {
     todayRequest,
     todaySessions,
     getAllSessions,
-    getWeekSessions
+    getWeekSessions,
+    profile
   } = props
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
@@ -205,11 +208,15 @@ const FatLoseProgram = props => {
 
     return formattedResult
   }
+
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
         <View style={[smallVMargin, regularHMargin]}>
-          <Text style={styles.heading}>Max's Fat Loss Program</Text>
+          <Text style={styles.heading}>
+            {letterCapitalize(profile?.username)}'s{" "}
+            {exerciseArray[profile?.fitness_goal - 1]?.heading}
+          </Text>
           {!todayRequest && getWeekSessions?.query?.length > 0 && (
             <>
               <View
@@ -340,8 +347,8 @@ const FatLoseProgram = props => {
                             />
                             <View
                               style={{
-                                backgroundColor: "green",
-                                left: -2,
+                                backgroundColor: "blue",
+                                left: 1,
                                 height: 7,
                                 width: 8,
                                 borderRadius: 10
@@ -470,7 +477,7 @@ const FatLoseProgram = props => {
                       ]}
                     >
                       <Text
-                        text="Find Routine"
+                        text="Start Workout"
                         style={{
                           fontSize: 16,
                           lineHeight: 18,
@@ -524,7 +531,7 @@ const FatLoseProgram = props => {
                       ]}
                     >
                       <Text
-                        text="Find Routine"
+                        text="Find Routes"
                         style={{
                           fontSize: 16,
                           lineHeight: 18,
@@ -538,58 +545,61 @@ const FatLoseProgram = props => {
               </View>
             </View>
           )}
-          <View style={[center, styles.cardView2]}>
-            <Text
-              text={"Create the a Custom Workout"}
-              style={styles.heading3}
-            />
-            <View style={{ marginHorizontal: 10, marginTop: 10 }}>
+          {!todayRequest && (
+            <View style={[center, styles.cardView2]}>
               <Text
-                text={
-                  "Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput"
-                }
-                style={styles.praText}
+                text={"Create the a Custom Workout"}
+                style={styles.heading3}
               />
-            </View>
-            <View style={[fill, center, Gutters.regularVMargin]}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("AddExercise")}
-                disabled={
-                  todayRequest ||
-                  todaySessions?.length === 0 ||
-                  todaySessions?.name === "Rest"
-                }
-              >
-                <LinearGradient
-                  start={start}
-                  end={end}
-                  colors={
-                    todayRequest ||
-                    todaySessions?.length === 0 ||
-                    todaySessions?.name === "Rest"
-                      ? ["#dddddd", "#dddddd"]
-                      : ["#00a2ff", "#00a2ff"]
+              <View style={{ marginHorizontal: 10, marginTop: 10 }}>
+                <Text
+                  text={
+                    "Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput"
                   }
-                  style={[
-                    fill,
-                    Gutters.small2xHPadding,
-                    Gutters.regularVPadding,
-                    styles.gradientWrapper
-                  ]}
+                  style={styles.praText}
+                />
+              </View>
+              <View style={[fill, center, Gutters.regularVMargin]}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AddExercise")}
+                  // disabled={
+                  //   todayRequest ||
+                  //   todaySessions?.length === 0 ||
+                  //   todaySessions?.name === "Rest"
+                  // }
                 >
-                  <Text
-                    text="Create Workout"
-                    style={{
-                      fontSize: 16,
-                      lineHeight: 18,
-                      fontWeight: "bold",
-                      color: "#fff"
-                    }}
-                  />
-                </LinearGradient>
-              </TouchableOpacity>
+                  <LinearGradient
+                    start={start}
+                    end={end}
+                    colors={
+                      // todayRequest ||
+                      // todaySessions?.length === 0 ||
+                      // todaySessions?.name === "Rest"
+                      //   ? ["#dddddd", "#dddddd"]
+                      //   :
+                      ["#00a2ff", "#00a2ff"]
+                    }
+                    style={[
+                      fill,
+                      Gutters.small2xHPadding,
+                      Gutters.regularVPadding,
+                      styles.gradientWrapper
+                    ]}
+                  >
+                    <Text
+                      text="Create Workout"
+                      style={{
+                        fontSize: 16,
+                        lineHeight: 18,
+                        fontWeight: "bold",
+                        color: "#fff"
+                      }}
+                    />
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </ScrollView>
 
@@ -787,7 +797,8 @@ const mapStateToProps = state => ({
   todaySessions: state.programReducer.todaySessions,
   requesting: state.programReducer.requesting,
   getAllSessions: state.programReducer.getAllSessions,
-  getWeekSessions: state.programReducer.getWeekSessions
+  getWeekSessions: state.programReducer.getWeekSessions,
+  profile: state.login.userDetail
 })
 
 const mapDispatchToProps = dispatch => ({

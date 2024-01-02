@@ -152,11 +152,7 @@ const SignUp = props => {
   }
 
   const openPrivacyPolicy = () => {
-    // Linking.canOpenURL('https://orumtraining-23610.botics.co/privacy-policy/').then((supported) => {
-    //   if (supported) {
     Linking.openURL(`${API_URL}/privacy-policy/`)
-    // }
-    // });
   }
 
   return (

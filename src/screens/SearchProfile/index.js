@@ -50,6 +50,7 @@ const SearchProfile = props => {
   const [loading, setLoading] = useState(false)
   const [nextPage, setNextPage] = useState(1)
   const [searchText, setSearchText] = useState("")
+  const [refresh, setRefresh] = useState(false)
 
   let newArray = []
   useEffect(() => {
@@ -281,16 +282,30 @@ const SearchProfile = props => {
             renderItem={renderItem}
             keyExtractor={item => item.id}
             onRefresh={() => {
+              setRefresh(true)
               setNextPage("")
               props.getUserProfile("", 1, setNextPage)
+              setRefresh(false)
             }}
             removeClippedSubviews={true}
-            initialNumToRender={10}
+            // initialNumToRender={10}
             numColumns={1}
-            refreshing={requesting}
+            refreshing={refresh}
             onEndReachedThreshold={0.5}
             onEndReached={onEndReached}
+            keyboardShouldPersistTaps="handled"
             windowSize={250}
+            ListFooterComponent={
+              requesting ? (
+                <View style={{ height: 50 }}>
+                  <ActivityIndicator
+                    color="black"
+                    size="large"
+                    style={{ flex: 1 }}
+                  />
+                </View>
+              ) : null
+            }
             ListEmptyComponent={() => (
               <View style={styles.loaderStyle}>
                 <Text style={{ fontSize: 18 }}>No record found</Text>
