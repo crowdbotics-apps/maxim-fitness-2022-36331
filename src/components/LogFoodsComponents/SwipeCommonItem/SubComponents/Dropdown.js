@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import ModalDropdown from 'react-native-modal-dropdown';
-import { Images } from '../../../../theme';
+import React from "react"
+import { View, Text, Image, StyleSheet } from "react-native"
+import ModalDropdown from "react-native-modal-dropdown"
+import { Images } from "../../../../theme"
 const SubDropDown = ({ item, onSelect, unitText }) => {
   return (
     <ModalDropdown
@@ -13,49 +13,52 @@ const SubDropDown = ({ item, onSelect, unitText }) => {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.modalButtonStyle}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.dropdownButtonText} numberOfLines={1}>
-            {unitText || 'Choose...'}
+        <View>
+          <Text style={styles.dropdownButtonText} numberOfLines={2}>
+            {unitText || "Choose..."}
           </Text>
         </View>
-        <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row' }}>
-          <Image source={Images.dropdownIcon} style={styles.dropdownImage} />
+        <View
+          style={{ flex: 1, justifyContent: "flex-end", flexDirection: "row" }}
+        >
+          <Image source={Images.dropDownIcon} style={styles.dropdownImage} />
         </View>
       </View>
     </ModalDropdown>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   dropdownButtonText: {
     fontSize: 14,
-    color: 'black',
+    color: "black"
   },
   dropdownImage: {
-    width: 20,
-    height: 20,
+    width: 15,
+    height: 15
   },
   modalButtonStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    width: 140
   },
   dropdownTextStyle: {
     fontSize: 14,
-    color: 'black',
+    color: "black"
   },
   dropdownStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    width: 120,
-    paddingHorizontal: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    width: 130,
+    paddingHorizontal: 10
   },
   dropdownContainer: {
     width: 140,
     maxWidth: 140,
-    paddingHorizontal: 10,
-  },
-});
+    paddingHorizontal: 10
+  }
+})
 
-export default SubDropDown;
+export default SubDropDown

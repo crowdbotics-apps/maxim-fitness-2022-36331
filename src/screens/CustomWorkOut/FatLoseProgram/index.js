@@ -51,11 +51,32 @@ const FatLoseProgram = props => {
       }
     })
   }, [getWeekSessions])
-  useEffect(() => {
-    if (getWeekSessions?.week) {
-      setActiveIndex(getWeekSessions?.week)
+
+  const getWeek = date => {
+    if (data) {
+      const weekStartDates = Object.keys(data)
+
+      const inputDate = new Date(date)
+      for (let i = 0; i < weekStartDates.length; i++) {
+        const weekStartDate = new Date(weekStartDates[i])
+        const nextWeekStartDate = new Date(weekStartDates[i + 1])
+
+        if (
+          i === weekStartDates.length - 1 ||
+          (inputDate >= weekStartDate && inputDate < nextWeekStartDate)
+        ) {
+          return `${i + 1 > 7 ? 2 : 1}`
+        }
+      }
+      return 2
     }
-  }, [getWeekSessions?.week])
+  }
+
+  useEffect(() => {
+    if (data) {
+      setActiveIndex(parseInt(getWeek(new Date())))
+    }
+  }, [])
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
@@ -81,27 +102,27 @@ const FatLoseProgram = props => {
   const { smallVMargin, regularHMargin, tinyLMargin } = Gutters
 
   const nextExercise = () => {
-    setActiveIndex(Number(activeIndex) - 1)
     if (getWeekSessions?.query?.length) {
       const today = new Date(getWeekSessions?.query[0].date_time)
       const lastDay = new Date(today.setDate(today.getDate() + 7))
-      const hh = moment(lastDay).format("YYYY-MM-DD")
-      setIndex(hh)
-      props.getAllSessionRequest(hh)
-      props.getDaySessionRequest(hh)
+      const date = moment(lastDay).format("YYYY-MM-DD")
+      setIndex(date)
+      setActiveIndex(parseInt(getWeek(date)))
+      props.getAllSessionRequest(date)
+      props.getDaySessionRequest(date)
     }
   }
 
   const previousExercise = () => {
-    setActiveIndex(Number(activeIndex) + 1)
     if (getWeekSessions?.query?.length) {
       const today = new Date(getWeekSessions.query[0].date_time)
 
       const lastDay = new Date(today.setDate(today.getDate() - 7))
-      const hh = moment(lastDay).format("YYYY-MM-DD")
-      setIndex(hh)
-      props.getAllSessionRequest(hh)
-      props.getDaySessionRequest(hh)
+      const date = moment(lastDay).format("YYYY-MM-DD")
+      setIndex(date)
+      setActiveIndex(parseInt(getWeek(date)))
+      props.getAllSessionRequest(date)
+      props.getDaySessionRequest(date)
     }
   }
 
@@ -162,15 +183,15 @@ const FatLoseProgram = props => {
     )
 
     if (listData) {
-      const index = dateList.indexOf(date?.dateString)
-      const isDateInFirstWeek = index <= 6 ? true : false
-      setActiveIndex(index <= 6 ? 2 : 1)
+      setActiveIndex(parseInt(getWeek(date?.dateString)))
       setIndex(date?.dateString)
       if (!checkWeek) {
         const today = new Date(getWeekSessions.query[0].date_time)
         const lastDay = new Date(
           today.setDate(
-            isDateInFirstWeek ? today.getDate() - 7 : today.getDate() + 7
+            getWeek(date?.dateString) == 1
+              ? today.getDate() - 7
+              : today.getDate() + 7
           )
         )
         const hh = moment(lastDay).format("YYYY-MM-DD")
@@ -185,13 +206,6 @@ const FatLoseProgram = props => {
 
       setIsModal(false)
     }
-  }
-
-  const getLastDate = () => {
-    const keys = Object.keys(data)
-    // Get the last key
-    const lastKey = keys[keys.length - 1]
-    return lastKey
   }
 
   const secondsToMinutes = seconds => {
@@ -229,13 +243,9 @@ const FatLoseProgram = props => {
               >
                 <TouchableOpacity
                   style={row}
-                  onPress={
-                    activeIndex === getWeekSessions?.week
-                      ? nextExercise
-                      : previousExercise
-                  }
+                  onPress={activeIndex === 1 ? nextExercise : previousExercise}
                 >
-                  {activeIndex !== getWeekSessions?.week ? (
+                  {activeIndex === 2 ? (
                     <Icon
                       type="FontAwesome5"
                       name={"chevron-left"}
@@ -244,16 +254,10 @@ const FatLoseProgram = props => {
                   ) : null}
                   <Text
                     color="primary"
-                    text={`Week ${
-                      activeIndex === getWeekSessions?.week
-                        ? getWeekSessions?.week
-                        : getWeekSessions?.week === undefined
-                        ? ""
-                        : getWeekSessions?.week - 1
-                    }`}
+                    text={`Week ${activeIndex === 1 ? 2 : 1}`}
                     style={[tinyLMargin, styles.smallText]}
                   />
-                  {activeIndex === getWeekSessions?.week ? (
+                  {activeIndex === 1 ? (
                     <Icon
                       type="FontAwesome5"
                       name={"chevron-right"}
@@ -340,17 +344,17 @@ const FatLoseProgram = props => {
                             <View
                               style={{
                                 backgroundColor: "red",
-                                height: 7,
-                                width: 8,
+                                height: 6,
+                                width: 6,
                                 borderRadius: 10
                               }}
                             />
                             <View
                               style={{
                                 backgroundColor: "blue",
-                                left: 1,
-                                height: 7,
-                                width: 8,
+                                left: 2,
+                                height: 6,
+                                width: 6,
                                 borderRadius: 10
                               }}
                             />
@@ -435,13 +439,12 @@ const FatLoseProgram = props => {
                       style={{ width: 60, height: 60 }}
                     />
                   </View>
+
                   <View
                     style={[row, fill, alignItemsCenter, { marginLeft: "18%" }]}
                   >
                     <Text
-                      text={`${secondsToMinutes(
-                        todaySessions?.workouts?.length * 90
-                      )} minutes`}
+                      text={`${todaySessions?.cardio_length} minutes`}
                       style={{
                         fontSize: 12,
                         lineHeight: 12,
@@ -505,7 +508,7 @@ const FatLoseProgram = props => {
                 <View style={[row, Gutters.smallVMargin]}>
                   <Text
                     text={
-                      "Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput"
+                      "No workout for today. We do encourage you to follow one of our quick stretching and mobility routines during your off days."
                     }
                     style={{
                       fontSize: 13,
@@ -531,7 +534,7 @@ const FatLoseProgram = props => {
                       ]}
                     >
                       <Text
-                        text="Find Routes"
+                        text="Find Routine"
                         style={{
                           fontSize: 16,
                           lineHeight: 18,
@@ -545,7 +548,7 @@ const FatLoseProgram = props => {
               </View>
             </View>
           )}
-          {!todayRequest && (
+          {!todayRequest && getWeekSessions?.query?.length > 0 && (
             <View style={[center, styles.cardView2]}>
               <Text
                 text={"Create the a Custom Workout"}
@@ -554,7 +557,7 @@ const FatLoseProgram = props => {
               <View style={{ marginHorizontal: 10, marginTop: 10 }}>
                 <Text
                   text={
-                    "Built upon the proven RG400 platform, Loram’s RGS Specialty Rail Grinder features 24 stones driven by 30 hp electric motors, achieving class-leading metal removal, productivity and throughput"
+                    "Design your own strength workout or choose an outdoor run, hike, walk, or bike ride using our GPS tracker and guided workouts."
                   }
                   style={styles.praText}
                 />
