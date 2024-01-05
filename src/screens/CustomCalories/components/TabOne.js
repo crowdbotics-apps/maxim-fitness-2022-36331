@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Layout, Global, Gutters, Colors, Images } from '../../../theme';
-import { Text, Button, DashboardCard } from '../../../components';
-import LinearGradient from 'react-native-linear-gradient';
+import React from "react"
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native"
+import { Layout, Global, Gutters, Colors, Images } from "../../../theme"
+import { Text, Button, DashboardCard } from "../../../components"
+import LinearGradient from "react-native-linear-gradient"
 
 const TabOne = props => {
-  const { setShowModal, signOut, connectAlexa, profile } = props;
+  const { setShowModal, signOut, connectAlexa, profile } = props
   const {
     row,
     fill,
@@ -15,13 +15,19 @@ const TabOne = props => {
     alignItemsCenter,
     justifyContentCenter,
     justifyContentStart,
-    justifyContentBetween,
-  } = Layout;
-  const { border } = Global;
-  const { smallHPadding, regularVPadding, regularHMargin, smallLMargin, mediumVMargin } = Gutters;
+    justifyContentBetween
+  } = Layout
+  const { border } = Global
+  const {
+    smallHPadding,
+    regularVPadding,
+    regularHMargin,
+    smallLMargin,
+    mediumVMargin
+  } = Gutters
 
-  const start = { x: 0, y: 1 };
-  const end = { x: 0, y: 0 };
+  const start = { x: 0, y: 1 }
+  const end = { x: 0, y: 0 }
 
   return (
     <View>
@@ -30,18 +36,18 @@ const TabOne = props => {
           <LinearGradient
             start={start}
             end={end}
-            colors={['#3c61ff', '#55bfff']}
+            colors={["#3c61ff", "#55bfff"]}
             style={[
               fill,
               regularHMargin,
               mediumVMargin,
               regularVPadding,
               smallHPadding,
-              styles.gradientWrapper,
+              styles.gradientWrapper
             ]}
           >
             <View style={[row, justifyContentBetween]}>
-              <Text text={'Current\nWeight'} color="secondary" bold center />
+              <Text text={"Current\nWeight"} color="secondary" bold center />
               <Image source={Images.icon} style={styles.imageStyle} />
             </View>
             <TouchableOpacity
@@ -50,7 +56,7 @@ const TabOne = props => {
             >
               <Text text={profile?.weight} color="secondary" bold center />
               <Text
-                text={profile?.unit === 'Feet/Pounds' ? 'lbs' : 'kg'}
+                text={profile?.unit === "Feet/Pounds" ? "lbs" : "kg"}
                 color="secondary"
                 center
                 style={smallLMargin}
@@ -63,7 +69,7 @@ const TabOne = props => {
             <LinearGradient
               start={start}
               end={end}
-              colors={['#fff', '#fff']}
+              colors={["#fff", "#fff"]}
               style={[
                 fill,
                 border,
@@ -72,11 +78,11 @@ const TabOne = props => {
                 regularHMargin,
                 regularVPadding,
                 justifyContentBetween,
-                styles.gradientWrapper,
+                styles.gradientWrapper
               ]}
             >
               <View style={[row, justifyContentBetween]}>
-                <Text text={'Fitness \nGoal'} color="quinary" bold center />
+                <Text text={"Fitness\nGoal"} color="quinary" bold />
                 <Image source={Images.goal} style={styles.imageStyle} />
               </View>
               {/* {netInfo.isConnected && loading && (
@@ -84,13 +90,18 @@ const TabOne = props => {
                   )} */}
               <View>
                 {profile?.fitness_goal === 1 && (
-                  <Text text={'Fat Loss'} color="nonary" bold center />
+                  <Text text={"Fat Loss"} color="nonary" bold center />
                 )}
                 {profile?.fitness_goal === 2 && (
-                  <Text text={'Strength and Hypertropy'} color="nonary" bold center />
+                  <Text
+                    text={"Strength and Hypertropy"}
+                    color="nonary"
+                    bold
+                    center
+                  />
                 )}
                 {profile?.fitness_goal === 3 && (
-                  <Text text={'Maintenance'} color="nonary" bold center />
+                  <Text text={"Maintenance"} color="nonary" bold center />
                 )}
               </View>
             </LinearGradient>
@@ -102,7 +113,7 @@ const TabOne = props => {
           <LinearGradient
             start={start}
             end={end}
-            colors={['#fff', '#fff']}
+            colors={["#fff", "#fff"]}
             style={[
               fill,
               border,
@@ -110,15 +121,20 @@ const TabOne = props => {
               regularVPadding,
               smallHPadding,
               justifyContentBetween,
-              styles.gradientWrapper,
+              styles.gradientWrapper
             ]}
           >
             <View style={[row, justifyContentBetween]}>
-              <Text text={'Training'} color="quinary" bold center />
+              <Text text={"Training"} color="quinary" bold center />
               <Image source={Images.programsIcon} style={styles.imageStyle} />
             </View>
             <View style={[justifyContentStart, alignItemsStart]}>
-              <Text text={profile?.number_of_training_days} color="nonary" bold center />
+              <Text
+                text={profile?.number_of_training_days}
+                color="nonary"
+                bold
+                center
+              />
               <Text text="Days" color="septenary" center />
             </View>
           </LinearGradient>
@@ -129,53 +145,53 @@ const TabOne = props => {
         <Button
           color="secondary"
           onPress={signOut}
-          text={'logout'}
+          text={"logout"}
           style={[
             border,
             center,
             regularHMargin,
             fill,
-            { height: 50, borderColor: Colors.azureradiance },
+            { height: 50, borderColor: Colors.azureradiance }
           ]}
           textStyle={{
             lineHeight: 16,
-            fontSize: 16,
+            fontSize: 16
           }}
         />
       </View>
       <View style={[center, row, fill, { marginBottom: 20 }]}>
         <Button
           textStyle={{
-            color: 'white',
+            color: "white",
             lineHeight: 16,
-            fontSize: 16,
+            fontSize: 16
           }}
           color="secondary"
           onPress={connectAlexa}
-          text={'Connect with Alexa'}
+          text={"Connect with Alexa"}
           disabled={false}
           style={[
             // border,
             center,
             regularHMargin,
             fill,
-            { height: 50, backgroundColor: Colors.azureradiance },
+            { height: 50, backgroundColor: Colors.azureradiance }
           ]}
         />
       </View>
     </View>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   imageStyle: {
     width: 25,
     height: 25,
-    resizeMode: 'contain',
+    resizeMode: "contain"
   },
   gradientWrapper: {
     height: 160,
     borderRadius: 20,
-    borderColor: Colors.azureradiance,
-  },
-});
-export default TabOne;
+    borderColor: Colors.azureradiance
+  }
+})
+export default TabOne

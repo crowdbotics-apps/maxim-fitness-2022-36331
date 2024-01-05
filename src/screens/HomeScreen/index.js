@@ -71,6 +71,9 @@ const HomeScreen = props => {
     )
   }
 
+  const pp = new Date(todaySessions?.id && todaySessions?.date_time)
+  const weekDay = pp?.getDay()
+
   return (
     <SafeAreaView style={[secondaryBg, fill]}>
       <HeaderForDrawer hideHamburger />
@@ -90,7 +93,10 @@ const HomeScreen = props => {
         >
           <View style={justifyContentBetween}>
             <View style={row}>
-              <Text style={styles.textStyle} text="Day 1" />
+              <Text
+                style={styles.textStyle}
+                text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+              />
               <Text style={styles.subTextStyle} text="W1" />
             </View>
 
@@ -132,7 +138,10 @@ const HomeScreen = props => {
         >
           <View style={justifyContentBetween}>
             <View style={row}>
-              <Text style={styles.textStyle} text="Day 1" />
+              <Text
+                style={styles.textStyle}
+                text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+              />
               <Text style={styles.subTextStyle} text="W1" />
             </View>
 

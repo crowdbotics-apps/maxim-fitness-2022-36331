@@ -20,6 +20,7 @@ const Notifications = props => {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [nextPage, setNextPage] = useState(1)
+  const [refresh, setRefresh] = useState(false)
 
   const getNotifications = async page => {
     setLoading(true)
@@ -93,7 +94,7 @@ const Notifications = props => {
 
   return (
     <View style={{ flex: 1 }}>
-      {loading && !nextPage ? (
+      {loading && !notifications?.length ? (
         <View style={styles.loaderStyle}>
           <ActivityIndicator color={"gray"} size="large" />
         </View>
@@ -104,16 +105,29 @@ const Notifications = props => {
           renderItem={renderItem}
           keyExtractor={item => item.id}
           onRefresh={() => {
+            setRefresh(true)
             setNextPage(1)
             getNotifications(1)
+            setRefresh(false)
           }}
           removeClippedSubviews={true}
           initialNumToRender={5}
           numColumns={1}
-          refreshing={loading}
+          refreshing={refresh}
           onEndReachedThreshold={0.5}
           onEndReached={onEndReached}
           windowSize={250}
+          ListFooterComponent={
+            loading ? (
+              <View style={{ height: 50 }}>
+                <ActivityIndicator
+                  color="black"
+                  size="large"
+                  style={{ flex: 1 }}
+                />
+              </View>
+            ) : null
+          }
           ListEmptyComponent={() => (
             <View style={styles.loaderStyle}>
               <Text style={{ fontSize: 18 }}>No record found</Text>

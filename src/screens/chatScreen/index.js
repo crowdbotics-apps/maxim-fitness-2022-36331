@@ -98,7 +98,7 @@ const ChatScreen = props => {
   let scrollOffsetY = useRef(new Animated.Value(100)).current
 
   const onSend = () => {
-    if (textInput) {
+    if (textInput.trim()) {
       const payload = {
         sender: userProfile?.id,
         receiver: item?.id && item?.id?.split("-")[1],
@@ -110,11 +110,12 @@ const ChatScreen = props => {
         receiverProfile: {
           image_url: ""
         },
-        message: textInput,
+        message: textInput.trim(),
         timestamp: moment().unix()
       }
       const channel = item.id
       sendMessages(pubnub, channel, payload).then(res => setTextInput(""))
+    } else {
     }
   }
 
@@ -450,7 +451,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     padding: 10,
-    marginTop: Platform.OS === "android" ? 0 : 10
+    marginTop: Platform.OS === "android" ? 0 : 30
   }
 })
 

@@ -8,7 +8,9 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
-  Platform
+  Platform,
+  Dimensions,
+  TextInput
 } from "react-native"
 import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
@@ -20,9 +22,12 @@ import Modal from "react-native-modal"
 
 //actions
 import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
+import { postReportRequest } from "../../ScreenRedux/feedRedux"
+
+let deviceHeight = Dimensions.get("window").height
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile } = props
+  const { feeds, requesting, navigation, profile, loadingReport } = props
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1)
   const [visible, setIsVisible] = useState(false)
@@ -31,6 +36,16 @@ const Feeds = props => {
   const [loading, setLoading] = useState(false)
   const [videoUri, setVideoUri] = useState(false)
   const [imageIndex, setImageIndex] = useState(0)
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [reason, setReason] = useState("")
+  const [itemData, setItemData] = useState("")
+  const [refresh, setRefresh] = useState(false)
+
+  const [visibleMenu, setVisibleMenu] = useState(false)
+
+  const hideMenu = () => setVisibleMenu("")
+
+  const showMenu = item => setVisibleMenu(item)
 
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
@@ -63,6 +78,26 @@ const Feeds = props => {
     }
   }
 
+  const handleButtonPress = () => {
+    let data = {
+      user: profile?.id,
+      reason: reason,
+      comment: "",
+      post: itemData?.id
+    }
+    props.postReportRequest(data, callback)
+  }
+
+  const callback = () => {
+    hideMenu()
+    setReason("")
+    setItemData("")
+    setModalVisible(false)
+    // setTimeout(() => {
+    //   setModalVisible(false)
+    // }, 500)
+  }
+
   const renderItem = ({ item, index }) => {
     return (
       // <TouchableOpacity>
@@ -79,14 +114,24 @@ const Feeds = props => {
         setShowModal={setShowModal}
         setVideoUri={setVideoUri}
         setImageIndex={setImageIndex}
+        hideMenu={hideMenu}
+        showMenu={showMenu}
+        visibleMenu={visibleMenu}
+        setVisibleMenu={setVisibleMenu}
+        isModalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+        itemData={itemData}
+        setItemData={setItemData}
       />
       // </TouchableOpacity>
     )
   }
 
   const onPullToRefresh = () => {
+    setRefresh(true)
     setPage(1)
     props.getFeedsRequest(1)
+    setRefresh(false)
   }
 
   return (
@@ -110,20 +155,25 @@ const Feeds = props => {
       ) : feedsState.length > 0 ? (
         <FlatList
           // ref={flatList}
-          refreshControl={
-            <RefreshControl
-              colors={["#9Bd35A", "#689F38"]}
-              refreshing={requesting}
-              onRefresh={() => onPullToRefresh()}
-              // progressViewOffset={20}
-            />
-          }
+          onRefresh={onPullToRefresh}
           data={feedsState}
+          refreshing={refresh}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           extraData={feedsState}
           onEndReached={onEnd}
           windowSize={250}
+          ListFooterComponent={
+            requesting ? (
+              <View style={{ height: 50 }}>
+                <ActivityIndicator
+                  color="black"
+                  size="large"
+                  style={{ flex: 1 }}
+                />
+              </View>
+            ) : null
+          }
           // onViewableItemsChanged={onViewRef.current}
           // viewabilityConfig={viewConfigRef.current}
           keyboardShouldPersistTaps={"handled"}
@@ -156,7 +206,10 @@ const Feeds = props => {
         <View style={styles.imageModal}>
           <TouchableOpacity
             onPress={() => setShowModal(false)}
-            style={{ alignItems: "flex-end" }}
+            style={{
+              alignItems: "flex-end",
+              marginTop: Platform.OS === "android" ? 0 : 20
+            }}
           >
             <Image
               source={Images.closeBtn}
@@ -191,6 +244,46 @@ const Feeds = props => {
           </View>
         </View>
       </Modal>
+      <Modal
+        isVisible={isModalVisible}
+        animationIn="zoomIn"
+        animationOut={"zoomOut"}
+        // onBackdropPress={() => toggleModal(false)}
+      >
+        <View style={styles.modalStyle}>
+          <View style={styles.reportStyle}>
+            <Text style={styles.reportText}>Report on post</Text>
+            <TextInput
+              value={reason}
+              onChangeText={value => setReason(value)}
+              style={styles.inputStyle}
+              placeholder="Reason"
+            />
+
+            <View style={styles.btnStyles}>
+              <TouchableOpacity
+                style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
+                onPress={callback}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+
+              <View style={{ paddingHorizontal: 5 }} />
+              <TouchableOpacity
+                style={[styles.smallBtnStyle, { backgroundColor: "gray" }]}
+                onPress={handleButtonPress}
+                disabled={loadingReport || reason === ""}
+              >
+                {loadingReport ? (
+                  <ActivityIndicator color={"white"} />
+                ) : (
+                  <Text style={{ color: "white" }}>Submit</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -212,24 +305,61 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     padding: 10,
-    marginTop: Platform.OS === "android" ? 0 : 10
+    marginTop: Platform.OS === "android" ? 0 : 30
   },
   imageModal: {
     backgroundColor: "black",
     paddingHorizontal: 5,
     flex: 1,
     paddingTop: 20
+  },
+  modalStyle: {
+    height: deviceHeight * 0.3,
+    borderRadius: 20,
+    backgroundColor: "white"
+  },
+  reportText: {
+    textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 18,
+    marginVertical: 20,
+    fontWeight: "bold"
+  },
+  inputStyle: {
+    height: 53,
+    borderRadius: 8,
+    borderColor: "#C4C4C4",
+    borderWidth: 1,
+    paddingHorizontal: 10
+  },
+  btnStyles: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 25
+  },
+  smallBtnStyle: {
+    flex: 1,
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10
+  },
+  reportStyle: {
+    paddingHorizontal: 20,
+    paddingVertical: 10
   }
 })
 
 const mapStateToProps = state => ({
   requesting: state.feedsReducer.requesting,
   feeds: state.feedsReducer.feeds,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
+  loadingReport: state.feedsReducer.loading
 })
 
 const mapDispatchToProps = dispatch => ({
   getFeedsRequest: data => dispatch(getFeedsRequest(data)),
-  postLikeRequest: data => dispatch(postLikeRequest(data))
+  postLikeRequest: data => dispatch(postLikeRequest(data)),
+  postReportRequest: (data, callback) =>
+    dispatch(postReportRequest(data, callback))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(Feeds)

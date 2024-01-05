@@ -8,8 +8,9 @@ export const getMessageTime = dateString => {
 }
 
 export const letterCapitalize = str => {
-  const str2 = str ? str.charAt(0).toUpperCase() + str.slice(1) : ""
-  return str2
+  return str?.replace(/\b\w/g, function (char) {
+    return char.toUpperCase()
+  })
 }
 export const calculatePostTime = item => {
   const today = new Date()

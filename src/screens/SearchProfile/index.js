@@ -20,6 +20,7 @@ import { usePubNub } from "pubnub-react"
 import { createDirectChannel, useStore, ChannelType } from "../../utils/chat"
 import { letterCapitalize } from "../../utils/functions"
 import { routeData } from "../../ScreenRedux/profileRedux"
+import SkeletonPlaceholder from "react-native-skeleton-placeholder"
 
 //action
 import { getUserProfile, userChat } from "../../ScreenRedux/searchProfileRedux"
@@ -50,6 +51,7 @@ const SearchProfile = props => {
   const [loading, setLoading] = useState(false)
   const [nextPage, setNextPage] = useState(1)
   const [searchText, setSearchText] = useState("")
+  const [refresh, setRefresh] = useState(false)
 
   let newArray = []
   useEffect(() => {
@@ -272,7 +274,28 @@ const SearchProfile = props => {
           </View>
         </View>
         {requesting && !profileUserData?.length ? (
-          <ActivityIndicator size="large" color="#000" style={{ flex: 1 }} />
+          <View style={{ marginHorizontal: 25, marginTop: 10 }}>
+            {Array(8)
+              .fill()
+              .map(() => (
+                <SkeletonPlaceholder borderRadius={4}>
+                  <SkeletonPlaceholder.Item
+                    flexDirection="row"
+                    alignItems="center"
+                    marginTop={10}
+                  >
+                    <SkeletonPlaceholder.Item
+                      width={60}
+                      height={60}
+                      borderRadius={50}
+                    />
+                    <SkeletonPlaceholder.Item marginLeft={20}>
+                      <SkeletonPlaceholder.Item width={260} height={40} />
+                    </SkeletonPlaceholder.Item>
+                  </SkeletonPlaceholder.Item>
+                </SkeletonPlaceholder>
+              ))}
+          </View>
         ) : profileUserData?.length ? (
           <FlatList
             nestedScrollEnabled={false}
@@ -281,16 +304,30 @@ const SearchProfile = props => {
             renderItem={renderItem}
             keyExtractor={item => item.id}
             onRefresh={() => {
+              setRefresh(true)
               setNextPage("")
               props.getUserProfile("", 1, setNextPage)
+              setRefresh(false)
             }}
             removeClippedSubviews={true}
-            initialNumToRender={10}
+            // initialNumToRender={10}
             numColumns={1}
-            refreshing={requesting}
+            refreshing={refresh}
             onEndReachedThreshold={0.5}
             onEndReached={onEndReached}
+            keyboardShouldPersistTaps="handled"
             windowSize={250}
+            ListFooterComponent={
+              requesting ? (
+                <View style={{ height: 50 }}>
+                  <ActivityIndicator
+                    color="black"
+                    size="large"
+                    style={{ flex: 1 }}
+                  />
+                </View>
+              ) : null
+            }
             ListEmptyComponent={() => (
               <View style={styles.loaderStyle}>
                 <Text style={{ fontSize: 18 }}>No record found</Text>

@@ -119,8 +119,6 @@ const EditProfile = props => {
 
   const onChangeProfileImage = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
       cropping: true
     }).then(image => {
       handleOnChange("profileImage", image)
@@ -129,8 +127,6 @@ const EditProfile = props => {
 
   const onChangebackgroundImage = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
       cropping: true
     }).then(image => {
       handleOnChange("backgroundImage", image)

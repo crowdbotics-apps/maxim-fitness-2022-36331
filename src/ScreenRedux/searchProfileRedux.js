@@ -95,7 +95,6 @@ function* getProfileData({ data, nextPage, setNextPage }) {
   try {
     const response = yield call(getUserProfileAPI, data, nextPage)
     yield put(getUserProfileSuccess(response.data, nextPage))
-
     setNextPage(
       response?.data.next
         ? response?.data.next?.split("?page=")[1].split("&")[0]
@@ -103,7 +102,6 @@ function* getProfileData({ data, nextPage, setNextPage }) {
     )
   } catch (e) {
     const { response } = e
-  } finally {
     yield put(resetUserProfile())
   }
 }
