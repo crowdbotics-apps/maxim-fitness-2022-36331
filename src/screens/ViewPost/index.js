@@ -10,7 +10,8 @@ import {
   SafeAreaView,
   Pressable,
   ActivityIndicator,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Platform
 } from "react-native"
 import { Text, ProfileHeader, SkeletonLoader } from "src/components"
 import { API_URL } from "../../config/app"
@@ -48,6 +49,7 @@ const ViewPost = props => {
     userDetail,
     loading
   } = props
+  let deviceWidth = Dimensions.get("window").width
   const [commentData, setCommentData] = useState(false)
   const [postComments, setPostComments] = useState([])
   const [subCommentData, setSubCommentData] = useState(false)
@@ -61,7 +63,6 @@ const ViewPost = props => {
   const [reportType, setReportType] = useState(false)
 
   const [visible, setVisible] = useState(false)
-
   const hideMenu = () => {
     setVisible("")
   }
@@ -105,7 +106,7 @@ const ViewPost = props => {
     }
   }, [postData?.comments])
 
-  const callBack = status => {
+  const callBackFun = status => {
     if (status) {
       setCommentData(false)
     }
@@ -121,14 +122,21 @@ const ViewPost = props => {
       }
       // setCommentData(false);
       setCancelOption(false)
-      props.replyComment(replyCommentData, subCommentData, callBack)
+      props.replyComment(replyCommentData, subCommentData, callBackFun)
     } else {
       const apiData = {
         comment: commentData,
         id: param?.id
       }
-      props.addComment(apiData, postData, callBack)
+      props.addComment(apiData, postData, callBackFun)
     }
+  }
+  const callback = () => {
+    hideMenu()
+    setReason("")
+    setItemData("")
+    setModalVisible(false)
+    setReportType(false)
   }
 
   const replyCommentData = item => {
@@ -205,8 +213,6 @@ const ViewPost = props => {
     props.likeComment(apiData)
   }
 
-  let deviceWidth = Dimensions.get("window").width
-
   const addLikeAction = () => {
     let feedId = param?.id
     likeFilter(feedId)
@@ -242,10 +248,9 @@ const ViewPost = props => {
       }
       props.postCommentDelete(isReply ? item.id : data, getComments, isReply)
     } else {
-      hideMenu()
       setTimeout(() => {
         setModalVisible(true)
-      }, 500)
+      }, 1000)
     }
   }
 
@@ -268,351 +273,360 @@ const ViewPost = props => {
     props.postCommentReportRequest(data, callback, reportType)
   }
 
-  const callback = () => {
-    hideMenu()
-    setReason("")
-    setItemData("")
-    setTimeout(() => {
-      setModalVisible(false)
-      setReportType(false)
-    }, 500)
-  }
-
   const getComments = () => {
     props.getPost(param?.id, true)
   }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {requesting ? (
-        <SkeletonLoader />
-      ) : (
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          enabled
-          keyboardVerticalOffset={100}
-        >
-          <ScrollView
-            contentContainerStyle={styles.mainContainer}
-            // keyboardShouldPersistTaps="handled"
-          >
-            <TouchableOpacity style={styles.leftArrow} onPress={() => goBack()}>
-              <Image source={Images.backArrow} style={styles.backArrowStyle} />
-            </TouchableOpacity>
-            <View style={styles.profileStyle}>
-              <ProfileHeader
-                source={
-                  postData?.user?.profile_picture === null
-                    ? Images.profile
-                    : { uri: postData?.user?.profile_picture }
-                }
-                userName={postData?.user?.username}
-                time={calculatePostTime(postData)}
-                content={postData?.content}
-              />
-              <SliderBox
-                images={
-                  param &&
-                  (param?.post_image?.length && param?.post_video?.length) > 0
-                    ? [...param.post_image, ...param.post_video].map(item =>
-                        item.image ? item.image : item.video
-                      )
-                    : param?.post_image?.length > 0
-                    ? param.post_image.map(item => item.image)
-                    : param?.post_video?.length > 0
-                    ? param.post_video.map(item => item.video_thumbnail)
-                    : []
-                }
-                style={styles.foodImageStyle}
-                sliderBoxHeight={260}
-                parentWidth={deviceWidth}
-                dotColor="#D4D4D4"
-                inactiveDotColor="#D4D4D4"
-                dotStyle={styles.sliderBoxStyle}
-                paginationBoxVerticalPadding={20}
-              />
-              <View style={styles.cardSocials}>
-                <View style={styles.socialIcons}>
-                  <Image
-                    source={Images.messageIcon}
-                    style={styles.msgIconStyle}
-                  />
-                  <Text text={postComments?.length} style={styles.timeText} />
-                </View>
-                <Pressable style={styles.socialIcons} onPress={addLikeAction}>
-                  <Image
-                    source={Images.heartIcon}
-                    style={[
-                      styles.likeImageStyle,
-                      { tintColor: param.liked ? "red" : "black" }
-                    ]}
-                    tintColor={param.liked ? "red" : "black"}
-                  />
-                  <Text
-                    text={param.likes ? param.likes : ""}
-                    style={styles.timeText}
-                  />
-                </Pressable>
-                <View style={styles.socialIcons}>
-                  <Pressable onPress={() => sharePost()}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" && "padding"}
+        style={{ flex: 1 }}
+      >
+        {requesting ? (
+          <SkeletonLoader />
+        ) : (
+          <>
+            <ScrollView
+              contentContainerStyle={styles.mainContainer}
+              // keyboardShouldPersistTaps="handled"
+            >
+              <TouchableOpacity
+                style={styles.leftArrow}
+                onPress={() => goBack()}
+              >
+                <Image
+                  source={Images.backArrow}
+                  style={styles.backArrowStyle}
+                />
+              </TouchableOpacity>
+              <View style={styles.profileStyle}>
+                <ProfileHeader
+                  source={
+                    postData?.user?.profile_picture === null
+                      ? Images.profile
+                      : { uri: postData?.user?.profile_picture }
+                  }
+                  userName={postData?.user?.username}
+                  time={calculatePostTime(postData)}
+                  content={postData?.content}
+                />
+                <SliderBox
+                  images={
+                    param &&
+                    (param?.post_image?.length && param?.post_video?.length) > 0
+                      ? [...param.post_image, ...param.post_video].map(item =>
+                          item.image ? item.image : item.video
+                        )
+                      : param?.post_image?.length > 0
+                      ? param.post_image.map(item => item.image)
+                      : param?.post_video?.length > 0
+                      ? param.post_video.map(item => item.video_thumbnail)
+                      : []
+                  }
+                  style={styles.foodImageStyle}
+                  sliderBoxHeight={260}
+                  parentWidth={deviceWidth}
+                  dotColor="#D4D4D4"
+                  inactiveDotColor="#D4D4D4"
+                  dotStyle={styles.sliderBoxStyle}
+                  paginationBoxVerticalPadding={20}
+                />
+                <View style={styles.cardSocials}>
+                  <View style={styles.socialIcons}>
                     <Image
-                      source={Images.shareIcon}
-                      style={styles.shareImageStyle}
+                      source={Images.messageIcon}
+                      style={styles.msgIconStyle}
+                    />
+                    <Text text={postComments?.length} style={styles.timeText} />
+                  </View>
+                  <Pressable style={styles.socialIcons} onPress={addLikeAction}>
+                    <Image
+                      source={Images.heartIcon}
+                      style={[
+                        styles.likeImageStyle,
+                        { tintColor: param.liked ? "red" : "black" }
+                      ]}
+                      tintColor={param.liked ? "red" : "black"}
+                    />
+                    <Text
+                      text={param.likes ? param.likes : ""}
+                      style={styles.timeText}
                     />
                   </Pressable>
+                  <View style={styles.socialIcons}>
+                    <Pressable onPress={() => sharePost()}>
+                      <Image
+                        source={Images.shareIcon}
+                        style={styles.shareImageStyle}
+                      />
+                    </Pressable>
+                  </View>
                 </View>
               </View>
-            </View>
-            {postComments.map((comment, i) => {
-              return (
-                <View key={i} style={{ paddingHorizontal: 10 }}>
-                  <View style={styles.commentStyle}>
-                    <View style={styles.commentSection}>
-                      <Image
-                        source={
-                          comment.image
-                            ? { uri: comment.image }
-                            : Images.profile
-                        }
-                        style={styles.profileImg}
-                      />
-                      <View style={styles.commentBody}>
-                        <View style={styles.commentBodyStyle}>
-                          <View style={styles.commentUsername}>
-                            <View style={styles.commentHeading}>
-                              <Text
-                                text={comment.userName}
-                                style={styles.nameText}
-                              />
-                              {/* <Text text={calculatePostTime(comment)} style={styles.timeText} /> */}
-                            </View>
-                            <TouchableOpacity
-                              style={styles.dotImg}
-                              onPress={() => showMenu(comment)}
-                            >
-                              <Menu
-                                visible={visible?.id === comment.id}
-                                onRequestClose={() => hideMenu()}
+              {postComments.map((comment, i) => {
+                return (
+                  <View key={i} style={{ paddingHorizontal: 10 }}>
+                    <View style={styles.commentStyle}>
+                      <View style={styles.commentSection}>
+                        <Image
+                          source={
+                            comment.image
+                              ? { uri: comment.image }
+                              : Images.profile
+                          }
+                          style={styles.profileImg}
+                        />
+                        <View style={styles.commentBody}>
+                          <View style={styles.commentBodyStyle}>
+                            <View style={styles.commentUsername}>
+                              <View style={styles.commentHeading}>
+                                <Text
+                                  text={comment.userName}
+                                  style={styles.nameText}
+                                />
+                                {/* <Text text={calculatePostTime(comment)} style={styles.timeText} /> */}
+                              </View>
+                              <TouchableOpacity
+                                style={styles.dotImg}
+                                onPress={() => showMenu(comment)}
                               >
-                                {userDetail?.id === comment?.userId ? (
-                                  <MenuItem
-                                    textStyle={{ color: "red" }}
-                                    onPress={() =>
-                                      action(comment, "delete", false)
-                                    }
-                                  >
-                                    Remove comment
-                                  </MenuItem>
-                                ) : (
-                                  <MenuItem
-                                    onPress={() =>
-                                      action(comment, "report", false)
-                                    }
-                                  >
-                                    Report comment
-                                  </MenuItem>
-                                )}
-                              </Menu>
+                                <Menu
+                                  visible={visible?.id === comment.id}
+                                  onRequestClose={() => hideMenu()}
+                                >
+                                  {userDetail?.id === comment?.userId ? (
+                                    <MenuItem
+                                      textStyle={{ color: "red" }}
+                                      onPress={() =>
+                                        action(comment, "delete", false)
+                                      }
+                                    >
+                                      Remove comment
+                                    </MenuItem>
+                                  ) : (
+                                    <MenuItem
+                                      onPress={() =>
+                                        action(comment, "report", false)
+                                      }
+                                    >
+                                      Report comment
+                                    </MenuItem>
+                                  )}
+                                </Menu>
 
-                              <Image
-                                source={Images.etc}
-                                style={styles.profileImg}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <Text
-                            text={comment.text}
-                            style={styles.commentBodyText}
-                          />
-                        </View>
-                        <View style={styles.commentSecond}>
-                          <View style={styles.socialIcons}>
+                                <Image
+                                  source={Images.etc}
+                                  style={styles.profileImg}
+                                />
+                              </TouchableOpacity>
+                            </View>
                             <Text
-                              text={calculatePostTime(comment)}
-                              style={styles.comText}
+                              text={comment.text}
+                              style={styles.commentBodyText}
                             />
-                            <TouchableOpacity
-                              onPress={() => replyCommentData(comment)}
-                            >
-                              <Text text="Reply" style={styles.comText1} />
-                            </TouchableOpacity>
                           </View>
-                          <View style={styles.socialIcons}>
-                            <Text
-                              text={comment.likes}
-                              style={styles.comText2}
-                            />
-                            <TouchableOpacity
-                              onPress={() => likeComment(comment)}
-                            >
-                              <Image
-                                source={Images.heartIcon}
-                                style={[
-                                  styles.comImage,
-                                  { tintColor: comment.liked ? "red" : "black" }
-                                ]}
-                                tintColor={comment.liked ? "red" : "black"}
+                          <View style={styles.commentSecond}>
+                            <View style={styles.socialIcons}>
+                              <Text
+                                text={calculatePostTime(comment)}
+                                style={styles.comText}
                               />
-                            </TouchableOpacity>
+                              <TouchableOpacity
+                                onPress={() => replyCommentData(comment)}
+                              >
+                                <Text text="Reply" style={styles.comText1} />
+                              </TouchableOpacity>
+                            </View>
+                            <View style={styles.socialIcons}>
+                              <Text
+                                text={comment.likes}
+                                style={styles.comText2}
+                              />
+                              <TouchableOpacity
+                                onPress={() => likeComment(comment)}
+                              >
+                                <Image
+                                  source={Images.heartIcon}
+                                  style={[
+                                    styles.comImage,
+                                    {
+                                      tintColor: comment.liked ? "red" : "black"
+                                    }
+                                  ]}
+                                  tintColor={comment.liked ? "red" : "black"}
+                                />
+                              </TouchableOpacity>
+                            </View>
                           </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                  {comment?.subComment?.map((subComment, index) => {
-                    return (
-                      <View style={styles.subCommentStyle} key={index}>
-                        <View style={styles.subCom} />
-                        <View style={styles.subCom1}>
-                          <View style={styles.commentSection}>
-                            <Image
-                              source={
-                                subComment?.user_detail?.profile_picture
-                                  ? {
-                                      uri: subComment?.user_detail
-                                        ?.profile_picture
-                                    }
-                                  : Images.profile
-                              }
-                              style={styles.profileImg}
-                            />
-                            <View style={styles.commentBody}>
-                              <View style={styles.commentBodyStyle}>
-                                <View style={styles.commentUsername}>
-                                  <View style={styles.commentHeading}>
-                                    <Text
-                                      text={subComment?.user_detail?.username}
-                                      style={styles.nameText}
-                                    />
-                                  </View>
-                                  <TouchableOpacity
-                                    style={styles.dotImg}
-                                    onPress={() => {
-                                      setReportType(true)
-                                      showMenu(subComment)
-                                    }}
-                                  >
-                                    <Menu
-                                      visible={visible?.id === subComment.id}
-                                      onRequestClose={() => hideMenu()}
+                    {comment?.subComment?.map((subComment, index) => {
+                      return (
+                        <View style={styles.subCommentStyle} key={index}>
+                          <View style={styles.subCom} />
+                          <View style={styles.subCom1}>
+                            <View style={styles.commentSection}>
+                              <Image
+                                source={
+                                  subComment?.user_detail?.profile_picture
+                                    ? {
+                                        uri: subComment?.user_detail
+                                          ?.profile_picture
+                                      }
+                                    : Images.profile
+                                }
+                                style={styles.profileImg}
+                              />
+                              <View style={styles.commentBody}>
+                                <View style={styles.commentBodyStyle}>
+                                  <View style={styles.commentUsername}>
+                                    <View style={styles.commentHeading}>
+                                      <Text
+                                        text={subComment?.user_detail?.username}
+                                        style={styles.nameText}
+                                      />
+                                    </View>
+                                    <TouchableOpacity
+                                      style={styles.dotImg}
+                                      onPress={() => {
+                                        setReportType(true)
+                                        showMenu(subComment)
+                                      }}
                                     >
-                                      {userDetail?.id === subComment?.user ? (
-                                        <MenuItem
-                                          textStyle={{ color: "red" }}
-                                          onPress={() =>
-                                            action(subComment, "delete", true)
-                                          }
-                                        >
-                                          Remove reply
-                                        </MenuItem>
-                                      ) : (
-                                        <MenuItem
-                                          onPress={() =>
-                                            action(subComment, "report", true)
-                                          }
-                                        >
-                                          Report reply
-                                        </MenuItem>
-                                      )}
-                                    </Menu>
+                                      <Menu
+                                        visible={visible?.id === subComment.id}
+                                        onRequestClose={() => hideMenu()}
+                                      >
+                                        {userDetail?.id === subComment?.user ? (
+                                          <MenuItem
+                                            textStyle={{ color: "red" }}
+                                            onPress={() =>
+                                              action(subComment, "delete", true)
+                                            }
+                                          >
+                                            Remove reply
+                                          </MenuItem>
+                                        ) : (
+                                          <MenuItem
+                                            onPress={() =>
+                                              action(subComment, "report", true)
+                                            }
+                                          >
+                                            Report reply
+                                          </MenuItem>
+                                        )}
+                                      </Menu>
 
-                                    <Image
-                                      source={Images.etc}
-                                      style={styles.profileImg}
-                                    />
-                                  </TouchableOpacity>
-                                  {/* <View
+                                      <Image
+                                        source={Images.etc}
+                                        style={styles.profileImg}
+                                      />
+                                    </TouchableOpacity>
+                                    {/* <View
                                   source={Images.etc}
                                   style={styles.profileImg}
                                 /> */}
+                                  </View>
+                                  <Text
+                                    text={subComment.content}
+                                    style={styles.commentBodyText}
+                                  />
                                 </View>
-                                <Text
-                                  text={subComment.content}
-                                  style={styles.commentBodyText}
-                                />
-                              </View>
-                              <View style={styles.commentSecond}>
-                                <View style={styles.socialIcons}>
-                                  {true && (
-                                    <Text
-                                      text={calculatePostTime({
-                                        created_at: subComment.created
-                                      })}
-                                      style={styles.comText}
-                                    />
-                                  )}
-                                  {/* <Text text="Reply" style={styles.comText1} /> */}
-                                </View>
-                                <View style={styles.socialIcons}>
-                                  {false && (
-                                    <Text text="23" style={styles.comText2} />
-                                  )}
-                                  <TouchableOpacity
-                                    onPress={() => likeSubComment(subComment)}
-                                  >
-                                    <Image
-                                      source={Images.heartIcon}
-                                      style={[
-                                        styles.comImage,
-                                        {
-                                          tintColor: subComment.liked
-                                            ? "red"
-                                            : "black"
-                                        }
-                                      ]}
-                                    />
-                                  </TouchableOpacity>
+                                <View style={styles.commentSecond}>
+                                  <View style={styles.socialIcons}>
+                                    {true && (
+                                      <Text
+                                        text={calculatePostTime({
+                                          created_at: subComment.created
+                                        })}
+                                        style={styles.comText}
+                                      />
+                                    )}
+                                    {/* <Text text="Reply" style={styles.comText1} /> */}
+                                  </View>
+                                  <View style={styles.socialIcons}>
+                                    {false && (
+                                      <Text text="23" style={styles.comText2} />
+                                    )}
+                                    <TouchableOpacity
+                                      onPress={() => likeSubComment(subComment)}
+                                    >
+                                      <Image
+                                        source={Images.heartIcon}
+                                        style={[
+                                          styles.comImage,
+                                          {
+                                            tintColor: subComment.liked
+                                              ? "red"
+                                              : "black"
+                                          }
+                                        ]}
+                                      />
+                                    </TouchableOpacity>
+                                  </View>
                                 </View>
                               </View>
                             </View>
                           </View>
                         </View>
-                      </View>
-                    )
-                  })}
-                </View>
-              )
-            })}
-          </ScrollView>
-          {showCancelOption && (
-            <TouchableOpacity
+                      )
+                    })}
+                  </View>
+                )
+              })}
+            </ScrollView>
+            {showCancelOption && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "white",
+                  paddingHorizontal: 30,
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+                onPress={() => setCancelOption(false)}
+              >
+                <Text style={{ fontWeight: "700" }}>
+                  reply to {focusreply && focusreply.name}
+                </Text>
+                <Text style={{ fontWeight: "700" }}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+            <View
               style={{
-                backgroundColor: "white",
-                paddingHorizontal: 30,
                 flexDirection: "row",
-                justifyContent: "space-between"
-              }}
-              onPress={() => setCancelOption(false)}
-            >
-              <Text style={{ fontWeight: "700" }}>
-                reply to {focusreply && focusreply.name}
-              </Text>
-              <Text style={{ fontWeight: "700" }}>Cancel</Text>
-            </TouchableOpacity>
-          )}
-          <View style={{ flexDirection: "row" }}>
-            <TextInput
-              placeholder="Write a comment"
-              value={commentData}
-              onChangeText={value => setCommentData(value)}
-              style={{ paddingHorizontal: 20, width: "90%" }}
-              ref={inputRef}
-            />
-            <TouchableOpacity
-              style={{ justifyContent: "center" }}
-              onPress={() => {
-                commentData && addAComment()
+                paddingHorizontal: 10,
+                paddingVertical: Platform.OS === "ios" ? 10 : 0,
+                alignItems: "center"
               }}
             >
-              <Image
-                source={Images.arrowIcon}
-                style={{ height: 30, width: 30 }}
+              <TextInput
+                placeholder="Write a comment"
+                value={commentData}
+                onChangeText={value => setCommentData(value)}
+                style={{ paddingHorizontal: 10, flex: 1 }}
+                ref={inputRef}
               />
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      )}
-
+              <TouchableOpacity
+                style={{ justifyContent: "center" }}
+                onPress={() => {
+                  commentData && addAComment()
+                }}
+              >
+                <Image
+                  source={Images.sendIcon}
+                  style={{
+                    height: 20,
+                    width: 20,
+                    marginRight: 10
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </KeyboardAvoidingView>
       <Modal
         isVisible={isModalVisible}
         animationIn="zoomIn"
