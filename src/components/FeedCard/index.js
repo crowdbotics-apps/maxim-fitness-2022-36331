@@ -21,7 +21,6 @@ import { connect } from "react-redux"
 import { routeData } from "../../ScreenRedux/profileRedux"
 import { postDeleteRequest } from "../../ScreenRedux/feedRedux"
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
-import Modal from "react-native-modal"
 
 let deviceWidth = Dimensions.get("window").width
 let deviceHeight = Dimensions.get("window").height
@@ -95,11 +94,9 @@ const FeedCard = props => {
         showConfirmDialog(item.id)
       }, 500)
     } else {
-      hideMenu()
-      setModalVisible(true)
-      // setTimeout(() => {
-      //   setModalVisible(true)
-      // }, 500)
+      setTimeout(() => {
+        setModalVisible(true)
+      }, 1000)
     }
   }
 

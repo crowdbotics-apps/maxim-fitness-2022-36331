@@ -11,12 +11,13 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput
 } from "react-native"
-import { InputField, Text } from "../../components"
+import { Text } from "../../components"
 // redux
 import { forgetPassWordConfirm } from "../../ScreenRedux/loginRedux"
-import { Gutters, Layout, Global, Colors, Fonts, Images } from "../../theme"
+import { Gutters, Layout, Global, Colors, Images } from "../../theme"
 
 import LinearGradient from "react-native-linear-gradient"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -24,15 +25,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 const SetForgetPassword = props => {
   const {
     requesting,
-    navigation: { navigate, goBack }
+    navigation: { goBack }
   } = props
 
   const [token, setToken] = useState(false)
   const [password, setPassword] = useState(false)
-  const [showPassword, setShowPassword] = useState(true)
   const [passwordError, setPasswordError] = useState(false)
 
-  const { tinyLPadding, small2xHPadding } = Gutters
+  const { small2xHPadding } = Gutters
   const {
     row,
     fill,
@@ -45,8 +45,7 @@ const SetForgetPassword = props => {
     justifyContentBetween
   } = Layout
   const { secondaryBg } = Global
-  const { leftArrow, inputWrapper, passwordInput } = styles
-  const { textMedium } = Fonts
+  const { leftArrow } = styles
 
   const ResetPassWord = async () => {
     const data = {
@@ -67,7 +66,7 @@ const SetForgetPassword = props => {
   }, [password])
 
   return (
-    <SafeAreaView style={fill}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <KeyboardAwareScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
@@ -112,37 +111,28 @@ const SetForgetPassword = props => {
               >
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                   <View>
-                    <View style={[fullWidth, inputWrapper]}>
-                      <InputField
-                        inputStyle={[fullWidth, tinyLPadding, textMedium]}
+                    <View style={[fullWidth]}>
+                      <TextInput
+                        keyboardType="numeric"
                         value={token}
+                        maxLength={4}
                         onChangeText={value => setToken(value)}
+                        style={[styles.inputStyle, { marginTop: 9 }]}
                         placeholder="Token"
-                        autoCapitalize="none"
-                        titleTextStyle={textMedium}
                       />
                     </View>
-                    <View style={[fullWidth, passwordInput]}>
-                      <InputField
-                        inputStyle={[fullWidth, tinyLPadding, textMedium]}
+                    <View style={[fullWidth]}>
+                      <TextInput
+                        secureTextEntry={true}
                         value={password}
                         onChangeText={value => setPassword(value)}
+                        style={[styles.inputStyle, { marginTop: 18 }]}
                         placeholder="Enter new Password"
-                        autoCapitalize="none"
-                        titleTextStyle={textMedium}
-                        secureTextEntry={showPassword}
-                        showSecondImage
-                        sourceSecond={
-                          showPassword
-                            ? Images.hidePassword
-                            : Images.showPassword
-                        }
-                        onPressSecond={() => setShowPassword(!showPassword)}
                       />
                     </View>
                     <>
                       {passwordError && (
-                        <Text style={{ color: "red" }}>
+                        <Text style={{ color: "red", marginTop: 10 }}>
                           Password must be minimum length 8 and maximum length
                           16 characters (with at least a lowercase letter and
                           uppercase letter, a number and special character).
@@ -217,6 +207,13 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 15,
     fontWeight: "500"
+  },
+  inputStyle: {
+    height: 53,
+    borderRadius: 8,
+    borderColor: "#C4C4C4",
+    borderWidth: 1,
+    paddingHorizontal: 10
   },
   sendEmailButton: {
     height: 53,

@@ -90,5 +90,6 @@ export default {
   leftArrow: require("src/assets/images/left-arrow.png"),
   barCode: require("src/assets/images/barcode.png"),
   close: require("src/assets/images/close.png"),
-  closeBtn: require("src/assets/images/closeBtn.png")
+  closeBtn: require("src/assets/images/closeBtn.png"),
+  sendIcon: require("src/assets/images/sendIcon.png")
 }

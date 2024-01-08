@@ -10,7 +10,7 @@ const SubDropDown = ({ item, onSelect, unitText }) => {
       dropdownStyle={styles.dropdownStyle}
       dropdownTextStyle={styles.dropdownTextStyle}
       onSelect={(value, items) => onSelect(value, items)}
-      showsVerticalScrollIndicator={false}
+      showsVerticalScrollIndicator={true}
     >
       <View style={styles.modalButtonStyle}>
         <View>
@@ -31,11 +31,12 @@ const SubDropDown = ({ item, onSelect, unitText }) => {
 const styles = StyleSheet.create({
   dropdownButtonText: {
     fontSize: 14,
-    color: "black"
+    color: "black",
+    width: 113
   },
   dropdownImage: {
-    width: 15,
-    height: 15
+    width: 30,
+    height: 30
   },
   modalButtonStyle: {
     justifyContent: "center",

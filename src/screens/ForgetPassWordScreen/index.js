@@ -13,15 +13,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
-  Text
+  Text,
+  TextInput
 } from "react-native"
 
-import { InputField, Button } from "../../components"
 import LinearGradient from "react-native-linear-gradient"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-
-// translation
-// import { useTranslation } from "react-i18next"
 
 // redux
 import { forgetPassWord } from "../../ScreenRedux/loginRedux"
@@ -30,14 +27,11 @@ import { Gutters, Layout, Global, Colors, Fonts, Images } from "../../theme"
 const ForgetPassWordScreen = props => {
   const {
     requesting,
-    navigation: { navigate, goBack }
+    navigation: { goBack }
   } = props
 
   const [email, setEmail] = useState("")
-
-  // const { t } = useTranslation()
-
-  const { tinyLPadding, small2xHPadding } = Gutters
+  const { small2xHPadding } = Gutters
   const {
     row,
     fill,
@@ -49,15 +43,14 @@ const ForgetPassWordScreen = props => {
     justifyContentStart,
     justifyContentBetween
   } = Layout
-  const { leftArrow, iconWrapper, inputWrapper } = styles
-  const { textMedium } = Fonts
+  const { leftArrow } = styles
 
   const SendEmail = async () => {
     props.forgetPassWord({ email: email })
   }
 
   return (
-    <SafeAreaView style={fill}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <KeyboardAwareScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
@@ -98,14 +91,13 @@ const ForgetPassWordScreen = props => {
             >
               <View style={[justifyContentStart, fullWidth, small2xHPadding]}>
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                  <View style={[fullWidth, inputWrapper]}>
-                    <InputField
-                      inputStyle={[fullWidth, tinyLPadding, textMedium]}
+                  <View style={[fullWidth]}>
+                    <TextInput
+                      keyboardType="email-address"
                       value={email}
                       onChangeText={value => setEmail(value)}
+                      style={[styles.inputStyle, { marginTop: 9 }]}
                       placeholder={"Enter your email"}
-                      autoCapitalize="none"
-                      titleTextStyle={textMedium}
                     />
                   </View>
                 </TouchableWithoutFeedback>
@@ -176,6 +168,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center"
+  },
+  inputStyle: {
+    height: 53,
+    borderRadius: 8,
+    borderColor: "#C4C4C4",
+    borderWidth: 1,
+    paddingHorizontal: 10
   },
   sendEmailText: { fontSize: 16, color: "white", fontWeight: "700" }
 })
