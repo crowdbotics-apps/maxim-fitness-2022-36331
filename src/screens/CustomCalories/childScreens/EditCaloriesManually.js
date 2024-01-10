@@ -228,7 +228,9 @@ const EditCaloriesManually = props => {
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Math.round(param?.fat / profile?.number_of_meal)}
+                    text={Math.round(
+                      (param?.fat / profile?.number_of_meal) * 2
+                    )}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium

@@ -44,11 +44,11 @@ const EditCustomCal = props => {
   useEffect(() => {
     if (consumeCalories[0]?.goals_values) {
       consumeCalories[0]?.goals_values?.protein &&
-        setProtein(consumeCalories[0]?.goals_values?.protein / 100 / 20.45)
+        setProtein(consumeCalories[0]?.goals_values?.protein / 100 / 40)
       consumeCalories[0]?.goals_values?.carbs &&
-        setCarbs(consumeCalories[0]?.goals_values?.carbs / 20.45 / 100)
+        setCarbs(consumeCalories[0]?.goals_values?.carbs / 40 / 100)
       consumeCalories[0]?.goals_values?.fat &&
-        setFat(consumeCalories[0]?.goals_values?.fat / 20.45 / 100)
+        setFat(consumeCalories[0]?.goals_values?.fat / 20 / 100)
       consumeCalories[0]?.goals_values?.calories &&
         setCalories(consumeCalories[0]?.goals_values?.calories)
     }
@@ -61,21 +61,21 @@ const EditCustomCal = props => {
         type: "danger"
       })
     } else if (
-      Number((protein.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === "0"
+      Number((protein.toFixed(3) * 100 * 40).toFixed(2)).toFixed(0) === "0"
     ) {
       showMessage({
         message: "Protein value should be greater then 0",
         type: "danger"
       })
     } else if (
-      Number((carbs.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === "0"
+      Number((carbs.toFixed(3) * 100 * 40).toFixed(2)).toFixed(0) === "0"
     ) {
       showMessage({
         message: "Carbs value should be greater then 0",
         type: "danger"
       })
     } else if (
-      Number((fat.toFixed(2) * 100 * 20.45).toFixed(2)).toFixed(0) === "0"
+      Number((fat.toFixed(3) * 100 * 20).toFixed(2)).toFixed(0) === "0"
     ) {
       showMessage({
         message: "Fat value should be greater then 0",
@@ -87,24 +87,24 @@ const EditCustomCal = props => {
         // Number(calories).toFixed(0).length > 1
         //   ? Number(calories).toFixed(0)
         //   : Number(consumeCalories[0]?.goals_values?.calories),
-        protein: Math.round(protein * 100 * 20.45),
-        carbs: Math.round(carbs * 100 * 20.45),
-        fat: Math.round(fat * 100 * 20.45)
+        protein: Math.round(protein.toFixed(3) * 100 * 40),
+        carbs: Math.round(carbs.toFixed(3) * 100 * 40),
+        fat: Math.round(fat.toFixed(3) * 100 * 20)
       }
       props.navigation.navigate("EditCaloriesManually", data)
     }
   }
 
-  const calculateCalories = val => {
-    const persentage = val * 100
-    const dd = persentage * 20.45
+  const calculateCalories = (val, type) => {
+    const persentage = val.toFixed(3) * 100
+    const dd = persentage * (type === "fats" ? 20 : 40)
     return Math.round(dd)
   }
 
   const countCalories = () => {
     const proteins = protein && calculateCalories(protein)
     const carbes = carbs && calculateCalories(carbs)
-    const fates = fat && calculateCalories(fat)
+    const fates = fat && calculateCalories(fat, "fats")
     return parseFloat(proteins) + parseFloat(carbes) + parseFloat(fates)
   }
 
@@ -210,7 +210,8 @@ const EditCustomCal = props => {
                 ]}
               >
                 <Text
-                  text={`${(protein * 100).toFixed(0)}/%`}
+                  // text={`${(protein * 100).toFixed(0)}/%`}
+                  text={`40 %`}
                   style={fontSize15TextCenter}
                   bold
                 />
@@ -290,7 +291,8 @@ const EditCustomCal = props => {
                 ]}
               >
                 <Text
-                  text={`${(carbs * 100).toFixed(0)}/%`}
+                  // text={`${(carbs * 100).toFixed(0)}/%`}
+                  text={`40%`}
                   style={fontSize15TextCenter}
                   bold
                 />
@@ -370,7 +372,8 @@ const EditCustomCal = props => {
                 ]}
               >
                 <Text
-                  text={`${(fat * 100).toFixed(0)}/%`}
+                  // text={`${(fat * 100).toFixed(0)}/%`}
+                  text={`20 %`}
                   style={fontSize15TextCenter}
                   bold
                 />
@@ -400,7 +403,7 @@ const EditCustomCal = props => {
               <View style={[row, regularHMargin, Gutters.smallTMargin]}>
                 <View style={[row, fill, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={calculateCalories(fat)}
+                    text={calculateCalories(fat, "fats")}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium
