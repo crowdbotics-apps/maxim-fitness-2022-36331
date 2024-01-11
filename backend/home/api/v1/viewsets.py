@@ -153,6 +153,16 @@ class ProfileViewSet(ModelViewSet):
         male, female, rma, calories, age, fitness_goal, gender, activity_level = 0, 0, 0, 0, 0, 0, 0, 0
         u = ''
         current_date = datetime.now().strftime('%Y-%m-%d')
+        if request_from and request_from == "goal":
+            if self.request.data["fitness_goal"]:
+                obj = queryset[0]
+                obj.fitness_goal = self.request.data["fitness_goal"]
+                obj.save()
+        if request_from and request_from == "days":
+            obj = queryset[0]
+            if self.request.data["number_of_training_days"]:
+                obj.fitness_goal = self.request.data["number_of_training_days"]
+                obj.save()
         if request_from and request_from == 'mealTime':
             obj = queryset[0]
             no_meal = obj.number_of_meal
@@ -712,16 +722,21 @@ class SessionViewSet(ModelViewSet):
             day_no += 1
 
         d_no = day_with_date.get(start_date)
+        date_in_week_number = 1
         if d_no:
             if d_no <= 7:
+                date_in_week_number = 1
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 14:
+                date_in_week_number = 2
                 first_day = first_day + timedelta(days=7)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 21:
+                date_in_week_number = 3
                 first_day = first_day + timedelta(days=14)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 28:
+                date_in_week_number = 4
                 first_day = first_day + timedelta(days=21)
                 last_day = first_day + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[first_day, last_day])
@@ -735,6 +750,7 @@ class SessionViewSet(ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         data = {
             "week": int(how_many_week),
+            "date_in_week_number": date_in_week_number,
             "query": serializer.data
         }
         return Response(data)
