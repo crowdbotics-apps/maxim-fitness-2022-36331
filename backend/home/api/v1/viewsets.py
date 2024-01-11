@@ -706,7 +706,8 @@ class SessionViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user).order_by('date_time')
+        session = Session.objects.filter(user=self.request.user).last()
+        return Session.objects.filter(user=self.request.user, program_id=session.program.id).order_by('date_time')
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
