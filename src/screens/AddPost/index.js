@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  Dimensions
+  Dimensions,
+  Platform
 } from "react-native"
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from "react-native-image-crop-picker"
@@ -23,6 +24,8 @@ import { AddPostData } from "../../ScreenRedux/addPostRequest"
 import { useIsFocused } from "@react-navigation/native"
 
 const { closeIcon, colorAddIcon, circleClose } = Images
+
+const { width } = Dimensions.get("window")
 const AddPost = props => {
   const { navigation, AddPostData } = props
 
@@ -96,8 +99,6 @@ const AddPost = props => {
     })
   }
 
-  const { width } = Dimensions.get("window")
-
   const filterData = item => {
     let filterData = imageData.filter(v => v.path !== item.path)
     setImageData(filterData)
@@ -163,14 +164,31 @@ const AddPost = props => {
               <View
                 style={{ marginTop: 20, alignItems: "center", width: "50%" }}
               >
-                <Image
-                  style={{
-                    height: (173 / 375) * width,
-                    width: (145 / 375) * width,
-                    borderRadius: 15
-                  }}
-                  source={{ uri: item.path }}
-                />
+                {Platform.OS === "android" ? (
+                  <Image
+                    style={{
+                      height: (173 / 375) * width,
+                      width: (145 / 375) * width,
+                      borderRadius: 15
+                    }}
+                    source={{ uri: item.path }}
+                  />
+                ) : (
+                  <View
+                    style={{
+                      height: (173 / 375) * width,
+                      width: (145 / 375) * width,
+                      borderRadius: 15,
+                      backgroundColor: "black"
+                    }}
+                  >
+                    <Image
+                      style={styles.playicon}
+                      source={Images.sendMessage}
+                    />
+                  </View>
+                )}
+
                 <TouchableOpacity
                   onPress={() => filterData(item)}
                   style={{ position: "absolute", right: 30, top: 8 }}
@@ -234,6 +252,14 @@ const styles = StyleSheet.create({
     width: 8,
     marginTop: 46,
     marginLeft: 22
+  },
+  playicon: {
+    height: 50,
+    width: 50,
+    position: "absolute",
+    tintColor: "white",
+    top: (60 / 375) * width,
+    left: (50 / 375) * width
   }
 })
 
