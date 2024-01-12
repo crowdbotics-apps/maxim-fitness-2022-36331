@@ -125,6 +125,11 @@ export const feedsReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
+    case COMMENT_DELETE_REQUEST:
+      return {
+        ...state,
+        requesting: true
+      }
 
     case REPORT_REQUEST:
     case COMMENT_REPORT_REQUEST:
@@ -136,7 +141,8 @@ export const feedsReducer = (state = initialState, action) => {
     case REPORT_SUCCESS:
       return {
         ...state,
-        loading: false
+        loading: false,
+        requesting: false
       }
 
     case FEEDS_SUCCESS:
@@ -379,6 +385,7 @@ function* commentDelete({ data, callBack, isReply }) {
       type: "success"
     })
     callBack()
+    yield put(postReportSuccess())
   } catch (error) {
     yield put(postReportSuccess())
   }

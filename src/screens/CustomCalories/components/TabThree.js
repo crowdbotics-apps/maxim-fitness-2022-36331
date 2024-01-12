@@ -228,7 +228,7 @@ const TabThree = ({
                 Math.round(
                   consumeCalories[0]?.goals_values?.fat /
                     profileData?.number_of_meal
-                ) || 0
+                ) * 2 || 0
               }g`}
               style={fontSize15TextCenter}
             />
@@ -256,7 +256,8 @@ const TabThree = ({
           />
           <View style={styles.changeBtn}>
             <Text
-              text={`Standard ${protein + "/" + carbs + "/" + fats}`}
+              // text={`Standard ${protein + "/" + carbs + "/" + fats}`}
+              text={`Standard 40/40/20`}
               color="nonary"
               style={smallVPadding}
             />

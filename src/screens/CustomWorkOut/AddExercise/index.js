@@ -9,7 +9,8 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Linking
 } from "react-native"
 import { Text, BottomSheet, Button, InputField } from "../../../components"
 import Video from "react-native-video"
@@ -300,7 +301,12 @@ const AddExercies = props => {
       <View
         style={[row, { alignSelf: "center", marginTop: 20, marginBottom: 10 }]}
       >
-        <TouchableOpacity onPress={() => setShowModal(true)}>
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL("http://orumtraining.com/create-custom-workout")
+            // setShowModal(true)
+          }}
+        >
           <Text
             text="Watch This"
             style={[

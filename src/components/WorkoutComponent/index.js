@@ -160,7 +160,7 @@ const WorkoutComponent = ({
             styles.cardWrapperInner
           ]}
         >
-          {item.workouts.length > 0
+          {item?.workouts?.length > 0
             ? item.workouts.map((item, i) => {
                 return (
                   <TouchableOpacity

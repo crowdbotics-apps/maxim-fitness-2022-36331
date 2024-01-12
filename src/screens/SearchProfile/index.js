@@ -223,16 +223,26 @@ const SearchProfile = props => {
         <View
           style={{ paddingHorizontal: 20, flexDirection: "row", marginTop: 20 }}
         >
-          <TouchableOpacity
-            style={{ flex: 1, justifyContent: "center" }}
-            onPress={() => {
-              route.params?.isFeed
-                ? navigation.goBack()
-                : navigation.navigate("Feeds")
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center"
             }}
           >
-            <Image source={backImage} style={{ height: 20, width: 30 }} />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                paddingVertical: 5,
+                width: "30%"
+              }}
+              onPress={() => {
+                route.params?.isFeed
+                  ? navigation.goBack()
+                  : navigation.navigate("Feeds")
+              }}
+            >
+              <Image source={backImage} style={{ height: 20, width: 30 }} />
+            </TouchableOpacity>
+          </View>
           <View style={{ flex: 1.5 }}>
             <Text text="People" style={{ fontSize: 22 }} bold />
           </View>

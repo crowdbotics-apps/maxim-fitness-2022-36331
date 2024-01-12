@@ -165,8 +165,10 @@ const ProfileScreen = props => {
   const refRBSheet = useRef()
 
   const findIndex = i => {
-    const index = profileData?.post_image.findIndex(item => item.id === i.id)
-    setImageIndex(index)
+    if (i) {
+      const index = profileData?.post_image.findIndex(item => item.id === i.id)
+      setImageIndex(index)
+    }
   }
 
   function handleBackButtonClick() {
@@ -443,7 +445,7 @@ const ProfileScreen = props => {
                 </TouchableOpacity>
               </View>
               {calculatedData()?.length &&
-                calculatedData().map((item, i) => {
+                calculatedData()?.map((item, i) => {
                   return (
                     <View
                       style={{
@@ -471,21 +473,25 @@ const ProfileScreen = props => {
                           />
                         </TouchableOpacity>
                       ) : (
-                        <TouchableOpacity
-                          onPress={() => {
-                            findIndex(item[0])
-                            setIsVisible(true)
-                          }}
-                        >
-                          <Image
-                            source={{ uri: item[0]?.image }}
-                            style={{
-                              height: (300 / 375) * width,
-                              width: (175 / 375) * width,
-                              borderRadius: 20
+                        item[0]?.image && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (item[0]) {
+                                findIndex(item[0])
+                                setIsVisible(true)
+                              }
                             }}
-                          />
-                        </TouchableOpacity>
+                          >
+                            <Image
+                              source={{ uri: item[0]?.image }}
+                              style={{
+                                height: (300 / 375) * width,
+                                width: (175 / 375) * width,
+                                borderRadius: 20
+                              }}
+                            />
+                          </TouchableOpacity>
+                        )
                       )}
                       <View
                         style={{
@@ -493,7 +499,7 @@ const ProfileScreen = props => {
                           marginRight: i % 2 === 0 ? 0 : 10
                         }}
                       >
-                        {showVideo ? (
+                        {showVideo && item[1] ? (
                           <TouchableOpacity
                             onPress={() => [
                               setShowModal(true),
@@ -512,23 +518,25 @@ const ProfileScreen = props => {
                             />
                           </TouchableOpacity>
                         ) : (
-                          <TouchableOpacity
-                            onPress={() => {
-                              findIndex(item[1])
-                              setIsVisible(true)
-                            }}
-                          >
-                            <Image
-                              source={{ uri: item[1]?.image }}
-                              style={{
-                                height: (145 / 375) * width,
-                                width: (175 / 375) * width,
-                                borderRadius: 20
+                          item[1] && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                findIndex(item[1])
+                                setIsVisible(true)
                               }}
-                            />
-                          </TouchableOpacity>
+                            >
+                              <Image
+                                source={{ uri: item[1]?.image }}
+                                style={{
+                                  height: (145 / 375) * width,
+                                  width: (175 / 375) * width,
+                                  borderRadius: 20
+                                }}
+                              />
+                            </TouchableOpacity>
+                          )
                         )}
-                        {showVideo ? (
+                        {showVideo && item[2]?.video ? (
                           <TouchableOpacity
                             onPress={() => [
                               setShowModal(true),
@@ -548,22 +556,24 @@ const ProfileScreen = props => {
                             />
                           </TouchableOpacity>
                         ) : (
-                          <TouchableOpacity
-                            onPress={() => {
-                              findIndex(item[2])
-                              setIsVisible(true)
-                            }}
-                          >
-                            <Image
-                              source={{ uri: item[2]?.image }}
-                              style={{
-                                height: (145 / 375) * width,
-                                width: (175 / 375) * width,
-                                borderRadius: 20,
-                                marginTop: 10
+                          item[2] && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                findIndex(item[2])
+                                setIsVisible(true)
                               }}
-                            />
-                          </TouchableOpacity>
+                            >
+                              <Image
+                                source={{ uri: item[2]?.image }}
+                                style={{
+                                  height: (145 / 375) * width,
+                                  width: (175 / 375) * width,
+                                  borderRadius: 20,
+                                  marginTop: 10
+                                }}
+                              />
+                            </TouchableOpacity>
+                          )
                         )}
                       </View>
                     </View>
