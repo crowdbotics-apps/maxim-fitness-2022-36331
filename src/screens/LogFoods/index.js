@@ -141,24 +141,28 @@ const LogFoods = props => {
 
   useEffect(() => {
     if (speechState && speechState.length) {
+      speechState["total_quantity"] = speechState.serving_qty
+
       setSpeechData(speechState)
     }
   }, [speechState])
-
   useEffect(() => {
     if (brandedState) {
+      brandedState["total_quantity"] = brandedState.serving_qty
       setBrandedData([brandedState])
     }
   }, [brandedState])
 
   useEffect(() => {
     if (commonState && commonState.length) {
+      commonState["total_quantity"] = commonState.serving_qty
       setCommonData(commonState)
     }
   }, [commonState])
 
   useEffect(() => {
     if (scannedProduct) {
+      scannedProduct["total_quantity"] = scannedProduct.serving_qty
       setScanData([scannedProduct])
     }
   }, [scannedProduct])
@@ -177,10 +181,12 @@ const LogFoods = props => {
     let totalFatCalc = 0
     if (data && data.length) {
       data.forEach(item => {
-        totalCalc += Math.ceil(item.food.calories * item.unit.quantity)
-        totalProteinCalc += Math.ceil(item.food.proteins * item.unit.quantity)
-        totalCarbsCalc += Math.ceil(item.food.carbohydrate * item.unit.quantity)
-        totalFatCalc += Math.ceil(item.food.fat * item.unit.quantity)
+        totalCalc += Math.round(item.food.calories * item.unit.quantity)
+        totalProteinCalc += Math.round(item.food.proteins * item.unit.quantity)
+        totalCarbsCalc += Math.round(
+          item.food.carbohydrate * item.unit.quantity
+        )
+        totalFatCalc += Math.round(item.food.fat * item.unit.quantity)
       })
     }
     setTotalCalFirst(totalCalc)
@@ -209,18 +215,24 @@ const LogFoods = props => {
     let totalFatCalc = 0
     if (data && data.length) {
       data.forEach(item => {
-        totalCalc += Math.ceil(item.nf_calories * item.serving_qty)
-        totalProteinCalc += Math.ceil(item.nf_protein * item.serving_qty)
-        totalCarbsCalc += Math.ceil(
-          item.nf_total_carbohydrate * item.serving_qty
+        totalCalc += Math.round(
+          (item?.nf_calories / item.serving_qty) * item.total_quantity
         )
-        totalFatCalc += Math.ceil(item.nf_total_fat * item.serving_qty)
+        totalProteinCalc += Math.round(
+          (item.nf_protein / item.serving_qty) * item.total_quantity
+        )
+        totalCarbsCalc += Math.round(
+          item.nf_total_carbohydrate * item.total_quantity
+        )
+        totalFatCalc += Math.round(
+          (item.nf_total_fat / item.serving_qty) * item.total_quantity
+        )
       })
     }
-    setTotalCal(totalCalc)
-    setTotalProtein(totalProteinCalc)
-    setTotalCarbs(totalCarbsCalc)
-    setTotalFat(totalFatCalc)
+    setTotalCal(totalCalc || 0)
+    setTotalProtein(totalProteinCalc || 0)
+    setTotalCarbs(totalCarbsCalc || 0)
+    setTotalFat(totalFatCalc || 0)
   }
 
   const onDeleteSelectedProduct = item => {
@@ -373,7 +385,7 @@ const LogFoods = props => {
             weight: item.serving_weight_grams || 1,
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
-            serving_qty: item.serving_qty,
+            serving_qty: item.total_quantity,
             created: formatedDate
           }))
         : []
@@ -389,7 +401,7 @@ const LogFoods = props => {
             weight: item.serving_weight_grams || 1,
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
-            serving_qty: item.serving_qty,
+            serving_qty: item.total_quantity,
             created: formatedDate
           }))
         : []
@@ -405,7 +417,7 @@ const LogFoods = props => {
             weight: item.serving_weight_grams || 1,
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
-            serving_qty: item.serving_qty,
+            serving_qty: item?.total_quantity,
             created: formatedDate
           }))
         : []
@@ -442,26 +454,15 @@ const LogFoods = props => {
     return f.food.calories * f?.unit?.quantity
   }
 
-  const scanCalories = f => {
-    return f?.nf_calories * f?.serving_qty
-  }
-
-  const speechCalories = v => {
-    return v?.nf_calories * v?.serving_qty
-  }
-
-  const brandedCalories = cal => {
-    return cal?.nf_calories * cal?.serving_qty
-  }
-
-  const commonCalories = cal => {
-    return cal?.nf_calories * cal?.serving_qty
+  const calculateCalories = cal => {
+    const data = (cal?.nf_calories / cal.serving_qty) * cal.total_quantity
+    return data
   }
 
   const onChangeSpeech = (e, index) => {
     let arr = [...speechData]
     let objToUpdate = arr[index]
-    objToUpdate.serving_qty = e
+    objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtyVoice(e)
     setSpeechData(arr)
@@ -470,7 +471,7 @@ const LogFoods = props => {
   const onChangeCommon = (e, index) => {
     let arr = [...commonData]
     let objToUpdate = arr[index]
-    objToUpdate.serving_qty = e
+    objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtyCommon(e)
     setCommonData(arr)
@@ -479,7 +480,7 @@ const LogFoods = props => {
   const onChangeBranded = (e, index) => {
     let arr = [...brandedData]
     let objToUpdate = arr[index]
-    objToUpdate.serving_qty = e
+    objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtyBranded(e)
     setBrandedData(arr)
@@ -488,7 +489,7 @@ const LogFoods = props => {
   const onChangeScan = (e, index) => {
     let arr = [...scanData]
     let objToUpdate = arr[index]
-    objToUpdate.serving_qty = e
+    objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtyScan(e)
     setScanData(arr)
@@ -697,11 +698,11 @@ const LogFoods = props => {
                             <SwipeScanItem
                               item={item}
                               value={
-                                item?.serving_qty?.toString() ||
+                                item?.total_quantity?.toString() ||
                                 qtyScan.toString()
                               }
                               onChangeText={e => onChangeScan(e, index)}
-                              calories={scanCalories(item)}
+                              calories={calculateCalories(item)}
                             />
                           )
                         }}
@@ -739,11 +740,11 @@ const LogFoods = props => {
                             <SwipeBrandedItem
                               item={item}
                               value={
-                                item?.serving_qty?.toString() ||
+                                item?.total_quantity?.toString() ||
                                 qtyBranded.toString()
                               }
                               onChangeText={e => onChangeBranded(e, index)}
-                              calories={brandedCalories(item)}
+                              calories={calculateCalories(item)}
                             />
                           )
                         }}
@@ -781,11 +782,11 @@ const LogFoods = props => {
                               item={item}
                               index={index}
                               value={
-                                item?.serving_qty?.toString() ||
+                                item?.total_quantity?.toString() ||
                                 qtyCommon.toString()
                               }
                               onChangeText={e => onChangeCommon(e, index)}
-                              caloriesCalc={commonCalories(item)}
+                              caloriesCalc={calculateCalories(item)}
                             />
                           )
                         }}
@@ -823,11 +824,11 @@ const LogFoods = props => {
                               item={item}
                               index={index}
                               value={
-                                item?.serving_qty?.toString() ||
+                                item?.total_quantity?.toString() ||
                                 qtyVoice.toString()
                               }
                               onChangeText={e => onChangeSpeech(e, index)}
-                              caloriesCalc={speechCalories(item)}
+                              caloriesCalc={calculateCalories(item)}
                             />
                           )
                         }}
@@ -866,15 +867,15 @@ const LogFoods = props => {
             >
               <TableColumn
                 name="Protein"
-                value={Math.ceil(totalProtein) + Math.ceil(totalProteinFirst)}
+                value={Math.round(totalProtein) + Math.round(totalProteinFirst)}
               />
               <TableColumn
                 name="Carbs"
-                value={Math.ceil(totalCarbs) + Math.ceil(totalCarbsFirst)}
+                value={Math.round(totalCarbs) + Math.round(totalCarbsFirst)}
               />
               <TableColumn
                 name="Fat"
-                value={Math.ceil(totalFat) + Math.ceil(totalFatFirst)}
+                value={Math.round(totalFat) + Math.round(totalFatFirst)}
               />
             </View>
             <View style={[regularHPadding, tinyVPadding, center, row]}>
@@ -886,7 +887,7 @@ const LogFoods = props => {
                   style={[border, smallHPadding, styles.tableHeadRightText]}
                   numberOfLines={1}
                 >
-                  {Math.ceil(totalCal) + Math.ceil(totalCalFirst)}
+                  {Math.round(totalCal) + Math.round(totalCalFirst)}
                 </Text>
               </View>
             </View>

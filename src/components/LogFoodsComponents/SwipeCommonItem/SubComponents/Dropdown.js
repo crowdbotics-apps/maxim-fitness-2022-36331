@@ -6,7 +6,7 @@ const SubDropDown = ({ item, onSelect, unitText }) => {
   return (
     <ModalDropdown
       style={styles.dropdownContainer}
-      options={item.map(val => val.measure)}
+      options={item.map(val => (val?.name ? val?.name : val?.measure))}
       dropdownStyle={styles.dropdownStyle}
       dropdownTextStyle={styles.dropdownTextStyle}
       onSelect={(value, items) => onSelect(value, items)}

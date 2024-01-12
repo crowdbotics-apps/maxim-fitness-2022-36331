@@ -47,7 +47,8 @@ const ViewPost = props => {
     postData,
     feeds,
     userDetail,
-    loading
+    loading,
+    deleteLoading
   } = props
   let deviceWidth = Dimensions.get("window").width
   const [commentData, setCommentData] = useState(false)
@@ -283,7 +284,7 @@ const ViewPost = props => {
         behavior={Platform.OS === "ios" && "padding"}
         style={{ flex: 1 }}
       >
-        {requesting ? (
+        {requesting || deleteLoading ? (
           <SkeletonLoader />
         ) : (
           <>
@@ -876,7 +877,8 @@ const mapStateToProps = state => ({
   postData: state.postReducer.postData,
   userDetail: state.login.userDetail,
   feeds: state.feedsReducer.feeds,
-  loading: state.feedsReducer.loading
+  loading: state.feedsReducer.loading,
+  deleteLoading: state.feedsReducer.requesting
 })
 
 const mapDispatchToProps = dispatch => ({

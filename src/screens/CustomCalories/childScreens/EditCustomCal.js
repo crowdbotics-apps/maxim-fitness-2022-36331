@@ -55,28 +55,24 @@ const EditCustomCal = props => {
   }, [])
 
   const postEditCal = () => {
-    if (Number(calories).toFixed(0) < 10) {
+    if (Number(countCalories()).toFixed(0) < 10) {
       showMessage({
         message: "Calories value should be greater then 9",
         type: "danger"
       })
-    } else if (
-      Number((protein.toFixed(3) * 100 * 40).toFixed(2)).toFixed(0) === "0"
-    ) {
+    } else if (Number(protein?.toFixed(3) * 100 * 40)?.toFixed(0) <= 0) {
       showMessage({
         message: "Protein value should be greater then 0",
         type: "danger"
       })
     } else if (
-      Number((carbs.toFixed(3) * 100 * 40).toFixed(2)).toFixed(0) === "0"
+      Number((carbs.toFixed(3) * 100 * 40).toFixed(2)).toFixed(0) <= 0
     ) {
       showMessage({
         message: "Carbs value should be greater then 0",
         type: "danger"
       })
-    } else if (
-      Number((fat.toFixed(3) * 100 * 20).toFixed(2)).toFixed(0) === "0"
-    ) {
+    } else if (Number((fat.toFixed(3) * 100 * 20).toFixed(2)).toFixed(0) <= 0) {
       showMessage({
         message: "Fat value should be greater then 0",
         type: "danger"

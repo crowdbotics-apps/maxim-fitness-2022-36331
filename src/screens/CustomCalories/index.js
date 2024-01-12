@@ -332,12 +332,12 @@ const CustomCalories = props => {
                   return (
                     <TouchableOpacity
                       key={index}
-                      // onPress={() =>
-                      //   navigation.navigate("WorkoutCard", {
-                      //     summary: item.workouts,
-                      //     uppercard: item
-                      //   })
-                      // }
+                      onPress={() =>
+                        navigation.navigate("WorkoutCard", {
+                          summary: item.workouts,
+                          uppercard: item
+                        })
+                      }
                     >
                       <RuningWorkout
                         item={item}

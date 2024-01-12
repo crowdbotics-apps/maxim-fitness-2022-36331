@@ -202,7 +202,9 @@ const AddExercies = props => {
                       style={[
                         center,
                         {
-                          marginRight: 5,
+                          width: 70,
+                          height: 90,
+                          borderRadius: 5,
                           backgroundColor:
                             selectMuscle === i ? "#74ccff" : "white"
                         }
@@ -214,8 +216,15 @@ const AddExercies = props => {
                             ? Images.workout1
                             : { uri: item.image }
                         }
-                        style={{ width: 80, height: 80 }}
+                        style={{
+                          width: 60,
+                          height: 60,
+                          resizeMode: "contain",
+
+                          borderRadius: 5
+                        }}
                       />
+
                       <Text text={item.name} style={styles.exerciseText} />
                     </TouchableOpacity>
                   )
@@ -477,6 +486,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     lineHeight: 16,
+    marginTop: 5,
     opacity: 0.7
   },
   btn: {
