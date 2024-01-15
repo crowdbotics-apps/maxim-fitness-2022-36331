@@ -51,7 +51,7 @@ const TabOne = props => {
               <Image source={Images.icon} style={styles.imageStyle} />
             </View>
             <TouchableOpacity
-              onPress={setShowModal}
+              onPress={() => setShowModal("weight")}
               style={[row, justifyContentCenter, alignItemsEnd, fill]}
             >
               <Text text={profile?.weight} color="secondary" bold center />
@@ -65,7 +65,7 @@ const TabOne = props => {
           </LinearGradient>
         </DashboardCard>
         <DashboardCard style={fill}>
-          <TouchableOpacity>
+          <View>
             <LinearGradient
               start={start}
               end={end}
@@ -88,7 +88,7 @@ const TabOne = props => {
               {/* {netInfo.isConnected && loading && (
                     <ActivityIndicator size="large" color="#000" />
                   )} */}
-              <View>
+              <TouchableOpacity onPress={() => setShowModal("goal")}>
                 {profile?.fitness_goal === 1 && (
                   <Text text={"Fat Loss"} color="nonary" bold center />
                 )}
@@ -103,9 +103,9 @@ const TabOne = props => {
                 {profile?.fitness_goal === 3 && (
                   <Text text={"Maintenance"} color="nonary" bold center />
                 )}
-              </View>
+              </TouchableOpacity>
             </LinearGradient>
-          </TouchableOpacity>
+          </View>
         </DashboardCard>
       </View>
       <View style={[row, justifyContentBetween, alignItemsCenter]}>
@@ -128,7 +128,10 @@ const TabOne = props => {
               <Text text={"Training"} color="quinary" bold center />
               <Image source={Images.programsIcon} style={styles.imageStyle} />
             </View>
-            <View style={[justifyContentStart, alignItemsStart]}>
+            <TouchableOpacity
+              onPress={() => setShowModal("days")}
+              style={[justifyContentStart, alignItemsStart]}
+            >
               <Text
                 text={profile?.number_of_training_days}
                 color="nonary"
@@ -136,7 +139,7 @@ const TabOne = props => {
                 center
               />
               <Text text="Days" color="septenary" center />
-            </View>
+            </TouchableOpacity>
           </LinearGradient>
         </DashboardCard>
         <DashboardCard style={fill} />

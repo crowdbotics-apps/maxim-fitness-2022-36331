@@ -87,7 +87,7 @@ const ViewPost = props => {
   }, [param?.id])
 
   useEffect(() => {
-    if (postData && postData?.comments?.length) {
+    if (postData && postData?.comments?.length > 0) {
       let data = [
         postData &&
           postData?.comments?.length &&
@@ -104,6 +104,8 @@ const ViewPost = props => {
           }))
       ]
       setPostComments(data[0])
+    } else {
+      setPostComments([])
     }
   }, [postData?.comments])
 

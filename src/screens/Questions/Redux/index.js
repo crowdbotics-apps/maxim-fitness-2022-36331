@@ -1,58 +1,58 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { all, call, put, takeLatest } from "redux-saga/effects"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 //URL
-import { API_URL } from '../../../config/app';
+import { API_URL } from "../../../config/app"
 
 //XHR
-import XHR from '../../../utils/XHR';
+import XHR from "../../../utils/XHR"
 
 // Action
-import { profileData } from '../../../ScreenRedux/profileRedux';
+import { profileData } from "../../../ScreenRedux/profileRedux"
 
-const UPDATE_ANSWERS = 'Questions/redux/UPDATE_ANSWERS';
-const RENDER_DATA = 'Questions/redux/RENDER_DATA';
-const UPDATE_ANSWERS_RESET = 'Questions/redux/UPDATE_ANSWERS_RESET';
+const UPDATE_ANSWERS = "Questions/redux/UPDATE_ANSWERS"
+const RENDER_DATA = "Questions/redux/RENDER_DATA"
+const UPDATE_ANSWERS_RESET = "Questions/redux/UPDATE_ANSWERS_RESET"
 
-const QUESTION_DATA_REQUEST = 'QuestionScreen/QUESTION_DATA_REQUEST';
-const QUESTION_DATA_SUCCESS = 'QuestionScreen/QUESTION_DATA_SUCCESS';
-const QUESTION_DATA_FAILURE = 'QuestionScreen/QUESTION_DATA_FAILURE';
+const QUESTION_DATA_REQUEST = "QuestionScreen/QUESTION_DATA_REQUEST"
+const QUESTION_DATA_SUCCESS = "QuestionScreen/QUESTION_DATA_SUCCESS"
+const QUESTION_DATA_FAILURE = "QuestionScreen/QUESTION_DATA_FAILURE"
 
 export const renderTabs = () => ({
-  type: RENDER_DATA,
-});
+  type: RENDER_DATA
+})
 
 export const updateAnswer = data => ({
   type: UPDATE_ANSWERS,
-  data,
-});
+  data
+})
 
 export const submitQuestionRequest = (profile, data) => ({
   type: QUESTION_DATA_REQUEST,
   profile,
-  data,
-});
+  data
+})
 
 export const submitQuestionSuccess = data => ({
   type: QUESTION_DATA_SUCCESS,
-  data,
-});
+  data
+})
 
 export const submitQuestionFailure = error => ({
   type: QUESTION_DATA_FAILURE,
-  error,
-});
+  error
+})
 
 export const resetQuestions = () => ({
-  type: UPDATE_ANSWERS_RESET,
-});
+  type: UPDATE_ANSWERS_RESET
+})
 
 const initialState = {
   answers: {},
   requesting: false,
   questionSuccess: false,
   questionError: false,
-  renderTab: false,
-};
+  renderTab: false
+}
 
 //Reducers
 export const questionReducer = (state = initialState, action) => {
@@ -60,87 +60,87 @@ export const questionReducer = (state = initialState, action) => {
     case RENDER_DATA:
       return {
         ...state,
-        renderTab: true,
-      };
+        renderTab: true
+      }
 
     case UPDATE_ANSWERS:
       return {
         ...state,
-        answers: action.data,
-      };
+        answers: action.data
+      }
 
     case QUESTION_DATA_REQUEST:
       return {
         ...state,
-        requesting: true,
-      };
+        requesting: true
+      }
 
     case QUESTION_DATA_SUCCESS:
       return {
         ...state,
         questionSuccess: action.data,
-        requesting: false,
-      };
+        requesting: false
+      }
 
     case QUESTION_DATA_FAILURE:
       return {
         ...state,
         questionError: action.data,
-        requesting: false,
-      };
+        requesting: false
+      }
 
     case UPDATE_ANSWERS_RESET:
       return {
         ...state,
         answers: {},
-        renderTab: false,
-      };
+        renderTab: false
+      }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 async function profileDataAPI(profile, data) {
-  const token = await AsyncStorage.getItem('authToken');
-  const URL = `${API_URL}/profile/${profile.id}/`;
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/profile/${profile.id}/`
   const options = {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
     },
-    method: 'PATCH',
-    data,
-  };
-  return XHR(URL, options);
+    method: "PATCH",
+    data
+  }
+  return XHR(URL, options)
 }
 
 async function submitQuestionAPI(data) {
-  const token = await AsyncStorage.getItem('authToken');
-  const URL = `${API_URL}/form/set_program/`;
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/form/set_program/`
   const options = {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
     },
-    method: 'POST',
-    data,
-  };
-  return XHR(URL, options);
+    method: "POST",
+    data
+  }
+  return XHR(URL, options)
 }
 
 function* submitQuestion({ profile, data }) {
   try {
-    const res = yield call(profileDataAPI, profile, data);
+    const res = yield call(profileDataAPI, profile, data)
     if (res) {
-      const response = yield call(submitQuestionAPI, data);
+      const response = yield call(submitQuestionAPI, data)
       if (response.status === 200) {
-        yield put(profileData());
+        yield put(profileData())
       }
     }
-    yield put(submitQuestionSuccess(true));
+    yield put(submitQuestionSuccess(true))
   } catch (error) {
-    yield put(submitQuestionSuccess(false));
+    yield put(submitQuestionSuccess(false))
   }
 }
-export default all([takeLatest(QUESTION_DATA_REQUEST, submitQuestion)]);
+export default all([takeLatest(QUESTION_DATA_REQUEST, submitQuestion)])

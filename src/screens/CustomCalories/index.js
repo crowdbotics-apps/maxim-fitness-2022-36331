@@ -26,8 +26,10 @@ import {
 } from "../../components"
 import { ScrollView as Content } from "native-base"
 import Icon from "react-native-vector-icons/FontAwesome5"
-import { Layout, Global, Gutters, Colors, Images } from "../../theme"
+import { Layout, Global, Gutters, Colors, Images, Fonts } from "../../theme"
 import { calculatePostTime } from "../../utils/functions"
+import { exerciseArray } from "../../utils/utils"
+
 import { TabOne, TabThree } from "./components"
 import {
   getCustomCalRequest,
@@ -62,12 +64,15 @@ const CustomCalories = props => {
   } = props
 
   let refWeight = useRef("")
+  let refTrainingDay = useRef("")
   const { state, dispatch } = useStore()
   const [tab, setTab] = useState(2)
   const [value, setValue] = useState(false)
   const [currentTab, setCurrentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [showModalHistory, setShowModalHistory] = useState(false)
+  const [exerciseLevel, setExerciseLevel] = useState(false)
+  const [typeData, setTypeData] = useState(false)
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
@@ -216,6 +221,43 @@ const CustomCalories = props => {
     }
   }
 
+  const exerciseDaysArray = [
+    { value: 1, text: "3 Days", days: 3 },
+    { value: 2, text: "4 Days", days: 4 },
+    { value: 3, text: "5 Days", days: 5 }
+  ]
+
+  const updateData = type => {
+    setTypeData(type)
+    if (type === "weight") {
+      refWeight?.current?.open()
+      setValue(`${profile.weight}`)
+    } else {
+      refTrainingDay?.current?.open()
+      setExerciseLevel(
+        type === "goal" ? profile.fitness_goal : profile.number_of_training_days
+      )
+    }
+  }
+
+  const updateFitnessAndDays = () => {
+    let data
+    if (typeData === "days") {
+      data = {
+        number_of_training_days: exerciseLevel,
+        request_type: "days"
+      }
+    } else {
+      data = {
+        fitness_goal: exerciseLevel,
+        request_type: "goal"
+      }
+    }
+    props.submitQuestionRequest(profile, data)
+    setExerciseLevel(false)
+    refTrainingDay.current.close()
+  }
+
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
       <ProfileComponent
@@ -263,10 +305,7 @@ const CustomCalories = props => {
       >
         {tab === 0 && (
           <TabOne
-            setShowModal={() => {
-              setValue(`${profile.weight}`)
-              refWeight.current.open()
-            }}
+            setShowModal={updateData}
             profile={profile}
             signOut={logOut}
             connectAlexa={() => navigation.navigate("Alexa")}
@@ -520,33 +559,158 @@ const CustomCalories = props => {
 
       {/*===============================================*/}
       <BottomSheet reff={refWeight} h={200}>
-        <View style={[fill, regularHMargin, regularVMargin]}>
-          <ModalInput
-            value={value}
-            onChangeText={val => setValue(val)}
-            placeholder="Enter weight..."
-            keyboardType="numeric"
-            text="Update weight"
-          />
-        </View>
-        <View style={[row, regularVMargin]}>
-          <Button
-            color="primary"
-            text="Update"
-            style={[regularHMargin, fill, center]}
-            onPress={() => {
-              const data = {
-                weight: value,
-                request_type: "weightUpdate"
-              }
-              props.submitQuestionRequest(profile, data)
-              setValue("")
-              refWeight.current.close()
-            }}
-          />
+        <View style={{ flex: 1, marginHorizontal: 20 }}>
+          <View style={[fill, regularHMargin, regularVMargin]}>
+            <ModalInput
+              value={value}
+              onChangeText={val => setValue(val)}
+              placeholder="Enter weight..."
+              keyboardType="numeric"
+              text="Update weight"
+            />
+          </View>
+
+          <View style={[row, regularVMargin]}>
+            <Button
+              color="primary"
+              text="Update"
+              style={[regularHMargin, fill, center]}
+              onPress={() => {
+                const data = {
+                  weight: value,
+                  request_type: "weightUpdate"
+                }
+                props.submitQuestionRequest(profile, data)
+                setValue("")
+                refWeight.current.close()
+              }}
+            />
+          </View>
         </View>
       </BottomSheet>
       {/*===============================================*/}
+
+      <BottomSheet reff={refTrainingDay} h={500}>
+        <View style={{ flex: 1, marginHorizontal: 20 }}>
+          {typeData === "goal" ? (
+            <>
+              <View style={Gutters.mediumTMargin}>
+                <Text
+                  color="commonCol"
+                  style={Fonts.titleRegular}
+                  text={"What is your fitness goal?"}
+                />
+              </View>
+              <View
+                style={[
+                  Layout.justifyContentStart,
+                  Layout.fill,
+                  Gutters.mediumTMargin
+                ]}
+              >
+                {exerciseArray?.map((item, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[
+                      Layout.row,
+                      Gutters.smallHPadding,
+                      Gutters.regularVPadding,
+                      Layout.alignItemsCenter,
+                      Layout.justifyContentBetween,
+                      exerciseLevel === item.value
+                        ? Global.border
+                        : Global.borderB,
+                      exerciseLevel !== item.value
+                        ? Global.borderAlto
+                        : { borderColor: Colors.primary }
+                    ]}
+                    onPress={() => setExerciseLevel(item.value)}
+                  >
+                    <View style={[Layout.justifyContentBetween]}>
+                      <Text
+                        text={item.heading}
+                        style={{
+                          fontSize: 20,
+                          color: "#6f6f6f",
+                          fontWeight: "600"
+                        }}
+                      />
+                      <Text
+                        style={{ color: "#7d7d7d", marginTop: 5 }}
+                        text={item.description}
+                      />
+                    </View>
+                    <Image
+                      source={Images.forwardIcon}
+                      style={styles.rightArrow}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={Gutters.mediumTMargin}>
+                <Text
+                  color="commonCol"
+                  style={Fonts.titleRegular}
+                  text={"How many days a week do you want to train?"}
+                />
+              </View>
+              <View
+                style={[
+                  Layout.justifyContentStart,
+                  Layout.fill,
+                  Gutters.mediumTMargin
+                ]}
+              >
+                {exerciseDaysArray?.map((item, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[
+                      Layout.row,
+                      Gutters.smallHPadding,
+                      Gutters.regularVPadding,
+                      Layout.alignItemsCenter,
+                      Layout.justifyContentBetween,
+                      exerciseLevel === item.days
+                        ? Global.border
+                        : Global.borderB,
+                      exerciseLevel !== item.days
+                        ? Global.borderAlto
+                        : { borderColor: Colors.primary }
+                    ]}
+                    onPress={() => setExerciseLevel(item.days)}
+                  >
+                    <View style={[Layout.justifyContentBetween]}>
+                      <Text
+                        text={item.text}
+                        style={{
+                          fontSize: 20,
+                          color: "#6f6f6f",
+                          fontWeight: "600"
+                        }}
+                      />
+                    </View>
+                    <Image
+                      source={Images.forwardIcon}
+                      style={styles.rightArrow}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+          <View style={[row, regularVMargin]}>
+            <Button
+              color="primary"
+              text="Update"
+              style={[regularHMargin, fill, center]}
+              onPress={updateFitnessAndDays}
+            />
+          </View>
+        </View>
+      </BottomSheet>
 
       <Modal
         animationType="slide"
@@ -741,6 +905,12 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderWidth: 1,
     borderColor: "gray"
+  },
+  rightArrow: {
+    height: 20,
+    width: 20,
+    resizeMode: "contain",
+    tintColor: Colors.nobel
   }
 })
 

@@ -58,7 +58,7 @@ const AddExercies = props => {
         getExerciseState && getExerciseState[0]?.id,
         ""
       )
-    !activeSet && setActiveSet(data[0])
+    // !activeSet && setActiveSet(data[0])
   }, [getExerciseState])
 
   const onSelectItem = i => {
@@ -412,7 +412,7 @@ const AddExercies = props => {
             })}
         </ScrollView>
         <View style={{ position: "absolute", bottom: 0, alignSelf: "center" }}>
-          <Button
+          {/* <Button
             text={"Add Exercies"}
             textStyle={[{ color: "white" }]}
             style={styles.addBtnStyle}
@@ -424,7 +424,7 @@ const AddExercies = props => {
                 : selectedItem?.length < 1
             }
             onPress={makeDataParams}
-          />
+          /> */}
         </View>
       </BottomSheet>
       <Modal

@@ -27,7 +27,7 @@ const MealEmptyItem = ({
     let currentD = moment(new Date()).format("YYYY-MM-DD")
     item?.map(item => {
       if (moment(item.created).format("YYYY-MM-DD") === currentD) {
-        carbs += Math.round(item.food.carbohydrate * item.unit.quantity)
+        carbs += Math.round(item.food.carbohydrate)
       }
     })
     return carbs
@@ -37,7 +37,7 @@ const MealEmptyItem = ({
     let currentD = moment(new Date()).format("YYYY-MM-DD")
     item?.map(item => {
       if (moment(item.created).format("YYYY-MM-DD") === currentD) {
-        protien += Math.round(item.food.proteins * item.unit.quantity)
+        protien += Math.round(item.food.proteins)
       }
     })
     return protien
@@ -47,7 +47,7 @@ const MealEmptyItem = ({
     let currentD = moment(new Date()).format("YYYY-MM-DD")
     item?.map(item => {
       if (moment(item.created).format("YYYY-MM-DD") === currentD) {
-        fat += Math.round(item.food.fat * item.unit.quantity)
+        fat += Math.round(item.food.fat)
       }
     })
     return fat

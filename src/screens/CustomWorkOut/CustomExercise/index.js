@@ -111,6 +111,14 @@ const CustomExercise = props => {
     setDualReps(tempObj)
   }
 
+  const keepRes = () => {
+    setDroupSets({
+      ...droupSet,
+      state1: reps,
+      state2: reps
+    })
+  }
+
   const updateDroupSets = value => {
     const tempObj = { ...droupSet }
     const key = `state${selectIndex + 1}`
@@ -128,6 +136,7 @@ const CustomExercise = props => {
     }))
   }
 
+  console.log("dualReps", dualReps)
   const updateSecondsSets = value => {
     setTimeData(prevState => ({
       ...prevState,
@@ -495,9 +504,12 @@ const CustomExercise = props => {
 
                 <TextInput
                   style={{
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: "700",
                     color: "#5e5e5e",
+                    borderBottomColor: "black",
+                    borderBottomWidth: 1,
+                    paddingBottom: -1,
                     marginTop:
                       activeSet &&
                       (activeSet?.item === "Drop Set" ||
@@ -526,10 +538,7 @@ const CustomExercise = props => {
                       .map((item, index) => (
                         <Pressable
                           // onPress={() => {
-                          //   const entries = Object.entries(droupSet);
-                          //   const checkIndex = index < entries.length;
-                          //   checkIndex && setReps(entries?.[index][1]);
-                          //   setSelectIndex(index);
+                          //   droupSet?.state2 && setReps(droupSet?.state2)
                           // }}
                           style={{
                             height: 5,
@@ -646,15 +655,7 @@ const CustomExercise = props => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    if (sets?.length) {
-                      if (sets[sets?.length - 1]?.reps.includes("/")) {
-                        const array = sets[sets?.length - 1]?.reps.split("/")
-                        updateDroupSets(array[selectIndex])
-                        setReps(array[selectIndex])
-                      } else {
-                        setReps(sets[sets?.length - 1]?.reps)
-                      }
-                    }
+                    keepRes()
                   }}
                 >
                   <Image source={radioBlue} style={{ width: 20, height: 20 }} />
@@ -898,7 +899,8 @@ const CustomExercise = props => {
                       fontSize: 24,
                       fontWeight: "700",
                       color: "#5e5e5e",
-                      marginTop: 5
+                      marginTop: 5,
+                      borderBottomWidth: 1
                     }}
                     value={temporaryReps}
                     keyboardType="number-pad"
@@ -930,6 +932,7 @@ const CustomExercise = props => {
                       source={radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
+                    {console.log("dualSets", temporaryReps)}
                   </TouchableOpacity>
                   <Text
                     style={{
