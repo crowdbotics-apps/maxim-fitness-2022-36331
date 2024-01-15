@@ -161,7 +161,7 @@ class ProfileViewSet(ModelViewSet):
         if request_from and request_from == "days":
             obj = queryset[0]
             if self.request.data["number_of_training_days"]:
-                obj.fitness_goal = self.request.data["number_of_training_days"]
+                obj.number_of_training_days = self.request.data["number_of_training_days"]
                 obj.save()
         if request_from and request_from == 'mealTime':
             obj = queryset[0]
