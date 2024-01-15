@@ -75,7 +75,7 @@ const SwipeCommonItem = ({
           </View>
           <View style={styles.caloriesContainer}>
             <Text style={styles.caloriesText}>
-              {Math.ceil(caloriesCalc) || 0}
+              {Math.round(caloriesCalc) || 0}
             </Text>
             <Text style={styles.caloriesTextStatic}>Cal</Text>
           </View>

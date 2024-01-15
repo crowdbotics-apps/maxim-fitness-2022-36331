@@ -1,22 +1,32 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TextInput } from 'react-native';
-import Font from '../../../assets/images/fonts';
-import { Gutters, Layout, Global } from '../../../theme';
+import React from "react"
+import { View, Text, StyleSheet, Image, TextInput } from "react-native"
+import Font from "../../../assets/images/fonts"
+import { Gutters, Layout, Global } from "../../../theme"
 
 const SwipeScanItem = ({ item, index, value, onChangeText, calories }) => {
-  const { smallVMargin, smallLPadding, smallRPadding } = Gutters;
-  const { row, center } = Layout;
-  const { border } = Global;
+  const { smallVMargin, smallLPadding, smallRPadding } = Gutters
+  const { row, center } = Layout
+  const { border } = Global
   return (
-    <View style={[smallVMargin, row, center, border, styles.containerSwipeItem]} key={index}>
+    <View
+      style={[smallVMargin, row, center, border, styles.containerSwipeItem]}
+      key={index}
+    >
       <View style={[smallLPadding, smallRPadding, styles.mainSwipeContainer]}>
         <View style={styles.mainUpperContainer}>
           <View style={styles.imageSwipeItem}>
-            <Image style={styles.imageSwipe} source={{ uri: item?.photo?.thumb }} />
+            <Image
+              style={styles.imageSwipe}
+              source={{ uri: item?.photo?.thumb }}
+            />
           </View>
           <View style={styles.mainInputQtyWrapper}>
             <View style={styles.inputWrapperContainer}>
-              <TextInput style={styles.quantityText} onChangeText={onChangeText} value={value} />
+              <TextInput
+                style={styles.quantityText}
+                onChangeText={onChangeText}
+                value={value}
+              />
             </View>
             <View style={styles.qtyParentWrapper}>
               <Text style={styles.unitText} numberOfLines={1}>
@@ -32,115 +42,115 @@ const SwipeScanItem = ({ item, index, value, onChangeText, calories }) => {
             </Text>
           </View>
           <View style={styles.caloriesContainer}>
-            <Text style={styles.caloriesText}>{Math.ceil(calories) || 0}</Text>
+            <Text style={styles.caloriesText}>{Math.round(calories) || 0}</Text>
             <Text style={styles.caloriesTextStatic}>Cal</Text>
           </View>
         </View>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   nameText: {
     fontFamily: Font.HELVETICA_NORMAL,
     fontSize: 15,
     lineHeight: 15,
-    color: 'black',
+    color: "black"
   },
   caloriesTextStatic: {
     fontFamily: Font.HELVETICA_MEDIUM,
-    color: 'black',
+    color: "black",
     fontSize: 14,
-    lineHeight: 14,
+    lineHeight: 14
   },
   quantityText: {
     fontFamily: Font.HELVETICA_MEDIUM,
-    color: 'black',
+    color: "black",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     height: 40,
-    textAlign: 'center',
+    textAlign: "center"
   },
   unitText: {
     fontFamily: Font.HELVETICA_MEDIUM,
-    color: 'black',
+    color: "black",
     fontSize: 16,
     lineHeight: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold"
   },
   caloriesText: {
     fontFamily: Font.HELVETICA_MEDIUM,
-    color: 'rgb(68, 161, 250)',
+    color: "rgb(68, 161, 250)",
     fontSize: 14,
     lineHeight: 16,
-    marginHorizontal: 8,
+    marginHorizontal: 8
   },
   nameContainer: {
     flex: 2,
-    flexDirection: 'row',
-    paddingLeft: 5,
+    flexDirection: "row",
+    paddingLeft: 5
   },
   caloriesContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    flexDirection: 'row',
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    flexDirection: "row"
   },
   inputWrapperContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
     borderRadius: 10,
     height: 50,
     width: 60,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   mainUpperContainer: {
     flex: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   mainSwipeContainer: {
-    flex: 7,
+    flex: 7
   },
   containerSwipeItem: {
     height: 110,
     borderRadius: 20,
-    borderColor: '#d6d5d5',
-    backgroundColor: '#f3f1f4',
-    marginBottom: 30,
+    borderColor: "#d6d5d5",
+    backgroundColor: "#f3f1f4",
+    marginBottom: 30
   },
   imageSwipeItem: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
     borderRadius: 10,
     height: 50,
-    width: 130,
+    width: 130
   },
   imageSwipe: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: "contain"
   },
   qtyParentWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
     borderRadius: 10,
     height: 50,
-    flex: 1,
+    flex: 1
   },
   mainInputQtyWrapper: {
     flex: 4,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 20,
-  },
-});
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 20
+  }
+})
 
-export default SwipeScanItem;
+export default SwipeScanItem

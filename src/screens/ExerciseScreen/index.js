@@ -342,6 +342,11 @@ const ExerciseScreen = props => {
     // })
   }
 
+  const checkDoneExcercise = () => {
+    const allDone = selectedSession?.every(item => item.done === true)
+    return allDone
+  }
+
   return (
     <SafeAreaView style={[fill, { backgroundColor: "#F2F2F2" }]}>
       <View
@@ -652,7 +657,7 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                         setStartTimer(false)
                       }}
-                      isDisable={timmer}
+                      isDisable={timmer || !checkDoneExcercise()}
                     />
                   </ScrollView>
                 </View>

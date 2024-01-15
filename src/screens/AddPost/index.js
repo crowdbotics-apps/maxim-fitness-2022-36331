@@ -55,14 +55,18 @@ const AddPost = props => {
 
   const aa = () => {
     let formData = new FormData()
-    formData.append("content", content)
+    const videoExtensions = ["mp4", "mov", "avi", "mkv"]
     // formData.append('video_thumbnail', {
     //   uri: videoThumbnail.path,
     //   type: videoThumbnail.mime,
     //   name: videoThumbnail.path,
     // });
     imageData.map((item, index) => {
-      if (item.mime === "video/mp4") {
+      const fileExtension = item?.path?.split(".").pop().toLowerCase()
+      if (
+        item?.mime.startsWith("video/") &&
+        videoExtensions.includes(fileExtension)
+      ) {
         formData.append("video", {
           uri: item.path,
           type: item.mime,

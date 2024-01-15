@@ -41,6 +41,7 @@ const FatLoseProgram = props => {
   const [index, setIndex] = useState(false)
   const [isModal, setIsModal] = useState(false)
   const [data, setData] = useState({})
+
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
 
@@ -50,17 +51,18 @@ const FatLoseProgram = props => {
         !index && setIndex(p?.date_time)
       }
     })
+    if (getWeekSessions?.date_in_week_number) {
+      setActiveIndex(getWeekSessions?.date_in_week_number)
+    }
   }, [getWeekSessions])
 
   const getWeek = date => {
     if (data) {
       const weekStartDates = Object.keys(data)
-
       const inputDate = new Date(date)
       for (let i = 0; i < weekStartDates.length; i++) {
         const weekStartDate = new Date(weekStartDates[i])
         const nextWeekStartDate = new Date(weekStartDates[i + 1])
-
         if (
           i === weekStartDates.length - 1 ||
           (inputDate >= weekStartDate && inputDate < nextWeekStartDate)
@@ -71,12 +73,6 @@ const FatLoseProgram = props => {
       return 2
     }
   }
-
-  useEffect(() => {
-    if (data) {
-      setActiveIndex(parseInt(getWeek(new Date())))
-    }
-  }, [])
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
@@ -107,7 +103,7 @@ const FatLoseProgram = props => {
       const lastDay = new Date(today.setDate(today.getDate() + 7))
       const date = moment(lastDay).format("YYYY-MM-DD")
       setIndex(date)
-      setActiveIndex(parseInt(getWeek(date)))
+
       props.getAllSessionRequest(date)
       props.getDaySessionRequest(date)
     }
@@ -116,11 +112,9 @@ const FatLoseProgram = props => {
   const previousExercise = () => {
     if (getWeekSessions?.query?.length) {
       const today = new Date(getWeekSessions.query[0].date_time)
-
       const lastDay = new Date(today.setDate(today.getDate() - 7))
       const date = moment(lastDay).format("YYYY-MM-DD")
       setIndex(date)
-      setActiveIndex(parseInt(getWeek(date)))
       props.getAllSessionRequest(date)
       props.getDaySessionRequest(date)
     }
@@ -176,36 +170,19 @@ const FatLoseProgram = props => {
     props.getAllSessionRequest()
   }
   const onDayPress = date => {
-    const dateList = Object.keys(data)
-    const listData = dateList?.find(obj => obj === date?.dateString)
     const checkWeek = getWeekSessions?.query?.find(
       obj => obj.date_time === date?.dateString
     )
-
-    if (listData) {
-      setActiveIndex(parseInt(getWeek(date?.dateString)))
-      setIndex(date?.dateString)
-      if (!checkWeek) {
-        const today = new Date(getWeekSessions.query[0].date_time)
-        const lastDay = new Date(
-          today.setDate(
-            getWeek(date?.dateString) == 1
-              ? today.getDate() - 7
-              : today.getDate() + 7
-          )
-        )
-        const hh = moment(lastDay).format("YYYY-MM-DD")
-        props.getAllSessionRequest(hh)
-
-        const newDate = moment(date?.dateString).format("YYYY-MM-DD")
-        props.getDaySessionRequest(newDate)
-      } else {
-        const newDate = moment(date?.dateString).format("YYYY-MM-DD")
-        props.getDaySessionRequest(newDate)
-      }
-
-      setIsModal(false)
+    setIndex(date?.dateString)
+    if (!checkWeek) {
+      const newDate = moment(date?.dateString).format("YYYY-MM-DD")
+      props.getAllSessionRequest(newDate)
+      props.getDaySessionRequest(newDate)
+    } else {
+      const newDate = moment(date?.dateString).format("YYYY-MM-DD")
+      props.getDaySessionRequest(newDate)
     }
+    setIsModal(false)
   }
 
   const secondsToMinutes = seconds => {
@@ -228,8 +205,8 @@ const FatLoseProgram = props => {
       <ScrollView>
         <View style={[smallVMargin, regularHMargin]}>
           <Text style={styles.heading}>
-            {letterCapitalize(profile?.username)}'s{" "}
-            {exerciseArray[profile?.fitness_goal - 1]?.heading}
+            {letterCapitalize(profile?.first_name)}'s{" "}
+            {exerciseArray[profile?.fitness_goal - 1]?.heading + " Program"}
           </Text>
           {!todayRequest && getWeekSessions?.query?.length > 0 && (
             <>
@@ -265,6 +242,7 @@ const FatLoseProgram = props => {
                     />
                   ) : null}
                 </TouchableOpacity>
+
                 <TouchableOpacity style={row} onPress={openModal}>
                   <Text
                     text={"Calendar"}
@@ -396,78 +374,82 @@ const FatLoseProgram = props => {
                     color="primary"
                     style={styles.dayText}
                   />
-                  <Image source={etc} style={styles.imgStyle} />
-                </View>
-                <View style={row}>
-                  <View style={row}>
-                    <Image
-                      source={workout1}
-                      style={{ width: 60, height: 60 }}
-                    />
-                    <Image
-                      source={workout2}
-                      style={{ width: 60, height: 60 }}
-                    />
-                  </View>
-
-                  <View>
-                    <Text
-                      text={todaySessions?.name}
-                      style={{
-                        fontSize: 15,
-                        lineHeight: 18,
-                        fontWeight: "bold",
-                        opacity: 0.7
-                      }}
-                    />
-                    <Text
-                      text={`${todaySessions?.workouts?.length} exercies`}
-                      style={{
-                        fontSize: 12,
-                        lineHeight: 12,
-                        fontWeight: "400",
-                        opacity: 0.7,
-                        marginTop: 15
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={[row]}>
-                  <View>
-                    <Image
-                      source={workout3}
-                      style={{ width: 60, height: 60 }}
-                    />
-                  </View>
-
-                  <View
-                    style={[row, fill, alignItemsCenter, { marginLeft: "18%" }]}
-                  >
-                    <Text
-                      text={`${todaySessions?.cardio_length} minutes`}
-                      style={{
-                        fontSize: 12,
-                        lineHeight: 12,
-                        fontWeight: "400",
-                        opacity: 0.7
-                      }}
-                    />
-                    <Text
-                      text="Steady State"
-                      style={{
-                        fontSize: 15,
-                        lineHeight: 18,
-                        fontWeight: "bold",
-                        opacity: 0.7,
-                        marginLeft: 30
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={[fill, center, Gutters.regularVMargin]}>
                   <TouchableOpacity
                     onPress={() => refDescription.current.open()}
                   >
+                    <Image source={etc} style={styles.imgStyle} />
+                  </TouchableOpacity>
+                </View>
+                <View style={[row]}>
+                  <View style={[row, { width: "36%", marginTop: 5 }]}>
+                    {todaySessions?.workouts &&
+                      todaySessions?.workouts?.map(item => (
+                        <Image
+                          source={{ uri: item?.exercise.exercise_type?.image }}
+                          style={{ width: 50, height: 50, marginLeft: 5 }}
+                        />
+                      ))}
+                  </View>
+
+                  <View
+                    style={{
+                      flex: 1,
+                      width: "85%",
+                      marginHorizontal: 10
+                    }}
+                  >
+                    <View>
+                      <Text
+                        text={todaySessions?.name}
+                        style={{
+                          fontSize: 15,
+                          lineHeight: 20,
+                          fontWeight: "bold"
+                        }}
+                      />
+                      <Text
+                        text={`${todaySessions?.workouts?.length} exercies`}
+                        style={{
+                          fontSize: 12,
+                          lineHeight: 12,
+                          fontWeight: "400",
+                          marginTop: 10
+                        }}
+                      />
+                    </View>
+
+                    <View
+                      style={[
+                        row,
+                        fill,
+                        alignItemsCenter,
+                        { marginVertical: 20, justifyContent: "space-between" }
+                      ]}
+                    >
+                      <Text
+                        text={`${todaySessions?.cardio_length} minutes`}
+                        style={{
+                          fontSize: 12,
+                          lineHeight: 12,
+                          fontWeight: "400"
+                          // opacity: 0.7
+                        }}
+                      />
+                      <Text
+                        text="Steady State"
+                        style={{
+                          fontSize: 15,
+                          lineHeight: 18,
+                          fontWeight: "bold",
+                          marginLeft: 30
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+                <View style={[row]}></View>
+                <View style={[fill, center, Gutters.regularVMargin]}>
+                  <TouchableOpacity onPress={selectExerciseObj}>
                     <LinearGradient
                       start={start}
                       end={end}
@@ -503,7 +485,7 @@ const FatLoseProgram = props => {
                     color="primary"
                     style={styles.dayText}
                   />
-                  <Image source={etc} style={styles.imgStyle} />
+                  {/* <Image source={etc} style={styles.imgStyle} /> */}
                 </View>
                 <View style={[row, Gutters.smallVMargin]}>
                   <Text

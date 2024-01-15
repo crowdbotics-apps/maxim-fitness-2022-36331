@@ -1,12 +1,26 @@
-import React from "react"
+import React, { useState } from "react"
 import { View, Text, StyleSheet, Image, TextInput } from "react-native"
 import Font from "../../../assets/images/fonts"
 import { Gutters, Layout, Global } from "../../../theme"
+import SubDropDown from "../../LogFoodsComponents/SwipeCommonItem/SubComponents/Dropdown"
 
 const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
   const { smallBMargin, smallVMargin, smallLPadding, smallRPadding } = Gutters
   const { row, center } = Layout
   const { border } = Global
+  const [unitText, setUnitText] = useState(item?.unit?.name)
+  const onSelect = (val, product) => {
+    // const seletecObj = item.units[val]
+    setUnitText(product)
+    // calculateCalories(seletecObj)
+
+    // let arr = [...commonData]
+    // let objToUpdate = arr[index]
+    // objToUpdate.serving_unit = product
+    // arr[index] = objToUpdate
+    // setCommonData(arr)
+  }
+
   return (
     <View
       style={[smallVMargin, row, center, border, styles.containerSwipeItem]}
@@ -29,9 +43,11 @@ const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
               />
             </View>
             <View style={styles.qtyParentWrapper}>
-              <Text style={styles.unitText} numberOfLines={1}>
-                {item?.unit?.name}
-              </Text>
+              <SubDropDown
+                item={item?.food?.units}
+                onSelect={onSelect}
+                unitText={unitText}
+              />
             </View>
           </View>
         </View>
@@ -41,8 +57,9 @@ const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
               {item?.food?.name}
             </Text>
           </View>
+
           <View style={styles.caloriesContainer}>
-            <Text style={styles.caloriesText}>{Math.ceil(calories) || 0}</Text>
+            <Text style={styles.caloriesText}>{Math.round(calories) || 0}</Text>
             <Text style={styles.caloriesTextStatic}>Cal</Text>
           </View>
         </View>
