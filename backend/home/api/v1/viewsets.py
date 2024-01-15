@@ -161,7 +161,7 @@ class ProfileViewSet(ModelViewSet):
         if request_from and request_from == "days":
             obj = queryset[0]
             if self.request.data["number_of_training_days"]:
-                obj.fitness_goal = self.request.data["number_of_training_days"]
+                obj.number_of_training_days = self.request.data["number_of_training_days"]
                 obj.save()
         if request_from and request_from == 'mealTime':
             obj = queryset[0]
@@ -706,8 +706,7 @@ class SessionViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        session = Session.objects.filter(user=self.request.user).last()
-        return Session.objects.filter(user=self.request.user, program_id=session.program.id).order_by('date_time')
+        return Session.objects.filter(user=self.request.user).order_by('date_time')
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
