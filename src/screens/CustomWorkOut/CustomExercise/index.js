@@ -112,8 +112,15 @@ const CustomExercise = props => {
   }
 
   const keepRes = () => {
-    setDroupSets({
-      ...droupSet,
+    setDualReps({
+      ...dualReps,
+      state1: reps,
+      state2: reps
+    })
+  }
+  const dualKeep = () => {
+    setDualSetState({
+      ...dualSetState,
       state1: reps,
       state2: reps
     })
@@ -136,7 +143,6 @@ const CustomExercise = props => {
     }))
   }
 
-  console.log("dualReps", dualReps)
   const updateSecondsSets = value => {
     setTimeData(prevState => ({
       ...prevState,
@@ -932,7 +938,6 @@ const CustomExercise = props => {
                       source={radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
-                    {console.log("dualSets", temporaryReps)}
                   </TouchableOpacity>
                   <Text
                     style={{

@@ -38,7 +38,7 @@ const Feeds = props => {
   const [imageIndex, setImageIndex] = useState(0)
   const [isModalVisible, setModalVisible] = useState(false)
   const [reason, setReason] = useState("")
-  const [itemData, setItemData] = useState("")
+  const [itemData, setItemData] = useState(false)
   const [refresh, setRefresh] = useState(false)
 
   const [visibleMenu, setVisibleMenu] = useState(false)
@@ -91,7 +91,7 @@ const Feeds = props => {
   const callback = () => {
     hideMenu()
     setReason("")
-    setItemData("")
+    setItemData(false)
     setModalVisible(false)
     // setTimeout(() => {
     //   setModalVisible(false)

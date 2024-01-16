@@ -34,10 +34,24 @@ const MessageScreen = props => {
   const [loading, setLoading] = useState(true)
   const [conversationList, setConversationList] = useState([])
   const [search, setSearch] = useState("")
+  const [channelCount, setChannelCount] = useState()
 
   const bootstrap = () => {
     setLoading(true)
     fetchChannels(pubnub, userProfile?.id).then(channels => {
+      Object.entries(channels)
+        .map(([id, rest]) => ({
+          id,
+          ...rest
+        }))
+        .filter(item => {
+          return item.name
+        })
+        .map(obj => {
+          obj?.id && pubnub.subscribe({ channels: [obj?.id] })
+          return { ...obj }
+        })
+
       dispatch({ channels })
       setLoading(false)
     })
@@ -48,12 +62,52 @@ const MessageScreen = props => {
       return
     }
     bootstrap()
+
+    pubnub.addListener({
+      message: () => {
+        unreadMessage()
+      }
+    })
   }, [])
 
   useEffect(() => {
     const DATA = makeChannelsList(state.channels)
     setConversationList(DATA)
   }, [state.channels])
+
+  const unreadMessage = () => {
+    pubnub.objects
+      .getMemberships({
+        include: {
+          customFields: true
+        }
+      })
+      .then(res => {
+        let countData = []
+        res?.data?.map(item => {
+          if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
+            pubnub
+              .messageCounts({
+                channels: [item?.channel?.id],
+                channelTimetokens: [item?.custom?.lastReadTimetoken]
+              })
+              .then(resMsg => {
+                Object.entries(resMsg?.channels)
+                  .map(([id, rest]) => ({
+                    id,
+                    rest
+                  }))
+                  .map(obj => {
+                    countData.push({ id: obj?.id, count: obj?.rest })
+                  })
+              })
+          }
+        })
+        setTimeout(() => {
+          setChannelCount(countData)
+        }, 1000)
+      })
+  }
 
   useEffect(() => {
     if (search !== "") {
@@ -114,10 +168,32 @@ const MessageScreen = props => {
     }
   }
 
+  const chatNavigate = item => {
+    navigation.navigate("ChatScreen", { item: item })
+    pubnub.history({ channel: item?.id }).then(res => {
+      if (res?.endTimeToken) {
+        pubnub.objects
+          .setMemberships({
+            channels: [
+              {
+                id: item?.id,
+                custom: {
+                  lastReadTimetoken: res?.endTimeToken
+                }
+              }
+            ]
+          })
+          .then(res => {
+            unreadMessage()
+          })
+      }
+    })
+  }
+
   const ListItem = item => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("ChatScreen", { item: item })}
+        onPress={() => chatNavigate(item)}
         style={{
           marginTop: 25,
           paddingHorizontal: 20,

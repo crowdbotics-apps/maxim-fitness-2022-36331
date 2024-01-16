@@ -114,9 +114,27 @@ const ChatScreen = props => {
         timestamp: moment().unix()
       }
       const channel = item.id
-      sendMessages(pubnub, channel, payload).then(res => setTextInput(""))
+      sendMessages(pubnub, channel, payload).then(res => {
+        memberships(res)
+        setTextInput("")
+      })
     } else {
     }
+  }
+
+  const memberships = res => {
+    pubnub.objects
+      .setMemberships({
+        channels: [
+          {
+            id: item?.id,
+            custom: {
+              lastReadTimetoken: res?.timetoken
+            }
+          }
+        ]
+      })
+      .then(res => {})
   }
 
   const pickImage = () => {

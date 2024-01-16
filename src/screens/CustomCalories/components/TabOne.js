@@ -33,39 +33,38 @@ const TabOne = props => {
     <View>
       <View style={[row, justifyContentBetween, alignItemsCenter]}>
         <DashboardCard style={fill}>
-          <LinearGradient
-            start={start}
-            end={end}
-            colors={["#3c61ff", "#55bfff"]}
-            style={[
-              fill,
-              regularHMargin,
-              mediumVMargin,
-              regularVPadding,
-              smallHPadding,
-              styles.gradientWrapper
-            ]}
-          >
-            <View style={[row, justifyContentBetween]}>
-              <Text text={"Current\nWeight"} color="secondary" bold center />
-              <Image source={Images.icon} style={styles.imageStyle} />
-            </View>
-            <TouchableOpacity
-              onPress={() => setShowModal("weight")}
-              style={[row, justifyContentCenter, alignItemsEnd, fill]}
+          <TouchableOpacity onPress={() => setShowModal("weight")}>
+            <LinearGradient
+              start={start}
+              end={end}
+              colors={["#3c61ff", "#55bfff"]}
+              style={[
+                fill,
+                regularHMargin,
+                mediumVMargin,
+                regularVPadding,
+                smallHPadding,
+                styles.gradientWrapper
+              ]}
             >
-              <Text text={profile?.weight} color="secondary" bold center />
-              <Text
-                text={profile?.unit === "Feet/Pounds" ? "lbs" : "kg"}
-                color="secondary"
-                center
-                style={smallLMargin}
-              />
-            </TouchableOpacity>
-          </LinearGradient>
+              <View style={[row, justifyContentBetween]}>
+                <Text text={"Current\nWeight"} color="secondary" bold center />
+                <Image source={Images.icon} style={styles.imageStyle} />
+              </View>
+              <View style={[row, justifyContentCenter, alignItemsEnd, fill]}>
+                <Text text={profile?.weight} color="secondary" bold center />
+                <Text
+                  text={profile?.unit === "Feet/Pounds" ? "lbs" : "kg"}
+                  color="secondary"
+                  center
+                  style={smallLMargin}
+                />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </DashboardCard>
         <DashboardCard style={fill}>
-          <View>
+          <TouchableOpacity onPress={() => setShowModal("goal")}>
             <LinearGradient
               start={start}
               end={end}
@@ -88,7 +87,7 @@ const TabOne = props => {
               {/* {netInfo.isConnected && loading && (
                     <ActivityIndicator size="large" color="#000" />
                   )} */}
-              <TouchableOpacity onPress={() => setShowModal("goal")}>
+              <View>
                 {profile?.fitness_goal === 1 && (
                   <Text text={"Fat Loss"} color="nonary" bold center />
                 )}
@@ -103,44 +102,43 @@ const TabOne = props => {
                 {profile?.fitness_goal === 3 && (
                   <Text text={"Maintenance"} color="nonary" bold center />
                 )}
-              </TouchableOpacity>
+              </View>
             </LinearGradient>
-          </View>
+          </TouchableOpacity>
         </DashboardCard>
       </View>
       <View style={[row, justifyContentBetween, alignItemsCenter]}>
         <DashboardCard style={fill}>
-          <LinearGradient
-            start={start}
-            end={end}
-            colors={["#fff", "#fff"]}
-            style={[
-              fill,
-              border,
-              regularHMargin,
-              regularVPadding,
-              smallHPadding,
-              justifyContentBetween,
-              styles.gradientWrapper
-            ]}
-          >
-            <View style={[row, justifyContentBetween]}>
-              <Text text={"Training"} color="quinary" bold center />
-              <Image source={Images.programsIcon} style={styles.imageStyle} />
-            </View>
-            <TouchableOpacity
-              onPress={() => setShowModal("days")}
-              style={[justifyContentStart, alignItemsStart]}
+          <TouchableOpacity onPress={() => setShowModal("days")}>
+            <LinearGradient
+              start={start}
+              end={end}
+              colors={["#fff", "#fff"]}
+              style={[
+                fill,
+                border,
+                regularHMargin,
+                regularVPadding,
+                smallHPadding,
+                justifyContentBetween,
+                styles.gradientWrapper
+              ]}
             >
-              <Text
-                text={profile?.number_of_training_days}
-                color="nonary"
-                bold
-                center
-              />
-              <Text text="Days" color="septenary" center />
-            </TouchableOpacity>
-          </LinearGradient>
+              <View style={[row, justifyContentBetween]}>
+                <Text text={"Training"} color="quinary" bold center />
+                <Image source={Images.programsIcon} style={styles.imageStyle} />
+              </View>
+              <View style={[justifyContentStart, alignItemsStart]}>
+                <Text
+                  text={profile?.number_of_training_days}
+                  color="nonary"
+                  bold
+                  center
+                />
+                <Text text="Days" color="septenary" center />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </DashboardCard>
         <DashboardCard style={fill} />
       </View>

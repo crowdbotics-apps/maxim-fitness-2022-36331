@@ -87,8 +87,8 @@ const FeedCard = props => {
   }
 
   const action = (item, type) => {
-    setItemData(item)
     hideMenu()
+    setItemData(item)
     if (type === "delete") {
       setTimeout(() => {
         showConfirmDialog(item.id)
@@ -96,7 +96,7 @@ const FeedCard = props => {
     } else {
       setTimeout(() => {
         setModalVisible(true)
-      }, 1000)
+      }, 1500)
     }
   }
 
@@ -209,16 +209,16 @@ const FeedCard = props => {
               dotStyle={styles.sliderBoxStyle}
               paginationBoxVerticalPadding={20}
               onCurrentImagePressed={index => {
-                if (item?.post_image?.length) {
+                const currentMedia = (item?.post_image || []).concat(
+                  item?.post_video || []
+                )[index]
+                if (currentMedia && currentMedia?.image) {
                   setIsVisible(true)
-                  setImages(item?.post_image?.length && item?.post_image)
+                  setImages(item?.post_image || [])
                   setImageIndex(index)
-                }
-                if (item?.post_video?.length) {
+                } else if (currentMedia && currentMedia?.video) {
                   setShowModal(true)
-                  setVideoUri(
-                    item?.post_video?.length && item?.post_video[index]
-                  )
+                  setVideoUri(currentMedia)
                 }
               }}
             />

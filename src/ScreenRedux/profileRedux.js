@@ -168,7 +168,6 @@ export const profileReducer = (state = initialState, action) => {
     case PROFILE_DATA_SUCCESS:
       return {
         ...state,
-        profile: action.data,
         request: false
       }
 
@@ -354,9 +353,10 @@ function* profileRequest() {
   try {
     const response = yield call(profileDataAPI)
     yield put(setUserDetail(response?.data[0]))
-    // yield put(profileDataSuccess(response?.data[0]))
+    yield put(profileDataSuccess(false))
   } catch (e) {
     const { response } = e
+    yield put(profileDataSuccess(false))
   }
 }
 
