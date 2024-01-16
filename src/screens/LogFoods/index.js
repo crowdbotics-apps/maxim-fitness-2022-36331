@@ -135,7 +135,12 @@ const LogFoods = props => {
 
   useEffect(() => {
     if (getMealsFood && getMealsFood[0]?.food_items) {
-      setMealsFood(getMealsFood[0].food_items)
+      const newArray = getMealsFood[0].food_items.map(item => ({
+        ...item,
+        total_quantity: item.unit.quantity
+      }))
+
+      setMealsFood(newArray)
     }
   }, [getMealsFood])
 
@@ -181,12 +186,18 @@ const LogFoods = props => {
     let totalFatCalc = 0
     if (data && data.length) {
       data.forEach(item => {
-        totalCalc += Math.round(item.food.calories * item.unit.quantity)
-        totalProteinCalc += Math.round(item.food.proteins * item.unit.quantity)
-        totalCarbsCalc += Math.round(
-          item.food.carbohydrate * item.unit.quantity
+        totalCalc += Math.round(
+          (item?.food?.calories / item.unit.quantity) * item.total_quantity
         )
-        totalFatCalc += Math.round(item.food.fat * item.unit.quantity)
+        totalProteinCalc += Math.round(
+          (item?.food?.proteins / item.unit.quantity) * item.total_quantity
+        )
+        totalCarbsCalc += Math.round(
+          (item?.food?.carbohydrate / item.unit.quantity) * item.total_quantity
+        )
+        totalFatCalc += Math.round(
+          (item?.food?.fat / item.unit.quantity) * item.total_quantity
+        )
       })
     }
     setTotalCalFirst(totalCalc)
@@ -409,10 +420,16 @@ const LogFoods = props => {
       brandedData.length > 0
         ? brandedData.map(item => ({
             food_name: item.food_name,
-            nf_calories: item.nf_calories || 0,
-            nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
-            nf_protein: item.nf_protein || 0,
-            nf_total_fat: item.nf_total_fat || 0,
+            nf_calories: calculateCalories(item) || 0,
+            nf_total_carbohydrate:
+              Math.round(item?.nf_total_carbohydrate / item.serving_qty) *
+                item.total_quantity || 0,
+            nf_protein:
+              Math.round(item?.nf_protein / item.serving_qty) *
+                item.total_quantity || 0,
+            nf_total_fat:
+              Math.round(item?.nf_total_fat / item.serving_qty) *
+                item.total_quantity || 0,
             nix_item_id: item.nix_item_id || "",
             weight: item.serving_weight_grams || 1,
             thumb: item.photo.thumb,
@@ -433,7 +450,7 @@ const LogFoods = props => {
             weight: item.serving_weight_grams || 1,
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
-            serving_qty: item.serving_qty,
+            serving_qty: item?.total_quantity,
             created: formatedDate
           }))
         : []
@@ -446,12 +463,14 @@ const LogFoods = props => {
         scan: scan
       }
     ]
+
     await props.postLogFoodRequest(selectedMeal?.id, data)
     clearAllData()
   }
 
   const selectedCalories = f => {
-    return f.food.calories * f?.unit?.quantity
+    const data = (f?.food.calories / f?.unit?.quantity) * f.total_quantity
+    return data
   }
 
   const calculateCalories = cal => {
@@ -499,7 +518,7 @@ const LogFoods = props => {
     let arr = [...mealsFood]
     let objToUpdate = arr[index]
     let itemId = objToUpdate.food.units[0].id
-    objToUpdate.unit.quantity = e
+    objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtySelected(e)
     setMealsFood(arr)
@@ -654,7 +673,7 @@ const LogFoods = props => {
                               item={item}
                               index={index}
                               value={
-                                item?.unit?.quantity.toString() ||
+                                item?.total_quantity.toString() ||
                                 qtySelected.toString()
                               }
                               onChangeText={text =>

@@ -98,7 +98,6 @@ function* getPostData({ data }) {
     yield put(getPostSuccess(response.data))
   } catch (e) {
     const { response } = e
-  } finally {
     yield put(resetViewPost())
   }
 }
