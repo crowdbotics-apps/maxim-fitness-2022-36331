@@ -20,7 +20,15 @@ import Share from "react-native-share"
 import { connect } from "react-redux"
 import { routeData } from "../../ScreenRedux/profileRedux"
 import { postDeleteRequest } from "../../ScreenRedux/feedRedux"
-import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+import Modal from "react-native-modal"
+import { postReportRequest } from "../../ScreenRedux/feedRedux"
+// import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger
+} from "react-native-popup-menu"
 
 let deviceWidth = Dimensions.get("window").width
 let deviceHeight = Dimensions.get("window").height
@@ -39,9 +47,6 @@ const FeedCard = props => {
     setShowModal,
     setVideoUri,
     setImageIndex,
-    visibleMenu,
-    hideMenu,
-    showMenu,
     setModalVisible,
     setItemData
   } = props
@@ -87,21 +92,17 @@ const FeedCard = props => {
   }
 
   const action = (item, type) => {
-    hideMenu()
     setItemData(item)
     if (type === "delete") {
       setTimeout(() => {
         showConfirmDialog(item.id)
       }, 500)
     } else {
-      setTimeout(() => {
-        setModalVisible(true)
-      }, 1500)
+      setModalVisible(true)
     }
   }
 
   const callback = () => {
-    hideMenu()
     setItemData("")
     setModalVisible(false)
     // setTimeout(() => {
@@ -163,27 +164,35 @@ const FeedCard = props => {
               />
               <Text text={calculatePostTime(item)} style={styles.text2} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => showMenu(item)}>
-              <Menu
-                visible={visibleMenu?.id === item.id}
-                onRequestClose={() => hideMenu()}
+            <Menu>
+              <MenuTrigger>
+                <Image source={Images.etc} style={styles.dotImg} />
+              </MenuTrigger>
+              <MenuOptions
+                optionsContainerStyle={{ width: 105, borderRadius: 5 }}
               >
                 {profile?.id === item?.user?.id ? (
-                  <MenuItem
-                    textStyle={{ color: "red" }}
-                    onPress={() => action(item, "delete")}
-                  >
-                    Remove post
-                  </MenuItem>
+                  <MenuOption onSelect={() => action(item, "delete")}>
+                    <Text
+                      style={{
+                        color: "red",
+                        paddingVertical: 6,
+                        textAlign: "center"
+                      }}
+                    >
+                      Remove post
+                    </Text>
+                  </MenuOption>
                 ) : (
-                  <MenuItem onPress={() => action(item, "report")}>
-                    Report post
-                  </MenuItem>
+                  <MenuOption onSelect={() => action(item, "report")}>
+                    <Text style={{ paddingVertical: 6, textAlign: "center" }}>
+                      Report post
+                    </Text>
+                  </MenuOption>
                 )}
-              </Menu>
-
-              <Image source={Images.etc} style={styles.dotImg} />
-            </TouchableOpacity>
+              </MenuOptions>
+            </Menu>
+            {/* </TouchableOpacity> */}
           </View>
           <View style={styles.cardBody}>
             <SliderBox
@@ -332,11 +341,15 @@ const styles = StyleSheet.create({
   socialIcons: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
-    flex: 1
+    alignItems: "center"
+    // flex: 1,
   },
   profileImg: { width: 30, height: 30, borderRadius: 50, resizeMode: "cover" },
-  dotImg: { width: 30, height: 30 },
+  dotImg: {
+    width: 40,
+    height: 40,
+    resizeMode: "cover"
+  },
   socialImg: { width: 25, height: 25, resizeMode: "contain" },
   socialImg1: { width: 25, height: 25, resizeMode: "contain" },
   socialImg2: { width: 22, height: 22, resizeMode: "contain" },
