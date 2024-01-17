@@ -32,9 +32,11 @@ const MealPreference = props => {
   }, [])
 
   const exerciseArray = [
+    { name: "3 Meals", value: 3 },
     { name: "4 Meals", value: 4 },
     { name: "5 Meals", value: 5 },
-    { name: "6 Meals", value: 6 }
+    { name: "6 Meals", value: 6 },
+    { name: "7 Meals", value: 7 }
   ]
 
   const onNext = () => {

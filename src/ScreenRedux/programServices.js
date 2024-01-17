@@ -301,8 +301,9 @@ async function getWeekSessionAPI(data) {
   return XHR(URL, options)
 }
 
-async function getAllSessionAPI() {
+async function getAllSessionAPI(data) {
   const token = await AsyncStorage.getItem("authToken")
+  const URL_All = `${API_URL}/session/?all=true`
   const URL = `${API_URL}/session/`
   const options = {
     headers: {
@@ -311,17 +312,17 @@ async function getAllSessionAPI() {
     },
     method: "GET"
   }
-  return XHR(URL, options)
+  return XHR(data ? URL_All : URL, options)
 }
 
 function* getAllSessions({ data }) {
   try {
-    if (data) {
+    if (data && data !== "all") {
       const response = yield call(getWeekSessionAPI, data)
       const query = sortSessionBySets(response?.data?.query)
       yield put(getWeekSessionSuccess({ ...response?.data, query }))
     } else {
-      const response = yield call(getAllSessionAPI)
+      const response = yield call(getAllSessionAPI, data)
       const query = sortSessionBySets(response?.data?.query)
       yield put(getAllSessionSuccess({ ...response?.data, query }))
     }

@@ -513,8 +513,7 @@ const LogFoods = props => {
     setQtyScan(e)
     setScanData(arr)
   }
-
-  const onChangeSelected = (e, index) => {
+  const onChangeSelected = (e, index, item) => {
     let arr = [...mealsFood]
     let objToUpdate = arr[index]
     let itemId = objToUpdate.food.units[0].id
@@ -522,7 +521,9 @@ const LogFoods = props => {
     arr[index] = objToUpdate
     setQtySelected(e)
     setMealsFood(arr)
-    productUnitAction(itemId, e)
+    if (e > 0) {
+      productUnitAction(itemId, e, item)
+    }
   }
 
   const emptyList = () => (
@@ -677,7 +678,7 @@ const LogFoods = props => {
                                 qtySelected.toString()
                               }
                               onChangeText={text =>
-                                onChangeSelected(text, index)
+                                onChangeSelected(text, index, item)
                               }
                               calories={selectedCalories(item)}
                             />
@@ -1059,7 +1060,8 @@ const mapDispatchToProps = dispatch => ({
   resetFoodItems: () => dispatch(resetFoodItems()),
   deleteAllMeals: (data, screenName) =>
     dispatch(deleteAllMeals(data, screenName)),
-  productUnitAction: (itemId, data) => dispatch(productUnitAction(itemId, data))
+  productUnitAction: (itemId, value, data) =>
+    dispatch(productUnitAction(itemId, value, data))
   // updateFoodItems: data => dispatch(updateFoodItems(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(LogFoods)

@@ -141,12 +141,33 @@ const ProfileScreen = props => {
       }
     } else if (profileData?.post_image?.length) {
       const chunkSize = 3
-      for (let i = 0; i < profileData?.post_image?.length; i += chunkSize) {
-        let chunk = profileData?.post_image?.slice(i, i + chunkSize)
-        imagesData.push(chunk)
+      let currentChunk = []
+
+      for (let i = 0; i < profileData.post_image.length; i++) {
+        const file = profileData.post_image[i]
+
+        if (currentChunk.length < chunkSize) {
+          if (!isVideo(file)) {
+            currentChunk.push(file)
+          }
+        }
+
+        if (
+          currentChunk.length === chunkSize ||
+          i === profileData.post_image.length - 1
+        ) {
+          imagesData.push(currentChunk)
+          currentChunk = []
+        }
       }
+
       return imagesData
     }
+  }
+
+  function isVideo(file) {
+    const videoExtensions = [".webm", ".mp4", ".avi", ".mov", ".mkv"]
+    return file.image && videoExtensions.some(ext => file.image.endsWith(ext))
   }
 
   const onPullToRefresh = () => {
@@ -444,6 +465,7 @@ const ProfileScreen = props => {
                   />
                 </TouchableOpacity>
               </View>
+              {console.log("calculatedData()", calculatedData())}
               {calculatedData()?.length &&
                 calculatedData()?.map((item, i) => {
                   return (
