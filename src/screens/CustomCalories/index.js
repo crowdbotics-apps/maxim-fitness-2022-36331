@@ -10,10 +10,12 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Modal from "react-native-modal"
+import Loader from "../../components/Loader"
 import {
   Text,
   Button,
@@ -60,7 +62,10 @@ const CustomCalories = props => {
     unreadCount,
     todaySessions,
     getAllSessions,
-    navigation
+    navigation,
+    requesting,
+    updateLoader,
+    loader
   } = props
 
   let refWeight = useRef("")
@@ -260,6 +265,8 @@ const CustomCalories = props => {
 
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
+      {(updateLoader || loader) && <Loader />}
+
       <ProfileComponent
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -362,7 +369,11 @@ const CustomCalories = props => {
             >
               <Text style={styles.comingSoonWork} text="Workouts" />
             </View>
-            {checkValue() && getAllSessions?.query ? (
+            {requesting ? (
+              <View style={styles.loaderContainer}>
+                <ActivityIndicator color="#000" size={"large"} />
+              </View>
+            ) : checkValue() && getAllSessions?.query ? (
               getAllSessions?.query?.map((item, index) => {
                 const todayDayString = moment(item.date_time).format(
                   "MM/DD/YYYY"
@@ -911,6 +922,11 @@ const styles = StyleSheet.create({
     width: 20,
     resizeMode: "contain",
     tintColor: Colors.nobel
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
   }
 })
 
@@ -920,7 +936,10 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   unreadCount: state.nutritionReducer.unreadCount,
   todaySessions: state.programReducer.todaySessions,
-  getAllSessions: state.programReducer.getAllSessions
+  getAllSessions: state.programReducer.getAllSessions,
+  requesting: state.programReducer.requesting,
+  loader: state.profileReducer.request,
+  updateLoader: state.questionReducer.requesting
 })
 
 const mapDispatchToProps = dispatch => ({

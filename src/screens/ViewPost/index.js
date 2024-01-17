@@ -277,7 +277,7 @@ const ViewPost = props => {
   }
 
   const getComments = () => {
-    props.getPost(param?.id, true)
+    props.getPost(param?.id)
   }
 
   return (
@@ -286,7 +286,7 @@ const ViewPost = props => {
         behavior={Platform.OS === "ios" && "padding"}
         style={{ flex: 1 }}
       >
-        {requesting || deleteLoading ? (
+        {requesting ? (
           <SkeletonLoader />
         ) : (
           <>
@@ -315,16 +315,18 @@ const ViewPost = props => {
                   content={postData?.content}
                 />
                 <SliderBox
-                  images={
+                  mages={
                     param &&
                     (param?.post_image?.length && param?.post_video?.length) > 0
                       ? [...param.post_image, ...param.post_video].map(item =>
-                          item.image ? item.image : item.video
+                          item?.image ? item?.image : item.video_thumbnail
                         )
-                      : param?.post_image?.length > 0
-                      ? param.post_image.map(item => item.image)
-                      : param?.post_video?.length > 0
-                      ? param.post_video.map(item => item.video_thumbnail)
+                      : param?.post_image?.length > 0 &&
+                        param?.post_video?.length === 0
+                      ? param?.post_image.map(item => item?.image)
+                      : param?.post_video?.length > 0 &&
+                        param?.post_image?.length === 0
+                      ? param?.post_video.map(item => item.video_thumbnail)
                       : []
                   }
                   style={styles.foodImageStyle}

@@ -16,6 +16,7 @@ import {
 } from "react-native"
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from "react-native-image-crop-picker"
+import { createThumbnail } from "react-native-create-thumbnail"
 import { Images } from "src/theme"
 import { connect } from "react-redux"
 
@@ -86,21 +87,41 @@ const AddPost = props => {
   const addData = () => {
     props.AddPostData(aa())
   }
+  const checkFileType = item => {
+    if (item?.mime.startsWith("video/")) {
+      return true
+    } else {
+      return false
+    }
+  }
 
   const onChangePostImage = () => {
-    ImagePicker.openPicker({
-      // width: 300,
-      // height: 400,
-      mediaType: "any",
-      multiple: true
-    }).then(image => {
-      let newArray = []
-      image.length &&
-        image.map(item => {
-          newArray.push(item)
-        })
-      setImageData(newArray)
-    })
+    if (imageData?.length < 5) {
+      ImagePicker.openPicker({
+        // width: 300,
+        // height: 400,
+        mediaType: "any",
+        multiple: true
+      }).then(image => {
+        image.length &&
+          image?.slice(0, 5 - imageData?.length).forEach(item => {
+            if (checkFileType(item) && Platform.OS === "ios") {
+              createThumbnail({
+                url: item.path,
+                timeStamp: 10000
+              })
+                .then(response => {
+                  const thumbnail = `file://${response?.path}`
+                  item["thumbnail"] = thumbnail
+                  setImageData(previous => [...previous, item])
+                })
+                .catch(err => {})
+            } else {
+              setImageData(previous => [...previous, item])
+            }
+          })
+      })
+    }
   }
 
   const filterData = item => {
@@ -168,34 +189,25 @@ const AddPost = props => {
               <View
                 style={{ marginTop: 20, alignItems: "center", width: "50%" }}
               >
-                {Platform.OS === "android" ? (
-                  <Image
-                    style={{
-                      height: (173 / 375) * width,
-                      width: (145 / 375) * width,
-                      borderRadius: 15
-                    }}
-                    source={{ uri: item.path }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      height: (173 / 375) * width,
-                      width: (145 / 375) * width,
-                      borderRadius: 15,
-                      backgroundColor: "black"
-                    }}
-                  >
-                    <Image
-                      style={styles.playicon}
-                      source={Images.sendMessage}
-                    />
-                  </View>
-                )}
+                <Image
+                  style={{
+                    height: (173 / 375) * width,
+                    width: (145 / 375) * width,
+                    borderRadius: 15
+                  }}
+                  source={{
+                    uri: item?.thumbnail ? item?.thumbnail : item.path
+                  }}
+                />
 
                 <TouchableOpacity
                   onPress={() => filterData(item)}
-                  style={{ position: "absolute", right: 30, top: 8 }}
+                  style={{
+                    position: "absolute",
+                    right: 30,
+                    top: 8,
+                    padding: 5
+                  }}
                 >
                   <Image
                     style={{ height: 20, width: 20 }}
@@ -231,20 +243,20 @@ const AddPost = props => {
             justifyContent: "center"
           }}
         >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "700",
-              color: "white",
-              textAlign: "center"
-            }}
-          >
-            {props.requesting ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              "Post"
-            )}
-          </Text>
+          {props?.requesting ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "700",
+                color: "white",
+                textAlign: "center"
+              }}
+            >
+              Post
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
