@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 
 from django.db.models import Prefetch, Q, Exists, OuterRef
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from fcm_django.models import FCMDevice
@@ -61,7 +62,7 @@ from home.api.v1.serializers import (
 from .permissions import (
     RecipePermission,
 )
-from home.models import Product, ProductUnit, Meal, FoodItem, Category, Recipe, Post, Form, ConsumeCalories, Following\
+from home.models import Product, ProductUnit, Meal, FoodItem, Category, Recipe, Post, Form, ConsumeCalories, Following \
     , Comment, ReportAPost, BlockUser
 from home.nutritionix import Nutritionix
 from program.models import Exercise, Session, Workout, Set, Report, ProgramExercise, ExerciseType
@@ -287,8 +288,10 @@ class ProfileViewSet(ModelViewSet):
         post = Post.objects.filter(user=instance).order_by('-id')
         for i in post:
             post_ids.append(i.id)
-        post_image = PostImageSerializer(PostImage.objects.filter(post_id__in=post_ids), many=True, context={"request": request})
-        post_video = PostVideoSerializer(PostVideo.objects.filter(post_id__in=post_ids), many=True, context={"request": request})
+        post_image = PostImageSerializer(PostImage.objects.filter(post_id__in=post_ids), many=True,
+                                         context={"request": request})
+        post_video = PostVideoSerializer(PostVideo.objects.filter(post_id__in=post_ids), many=True,
+                                         context={"request": request})
         user_detail = UserSerializer(instance, context={"request": request})
         followers = len(follower.data)
         followings = len(following.data)
@@ -447,7 +450,7 @@ class FacebookLogin(SocialLoginView):
         user = self.user
         user_detail = UserSerializer(self.user, many=False)
         serializer = serializer_class(instance=self.token,
-                                          context={'request': self.request})
+                                      context={'request': self.request})
         resp = serializer.data
         resp["user_detail"] = user_detail.data
         resp["token"] = resp["key"]
@@ -466,7 +469,7 @@ class GoogleLogin(SocialLoginView):
         user = self.user
         user_detail = UserSerializer(self.user, many=False)
         serializer = serializer_class(instance=self.token,
-                                          context={'request': self.request})
+                                      context={'request': self.request})
         resp = serializer.data
         resp["user_detail"] = user_detail.data
         resp["token"] = resp["key"]
@@ -692,7 +695,7 @@ class ExerciseViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         exercise_type = self.request.query_params.get("exercise_type")
-        exercise_type_name = self.request.query_params.get("search") # search on the bases of exercise_type name
+        exercise_type_name = self.request.query_params.get("search")  # search on the bases of exercise_type name
         if exercise_type:
             queryset = queryset.filter(exercise_type__id=exercise_type)
         if exercise_type_name:
@@ -706,12 +709,27 @@ class SessionViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user).order_by('date_time')
+        current_date = timezone.now().date()
+        sessions = Session.objects.filter(user=self.request.user, is_active=True)
+        last_session = sessions.order_by('-date_time').first()
+        if last_session:
+            if last_session.date_time < current_date:
+                sessions.update(is_active=False)
+        return sessions.order_by('date_time')
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         start_date = self.request.query_params.get("date")
         how_many_week = queryset.count() / 7
+        all_sessions = self.request.query_params.get("all")
+        if all_sessions:
+            queryset = Session.objects.filter(user=self.request.user)
+            serializer = self.get_serializer(queryset, many=True)
+            data = {
+                "week": int(how_many_week),
+                "query": serializer.data
+            }
+            return Response(data)
         if queryset:
             first_day = queryset.first().date_time
             last_day = queryset.last().date_time
@@ -722,8 +740,8 @@ class SessionViewSet(ModelViewSet):
             day_no += 1
 
         d_no = day_with_date.get(start_date)
-        date_in_week_number = 1
-        if d_no:
+        date_in_week_number = 0
+        if d_no and start_date:
             if d_no <= 7:
                 date_in_week_number = 1
                 last_day = first_day + timedelta(days=6)
@@ -740,6 +758,9 @@ class SessionViewSet(ModelViewSet):
                 first_day = first_day + timedelta(days=21)
                 last_day = first_day + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[first_day, last_day])
+        elif start_date and not d_no:
+            queryset = queryset.none()
+
         # if start_date:
         #     date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
         #     end = date_time_obj + timedelta(days=6)
@@ -777,7 +798,7 @@ class SessionViewSet(ModelViewSet):
                 carb_casual=session.carb_casual,
                 name=workout_title,
             )
-            session.delete()
+            session.update(is_active=False)
             order = 1
 
             for exe_id in exercise_ids:
@@ -882,7 +903,7 @@ class SessionViewSet(ModelViewSet):
         if day:
             # date_time_obj = datetime.strptime(day, '%Y-%m-%d')
             # session = Session.objects.filter(user=request.user).first()
-            session = Session.objects.filter(user=request.user, date_time=day).first()
+            session = Session.objects.filter(user=request.user, date_time=day, is_active=True).first()
             if reset:
                 session.reset()
             serializer = self.serializer_class(session, context={'request': request})
@@ -1058,7 +1079,6 @@ class PostViewSet(ModelViewSet):
                               title="Comment on Post", message=f"{request.user.username} comment on your post {title}")
         return Response(res.data)
 
-
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def add_like(self, request, pk=None):
         post = self.get_object()
@@ -1217,6 +1237,7 @@ class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
     queryset = Comment.objects.all()
+
     # http_method_names = ['delete']
 
     def destroy(self, request, *args, **kwargs):
@@ -1249,6 +1270,19 @@ class ProductUnitViewSet(ModelViewSet):
     def get_queryset(self, **kwargs):
         queryset = ProductUnit.objects.filter(id=int(self.kwargs['pk']))
         return queryset
+
+    def update(self, request, *args, **kwargs):
+        partial = True
+        instance = self.get_object()
+        product_unit = request.data.get("unit")
+        serializer = self.get_serializer(instance, data=product_unit, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        product_data = request.data.get('food')
+        product_serializer = ProductSerializer(obj.product, data=product_data, partial=True)
+        product_serializer.is_valid(raise_exception=True)
+        product_serializer.save()
+        return Response(serializer.data)
 
 
 class CheckUserViewSet(ModelViewSet):
@@ -1288,7 +1322,7 @@ class ReportAPostViewSet(ModelViewSet):
         self.perform_create(serializer)
         post = Post.objects.filter(id=post_id).first()
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
-                          message=f"Your post is reported by { self.request.user.username}", post_id=post)
+                          message=f"Your post is reported by {self.request.user.username}", post_id=post)
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
 
@@ -1311,7 +1345,7 @@ class ReportACommentViewSet(ModelViewSet):
         self.perform_create(serializer)
         comment = Comment.objects.filter(id=comment_id).first()
         send_notification(sender=self.request.user, receiver=comment.user, title="Report Comment",
-                          message=f"Your comment is reported by { self.request.user.username}")
+                          message=f"Your comment is reported by {self.request.user.username}")
         return Response({"data": "Comment Reported successfully"}, status=status.HTTP_201_CREATED)
 
 

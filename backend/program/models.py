@@ -37,6 +37,7 @@ class Session(models.Model):
     carb = models.FloatField(null=True, blank=True)
     carb_casual = models.FloatField(null=True, blank=True)
     done = models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.user)
@@ -128,7 +129,7 @@ class Program(models.Model):
     def create_session(self, user):
         session = Session.objects.filter(user=user)
         if session:
-            session.delete()
+            session.update(is_active=True)
         weeks = self.weeks.all()
         print('weeks', weeks)
         days_gap = 0

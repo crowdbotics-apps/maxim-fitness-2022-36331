@@ -378,7 +378,7 @@ class Post(models.Model):
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_image_video")
-    image = models.FileField(upload_to="post_image/image", null=True, blank=True)
+    image = models.ImageField(upload_to="post_image/image", null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
