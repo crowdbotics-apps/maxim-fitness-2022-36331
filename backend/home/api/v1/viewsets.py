@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 
 from django.db.models import Prefetch, Q, Exists, OuterRef
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from fcm_django.models import FCMDevice
@@ -706,7 +707,11 @@ class SessionViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user).order_by('date_time')
+        current_date = timezone.now().date()
+        sessions = Session.objects.filter(user=self.request.user).order_by('date_time')
+        sessions.filter(date_time__lt=current_date).update(is_active=False)
+        return Session.objects.filter(user=self.request.user, is_active=True).order_by('date_time')
+
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -722,7 +727,7 @@ class SessionViewSet(ModelViewSet):
             day_no += 1
 
         d_no = day_with_date.get(start_date)
-        date_in_week_number = 1
+        date_in_week_number = 0
         if d_no:
             if d_no <= 7:
                 date_in_week_number = 1
@@ -740,6 +745,9 @@ class SessionViewSet(ModelViewSet):
                 first_day = first_day + timedelta(days=21)
                 last_day = first_day + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[first_day, last_day])
+        if start_date and d_no:
+            queryset = queryset.none()
+
         # if start_date:
         #     date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
         #     end = date_time_obj + timedelta(days=6)
@@ -777,7 +785,7 @@ class SessionViewSet(ModelViewSet):
                 carb_casual=session.carb_casual,
                 name=workout_title,
             )
-            session.delete()
+            session.update(is_active=False)
             order = 1
 
             for exe_id in exercise_ids:
@@ -882,7 +890,7 @@ class SessionViewSet(ModelViewSet):
         if day:
             # date_time_obj = datetime.strptime(day, '%Y-%m-%d')
             # session = Session.objects.filter(user=request.user).first()
-            session = Session.objects.filter(user=request.user, date_time=day).first()
+            session = Session.objects.filter(user=request.user, date_time=day, is_active=True).first()
             if reset:
                 session.reset()
             serializer = self.serializer_class(session, context={'request': request})
@@ -1249,6 +1257,19 @@ class ProductUnitViewSet(ModelViewSet):
     def get_queryset(self, **kwargs):
         queryset = ProductUnit.objects.filter(id=int(self.kwargs['pk']))
         return queryset
+
+    def update(self, request, *args, **kwargs):
+        partial = True
+        instance = self.get_object()
+        product_unit = request.data.get("unit")
+        serializer = self.get_serializer(instance, data=product_unit, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        obj = serializer.save()
+        product_data = request.data.get('food')
+        product_serializer = ProductSerializer(obj.product, data=product_data, partial=True)
+        product_serializer.is_valid(raise_exception=True)
+        product_serializer.save()
+        return Response(serializer.data)
 
 
 class CheckUserViewSet(ModelViewSet):
