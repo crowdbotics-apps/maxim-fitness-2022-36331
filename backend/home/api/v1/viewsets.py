@@ -814,7 +814,7 @@ class SessionViewSet(ModelViewSet):
             w_session = Session.objects.get(id=session_id)
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
-            order = workout_obj.order
+            order = workout_obj.order + 1 if workout_obj else 1
             for exe_id in exercise_ids:
                 exercise = Exercise.objects.get(id=exe_id)
                 workout = Workout.objects.create(
