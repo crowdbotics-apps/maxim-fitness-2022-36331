@@ -91,7 +91,7 @@ class Exercise(models.Model):
 
 @receiver(post_save, sender=Exercise)
 def save_video_thumbnail(sender, instance, created, **kwargs):
-    if created:
+    if not instance.video_thumbnail:
         exercise_video = Exercise.objects.get(id=instance.id)
         filename_sp = exercise_video.video.name.split("/")[-1].split(".")[0]
         destination_file_name = f"{filename_sp}.{exercise_video.video.name.split('.')[-1]}"

@@ -798,7 +798,8 @@ class SessionViewSet(ModelViewSet):
                 carb_casual=session.carb_casual,
                 name=workout_title,
             )
-            session.update(is_active=False)
+            session.is_active = False
+            session.save()
             order = 1
 
             for exe_id in exercise_ids:
