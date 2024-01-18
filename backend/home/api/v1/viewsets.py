@@ -183,11 +183,12 @@ class ProfileViewSet(ModelViewSet):
             u = u[0]
             date_time = self.request.data["date_time"]
             meal_list = []
+            Meal.objects.filter(user=self.request.user).delete()
             for i in date_time:
                 meal_list.append(Meal(user=self.request.user, date_time=i["mealTime"]))
             Meal.objects.bulk_create(meal_list)
-            meal = no_meal + len(date_time)
-            obj.number_of_meal = meal
+
+            obj.number_of_meal = len(date_time)
             obj.save()
 
         if request_from and request_from == 'question':
