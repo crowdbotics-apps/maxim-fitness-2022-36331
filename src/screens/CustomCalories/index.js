@@ -83,6 +83,7 @@ const CustomCalories = props => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
       props.getMealsRequest()
+      setTab(2)
     })
     return unsubscribe
   }, [props.navigation])
@@ -182,19 +183,14 @@ const CustomCalories = props => {
   const tabSettings = i => {
     setTab(i)
     if (i === 1) {
-      const newDate = moment(new Date()).format("YYYY-MM-DD")
-      props.getAllSessionRequest(newDate)
+      props.getAllSessionRequest("all")
       // props.getDaySessionRequest(numberOfDayForBackend);
     }
   }
 
   const onMealUpdate = () => {
-    if (profile && profile.number_of_meal >= 6) {
-      return Alert.alert("Maximum add food limit exceeded")
-    } else {
-      const mealValue = 6 - profile?.number_of_meal
-      navigation.navigate("SurveyScreenMeal", { mealValue })
-    }
+    const mealValue = 7 - profile?.number_of_meal
+    navigation.navigate("SurveyScreenMeal", { mealValue })
   }
 
   const checkValue = () => {
@@ -948,7 +944,7 @@ const mapDispatchToProps = dispatch => ({
   getNotificationCount: () => dispatch(getNotificationCount()),
   submitQuestionRequest: (profile, data) =>
     dispatch(submitQuestionRequest(profile, data)),
-  getAllSessionRequest: () => dispatch(getAllSessionRequest()),
+  getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   setAccessToken: data => dispatch(setAccessToken(data)),
   resetQuestions: () => dispatch(resetQuestions())

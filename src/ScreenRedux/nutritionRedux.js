@@ -155,9 +155,10 @@ export const getNotificationCountSuccess = data => ({
   payload: data
 })
 
-export const productUnitAction = (itemId, data) => ({
+export const productUnitAction = (itemId, value, data) => ({
   type: PRODUCT_UNIT_ACTION,
   itemId,
+  value,
   data
 })
 
@@ -463,7 +464,26 @@ function* getUnreadNotifications() {
   } catch (e) {}
 }
 
-async function productUnitAPI(itemId, data) {
+async function productUnitAPI(itemId, value, data) {
+  const objToUpdate = { ...data }
+  objToUpdate.food.calories =
+    ((objToUpdate && objToUpdate.food && objToUpdate.food.calories) /
+      (objToUpdate && objToUpdate.unit && objToUpdate.unit.quantity)) *
+    value
+  objToUpdate.food.carbohydrate =
+    ((objToUpdate && objToUpdate.food && objToUpdate.food.carbohydrate) /
+      (objToUpdate && objToUpdate.unit && objToUpdate.unit.quantity)) *
+    value
+  objToUpdate.food.fat =
+    ((objToUpdate && objToUpdate.food && objToUpdate.food.fat) /
+      (objToUpdate && objToUpdate.unit && objToUpdate.unit.quantity)) *
+    value
+  objToUpdate.food.proteins =
+    ((objToUpdate && objToUpdate.food && objToUpdate.food.proteins) /
+      (objToUpdate && objToUpdate.unit && objToUpdate.unit.quantity)) *
+    value
+  objToUpdate.unit.quantity = value
+
   const URL = `${API_URL}/product-unit/${itemId}/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
@@ -472,16 +492,19 @@ async function productUnitAPI(itemId, data) {
       "Content-Type": "application/json",
       Authorization: `Token  ${token}`
     },
-    data: { quantity: data }
+    data: objToUpdate
   }
 
   return XHR(URL, options)
 }
 
-function* productUnitData({ itemId, data }) {
+function* productUnitData({ itemId, value, data }) {
   try {
-    const response = yield call(productUnitAPI, itemId, data)
-  } catch (e) {}
+    const response = yield call(productUnitAPI, itemId, value, data)
+    console.log("ddddddddddddd", response.data)
+  } catch (e) {
+    console.log("errorrrrrrrrrr", e.response?.data)
+  }
 }
 
 export default all([

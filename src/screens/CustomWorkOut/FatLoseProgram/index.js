@@ -167,7 +167,7 @@ const FatLoseProgram = props => {
 
   const openModal = () => {
     setIsModal(true)
-    props.getAllSessionRequest()
+    props.getAllSessionRequest("")
   }
   const onDayPress = date => {
     const checkWeek = getWeekSessions?.query?.find(

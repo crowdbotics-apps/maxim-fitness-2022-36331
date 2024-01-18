@@ -10,6 +10,7 @@ import Navigation from "src/navigation"
 import { PubNubProvider } from "pubnub-react"
 import PubNub from "pubnub"
 import { PUBNUB_PUBLISH_KEY, PUBNUB_SUBSCRIBE_KEY } from "@env"
+import { MenuProvider } from "react-native-popup-menu"
 
 import { store } from "src/redux/store"
 
@@ -29,7 +30,9 @@ const App = () => {
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <NativeBaseProvider theme={theme}>
-            <Navigation />
+            <MenuProvider>
+              <Navigation />
+            </MenuProvider>
             <FlashMessage />
           </NativeBaseProvider>
         </PersistGate>

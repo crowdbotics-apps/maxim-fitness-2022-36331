@@ -19,7 +19,14 @@ import { Images } from "src/theme"
 import { calculatePostTime } from "src/utils/functions"
 import { connect } from "react-redux"
 import { SliderBox } from "react-native-image-slider-box"
-import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+// import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger
+} from "react-native-popup-menu"
+
 import Modal from "react-native-modal"
 
 //action
@@ -62,15 +69,6 @@ const ViewPost = props => {
   const [reason, setReason] = useState("")
   const [itemData, setItemData] = useState("")
   const [reportType, setReportType] = useState(false)
-
-  const [visible, setVisible] = useState(false)
-  const hideMenu = () => {
-    setVisible("")
-  }
-
-  const showMenu = item => {
-    setVisible(item)
-  }
 
   const inputRef = useRef()
 
@@ -135,7 +133,6 @@ const ViewPost = props => {
     }
   }
   const callback = () => {
-    hideMenu()
     setReason("")
     setItemData("")
     setModalVisible(false)
@@ -242,7 +239,6 @@ const ViewPost = props => {
 
   const action = (item, type, isReply) => {
     setItemData(item)
-    hideMenu()
     if (type === "delete") {
       const data = {
         id: item?.id,
@@ -251,9 +247,7 @@ const ViewPost = props => {
       }
       props.postCommentDelete(isReply ? item.id : data, getComments, isReply)
     } else {
-      setTimeout(() => {
-        setModalVisible(true)
-      }, 1000)
+      setModalVisible(true)
     }
   }
 
@@ -315,18 +309,18 @@ const ViewPost = props => {
                   content={postData?.content}
                 />
                 <SliderBox
-                  mages={
+                  images={
                     param &&
                     (param?.post_image?.length && param?.post_video?.length) > 0
                       ? [...param.post_image, ...param.post_video].map(item =>
-                          item?.image ? item?.image : item.video_thumbnail
+                          item?.image ? item?.image : item?.video_thumbnail
                         )
                       : param?.post_image?.length > 0 &&
                         param?.post_video?.length === 0
-                      ? param?.post_image.map(item => item?.image)
+                      ? param?.post_image?.map(item => item?.image)
                       : param?.post_video?.length > 0 &&
                         param?.post_image?.length === 0
-                      ? param?.post_video.map(item => item.video_thumbnail)
+                      ? param?.post_video.map(item => item?.video_thumbnail)
                       : []
                   }
                   style={styles.foodImageStyle}
@@ -392,39 +386,53 @@ const ViewPost = props => {
                                 />
                                 {/* <Text text={calculatePostTime(comment)} style={styles.timeText} /> */}
                               </View>
-                              <TouchableOpacity
-                                style={styles.dotImg}
-                                onPress={() => showMenu(comment)}
-                              >
-                                <Menu
-                                  visible={visible?.id === comment.id}
-                                  onRequestClose={() => hideMenu()}
+                              <Menu>
+                                <MenuTrigger>
+                                  <Image
+                                    source={Images.etc}
+                                    style={styles.profileImg}
+                                  />
+                                </MenuTrigger>
+                                <MenuOptions
+                                  optionsContainerStyle={{
+                                    width: 150,
+                                    borderRadius: 5
+                                  }}
                                 >
                                   {userDetail?.id === comment?.userId ? (
-                                    <MenuItem
-                                      textStyle={{ color: "red" }}
-                                      onPress={() =>
+                                    <MenuOption
+                                      onSelect={() =>
                                         action(comment, "delete", false)
                                       }
                                     >
-                                      Remove comment
-                                    </MenuItem>
+                                      <Text
+                                        style={{
+                                          color: "red",
+                                          paddingVertical: 6,
+                                          textAlign: "center"
+                                        }}
+                                      >
+                                        Remove comment
+                                      </Text>
+                                    </MenuOption>
                                   ) : (
-                                    <MenuItem
-                                      onPress={() =>
+                                    <MenuOption
+                                      onSelect={() =>
                                         action(comment, "report", false)
                                       }
                                     >
-                                      Report comment
-                                    </MenuItem>
+                                      <Text
+                                        style={{
+                                          paddingVertical: 6,
+                                          textAlign: "center"
+                                        }}
+                                      >
+                                        Report comment
+                                      </Text>
+                                    </MenuOption>
                                   )}
-                                </Menu>
-
-                                <Image
-                                  source={Images.etc}
-                                  style={styles.profileImg}
-                                />
-                              </TouchableOpacity>
+                                </MenuOptions>
+                              </Menu>
                             </View>
                             <Text
                               text={comment.text}
@@ -493,7 +501,57 @@ const ViewPost = props => {
                                         style={styles.nameText}
                                       />
                                     </View>
-                                    <TouchableOpacity
+
+                                    <Menu onSelect={() => setReportType(true)}>
+                                      <MenuTrigger>
+                                        <Image
+                                          source={Images.etc}
+                                          style={styles.profileImg}
+                                        />
+                                      </MenuTrigger>
+                                      <MenuOptions
+                                        optionsContainerStyle={{
+                                          width: 120,
+                                          borderRadius: 5
+                                        }}
+                                      >
+                                        {userDetail?.id === subComment?.user ? (
+                                          <MenuOption
+                                            onSelect={() =>
+                                              action(subComment, "delete", true)
+                                            }
+                                          >
+                                            <Text
+                                              style={{
+                                                color: "red",
+                                                paddingVertical: 6,
+                                                textAlign: "center"
+                                              }}
+                                            >
+                                              Remove reply
+                                            </Text>
+                                          </MenuOption>
+                                        ) : (
+                                          <MenuOption
+                                            onSelect={() => {
+                                              setReportType(true)
+                                              action(subComment, "report", true)
+                                            }}
+                                          >
+                                            <Text
+                                              style={{
+                                                paddingVertical: 6,
+                                                textAlign: "center"
+                                              }}
+                                            >
+                                              Report reply
+                                            </Text>
+                                          </MenuOption>
+                                        )}
+                                      </MenuOptions>
+                                    </Menu>
+
+                                    {/* <TouchableOpacity
                                       style={styles.dotImg}
                                       onPress={() => {
                                         setReportType(true)
@@ -501,8 +559,6 @@ const ViewPost = props => {
                                       }}
                                     >
                                       <Menu
-                                        visible={visible?.id === subComment.id}
-                                        onRequestClose={() => hideMenu()}
                                       >
                                         {userDetail?.id === subComment?.user ? (
                                           <MenuItem
@@ -528,7 +584,7 @@ const ViewPost = props => {
                                         source={Images.etc}
                                         style={styles.profileImg}
                                       />
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> */}
                                     {/* <View
                                   source={Images.etc}
                                   style={styles.profileImg}

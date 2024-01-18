@@ -41,12 +41,6 @@ const Feeds = props => {
   const [itemData, setItemData] = useState(false)
   const [refresh, setRefresh] = useState(false)
 
-  const [visibleMenu, setVisibleMenu] = useState(false)
-
-  const hideMenu = () => setVisibleMenu("")
-
-  const showMenu = item => setVisibleMenu(item)
-
   // const [uploadAvatar, setUploadAvatar] = useState('');
 
   useEffect(() => {
@@ -89,7 +83,6 @@ const Feeds = props => {
   }
 
   const callback = () => {
-    hideMenu()
     setReason("")
     setItemData(false)
     setModalVisible(false)
@@ -114,13 +107,7 @@ const Feeds = props => {
         setShowModal={setShowModal}
         setVideoUri={setVideoUri}
         setImageIndex={setImageIndex}
-        hideMenu={hideMenu}
-        showMenu={showMenu}
-        visibleMenu={visibleMenu}
-        setVisibleMenu={setVisibleMenu}
-        isModalVisible={isModalVisible}
         setModalVisible={setModalVisible}
-        itemData={itemData}
         setItemData={setItemData}
       />
       // </TouchableOpacity>
