@@ -56,7 +56,7 @@ const AddPost = props => {
 
   const aa = () => {
     let formData = new FormData()
-    const videoExtensions = ["mp4", "mov", "avi", "mkv"]
+    const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"]
     // formData.append('video_thumbnail', {
     //   uri: videoThumbnail.path,
     //   type: videoThumbnail.mime,

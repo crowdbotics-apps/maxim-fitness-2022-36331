@@ -33,10 +33,13 @@ import { calculatePostTime } from "../../utils/functions"
 import { exerciseArray } from "../../utils/utils"
 
 import { TabOne, TabThree } from "./components"
+//Actions
+import { updateAnswer } from "../Questions/Redux/index"
 import {
   getCustomCalRequest,
   getMealsRequest
 } from "../../ScreenRedux/customCalRedux"
+
 import { submitQuestionRequest } from "../Questions/Redux"
 import { getNumberOfDayByString } from "../../utils/common"
 import moment from "moment"
@@ -189,8 +192,14 @@ const CustomCalories = props => {
   }
 
   const onMealUpdate = () => {
-    const mealValue = 7 - profile?.number_of_meal
-    navigation.navigate("SurveyScreenMeal", { mealValue })
+    const tempData = props.answers
+    const data = {
+      name: `${profile?.number_of_meal} Meals`,
+      value: profile?.number_of_meal
+    }
+    tempData.number_of_meal = data
+    props.updateAnswers(tempData)
+    navigation.navigate("MealPreference", { isHome: true })
   }
 
   const checkValue = () => {
@@ -935,7 +944,8 @@ const mapStateToProps = state => ({
   getAllSessions: state.programReducer.getAllSessions,
   requesting: state.programReducer.requesting,
   loader: state.profileReducer.request,
-  updateLoader: state.questionReducer.requesting
+  updateLoader: state.questionReducer.requesting,
+  answers: state.questionReducer.answers
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -947,6 +957,7 @@ const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   setAccessToken: data => dispatch(setAccessToken(data)),
-  resetQuestions: () => dispatch(resetQuestions())
+  resetQuestions: () => dispatch(resetQuestions()),
+  updateAnswers: data => dispatch(updateAnswer(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomCalories)

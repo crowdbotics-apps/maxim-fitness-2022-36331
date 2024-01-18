@@ -13,7 +13,7 @@ import ProgressBar from "react-native-progress/Bar"
 import { Images, Gutters, Layout } from "../../../theme"
 
 const HeaderTitle = props => {
-  const { percentage, showBackButton } = props
+  const { percentage, showBackButton, isHome } = props
   const navigation = useNavigation()
   const deviceWidth = Dimensions.get("window").width
 
@@ -43,20 +43,22 @@ const HeaderTitle = props => {
           source={Images.orumIcon}
           style={[Gutters.regularVMargin, styles.logoStyle]}
         />
+
         <View style={Layout.fill} />
       </View>
-
-      <View style={[Layout.justifyContentCenter, Layout.alignItemsCenter]}>
-        <ProgressBar
-          height={15}
-          borderRadius={0}
-          color={"#317fbd"}
-          progress={percentage}
-          width={deviceWidth - 40}
-          unfilledColor={"#d3d3d3"}
-          borderColor={"#f2f2f2"}
-        />
-      </View>
+      {!isHome && (
+        <View style={[Layout.justifyContentCenter, Layout.alignItemsCenter]}>
+          <ProgressBar
+            height={15}
+            borderRadius={0}
+            color={"#317fbd"}
+            progress={percentage}
+            width={deviceWidth - 40}
+            unfilledColor={"#d3d3d3"}
+            borderColor={"#f2f2f2"}
+          />
+        </View>
+      )}
     </>
   )
 }

@@ -501,10 +501,7 @@ async function productUnitAPI(itemId, value, data) {
 function* productUnitData({ itemId, value, data }) {
   try {
     const response = yield call(productUnitAPI, itemId, value, data)
-    console.log("ddddddddddddd", response.data)
-  } catch (e) {
-    console.log("errorrrrrrrrrr", e.response?.data)
-  }
+  } catch (e) {}
 }
 
 export default all([

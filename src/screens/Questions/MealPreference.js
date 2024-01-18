@@ -21,7 +21,8 @@ import { updateAnswer } from "./Redux"
 
 const MealPreference = props => {
   const {
-    navigation: { navigate }
+    navigation: { navigate },
+    route: { params }
   } = props
   const [exerciseLevel, setExerciseLevel] = useState(false)
 
@@ -40,15 +41,26 @@ const MealPreference = props => {
   ]
 
   const onNext = () => {
-    const tempData = props.answers
-    tempData.number_of_meal = exerciseLevel
+    let tempData = { ...props.answers }
+    if (params?.isHome) {
+      tempData = {}
+      tempData["number_of_meal"] = exerciseLevel
+    } else {
+      delete tempData?.number_of_meal
+      delete tempData?.mealTimes
+      tempData.number_of_meal = exerciseLevel
+    }
     props.updateAnswers(tempData)
-    navigate("MealTime", { numberOfMeals: exerciseLevel.value })
+
+    navigate("MealTime", {
+      numberOfMeals: exerciseLevel.value,
+      isHome: params?.isHome ? params?.isHome : false
+    })
   }
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
-      <HeaderTitle percentage={0.68} showBackButton />
+      <HeaderTitle percentage={0.68} showBackButton isHome={params?.isHome} />
       <ScrollView
         contentContainerStyle={[
           Layout.fillGrow,

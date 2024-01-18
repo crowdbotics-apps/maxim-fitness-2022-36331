@@ -180,7 +180,6 @@ function* login({ data }) {
     // }
   } catch (e) {
     const { response } = e
-    console.log("error response---", response)
     showMessage({
       message: "Unable to log in with provided credentials.",
       type: "danger"

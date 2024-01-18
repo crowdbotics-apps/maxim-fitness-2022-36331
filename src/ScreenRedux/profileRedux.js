@@ -2,7 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { showMessage } from "react-native-flash-message"
-import { goBack } from "../navigation/NavigationService"
+import { goBack, navigate } from "../navigation/NavigationService"
 
 //Actions
 import { setUserDetail } from "./loginRedux"
@@ -379,7 +379,7 @@ function* updateProfileMeal({ data, id }) {
   try {
     const response = yield call(updateProfileMealAPI, data, id)
     showMessage({ message: "Meal updated successfully", type: "success" })
-    goBack()
+    navigate("Custom")
     yield put(editProfileMealSuccess())
     yield put(profileData())
   } catch (e) {

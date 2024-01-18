@@ -6,6 +6,8 @@ import { API_URL } from "../../../config/app"
 //XHR
 import XHR from "../../../utils/XHR"
 
+import { showMessage } from "react-native-flash-message"
+
 // Action
 import { profileData } from "../../../ScreenRedux/profileRedux"
 
@@ -141,6 +143,10 @@ function* submitQuestion({ profile, data }) {
     yield put(submitQuestionSuccess(true))
   } catch (error) {
     yield put(submitQuestionSuccess(false))
+    showMessage({
+      message: error.response?.data && error.response?.data?.message,
+      type: "danger"
+    })
   }
 }
 export default all([takeLatest(QUESTION_DATA_REQUEST, submitQuestion)])

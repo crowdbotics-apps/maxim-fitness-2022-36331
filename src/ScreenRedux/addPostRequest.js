@@ -1,17 +1,17 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { navigate } from '../navigation/NavigationService'
-import { getFeedsRequest } from './feedRedux'
+import { all, call, put, takeLatest } from "redux-saga/effects"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { navigate } from "../navigation/NavigationService"
+import { getFeedsRequest } from "./feedRedux"
 
 // config
-import { API_URL } from '../config/app';
+import { API_URL } from "../config/app"
 
 // utils
-import XHR from 'src/utils/XHR';
+import XHR from "src/utils/XHR"
 
 //Types
-const ADD_POST = 'SCREEN/ADDPOST';
-const RESET = 'SCREEN/ADDPOST/RESET';
+const ADD_POST = "SCREEN/ADDPOST"
+const RESET = "SCREEN/ADDPOST/RESET"
 
 const initialState = {
   requesting: false
@@ -49,14 +49,14 @@ export const addPostReducer = (state = initialState, action) => {
 //Saga
 async function addPostAPI(data) {
   const URL = `${API_URL}/post/`
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem("authToken")
   const options = {
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'multipart/form-data',
-      Authorization: `Token  ${token}`,
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+      Authorization: `Token  ${token}`
     },
-    method: 'POST',
+    method: "POST",
     data
   }
 
@@ -66,7 +66,7 @@ async function addPostAPI(data) {
 function* AddPost({ data }) {
   try {
     const response = yield call(addPostAPI, data)
-    navigate('Feeds')
+    navigate("Feeds")
     // yield put((getFeedsRequest(1)))
   } catch (e) {
     const { response } = e
