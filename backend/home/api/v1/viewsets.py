@@ -814,7 +814,7 @@ class SessionViewSet(ModelViewSet):
             w_session = Session.objects.get(id=session_id)
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
-            order = workout_obj.order
+            order = workout_obj.order + 1 if workout_obj else 1
             for exe_id in exercise_ids:
                 exercise = Exercise.objects.get(id=exe_id)
                 workout = Workout.objects.create(
@@ -824,15 +824,14 @@ class SessionViewSet(ModelViewSet):
                 )
                 order = order + 1
                 for set in sets:
-                    if set["ex_id"] == exercise.id:
-                        s_ = Set.objects.create(
-                            workout=workout,
-                            set_no=set["set_no"],
-                            reps=set["reps"],
-                            weight=set["weight"],
-                            timer=set["timer"],
-                            set_type=set["set_type"],
-                        )
+                    s_ = Set.objects.create(
+                        workout=workout,
+                        set_no=set["set_no"],
+                        reps=set["reps"],
+                        weight=set["weight"],
+                        timer=set["timer"],
+                        set_type=set["set_type"],
+                    )
             return Response("data save successful")
 
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
