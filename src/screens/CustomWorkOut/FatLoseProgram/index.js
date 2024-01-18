@@ -210,51 +210,55 @@ const FatLoseProgram = props => {
           </Text>
           {!todayRequest && getWeekSessions?.query?.length > 0 && (
             <>
-              <View
-                style={[
-                  row,
-                  alignItemsCenter,
-                  justifyContentBetween,
-                  Gutters.small2xTMargin
-                ]}
-              >
-                <TouchableOpacity
-                  style={row}
-                  onPress={activeIndex === 1 ? nextExercise : previousExercise}
+              {getWeekSessions?.query?.length > 1 ? (
+                <View
+                  style={[
+                    row,
+                    alignItemsCenter,
+                    justifyContentBetween,
+                    Gutters.small2xTMargin
+                  ]}
                 >
-                  {activeIndex === 2 ? (
-                    <Icon
-                      type="FontAwesome5"
-                      name={"chevron-left"}
-                      style={styles.IconStyle}
+                  <TouchableOpacity
+                    style={row}
+                    onPress={
+                      activeIndex === 1 ? nextExercise : previousExercise
+                    }
+                  >
+                    {activeIndex === 2 ? (
+                      <Icon
+                        type="FontAwesome5"
+                        name={"chevron-left"}
+                        style={styles.IconStyle}
+                      />
+                    ) : null}
+                    <Text
+                      color="primary"
+                      text={`Week ${activeIndex === 1 ? 2 : 1}`}
+                      style={[tinyLMargin, styles.smallText]}
                     />
-                  ) : null}
-                  <Text
-                    color="primary"
-                    text={`Week ${activeIndex === 1 ? 2 : 1}`}
-                    style={[tinyLMargin, styles.smallText]}
-                  />
-                  {activeIndex === 1 ? (
-                    <Icon
-                      type="FontAwesome5"
-                      name={"chevron-right"}
-                      style={styles.IconStyle}
-                    />
-                  ) : null}
-                </TouchableOpacity>
+                    {activeIndex === 1 ? (
+                      <Icon
+                        type="FontAwesome5"
+                        name={"chevron-right"}
+                        style={styles.IconStyle}
+                      />
+                    ) : null}
+                  </TouchableOpacity>
 
-                <TouchableOpacity style={row} onPress={openModal}>
-                  <Text
-                    text={"Calendar"}
-                    style={[tinyLMargin, styles.CalenderText]}
-                  />
-                  <Icon
-                    type="FontAwesome5"
-                    name="chevron-right"
-                    style={[styles.IconStyle, { color: "gray" }]}
-                  />
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity style={row} onPress={openModal}>
+                    <Text
+                      text={"Calendar"}
+                      style={[tinyLMargin, styles.CalenderText]}
+                    />
+                    <Icon
+                      type="FontAwesome5"
+                      name="chevron-right"
+                      style={[styles.IconStyle, { color: "gray" }]}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
               <View style={Layout.alignItemsCenter}>
                 <ScrollView
                   horizontal
@@ -275,7 +279,9 @@ const FatLoseProgram = props => {
                         style={{
                           marginHorizontal: 8,
                           marginVertical: 10,
-                          alignItems: "center"
+                          alignItems: "center",
+                          marginTop:
+                            getWeekSessions?.query?.length <= 1 ? 20 : 10
                         }}
                       >
                         <Text
@@ -345,7 +351,6 @@ const FatLoseProgram = props => {
               </View>
             </>
           )}
-
           {todayRequest ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
@@ -380,13 +385,27 @@ const FatLoseProgram = props => {
                     <Image source={etc} style={styles.imgStyle} />
                   </TouchableOpacity>
                 </View>
-                <View style={[row]}>
-                  <View style={[row, { width: "36%", marginTop: 5 }]}>
+                <View style={[row, { flex: 1 }]}>
+                  <View
+                    style={[
+                      row,
+                      {
+                        width: "36%",
+                        marginTop: 5,
+                        flexWrap: "wrap"
+                      }
+                    ]}
+                  >
                     {todaySessions?.workouts &&
-                      todaySessions?.workouts?.map(item => (
+                      todaySessions?.workouts?.map((item, i) => (
                         <Image
                           source={{ uri: item?.exercise.exercise_type?.image }}
-                          style={{ width: 50, height: 50, marginLeft: 5 }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            marginLeft: 5,
+                            marginTop: i > 1 ? 5 : 0
+                          }}
                         />
                       ))}
                   </View>
@@ -395,7 +414,8 @@ const FatLoseProgram = props => {
                     style={{
                       flex: 1,
                       width: "85%",
-                      marginHorizontal: 10
+                      marginHorizontal: 10,
+                      fllex: 1
                     }}
                   >
                     <View>

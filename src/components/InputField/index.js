@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, StyleSheet, TextInput } from 'react-native';
-import { Colors } from '../../theme';
+import React from "react"
+import { View, StyleSheet, TextInput } from "react-native"
+import { Colors } from "../../theme"
 
 const InputField = ({
   value,
@@ -10,7 +10,7 @@ const InputField = ({
   inputStyle,
   placeholder,
   placeholderTextColor,
-  keyboardType,
+  keyboardType
 }) => {
   return (
     <TextInput
@@ -23,17 +23,17 @@ const InputField = ({
       style={[styles.textInput, inputStyle]}
       placeholderTextColor={placeholderTextColor}
     />
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   textInput: {
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
     color: Colors.black,
     borderColor: Colors.steel,
     paddingHorizontal: 10
-  },
-});
+  }
+})
 
-export default InputField;
+export default InputField

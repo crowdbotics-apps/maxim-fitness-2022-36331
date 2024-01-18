@@ -22,13 +22,17 @@ import { Images, Global, Layout, Gutters, Fonts, Colors } from "../../theme"
 
 //Actions
 import { updateAnswer } from "./Redux"
+import { editProfileMeal } from "../../ScreenRedux/profileRedux"
+
 import DatePicker from "react-native-date-picker"
 import LinearGradient from "react-native-linear-gradient"
 
 const MealTime = props => {
   const {
     navigation: { navigate },
-    route: { params }
+    route: { params },
+    profileData,
+    mealRequest
   } = props
   const deviceWidth = Dimensions.get("window").width
   const { numberOfMeals } = params
@@ -75,10 +79,19 @@ const MealTime = props => {
     })
 
     if (meals.length === duplicateArray.length) {
-      const tempData = props.answers
-      tempData.mealTimes = meals
-      props.updateAnswers(tempData)
-      navigate("NutritionUnderstanding")
+      if (params?.isHome) {
+        const data = {
+          date_time: meals,
+          number_of_meal: meals?.length,
+          request_type: "mealTime"
+        }
+        props.editProfileMeal(data, profileData?.id)
+      } else {
+        const tempData = props.answers
+        tempData.mealTimes = meals
+        props.updateAnswers(tempData)
+        navigate("NutritionUnderstanding")
+      }
     } else {
       Alert.alert("Please choose different time")
     }
@@ -92,7 +105,11 @@ const MealTime = props => {
 
   return (
     <SafeAreaView style={[Global.secondaryBg, Layout.fill]}>
-      <HeaderTitle showBackButton={true} percentage={0.75} />
+      <HeaderTitle
+        showBackButton={true}
+        percentage={0.75}
+        isHome={params?.isHome}
+      />
       <ScrollView
         contentContainerStyle={[
           Layout.fillGrow,
@@ -157,10 +174,13 @@ const MealTime = props => {
         <View style={Layout.justifyContentEnd}>
           <Button
             block
-            text={"Next"}
+            text={params?.isHome ? "Add Meal" : "Next"}
             color="primary"
             onPress={onNext}
-            disabled={buttonDiabled().includes("") ? true : false}
+            loading={mealRequest}
+            disabled={
+              mealRequest || buttonDiabled().includes("") ? true : false
+            }
             style={Gutters.regularBMargin}
           />
         </View>
@@ -249,10 +269,13 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-  answers: state.questionReducer.answers
+  answers: state.questionReducer.answers,
+  profileData: state.login.userDetail,
+  mealRequest: state.profileReducer.mealRequest
 })
 
 const mapDispatchToProps = dispatch => ({
-  updateAnswers: data => dispatch(updateAnswer(data))
+  updateAnswers: data => dispatch(updateAnswer(data)),
+  editProfileMeal: (mealtime, id) => dispatch(editProfileMeal(mealtime, id))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(MealTime)

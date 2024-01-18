@@ -584,6 +584,8 @@ const LogFoods = props => {
     return <></>
   }
 
+  const totalCalories = Math.round(totalCal) + Math.round(totalCalFirst)
+
   return (
     <SafeAreaView style={[fill, secondaryBg]}>
       <>
@@ -923,7 +925,7 @@ const LogFoods = props => {
               buttonContainerTextStyle={styles.buttonContainerTextStyle}
               buttonContentContainerProp={{ paddingBottom: 0 }}
               onPress={logFoodAction}
-              isDone={disable}
+              isDone={disable || totalCalories === 0}
               loading={loaderLogFood}
             />
           </View>

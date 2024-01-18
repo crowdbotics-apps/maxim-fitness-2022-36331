@@ -36,6 +36,8 @@ import SurveyScreenMeal from "../screens/SurveyScreenMeal"
 import Alexa from "../screens/Alexa"
 import SwapExerciseScreen from "../screens/SwapExerciseScreen"
 import WorkoutCard from "../screens/WorkoutCard"
+import MealPreference from "../screens/Questions/MealPreference"
+import MealTime from "../screens/Questions/MealTime"
 
 import LogFoods from "../screens/LogFoods"
 import { modules } from "@modules"
@@ -269,6 +271,17 @@ const MainNavigator = () => (
       name="EditCaloriesManually"
       component={EditCaloriesManually}
     />
+    <mainStack.Screen
+      name="MealPreference"
+      component={MealPreference}
+      options={{ animationEnabled: false }}
+    />
+    <mainStack.Screen
+      name="MealTime"
+      component={MealTime}
+      options={{ animationEnabled: false }}
+    />
+
     <mainStack.Screen name="SurveyScreenMeal" component={SurveyScreenMeal} />
     <mainStack.Screen name="MealRegulator" component={MealRegulator} />
     <mainStack.Screen name="SelectBrand" component={SelectBrand} />

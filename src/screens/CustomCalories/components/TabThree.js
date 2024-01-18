@@ -287,9 +287,7 @@ const TabThree = ({
             }}
             bold
           />
-          {profileData.number_of_meal < 6 && (
-            <Text text="Edit" color="nonary" onPress={onMealUpdate} />
-          )}
+          <Text text="Edit" color="nonary" onPress={onMealUpdate} />
         </View>
         <Text text={`${profileData.number_of_meal} meals`} color="nonary" />
       </View>

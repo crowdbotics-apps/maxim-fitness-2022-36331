@@ -266,8 +266,8 @@ const ExerciseScreen = props => {
 
   const submitData = data => {
     const findSetId = data?.sets[activeSet]
-    const allDone = data.sets.every(set => set.done)
-    const arrayHowManyDone = data.sets.filter(
+    const allDone = data?.sets?.every(set => set.done)
+    const arrayHowManyDone = data?.sets?.filter(
       countSetsDone => countSetsDone.done
     )
     const countHowManyDone = arrayHowManyDone.length

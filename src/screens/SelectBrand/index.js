@@ -180,49 +180,51 @@ const SelectBrand = props => {
           <Image style={styles.barCodeStyle} source={Images.barCode} />
         </TouchableOpacity>
       </View>
-      <View style={[Layout.fill, Gutters.small2xHMargin, Global.secondaryBg]}>
-        {value === "" ? (
-          <View
-            style={[
-              Layout.fill,
-              Gutters.mediumHMargin,
-              Gutters.mediumTMargin,
-              Layout.alignItemsCenter,
-              Layout.justifyContentStart
-            ]}
-          >
-            <Icon
-              type="FontAwesome5"
-              name="arrow-up"
-              size={25}
-              style={{ color: "gray" }}
-            />
-            <Text
-              style={{
-                color: "gray",
-                fontSize: 15,
-                textAlign: "center",
-                lineHeight: 30,
-                marginTop: 15
-              }}
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps={"handled"}
+      >
+        <View style={[Layout.fill, Gutters.small2xHMargin, Global.secondaryBg]}>
+          {value === "" ? (
+            <View
+              style={[
+                Layout.fill,
+                Gutters.mediumHMargin,
+                Gutters.mediumTMargin,
+                Layout.alignItemsCenter,
+                Layout.justifyContentStart
+              ]}
             >
-              Use the search box above to search for foods to add to your log
-            </Text>
-          </View>
-        ) : foodRequesting ? (
-          <View style={styles.loaderStyle}>
-            <ActivityIndicator size="large" color="green" />
-          </View>
-        ) : (
-          <KeyboardAwareScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps={"handled"}
-          >
-            <View>{filterCommon && renderedData()}</View>
-            <View>{filterBranded && renderFilterData()}</View>
-          </KeyboardAwareScrollView>
-        )}
-      </View>
+              <Icon
+                type="FontAwesome5"
+                name="arrow-up"
+                size={25}
+                style={{ color: "gray" }}
+              />
+              <Text
+                style={{
+                  color: "gray",
+                  fontSize: 15,
+                  textAlign: "center",
+                  lineHeight: 30,
+                  marginTop: 15
+                }}
+              >
+                Use the search box above to search for foods to add to your log
+              </Text>
+            </View>
+          ) : foodRequesting ? (
+            <View style={styles.loaderStyle}>
+              <ActivityIndicator size="large" color="green" />
+            </View>
+          ) : (
+            <>
+              <View>{filterCommon && renderedData()}</View>
+              <View>{filterBranded && renderFilterData()}</View>
+            </>
+          )}
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   )
 }

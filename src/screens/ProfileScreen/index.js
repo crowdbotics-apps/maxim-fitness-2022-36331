@@ -465,7 +465,6 @@ const ProfileScreen = props => {
                   />
                 </TouchableOpacity>
               </View>
-              {console.log("calculatedData()", calculatedData())}
               {calculatedData()?.length &&
                 calculatedData()?.map((item, i) => {
                   return (
@@ -490,7 +489,8 @@ const ProfileScreen = props => {
                             style={{
                               height: (300 / 375) * width,
                               width: (175 / 375) * width,
-                              borderRadius: 20
+                              borderRadius: 20,
+                              resizeMode: "cover"
                             }}
                           />
                         </TouchableOpacity>
@@ -521,7 +521,7 @@ const ProfileScreen = props => {
                           marginRight: i % 2 === 0 ? 0 : 10
                         }}
                       >
-                        {showVideo && item[1] ? (
+                        {showVideo && item[1]?.video_thumbnail ? (
                           <TouchableOpacity
                             onPress={() => [
                               setShowModal(true),
@@ -535,12 +535,13 @@ const ProfileScreen = props => {
                               style={{
                                 height: (145 / 375) * width,
                                 width: (175 / 375) * width,
-                                borderRadius: 20
+                                borderRadius: 20,
+                                resizeMode: "stretch"
                               }}
                             />
                           </TouchableOpacity>
                         ) : (
-                          item[1] && (
+                          item[1]?.image && (
                             <TouchableOpacity
                               onPress={() => {
                                 findIndex(item[1])
@@ -578,7 +579,7 @@ const ProfileScreen = props => {
                             />
                           </TouchableOpacity>
                         ) : (
-                          item[2] && (
+                          item[2]?.image && (
                             <TouchableOpacity
                               onPress={() => {
                                 findIndex(item[2])
