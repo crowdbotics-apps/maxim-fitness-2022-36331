@@ -134,11 +134,16 @@ class ProfileViewSet(ModelViewSet):
         return queryset
 
     def create_calories(self, calories, date):
+
+        carbs = ((calories * 40) / 100) / 4
+        protein =((calories * 40) / 100) / 4
+        fat = ((calories * 20) / 100) / 9
+
         new_values = {
-            'calories': calories,
-            'carbs': ((calories * 40) / 100) / 4,
-            'protein': ((calories * 40) / 100) / 4,
-            'fat': ((calories * 20) / 100) / 9
+            'calories': calories if calories > 0 else 0,
+            'carbs': carbs if carbs > 0 else 0,
+            'protein': protein if protein > 0 else 0,
+            'fat': fat if fat > 0 else 0
         }
         CaloriesRequired.objects.update_or_create(
             user=self.request.user,
@@ -157,11 +162,31 @@ class ProfileViewSet(ModelViewSet):
         if request_from and request_from == "goal":
             if self.request.data["fitness_goal"]:
                 obj = queryset[0]
+                program = AnswerProgram.objects.filter(
+                    age_min__lte=age,
+                    age_max__gte=age,
+                    exercise_level=obj.exercise_level,
+                    number_of_training_days=obj.number_of_training_days,
+                    fitness_goal=int(self.request.data["fitness_goal"])
+                ).first()
+                if not program:
+                    return Response({"message": "No program currently aligns with selected fitness goal."},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 obj.fitness_goal = self.request.data["fitness_goal"]
                 obj.save()
         if request_from and request_from == "days":
             obj = queryset[0]
             if self.request.data["number_of_training_days"]:
+                program = AnswerProgram.objects.filter(
+                    age_min__lte=age,
+                    age_max__gte=age,
+                    exercise_level=obj.exercise_level,
+                    number_of_training_days=int(self.request.data["number_of_training_days"]),
+                    fitness_goal=obj.fitness_goal
+                ).first()
+                if not program:
+                    return Response({"message": "No program currently aligns with this training days."},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 obj.number_of_training_days = self.request.data["number_of_training_days"]
                 obj.save()
         if request_from and request_from == 'mealTime':
