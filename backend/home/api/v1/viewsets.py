@@ -808,6 +808,33 @@ class SessionViewSet(ModelViewSet):
         workout_title = self.request.data.get("title")
         exercise_ids = self.request.data.get("exercise_ids")
         sets = self.request.data.get("set")
+        adding_exercise_in_workout = self.request.data.get("adding_exercise_in_workout")
+        if adding_exercise_in_workout:
+            session_id = self.request.data.get("session_id")
+            w_session = Session.objects.get(id=session_id)
+            workout_obj = Workout.objects.filter(session_id=w_session.id).last()
+
+            order = workout_obj.order
+            for exe_id in exercise_ids:
+                exercise = Exercise.objects.get(id=exe_id)
+                workout = Workout.objects.create(
+                    session=w_session,
+                    exercise=exercise,
+                    order=order
+                )
+                order = order + 1
+                for set in sets:
+                    if set["ex_id"] == exercise.id:
+                        s_ = Set.objects.create(
+                            workout=workout,
+                            set_no=set["set_no"],
+                            reps=set["reps"],
+                            weight=set["weight"],
+                            timer=set["timer"],
+                            set_type=set["set_type"],
+                        )
+            return Response("data save successful")
+
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
         if session:
             w_session = Session.objects.create(
