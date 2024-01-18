@@ -6,7 +6,8 @@ from django.utils.safestring import mark_safe
 
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
     RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
-    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo
+    ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo, ReportAComment, \
+    ReportCommentReply
 import nested_admin
 
 
@@ -114,8 +115,12 @@ class ConsumeCaloriesAdmin(admin.ModelAdmin):
 
 
 class ReportAPostAdmin(admin.ModelAdmin):
-    # list_display = ["user", "post", "comment", "reason", "resolved",  "created"]
-    # change_form_template = "home/resolve.html"
+    list_display = ["user", "post", "post_owner", "comment", "reason", "resolved", "created"]
+
+    def post_owner(self, obj):
+        return obj.post.user.username if obj.post else None
+
+    post_owner.short_description = "Post Owner"
 
     def response_change(self, request, obj):
         if "resolve" in request.POST:
@@ -125,18 +130,6 @@ class ReportAPostAdmin(admin.ModelAdmin):
             # return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 
-    # def image_tag(self, obj):
-    #     if obj.post.image:
-    #         return mark_safe('<img src="%s" style="width: 45px; height:45px;" />' % obj.post.image_url)
-    #
-    # def post_image(self, obj):
-    #     return mark_safe('<img src="%s" style="width: 400px; height:400px;" />' % obj.post.image_url)
-    #
-    # image_tag.short_description = 'Post Image'
-
-    list_display = ["user", "post", "comment", "reason", "resolved",  "created"]
-    # readonly_fields = ["post_image"]
-
 
 class BlockUserAdmin(admin.ModelAdmin):
     list_display = ["requested_user", "blocked_user", "created"]
@@ -144,6 +137,22 @@ class BlockUserAdmin(admin.ModelAdmin):
 
 class PostImageVideoAdmin(admin.ModelAdmin):
     list_display = ["id", "post", "image", "created"]
+
+
+class ReportCommentReplyAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment_reply", "user", "reason", "created"]
+
+
+class PostCommentReplyAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "content", "created"]
+
+
+class PostCommentLikeAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "comment_reply"]
+
+
+class ReportACommentAdmin(admin.ModelAdmin):
+    list_display = ["id", "comment", "user", "reason", "created"]
 
 
 admin.site.register(Form, FormAdmin)
@@ -157,9 +166,10 @@ admin.site.register(ProductUnit)
 admin.site.register(ReportAPost, ReportAPostAdmin)
 admin.site.register(BlockUser, BlockUserAdmin)
 admin.site.register(PostImage, PostImageVideoAdmin)
-admin.site.register(PostCommentReply)
-admin.site.register(PostCommentLike)
+admin.site.register(ReportCommentReply, ReportCommentReplyAdmin)
+admin.site.register(PostCommentReply, PostCommentReplyAdmin)
+admin.site.register(PostCommentLike, PostCommentLikeAdmin)
 admin.site.register(PostVideo)
-
+admin.site.register(ReportAComment, ReportACommentAdmin)
 
 # admin.site.register(Settings, SingletonModelAdmin)

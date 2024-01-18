@@ -1,4 +1,5 @@
 from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 from push_notifications.api.rest_framework import APNSDeviceAuthorizedViewSet, GCMDeviceAuthorizedViewSet
 from home.api.v1.viewsets import (
@@ -28,7 +29,8 @@ from home.api.v1.viewsets import (
     CheckUserViewSet,
     ReportAPostViewSet,
     BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
-    ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet
+    ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet,
+    ReportACommentViewSet, ReportCommentReplyViewSet,
 )
 
 from rest_framework import permissions
@@ -88,6 +90,8 @@ router.register(r'device/fcm', GCMDeviceAuthorizedViewSet)
 
 router.register('check-user', CheckUserViewSet, basename='check_user')
 router.register('report-post', ReportAPostViewSet, basename='report_post')
+router.register('report-comment', ReportACommentViewSet, basename='report_comment')
+router.register('report-reply-comment', ReportCommentReplyViewSet, basename='report_reply_comment')
 router.register('report-user', ReportAUserViewSet, basename='report_user')
 router.register('block-user', BlockedUserViewSet, basename='block_user')
 router.register("chat", ChatViewSet, basename="chat")
@@ -105,5 +109,6 @@ urlpatterns = [
     re_path(r'^login/google/$', GoogleLogin.as_view(), name='google_login'),
     re_path(r'^login/apple/$', AppleLogin.as_view(), name='apple_login'),
 
-    path('forgot-password/', include('django_rest_passwordreset.urls', namespace='password_reset'))
+    path('forgot-password/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html')),
 ]

@@ -1,9 +1,15 @@
+import wget
+import os
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.conf import settings
-# Create your models here.
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.core.files import File
 
 from datetime import datetime, timedelta
+
+from thumbnail import generate_thumbnail
+
 User = get_user_model()
 
 
@@ -31,6 +37,7 @@ class Session(models.Model):
     carb = models.FloatField(null=True, blank=True)
     carb_casual = models.FloatField(null=True, blank=True)
     done = models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.user)
@@ -76,9 +83,36 @@ class Exercise(models.Model):
     exercise_type = models.ForeignKey('ExerciseType', related_name='exercises', on_delete=models.CASCADE, null=True)
     description = models.TextField()
     video = models.FileField(upload_to='videos/', null=True)
+    video_thumbnail = models.FileField(upload_to='exercise_video/thumbnail', null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+@receiver(post_save, sender=Exercise)
+def save_video_thumbnail(sender, instance, created, **kwargs):
+    if not instance.video_thumbnail:
+        exercise_video = Exercise.objects.get(id=instance.id)
+        filename_sp = exercise_video.video.name.split("/")[-1].split(".")[0]
+        destination_file_name = f"{filename_sp}.{exercise_video.video.name.split('.')[-1]}"
+        thumbnail_file_name = f"{filename_sp}.png"
+        try:
+            wget.download(exercise_video.video.url, destination_file_name)
+            options = {
+                'trim': False,
+                'height': 300,
+                'width': 300,
+                'quality': 85,
+                'type': 'thumbnail'
+            }
+            generate_thumbnail(destination_file_name, thumbnail_file_name, options)
+            # TODO: upload thumbnail_file_name to post_video.thumbnail
+            exercise_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+        except Exception as e:
+            print(e)
+        finally:
+            os.remove(destination_file_name)
+            os.remove(thumbnail_file_name)
 
 
 class Program(models.Model):
@@ -95,7 +129,7 @@ class Program(models.Model):
     def create_session(self, user):
         session = Session.objects.filter(user=user)
         if session:
-            session.delete()
+            session.update(is_active=True)
         weeks = self.weeks.all()
         print('weeks', weeks)
         days_gap = 0

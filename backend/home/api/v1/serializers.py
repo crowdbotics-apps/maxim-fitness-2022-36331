@@ -23,7 +23,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
-    PostCommentReply, PostCommentLike, PostVideo, ReportAUser
+    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings, UserPhoto, UserVideo
@@ -129,7 +129,7 @@ class RestSocialLoginSerializer(SocialLoginSerializer):
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password')
+        fields = ('id', 'name', 'email', 'password', "first_name","last_name")
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -138,6 +138,14 @@ class SignupSerializer(serializers.ModelSerializer):
                 }
             },
             'email': {
+                'required': True,
+                'allow_blank': False,
+            },
+            'first_name': {
+                'required': True,
+                'allow_blank': False,
+            },
+            'last_name': {
                 'required': True,
                 'allow_blank': False,
             }
@@ -161,6 +169,8 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User(
             email=validated_data.get('email'),
             name=validated_data.get('name'),
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
             username=generate_unique_username([
                 validated_data.get('name'),
                 validated_data.get('email'),
@@ -531,6 +541,13 @@ class ReportAPostSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ReportACommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReportAComment
+        fields = "__all__"
+
+
 class ReportAUserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -592,3 +609,11 @@ class UserVideoSerializer(serializers.ModelSerializer):
                 )
 
         return user_video
+
+
+
+class ReportCommentReplySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReportCommentReply
+        fields = "__all__"

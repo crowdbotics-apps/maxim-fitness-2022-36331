@@ -13,6 +13,12 @@ class Notification(models.Model):
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    # for handling delete post's notifications on resolved and resolved report_a_post object
+    post = models.ForeignKey(
+        "home.Post", on_delete=models.CASCADE,
+        related_name="notify_report",
+        null=True, blank=True
+    )
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

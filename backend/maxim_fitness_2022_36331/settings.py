@@ -222,12 +222,15 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 # Custom user model
 AUTH_USER_MODEL = "users.User"
 
-EMAIL_HOST = env.str("EMAIL_HOST", "smtp.sendgrid.net")
-EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
-EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
+SENDGRID_API_KEY = env.str("SENDGRID_API_KEY", "")
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+DEFAULT_FROM_EMAIL = env.str("FROM_EMAIL", "")
 # AWS S3 config
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
@@ -263,11 +266,11 @@ SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
 
-if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
-    # output email to console instead of sending
-    if not DEBUG:
-        logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+#     # output email to console instead of sending
+#     if not DEBUG:
+#         logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # GCP config 
