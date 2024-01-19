@@ -7,6 +7,7 @@ import { API_URL } from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
+import { navigate } from "../navigation/NavigationService"
 // import { errorAlert } from "src/utils/alerts"
 
 //Types
@@ -23,10 +24,10 @@ const initialState = {
 }
 
 //Actions
-export const getPost = (data, isLoader) => ({
+export const getPost = (data, isTrue) => ({
   type: VIEW_POST,
   data,
-  isLoader
+  isTrue
 })
 
 export const getPostSuccess = data => ({
@@ -57,7 +58,7 @@ export const postReducer = (state = initialState, action) => {
     case VIEW_POST:
       return {
         ...state,
-        requesting: action?.isLoader ? false : true
+        requesting: true
       }
 
     case VIEW_POST_SUCCESS:
@@ -92,10 +93,13 @@ async function getPostAPI(data) {
   return XHR(URL, options)
 }
 
-function* getPostData({ data }) {
+function* getPostData({ data, isTrue }) {
   try {
     const response = yield call(getPostAPI, data)
     yield put(getPostSuccess(response.data))
+    if (isTrue) {
+      navigate("ViewPost", response.data)
+    }
   } catch (e) {
     const { response } = e
     yield put(resetViewPost())
@@ -157,7 +161,6 @@ function* likeCommentData({ data }) {
 
 export default all([
   takeLatest(VIEW_POST, getPostData),
-
   takeLatest(REPLY_COMMENT, replyCommentData),
   takeLatest(LIKE_COMMENT, likeCommentData)
 ])

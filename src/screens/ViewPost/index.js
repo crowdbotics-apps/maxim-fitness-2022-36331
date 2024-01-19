@@ -942,7 +942,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getPost: (data, isLoader) => dispatch(getPost(data, isLoader)),
+  getPost: data => dispatch(getPost(data)),
   addComment: (data, postData, callBack) =>
     dispatch(addComment(data, postData, callBack)),
   replyComment: (data, subCommentData, callBack) =>

@@ -5,17 +5,27 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
-  RefreshControl
+  TouchableOpacity
 } from "react-native"
 import options from "./options"
 import { fetchNotifications } from "./api"
+import { useDispatch, useSelector } from "react-redux"
+//action
+import { getPost } from "../../src/ScreenRedux/viewPostRedux"
+import { routeData } from "../../src/ScreenRedux/profileRedux"
+
 import { getNotificationCountSuccess } from "../../src/ScreenRedux/nutritionRedux"
 import moment from "moment"
 import { Images } from "../../src/theme"
+import { Loader } from "../../src/components"
 
 const Notifications = props => {
-  const { navigation } = props
+  const {
+    navigation: { navigate }
+  } = props
   const { styles } = options
+  const dispatch = useDispatch()
+  const requesting = useSelector(state => state?.postReducer?.requesting)
   // Contains the messages recieved from backend
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -57,15 +67,37 @@ const Notifications = props => {
    * @param  {Object} item Object containing Notification details
    * @return {React.ReactNode}
    */
+
+  const navigateScreen = item => {
+    const validTitle = ["Follow", "UnFollow"]
+    if (item?.post) {
+      dispatch(getPost(item?.post, true))
+    } else {
+      if (validTitle.includes(item?.title)) {
+        const newData = {
+          follow: true,
+          user: item?.sender_detail
+        }
+        dispatch(routeData(newData))
+        navigate("ProfileScreen", {
+          item: newData,
+          backScreenName: "NotificationScreen"
+        })
+      }
+    }
+  }
+
   const renderItem = ({ item }) => {
     const date = item?.created
-
     const timeFormate = item?.created.toLocaleString()
     const arr = date.split("T")
     const time = moment(timeFormate).format("hh:mm A")
 
     return (
-      <View style={styles.walletCard}>
+      <TouchableOpacity
+        style={styles.walletCard}
+        onPress={() => navigateScreen(item)}
+      >
         <View style={styles.walletInner}>
           <View style={styles.imgContainer}>
             <Image
@@ -88,12 +120,14 @@ const Notifications = props => {
           <Text style={styles.view}>Date: {arr[0]}</Text>
           <Text style={styles.reject}>Time: {time}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 
   return (
     <View style={{ flex: 1 }}>
+      {requesting && <Loader />}
+
       {loading && !notifications?.length ? (
         <View style={styles.loaderStyle}>
           <ActivityIndicator color={"gray"} size="large" />

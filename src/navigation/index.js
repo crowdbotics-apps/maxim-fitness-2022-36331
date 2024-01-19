@@ -18,8 +18,30 @@ const questionStack = createStackNavigator()
 const Navigation = props => {
   const { renderTab, profile, accessToken } = props
 
+  const config = {
+    screens: {
+      MainStack: {
+        screens: {
+          ViewPost: {
+            path: "post/:id"
+          }
+        }
+      }
+    }
+  }
+
+  const LinkingConfig = {
+    prefixes: [
+      "https://maxim-fitness-2022-36331.botics.co",
+      "maxim-fitness-2022-36331.botics.co",
+      "maxim-fitness://"
+    ],
+    config: config
+  }
+
   return (
     <NavigationContainer
+      linking={LinkingConfig}
       ref={navigationRef}
       theme={{
         ...DefaultTheme,
