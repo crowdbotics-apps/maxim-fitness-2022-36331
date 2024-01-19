@@ -28,10 +28,11 @@ export const updateAnswer = data => ({
   data
 })
 
-export const submitQuestionRequest = (profile, data) => ({
+export const submitQuestionRequest = (profile, data, isCheck) => ({
   type: QUESTION_DATA_REQUEST,
   profile,
-  data
+  data,
+  isCheck
 })
 
 export const submitQuestionSuccess = data => ({
@@ -131,13 +132,15 @@ async function submitQuestionAPI(data) {
   return XHR(URL, options)
 }
 
-function* submitQuestion({ profile, data }) {
+function* submitQuestion({ profile, data, isCheck }) {
   try {
     const res = yield call(profileDataAPI, profile, data)
-    showMessage({
-      message: "Workout assign successfully.",
-      type: "success"
-    })
+    if (isCheck) {
+      showMessage({
+        message: "Workout assign successfully.",
+        type: "success"
+      })
+    }
     if (res) {
       const response = yield call(submitQuestionAPI, data)
       if (response.status === 200) {

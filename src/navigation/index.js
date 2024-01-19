@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 // import { createDrawerNavigator } from "@react-navigation/drawer"
 import { connect } from "react-redux"
 import { navigationRef } from "./NavigationService"
-import { DEEP_LINKIN_API_URL } from "../config/app"
+import { DEEP_LINKING_API_URL } from "../config/app"
 
 import AuthStackScreen from "./AuthScreens"
 import MainNavigator from "./Main"
@@ -32,7 +32,7 @@ const Navigation = props => {
   }
 
   const LinkingConfig = {
-    prefixes: ["maximfitness://", DEEP_LINKIN_API_URL],
+    prefixes: ["maximfitness://", DEEP_LINKING_API_URL],
     config: config
   }
 
