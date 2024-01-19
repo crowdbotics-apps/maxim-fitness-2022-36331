@@ -162,6 +162,8 @@ class ProfileViewSet(ModelViewSet):
         if request_from and request_from == "goal":
             if self.request.data["fitness_goal"]:
                 obj = queryset[0]
+                today = date.today()
+                age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
                 program = AnswerProgram.objects.filter(
                     age_min__lte=age,
                     age_max__gte=age,
@@ -176,6 +178,8 @@ class ProfileViewSet(ModelViewSet):
                 obj.save()
         if request_from and request_from == "days":
             obj = queryset[0]
+            today = date.today()
+            age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
             if self.request.data["number_of_training_days"]:
                 program = AnswerProgram.objects.filter(
                     age_min__lte=age,
