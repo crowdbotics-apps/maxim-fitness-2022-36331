@@ -210,7 +210,7 @@ const FatLoseProgram = props => {
           </Text>
           {!todayRequest && getWeekSessions?.query?.length > 0 && (
             <>
-              {getWeekSessions?.query?.length > 1 ? (
+              {getWeekSessions?.query?.length > 6 ? (
                 <View
                   style={[
                     row,
@@ -281,7 +281,7 @@ const FatLoseProgram = props => {
                           marginVertical: 10,
                           alignItems: "center",
                           marginTop:
-                            getWeekSessions?.query?.length <= 1 ? 20 : 10
+                            getWeekSessions?.query?.length < 6 ? 20 : 10
                         }}
                       >
                         <Text

@@ -269,7 +269,7 @@ const CustomCalories = props => {
         request_type: "goal"
       }
     }
-    props.submitQuestionRequest(profile, data)
+    props.submitQuestionRequest(profile, data, "update")
     setExerciseLevel(false)
     refTrainingDay.current.close()
   }
@@ -959,8 +959,8 @@ const mapDispatchToProps = dispatch => ({
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsRequest: () => dispatch(getMealsRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),
-  submitQuestionRequest: (profile, data) =>
-    dispatch(submitQuestionRequest(profile, data)),
+  submitQuestionRequest: (profile, data, isCheck) =>
+    dispatch(submitQuestionRequest(profile, data, isCheck)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   setAccessToken: data => dispatch(setAccessToken(data)),
