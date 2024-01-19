@@ -816,6 +816,8 @@ class SessionViewSet(ModelViewSet):
         if adding_exercise_in_workout:
             session_id = self.request.data.get("session_id")
             w_session = Session.objects.get(id=session_id)
+            w_session.name = workout_title
+            w_session.save()
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
             order = workout_obj.order + 1 if workout_obj else 1
