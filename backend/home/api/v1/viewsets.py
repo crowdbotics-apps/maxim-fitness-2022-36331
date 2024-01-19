@@ -160,8 +160,13 @@ class ProfileViewSet(ModelViewSet):
         u = ''
         current_date = datetime.now().strftime('%Y-%m-%d')
         if request_from and request_from == "goal":
-            if self.request.data["fitness_goal"]:
-                obj = queryset[0]
+            fitness_goal = self.request.data["fitness_goal"]
+            obj = queryset[0]
+            if fitness_goal:
+                if int(fitness_goal) == obj.fitness_goal:
+                    if Session.objects.filter(user_id=obj.id, is_active=True).exists():
+                        return Response({"message": "Can't revised same fitness goal."},
+                                        status=status.HTTP_400_BAD_REQUEST)
                 today = date.today()
                 age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
                 program = AnswerProgram.objects.filter(
@@ -169,7 +174,7 @@ class ProfileViewSet(ModelViewSet):
                     age_max__gte=age,
                     exercise_level=obj.exercise_level,
                     number_of_training_days=obj.number_of_training_days,
-                    fitness_goal=int(self.request.data["fitness_goal"])
+                    fitness_goal=int(fitness_goal)
                 ).first()
                 if not program:
                     return Response({"message": "No program currently aligns with selected fitness goal."},
@@ -180,7 +185,12 @@ class ProfileViewSet(ModelViewSet):
             obj = queryset[0]
             today = date.today()
             age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
-            if self.request.data["number_of_training_days"]:
+            days = self.request.data["number_of_training_days"]
+            if days:
+                if int(days) == obj.number_of_training_days:
+                    if Session.objects.filter(user_id=obj.id, is_active=True).exists():
+                        return Response({"message": "Already have same number of training days."},
+                                        status=status.HTTP_400_BAD_REQUEST)
                 program = AnswerProgram.objects.filter(
                     age_min__lte=age,
                     age_max__gte=age,
