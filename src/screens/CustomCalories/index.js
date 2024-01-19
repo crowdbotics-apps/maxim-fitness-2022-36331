@@ -269,7 +269,7 @@ const CustomCalories = props => {
         request_type: "goal"
       }
     }
-    props.submitQuestionRequest(profile, data, true)
+    props.submitQuestionRequest(profile, data, "update")
     setExerciseLevel(false)
     refTrainingDay.current.close()
   }
@@ -603,7 +603,7 @@ const CustomCalories = props => {
                   weight: value,
                   request_type: "weightUpdate"
                 }
-                props.submitQuestionRequest(profile, data, false)
+                props.submitQuestionRequest(profile, data)
                 setValue("")
                 refWeight.current.close()
               }}

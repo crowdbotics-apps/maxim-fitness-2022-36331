@@ -135,19 +135,17 @@ async function submitQuestionAPI(data) {
 function* submitQuestion({ profile, data, isCheck }) {
   try {
     const res = yield call(profileDataAPI, profile, data)
-    if (isCheck) {
+    if (res && data?.request_type !== "weightUpdate") {
+      yield call(submitQuestionAPI, data)
+    }
+    yield put(profileData())
+    yield put(submitQuestionSuccess(true))
+    if (isCheck === "update") {
       showMessage({
         message: "Workout assign successfully.",
         type: "success"
       })
     }
-    if (res) {
-      const response = yield call(submitQuestionAPI, data)
-      if (response.status === 200) {
-        yield put(profileData())
-      }
-    }
-    yield put(submitQuestionSuccess(true))
   } catch (error) {
     yield put(submitQuestionSuccess(false))
     showMessage({
