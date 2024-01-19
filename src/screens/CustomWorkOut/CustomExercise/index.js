@@ -63,7 +63,7 @@ const CustomExercise = props => {
   const activeSet = route?.params?.activeSet
 
   useEffect(() => {
-    if (todaySessions?.id) {
+    if (todaySessions?.id && todaySessions?.name !== "Rest") {
       setTitle(todaySessions?.name)
     }
   }, [])

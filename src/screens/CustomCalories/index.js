@@ -86,7 +86,6 @@ const CustomCalories = props => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
       props.getMealsRequest()
-      setTab(2)
     })
     return unsubscribe
   }, [props.navigation])
@@ -202,9 +201,16 @@ const CustomCalories = props => {
     navigation.navigate("MealPreference", { isHome: true })
   }
 
+  const sortedData = () => {
+    const data = getAllSessions?.query?.sort(
+      (a, b) => new Date(b.date_time) - new Date(a.date_time)
+    )
+    return data || []
+  }
+
   const checkValue = () => {
     const data = getAllSessions?.query?.map((item, index) => {
-      if (item.workouts[item.workouts.length - 1]?.done === true) {
+      if (item?.workouts?.some(item => item?.done)) {
         return true
       } else {
         return false
@@ -378,12 +384,13 @@ const CustomCalories = props => {
               <View style={styles.loaderContainer}>
                 <ActivityIndicator color="#000" size={"large"} />
               </View>
-            ) : checkValue() && getAllSessions?.query ? (
-              getAllSessions?.query?.map((item, index) => {
+            ) : checkValue() && sortedData()?.length ? (
+              sortedData()?.map((item, index) => {
                 const todayDayString = moment(item.date_time).format(
                   "MM/DD/YYYY"
                 )
-                if (item.workouts[item.workouts.length - 1]?.done === true) {
+
+                if (item?.workouts?.some(item => item?.done)) {
                   return (
                     <TouchableOpacity
                       key={index}
