@@ -749,17 +749,11 @@ class SessionViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        current_date = date.today()
         start_date = self.request.query_params.get("date")
         how_many_week = queryset.count() / 7
         all_sessions = self.request.query_params.get("all")
-        if all_sessions:
-            queryset = Session.objects.filter(user=self.request.user)
-            serializer = self.get_serializer(queryset, many=True)
-            data = {
-                "week": int(how_many_week),
-                "query": serializer.data
-            }
-            return Response(data)
+        date_in_week_number = 1
         if queryset:
             first_day = queryset.first().date_time
             last_day = queryset.last().date_time
@@ -770,7 +764,6 @@ class SessionViewSet(ModelViewSet):
             day_no += 1
 
         d_no = day_with_date.get(start_date)
-        date_in_week_number = 0
         if d_no and start_date:
             if d_no <= 7:
                 date_in_week_number = 1
@@ -791,10 +784,18 @@ class SessionViewSet(ModelViewSet):
         elif start_date and not d_no:
             queryset = queryset.none()
 
-        # if start_date:
-        #     date_time_obj = datetime.strptime(start_date, '%Y-%m-%d')
-        #     end = date_time_obj + timedelta(days=6)
-        #     queryset = queryset.filter(date_time__range=[start_date, end.date()])
+        if all_sessions:
+            queryset = Session.objects.filter(user=self.request.user)
+            serializer = self.get_serializer(queryset, many=True)
+            day_no = day_with_date.get(str(current_date))
+            if day_no:
+                date_in_week_number = 1 if day_no <= 7 else 2
+            data = {
+                "week": int(how_many_week),
+                "query": serializer.data,
+                "date_in_week_number": date_in_week_number
+            }
+            return Response(data)
         if request.GET.get('reset'):
             for session in queryset:
                 session.reset()

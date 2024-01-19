@@ -40,7 +40,7 @@ class Session(models.Model):
     is_active=models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.user)
+        return f"{self.user}_{self.date_time}"
 
     def reset(self):
         Report.objects.create(
@@ -91,28 +91,27 @@ class Exercise(models.Model):
 
 @receiver(post_save, sender=Exercise)
 def save_video_thumbnail(sender, instance, created, **kwargs):
-    if not instance.video_thumbnail:
-        exercise_video = Exercise.objects.get(id=instance.id)
-        filename_sp = exercise_video.video.name.split("/")[-1].split(".")[0]
-        destination_file_name = f"{filename_sp}.{exercise_video.video.name.split('.')[-1]}"
-        thumbnail_file_name = f"{filename_sp}.png"
-        try:
-            wget.download(exercise_video.video.url, destination_file_name)
-            options = {
-                'trim': False,
-                'height': 300,
-                'width': 300,
-                'quality': 85,
-                'type': 'thumbnail'
-            }
-            generate_thumbnail(destination_file_name, thumbnail_file_name, options)
-            # TODO: upload thumbnail_file_name to post_video.thumbnail
-            exercise_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
-        except Exception as e:
-            print(e)
-        finally:
-            os.remove(destination_file_name)
-            os.remove(thumbnail_file_name)
+    exercise_video = Exercise.objects.get(id=instance.id)
+    filename_sp = exercise_video.video.name.split("/")[-1].split(".")[0]
+    destination_file_name = f"{filename_sp}.{exercise_video.video.name.split('.')[-1]}"
+    thumbnail_file_name = f"{filename_sp}.png"
+    try:
+        wget.download(exercise_video.video.url, destination_file_name)
+        options = {
+            'trim': False,
+            'height': 300,
+            'width': 300,
+            'quality': 85,
+            'type': 'thumbnail'
+        }
+        generate_thumbnail(destination_file_name, thumbnail_file_name, options)
+        # TODO: upload thumbnail_file_name to post_video.thumbnail
+        exercise_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+    except Exception as e:
+        print(e)
+    finally:
+        os.remove(destination_file_name)
+        os.remove(thumbnail_file_name)
 
 
 class Program(models.Model):
