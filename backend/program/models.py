@@ -40,7 +40,7 @@ class Session(models.Model):
     is_active=models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user}_{self.date_time}"
+        return f"{self.user}_{self.date_time}{self.id}"
 
     def reset(self):
         Report.objects.create(
@@ -126,9 +126,9 @@ class Program(models.Model):
         return date_time
 
     def create_session(self, user):
-        session = Session.objects.filter(user=user)
-        if session:
-            session.update(is_active=True)
+        existing_session = Session.objects.filter(user=user)
+        if existing_session:
+            existing_session.update(is_active=True)
         weeks = self.weeks.all()
         print('weeks', weeks)
         days_gap = 0

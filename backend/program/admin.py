@@ -180,6 +180,10 @@ class ExerciseImagesInline(admin.TabularInline):
     model = ExerciseImages
 
 
+class WorkoutAdmin(admin.ModelAdmin):
+    list_display = ["id", "session", "exercise"]
+
+
 class ExerciseAdmin(admin.ModelAdmin):
     '''
         Admin View for
@@ -212,12 +216,13 @@ class ProgramExerciseReplacementAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Session, SessionAdmin)
+admin.site.register(Workout, WorkoutAdmin)
 
 admin.site.register(Report)
 admin.site.register(Day)
 admin.site.register(Week)
 admin.site.register(ProgramExercise)
 admin.site.register(ProgramSet)
-admin.site.register(Workout)
+# admin.site.register(Workout)
 admin.site.register(Set)
 admin.site.register(ProgramExerciseReplacement, ProgramExerciseReplacementAdmin)
