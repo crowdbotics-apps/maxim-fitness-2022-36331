@@ -530,6 +530,8 @@ const CustomExercise = props => {
                     borderBottomColor: "black",
                     borderBottomWidth: 1,
                     paddingBottom: -1,
+                    maxWidth: 70,
+                    minWidth: 40,
                     marginTop:
                       activeSet &&
                       (activeSet?.item === "Drop Set" ||
@@ -607,9 +609,13 @@ const CustomExercise = props => {
                       keyboardType="number-pad"
                       onChangeText={val => setMinutes(val)}
                       editable={
-                        (activeSet?.item === "Drop Set" ||
-                          activeSet?.item === "Triple Set") &&
-                        (activeSet?.value === selectIndex + 1 ? true : false)
+                        activeSet?.item === "Single Set"
+                          ? true
+                          : (activeSet?.item === "Drop Set" ||
+                              activeSet?.item === "Triple Set") &&
+                            (activeSet?.value === selectIndex + 1
+                              ? true
+                              : false)
                       }
                       maxLength={2}
                       value={`${minutes}`}
@@ -643,9 +649,13 @@ const CustomExercise = props => {
                       maxLength={3}
                       onChangeText={val => setSeconds(val)}
                       editable={
-                        (activeSet?.item === "Drop Set" ||
-                          activeSet?.item === "Triple Set") &&
-                        (activeSet?.value === selectIndex + 1 ? true : false)
+                        activeSet?.item === "Single Set"
+                          ? true
+                          : (activeSet?.item === "Drop Set" ||
+                              activeSet?.item === "Triple Set") &&
+                            (activeSet?.value === selectIndex + 1
+                              ? true
+                              : false)
                       }
                       value={`${seconds}`}
                     />
@@ -780,7 +790,7 @@ const CustomExercise = props => {
                         set_no: 1,
                         reps: reps,
                         weight: "",
-                        set_type: "ct",
+                        set_type: "r",
                         rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
                         timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
                       }
@@ -920,7 +930,10 @@ const CustomExercise = props => {
                       fontWeight: "700",
                       color: "#5e5e5e",
                       marginTop: 5,
-                      borderBottomWidth: 1
+                      borderBottomWidth: 1,
+                      maxWidth: 70,
+                      minWidth: 40
+                      // marginTop: 15
                     }}
                     value={temporaryReps}
                     keyboardType="number-pad"
@@ -1135,7 +1148,7 @@ const CustomExercise = props => {
                             ex_id: route?.params?.exercises[0]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ct",
+                            set_type: "gs",
                             timer:
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
@@ -1162,7 +1175,7 @@ const CustomExercise = props => {
                             ex_id: route?.params?.exercises[1]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ct",
+                            set_type: "gs",
                             timer:
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
@@ -1189,7 +1202,7 @@ const CustomExercise = props => {
                             ex_id: route?.params?.exercises[2]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ct",
+                            set_type: "gs",
                             timer:
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
@@ -1222,7 +1235,7 @@ const CustomExercise = props => {
                             ex_id: route?.params?.exercises[0]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ct",
+                            set_type: "ss",
                             timer:
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
@@ -1249,7 +1262,7 @@ const CustomExercise = props => {
                             ex_id: route?.params?.exercises[1].id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ct",
+                            set_type: "ss",
                             timer:
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2

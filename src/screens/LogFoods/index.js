@@ -397,7 +397,8 @@ const LogFoods = props => {
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
             serving_qty: item.total_quantity,
-            created: formatedDate
+            created: formatedDate,
+            alt_measures: item?.alt_measures
           }))
         : []
     let common =
@@ -413,7 +414,8 @@ const LogFoods = props => {
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
             serving_qty: item.total_quantity,
-            created: formatedDate
+            created: formatedDate,
+            alt_measures: item?.alt_measures
           }))
         : []
     let branded =
@@ -435,7 +437,8 @@ const LogFoods = props => {
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
             serving_qty: item?.total_quantity,
-            created: formatedDate
+            created: formatedDate,
+            alt_measures: item?.alt_measures
           }))
         : []
     let scan =
@@ -451,7 +454,8 @@ const LogFoods = props => {
             thumb: item.photo.thumb,
             serving_unit: item.serving_unit,
             serving_qty: item?.total_quantity,
-            created: formatedDate
+            created: formatedDate,
+            alt_measures: item?.alt_measures
           }))
         : []
 

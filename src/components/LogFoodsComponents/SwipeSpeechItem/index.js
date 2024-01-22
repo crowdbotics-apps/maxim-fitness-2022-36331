@@ -77,7 +77,7 @@ const SwipeSpeechItem = ({
             </View>
             <View style={styles.qtyParentWrapper}>
               <SubDropDown
-                item={item.alt_measures}
+                item={item?.alt_measures}
                 onSelect={onSelect}
                 unitText={unitText}
               />
