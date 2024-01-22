@@ -25,8 +25,12 @@ from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
 
+from subscriptions.views import get_apple_app_association_json, get_assets_links_json
+
 urlpatterns = [
                   path("", include("home.urls")),
+                  path('apple-app-site-association', get_apple_app_association_json, name='get_json_association_site'),
+                  path('.well-known/assetlinks.json', get_assets_links_json, name='get_json_assetslinks'),
                   path("accounts/", include("allauth.urls")),
                   path("modules/", include("modules.urls")),
                   path("api/v1/", include("home.api.v1.urls")),

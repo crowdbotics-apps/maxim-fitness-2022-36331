@@ -1,6 +1,9 @@
 import json
+import os
 
 from django.db.models import Q
+from django.http import JsonResponse
+from maxim_fitness_2022_36331.settings import BASE_DIR
 from drf_yasg import openapi
 from rest_framework import viewsets, status
 from django.conf import settings
@@ -656,3 +659,29 @@ def customer_deleted_handler(event, **kwargs):
         internal_customer.delete()
     except InternalCustomer.DoesNotExist:
         pass
+
+
+def get_assets_links_json(request):
+    # Specify the path to your JSON file
+    json_file_path = os.path.join(BASE_DIR, 'assets_links.json')
+
+    # Check if the file exists
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as file:
+            json_data = json.load(file)
+            return JsonResponse(json_data)
+    else:
+        return JsonResponse({'error': 'JSON file not found'}, status=404)
+
+
+def get_apple_app_association_json(request):
+    # Specify the path to your JSON file
+    json_file_path = os.path.join(BASE_DIR, 'apple-app-association.json')
+
+    # Check if the file exists
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as file:
+            json_data = json.load(file)
+            return JsonResponse(json_data)
+    else:
+        return JsonResponse({'error': 'JSON file not found'}, status=404)

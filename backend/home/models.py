@@ -23,7 +23,6 @@ from maxim_fitness_2022_36331.settings import MEDIA_URL, MEDIA_ROOT
 from program.models import Program, Session
 from users.models import AnswerProgram
 
-
 User = get_user_model()
 nix = Nutritionix(settings.NIX_APP_ID, settings.NIX_API_KEY)
 
@@ -139,8 +138,15 @@ def add_food_items(food_items, meal):
         unit.weight = food_item['weight']
         unit.quantity = food_item['serving_qty']
         unit.save()
-        FoodItem.objects.create(meal=meal, food=final_food, portion=food_item['serving_qty'], unit=unit,
-                                created=food_item["created"])
+        food = FoodItem.objects.create(meal=meal, food=final_food, portion=food_item['serving_qty'], unit=unit,
+                                            created=food_item["created"])
+        if food_item['alt_measures']:
+            alt_measures = food_item['alt_measures']
+            for measure in alt_measures:
+                AltMeasure.objects.create(
+                    serving_weight=measure['serving_weight'],
+                    measure=measure['measure'], food_item=food, meal=meal, product=final_food,
+                    seq=measure['seq'], qty=measure['qty'])
 
     return "Food item added."
 
@@ -232,6 +238,19 @@ class FoodItem(models.Model):
     @property
     def calories(self):
         return self.get_quantity() * self.get_weight() * self.food.calories
+
+
+class AltMeasure(models.Model):
+    serving_weight = models.FloatField()
+    measure = models.CharField(max_length=255)
+    food_item = models.ForeignKey('FoodItem', on_delete=models.CASCADE, null=True, blank=True, related_name='food_items')
+    meal = models.ForeignKey('Meal', on_delete=models.CASCADE, null=True, blank=True, related_name='meal_measures')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
+    seq = models.IntegerField(null=True, blank=True)
+    qty = models.FloatField()
+
+    def __str__(self):
+        return f"{self.measure} - {self.qty}"
 
 
 class Meal(models.Model):
@@ -357,13 +376,14 @@ class Post(models.Model):
         like, created = Like.objects.get_or_create(post=self, user=user)
         if not created:
             like.delete()
-            notification = Notification.objects.filter(sender=user, receiver=self.user, title="Like Post").first()
+            notification = Notification.objects.filter(sender=user, receiver=self.user, title="Like Post",
+                                                       post=self).first()
             if notification:
                 notification.delete()
         else:
             if not (user == self.user):
                 send_notification(sender=user, receiver=self.user,
-                                  title="Like Post", message=f"{user.username} like your post.")
+                                  title="Like Post", message=f"{user.username} like your post.", post_id=self.id)
 
     def get_like(self, user):
         like = Like.objects.filter(post=self, user=user)
@@ -658,8 +678,10 @@ class PostCommentLike(models.Model):
 
 class ReportCommentReply(models.Model):
     """Report a reply of a comment"""
-    comment_reply = models.ForeignKey('PostCommentReply', related_name='report_post_comment_reply', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='user_report_comment_reply', on_delete=models.CASCADE, null=True, blank=True)
+    comment_reply = models.ForeignKey('PostCommentReply', related_name='report_post_comment_reply',
+                                      on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_report_comment_reply', on_delete=models.CASCADE, null=True,
+                             blank=True)
     reason = models.CharField(max_length=500)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
