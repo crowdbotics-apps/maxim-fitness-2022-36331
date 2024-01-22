@@ -23,7 +23,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
-    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply
+    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply, AltMeasure
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings, UserPhoto, UserVideo
@@ -261,6 +261,11 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+class AltMeasureSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AltMeasure
+        fields = '__all__'
 
 
 class FoodItemSerializer(serializers.ModelSerializer):
@@ -270,6 +275,8 @@ class FoodItemSerializer(serializers.ModelSerializer):
     fat = serializers.ReadOnlyField()
     calories = serializers.ReadOnlyField()
     unit = ProductUnitSerializer()
+    alt_measures = AltMeasureSerializer(read_only=True, many=True, source='food_items')
+
 
     class Meta:
         model = FoodItem

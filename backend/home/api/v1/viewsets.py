@@ -1146,7 +1146,10 @@ class PostViewSet(ModelViewSet):
         if not post.user == request.user:
             title = post.title if post.title else ""
             send_notification(sender=request.user, receiver=post.user,
-                              title="Comment on Post", message=f"{request.user.username} comment on your post {title}")
+                              title="Comment on Post",
+                              message=f"{request.user.username} comment on your post {title}",
+                              post_id=post.id
+                              )
         return Response(res.data)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
@@ -1261,7 +1264,7 @@ class SetViewSet(ModelViewSet):
     serializer_class = SetSerializer
 
     def get_queryset(self):
-        return Set.objects.all()
+        return Set.objects.all().order_by('-id')
 
 
 class CaloriesRequiredViewSet(ModelViewSet):
