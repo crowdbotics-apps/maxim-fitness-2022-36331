@@ -795,7 +795,7 @@ class SessionViewSet(ModelViewSet):
             queryset = queryset.none()
 
         if all_sessions:
-            queryset = Session.objects.filter(user=self.request.user)
+            queryset = self.filter_queryset(self.get_queryset())
             serializer = self.get_serializer(queryset, many=True)
             day_no = day_with_date.get(str(current_date))
             if day_no:
