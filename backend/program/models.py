@@ -128,7 +128,7 @@ class Program(models.Model):
     def create_session(self, user):
         existing_session = Session.objects.filter(user=user)
         if existing_session:
-            existing_session.update(is_active=True)
+            existing_session.update(is_active=False)
         weeks = self.weeks.all()
         print('weeks', weeks)
         days_gap = 0
