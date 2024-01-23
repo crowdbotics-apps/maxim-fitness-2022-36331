@@ -82,7 +82,7 @@ class Exercise(models.Model):
     exercise_id = models.CharField(max_length=150)
     exercise_type = models.ForeignKey('ExerciseType', related_name='exercises', on_delete=models.CASCADE, null=True)
     description = models.TextField()
-    video = models.FileField(upload_to='videos/', null=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True)
     video_thumbnail = models.FileField(upload_to='exercise_video/thumbnail', null=True, blank=True)
 
     def __str__(self):
@@ -91,12 +91,16 @@ class Exercise(models.Model):
 
 @receiver(post_save, sender=Exercise)
 def save_video_thumbnail(sender, instance, created, **kwargs):
-    exercise_video = Exercise.objects.get(id=instance.id)
-    filename_sp = exercise_video.video.name.split("/")[-1].split(".")[0]
-    destination_file_name = f"{filename_sp}.{exercise_video.video.name.split('.')[-1]}"
+    try:
+        Exercise.objects.all().update(video=None, video_thumbnail=None)
+        return instance
+    except:
+        pass
+    filename_sp = instance.video.name.split("/")[-1].split(".")[0]
+    destination_file_name = f"{filename_sp}.{instance.video.name.split('.')[-1]}"
     thumbnail_file_name = f"{filename_sp}.png"
     try:
-        wget.download(exercise_video.video.url, destination_file_name)
+        wget.download(instance.video.url, destination_file_name)
         options = {
             'trim': False,
             'height': 300,
@@ -106,7 +110,7 @@ def save_video_thumbnail(sender, instance, created, **kwargs):
         }
         generate_thumbnail(destination_file_name, thumbnail_file_name, options)
         # TODO: upload thumbnail_file_name to post_video.thumbnail
-        exercise_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+        instance.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
     except Exception as e:
         print(e)
     finally:
