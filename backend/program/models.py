@@ -91,31 +91,27 @@ class Exercise(models.Model):
 
 @receiver(post_save, sender=Exercise)
 def save_video_thumbnail(sender, instance, created, **kwargs):
-    try:
-        Exercise.objects.all().update(video=None, video_thumbnail=None)
-        return instance
-    except:
-        pass
-    filename_sp = instance.video.name.split("/")[-1].split(".")[0]
-    destination_file_name = f"{filename_sp}.{instance.video.name.split('.')[-1]}"
-    thumbnail_file_name = f"{filename_sp}.png"
-    try:
-        wget.download(instance.video.url, destination_file_name)
-        options = {
-            'trim': False,
-            'height': 300,
-            'width': 300,
-            'quality': 85,
-            'type': 'thumbnail'
-        }
-        generate_thumbnail(destination_file_name, thumbnail_file_name, options)
-        # TODO: upload thumbnail_file_name to post_video.thumbnail
-        instance.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
-    except Exception as e:
-        print(e)
-    finally:
-        os.remove(destination_file_name)
-        os.remove(thumbnail_file_name)
+    if instance.video and not instance.video_thumbnail:
+        filename_sp = instance.video.name.split("/")[-1].split(".")[0]
+        destination_file_name = f"{filename_sp}.{instance.video.name.split('.')[-1]}"
+        thumbnail_file_name = f"{filename_sp}.png"
+        try:
+            wget.download(instance.video.url, destination_file_name)
+            options = {
+                'trim': False,
+                'height': 300,
+                'width': 300,
+                'quality': 85,
+                'type': 'thumbnail'
+            }
+            generate_thumbnail(destination_file_name, thumbnail_file_name, options)
+            # TODO: upload thumbnail_file_name to post_video.thumbnail
+            instance.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+        except Exception as e:
+            print(e)
+        finally:
+            os.remove(destination_file_name)
+            os.remove(thumbnail_file_name)
 
 
 class Program(models.Model):
