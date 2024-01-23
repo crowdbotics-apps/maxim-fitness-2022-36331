@@ -180,6 +180,9 @@ class Week(models.Model):
     program = models.ForeignKey("Program", on_delete=models.CASCADE, related_name="weeks")
     week = models.PositiveIntegerField()
 
+    def __str__(self):
+        return f"{self.program.name}_{self.id}>{self.week}"
+
 
 class Day(models.Model):
     week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="days")
