@@ -136,7 +136,7 @@ class ProfileViewSet(ModelViewSet):
     def create_calories(self, calories, date):
 
         carbs = ((calories * 40) / 100) / 4
-        protein =((calories * 40) / 100) / 4
+        protein = ((calories * 40) / 100) / 4
         fat = ((calories * 20) / 100) / 9
 
         new_values = {
@@ -163,10 +163,10 @@ class ProfileViewSet(ModelViewSet):
             fitness_goal = self.request.data["fitness_goal"]
             obj = queryset[0]
             if fitness_goal:
-            #     if int(fitness_goal) == obj.fitness_goal:
-            #         if Session.objects.filter(user_id=obj.id, is_active=True).exists():
-            #             return Response({"message": "Can't revised same fitness goal."},
-            #                             status=status.HTTP_400_BAD_REQUEST)
+                #     if int(fitness_goal) == obj.fitness_goal:
+                #         if Session.objects.filter(user_id=obj.id, is_active=True).exists():
+                #             return Response({"message": "Can't revised same fitness goal."},
+                #                             status=status.HTTP_400_BAD_REQUEST)
                 today = date.today()
                 age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
                 program = AnswerProgram.objects.filter(
@@ -581,6 +581,19 @@ class MealViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=['get'])
+    def history(self, request, pk=None):
+        user = self.request.user
+        data = []
+        custom_dict = {}
+        meals_ids = FoodItem.objects.filter(meal__user=user).distinct("meal").values_list("meal_id", flat=True)
+        unique_dates = Meal.objects.filter(user=user, id__in=meals_ids).order_by("-date_time__date").distinct("date_time__date").values_list("date_time__date", flat=True)
+        for date in unique_dates:
+            query = Meal.objects.filter(date_time__date=date, user=user)
+            serializer = MealSerializer(query, many=True)
+            data.append({str(date): serializer.data})
+        return Response(data)
+
     @action(detail=True, methods=['post'])
     def add_log_food(self, request, pk):
         meal = Meal.objects.get(pk=pk)
@@ -620,9 +633,6 @@ class MealViewSet(ModelViewSet):
                 return Response('Food added to the meal.')
         return Response({'error': "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['get'])
-    def history(self, request):
-        queryset = self.get_queryset().order_by("date_time")
 
     @action(detail=False, methods=['post'])
     def delete_food(self, request):
