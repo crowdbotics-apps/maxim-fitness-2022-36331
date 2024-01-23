@@ -215,12 +215,20 @@ class ProgramExerciseReplacementAdmin(admin.ModelAdmin):
     list_display = ["exercise", "replacement"]
 
 
+class DayAdmin(admin.ModelAdmin):
+    list_display = ["id", "week", 'name', 'cardio', 'cardio_length', 'cardio_frequency', 'heart_rate', 'location']
+
+
+class WeekAdmin(admin.ModelAdmin):
+    list_display = ["id", "program", 'week']
+
+
 admin.site.register(Session, SessionAdmin)
 admin.site.register(Workout, WorkoutAdmin)
+admin.site.register(Day, DayAdmin)
+admin.site.register(Week, WeekAdmin)
 
 admin.site.register(Report)
-admin.site.register(Day)
-admin.site.register(Week)
 admin.site.register(ProgramExercise)
 admin.site.register(ProgramSet)
 # admin.site.register(Workout)

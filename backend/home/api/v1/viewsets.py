@@ -576,7 +576,7 @@ class MealViewSet(ModelViewSet):
         return MealSerializer
 
     def get_queryset(self):
-        return Meal.objects.filter(user=self.request.user).order_by("id")
+        return Meal.objects.filter(user=self.request.user).order_by("date_time")
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -619,6 +619,10 @@ class MealViewSet(ModelViewSet):
                     FoodItem.objects.create(meal=meal, food=food, portion=food_item['portion'], unit=unit)
                 return Response('Food added to the meal.')
         return Response({'error': "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['get'])
+    def history(self, request):
+        queryset = self.get_queryset().order_by("date_time")
 
     @action(detail=False, methods=['post'])
     def delete_food(self, request):
@@ -1148,7 +1152,7 @@ class PostViewSet(ModelViewSet):
             send_notification(sender=request.user, receiver=post.user,
                               title="Comment on Post",
                               message=f"{request.user.username} comment on your post {title}",
-                              post_id=post.id
+                              post_id=post
                               )
         return Response(res.data)
 
