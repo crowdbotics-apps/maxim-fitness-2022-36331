@@ -40,6 +40,7 @@ import MealPreference from "../screens/Questions/MealPreference"
 import MealTime from "../screens/Questions/MealTime"
 
 import LogFoods from "../screens/LogFoods"
+import BarCodeScreen from "../screens/BarCodeScreen"
 import { modules } from "@modules"
 
 import SubscriptionScreen from "../screens/Subscription"
@@ -286,6 +287,7 @@ const MainNavigator = () => (
     <mainStack.Screen name="MealRegulator" component={MealRegulator} />
     <mainStack.Screen name="SelectBrand" component={SelectBrand} />
     <mainStack.Screen name="LogFoods" component={LogFoods} />
+    <mainStack.Screen name="BarCodeScreen" component={BarCodeScreen} />
     <mainStack.Screen name="Alexa" component={Alexa} />
     <mainStack.Screen
       name="SwapExerciseScreen"

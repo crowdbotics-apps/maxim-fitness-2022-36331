@@ -297,29 +297,32 @@ const ExerciseScreen = props => {
   const selectExercise = (item, i) => {
     setActive(i)
     setActiveSet(0)
-    props.repsWeightRequest(item?.sets?.[0]?.id, null, null)
+    props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+  }
+
+  const callBack = item => {
     setTimmer(false)
-    if (repsWeightState?.set_type?.toLowerCase() === "ss") {
+    if (item?.set_type?.toLowerCase() === "ss") {
       setModal("ss")
       refModal.current.open()
     }
-    if (repsWeightState?.set_type?.toLowerCase() === "gs") {
+    if (item?.set_type?.toLowerCase() === "gs") {
       setModal("gs")
       refModal.current.open()
     }
-    if (repsWeightState?.set_type?.toLowerCase() === "ds") {
+    if (item?.set_type?.toLowerCase() === "ds") {
       setModal("ds")
       refModal.current.open()
     }
-    if (repsWeightState?.set_type?.toLowerCase() === "tds") {
+    if (item?.set_type?.toLowerCase() === "tds") {
       setModal("tds")
       refModal.current.open()
     }
-    if (repsWeightState?.set_type?.toLowerCase() === "ct") {
+    if (item?.set_type?.toLowerCase() === "ct") {
       setModal("ct")
       refModal.current.open()
     }
-    if (repsWeightState?.set_type?.toLowerCase() === "r") {
+    if (item?.set_type?.toLowerCase() === "r") {
       setModal(null)
     }
   }
@@ -623,7 +626,7 @@ const ExerciseScreen = props => {
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === "cr"
                             ? "Complete"
-                            : item?.sets && item?.sets[activeSet].done
+                            : item?.sets && item?.sets?.[activeSet]?.done
                             ? "Done"
                             : "Done, Start Rest"
                         }
@@ -948,13 +951,15 @@ const ExerciseScreen = props => {
                 end={endSocial}
                 colors={["#fa201b", "#fe5b06"]}
                 style={[
-                  fill2x,
                   punchBg,
                   center,
                   row,
                   borderR10,
                   height40,
-                  tiny2xHPadding
+                  tiny2xHPadding,
+                  {
+                    width: "40%"
+                  }
                 ]}
               >
                 <Text
@@ -1032,8 +1037,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
-  repsWeightRequest: (id, data, dd) =>
-    dispatch(repsWeightRequest(id, data, dd)),
+  repsWeightRequest: (id, data, dd, callBack) =>
+    dispatch(repsWeightRequest(id, data, dd, callBack)),
   setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
   sessionDone: (id, screenNavigation) =>
     dispatch(sessionDone(id, screenNavigation)),

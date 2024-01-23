@@ -94,7 +94,10 @@ const AddExercies = props => {
         }
       })
     })
-    navigation.navigate("CustomExercise", { exercises, activeSet })
+    const data = activeSet?.item
+      ? activeSet
+      : { id: 0, value: 0, item: "Single Set" }
+    navigation.navigate("CustomExercise", { exercises, activeSet: data })
   }
 
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout

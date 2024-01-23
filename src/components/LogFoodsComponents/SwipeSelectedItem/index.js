@@ -44,7 +44,7 @@ const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
             </View>
             <View style={styles.qtyParentWrapper}>
               <SubDropDown
-                item={item?.food?.units}
+                item={item?.alt_measures}
                 onSelect={onSelect}
                 unitText={unitText}
               />

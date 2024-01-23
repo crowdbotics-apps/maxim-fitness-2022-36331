@@ -70,11 +70,12 @@ export const getDaySessionSuccess = data => ({
   data
 })
 
-export const repsWeightRequest = (id, data, dd) => ({
+export const repsWeightRequest = (id, data, dd, callBack) => ({
   type: REPS_WEIGHT_REQUEST,
   id,
   data,
-  dd
+  dd,
+  callBack
 })
 
 export const repsWeightSuccess = data => ({
@@ -416,11 +417,10 @@ async function updateRepsWeightAPI(id) {
   return XHR(URL, options)
 }
 
-function* updateRepsWeight({ id, data, dd }) {
+function* updateRepsWeight({ id, data, dd, callBack }) {
   try {
     if (dd === "reps") {
       const response = yield call(updateRepsAPI, id, data)
-
       yield put(repsWeightSuccess(response.data))
     } else if (dd === "weight") {
       const response = yield call(updateWeightAPI, id, data)
@@ -434,7 +434,12 @@ function* updateRepsWeight({ id, data, dd }) {
       yield put(getAllSessionRequest(newDate))
     } else {
       const response = yield call(updateRepsWeightAPI, id)
-      yield put(repsWeightSuccess(response.data))
+      if (response?.data) {
+        yield put(repsWeightSuccess(response?.data))
+        if (callBack) {
+          callBack(response?.data)
+        }
+      }
     }
   } catch (e) {
     yield put(repsWeightSuccess(false))
