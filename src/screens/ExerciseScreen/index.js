@@ -134,6 +134,10 @@ const ExerciseScreen = props => {
             text={"Circuit Training"}
           />
         )
+      case "r":
+        return (
+          <SetsComponents colors={["#60d937", "#60d937"]} text={"Sigle Sets"} />
+        )
       default:
         break
     }
@@ -323,7 +327,8 @@ const ExerciseScreen = props => {
       refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "r") {
-      setModal(null)
+      setModal("r")
+      refModal.current.open()
     }
   }
 

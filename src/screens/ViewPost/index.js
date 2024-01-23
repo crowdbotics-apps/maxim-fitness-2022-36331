@@ -14,7 +14,7 @@ import {
   Platform
 } from "react-native"
 import { Text, ProfileHeader, SkeletonLoader } from "src/components"
-import { API_URL } from "../../config/app"
+import { DEEP_LINKING_API_URL } from "../../config/app"
 import { Images } from "src/theme"
 import { calculatePostTime } from "src/utils/functions"
 import { connect } from "react-redux"
@@ -74,15 +74,15 @@ const ViewPost = props => {
 
   useEffect(() => {
     if (route?.params) {
-      setParam(route.params)
+      props.getPost(route?.params?.id ? route?.params?.id : route?.params)
     }
-  }, [route])
+  }, [route?.params])
 
   useEffect(() => {
-    if (param?.id) {
-      props.getPost(param?.id)
+    if (postData) {
+      setParam(postData)
     }
-  }, [param?.id])
+  }, [postData])
 
   useEffect(() => {
     if (postData && postData?.comments?.length > 0) {
@@ -198,7 +198,7 @@ const ViewPost = props => {
   }
 
   const sharePost = async () => {
-    const data = { message: `${API_URL + "/" + param?.id}/` }
+    const data = { message: `${DEEP_LINKING_API_URL + "/post/" + param?.id}/` }
     await Share.open(data)
       .then(res => {})
       .catch(err => {})
@@ -281,7 +281,9 @@ const ViewPost = props => {
         style={{ flex: 1 }}
       >
         {requesting ? (
-          <SkeletonLoader />
+          <View style={{ marginHorizontal: 10 }}>
+            <SkeletonLoader />
+          </View>
         ) : (
           <>
             <ScrollView

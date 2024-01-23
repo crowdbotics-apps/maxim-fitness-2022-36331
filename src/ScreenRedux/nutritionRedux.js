@@ -1,6 +1,7 @@
 import { all, call, put, takeLatest } from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { navigate } from "../navigation/NavigationService"
+import { goBack, navigate } from "../navigation/NavigationService"
+import { showMessage } from "react-native-flash-message"
 
 // config
 import { API_URL } from "../config/app"
@@ -33,6 +34,9 @@ const RESET_FOOD_ITEMS = "NutritionScreen/RESET_FOOD_ITEMS"
 const GET_MEALS_REQUEST = "NutritionScreen/GET_MEALS_REQUEST"
 const GET_MEALS_SUCCESS = "NutritionScreen/GET_MEALS_SUCCESS"
 
+const GET_SCAN_FOODS_REQUEST = "NutritionScreen/GET_SCAN_FOODS_REQUEST"
+const GET_SCAN_FOODS_SUCCESS = "NutritionScreen/GET_SCAN_FOODS_SUCCESS"
+
 const GET_UNREAD_NOTIFICATIONS = "NutritionScreen/GET_UNREAD_NOTIFICATIONS"
 const GET_UNREAD_NOTIFICATIONS_SUCCESS =
   "NutritionScreen/GET_UNREAD_NOTIFICATIONS_SUCCESS"
@@ -48,9 +52,11 @@ const initialState = {
   foodRequesting: false,
   foodSearchState: false,
 
+  requestingScan: false,
   request: false,
   commonState: false,
   brandedState: false,
+  scannedProduct: false,
 
   loader: false,
   logFoodState: false,
@@ -162,6 +168,17 @@ export const productUnitAction = (itemId, value, data) => ({
   data
 })
 
+// search food action
+export const getScanFoodsRequest = data => ({
+  type: GET_SCAN_FOODS_REQUEST,
+  data
+})
+
+export const getScanFoodsSuccess = data => ({
+  type: GET_SCAN_FOODS_SUCCESS,
+  data
+})
+
 //Reducers
 export const nutritionReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -177,11 +194,24 @@ export const nutritionReducer = (state = initialState, action) => {
         speechState: action.data,
         requesting: false
       }
+
     case GET_SPEECH_FAILURE:
       return {
         ...state,
         speechError: action.error,
         requesting: false
+      }
+
+    case GET_SCAN_FOODS_REQUEST:
+      return {
+        ...state,
+        requestingScan: true
+      }
+    case GET_SCAN_FOODS_SUCCESS:
+      return {
+        ...state,
+        scannedProduct: action.data,
+        requestingScan: false
       }
 
     case GET_UNREAD_NOTIFICATIONS_SUCCESS:
@@ -504,6 +534,36 @@ function* productUnitData({ itemId, value, data }) {
   } catch (e) {}
 }
 
+async function getScanFoodAPI(barcode) {
+  const URL = `${API_URL}/products/code/?upc=${barcode}`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token  ${token}`
+    }
+  }
+
+  return XHR(URL, options)
+}
+
+function* getScanMealsFood({ data }) {
+  try {
+    const response = yield call(getScanFoodAPI, data)
+    navigate("LogFoods")
+    yield put(getScanFoodsSuccess(response.data))
+  } catch (e) {
+    goBack()
+    yield put(getScanFoodsSuccess(false))
+    if (e?.response?.data) {
+      showMessage({ message: e?.response?.data, type: "danger" })
+    }
+
+    // yield put(getMealsFoodFailure(e))
+  }
+}
+
 export default all([
   takeLatest(DELETE_ALL_MEALS, deleteAllMealsReq),
   takeLatest(GET_MEALS_REQUEST, getMealsFood),
@@ -512,5 +572,6 @@ export default all([
   takeLatest(GET_FOODS_SEARCH_REQUEST, getFoodsSearch),
   takeLatest(GET_SPEECH_REQUEST, getSpeech),
   takeLatest(GET_UNREAD_NOTIFICATIONS, getUnreadNotifications),
-  takeLatest(PRODUCT_UNIT_ACTION, productUnitData)
+  takeLatest(PRODUCT_UNIT_ACTION, productUnitData),
+  takeLatest(GET_SCAN_FOODS_REQUEST, getScanMealsFood)
 ])

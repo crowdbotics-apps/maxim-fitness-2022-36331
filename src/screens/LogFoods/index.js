@@ -634,7 +634,7 @@ const LogFoods = props => {
                 Layout.justifyContentCenter,
                 Layout.alignItemsEnd
               ]}
-              onPress={() => navigation.navigate("SelectBrand")}
+              onPress={() => navigation.navigate("BarCodeScreen")}
             >
               <Image style={styles.barCodeStyle} source={Images.barCode} />
             </TouchableOpacity>
@@ -1057,6 +1057,7 @@ const mapStateToProps = state => ({
   commonState: state.nutritionReducer.commonState,
   brandedState: state.nutritionReducer.brandedState,
   selectedMeal: state.nutritionReducer.selectedMeal,
+  scannedProduct: state.nutritionReducer.scannedProduct,
   loaderLogFood: state.nutritionReducer.loader,
   getMealsFood: state.nutritionReducer.getMealsFoodState
 })
