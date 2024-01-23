@@ -3,10 +3,8 @@
     "apps": [],
     "details": [
       {
-        "appID": "ABCDE12345.example.com",
-        "paths": [
-          "*"
-        ]
+        "appID": "6YKR59QXKM.com.crowdbotics.maximfitness5250",
+        "paths": ["*"]
       }
     ]
   }
