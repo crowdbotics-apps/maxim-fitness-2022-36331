@@ -584,14 +584,22 @@ class MealViewSet(ModelViewSet):
     @action(detail=False, methods=['get'])
     def history(self, request, pk=None):
         user = self.request.user
+        current_datetime = timezone.now()
         data = []
-        custom_dict = {}
         meals_ids = FoodItem.objects.filter(meal__user=user).distinct("meal").values_list("meal_id", flat=True)
         unique_dates = Meal.objects.filter(user=user, id__in=meals_ids).order_by("-date_time__date").distinct("date_time__date").values_list("date_time__date", flat=True)
         for date in unique_dates:
-            query = Meal.objects.filter(date_time__date=date, user=user)
-            serializer = MealSerializer(query, many=True)
-            data.append({str(date): serializer.data})
+            if date == current_datetime.date():
+                query = Meal.objects.filter(date_time__lte=current_datetime, user=user, date_time__date=date)
+                if not query.exists():
+                    pass
+                else:
+                    serializer = MealSerializer(query, many=True)
+                    data.append({str(date): serializer.data})
+            else:
+                query = Meal.objects.filter(date_time__date=date, user=user)
+                serializer = MealSerializer(query, many=True)
+                data.append({str(date): serializer.data})
         return Response(data)
 
     @action(detail=True, methods=['post'])
@@ -1213,9 +1221,11 @@ class FollowViewSet(ViewSet):
         a = Following.add_follower(request.user, other_user)
         if a == 'already follows':
             return Response("already follow")
+        sender_detail = UserSerializer(request.user)
         send_notification(sender=self.request.user, receiver=other_user, title="Follow",
                           message=f"{self.request.user.username} start following you", post_id=None,
-                          extra={"sender": request.user.id, "receiver": other_user.id}
+                          extra={"sender": request.user.id, "receiver": other_user.id,
+                                 'sender_detail': sender_detail.data}
                           )
         return Response("Added")
 
