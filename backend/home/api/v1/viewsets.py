@@ -1162,7 +1162,8 @@ class PostViewSet(ModelViewSet):
             send_notification(sender=request.user, receiver=post.user,
                               title="Comment on Post",
                               message=f"{request.user.username} comment on your post {title}",
-                              post_id=post
+                              post_id=post,
+                              extra={"post_id": post.id, "sender": request.user.id, "receiver": post.user.id}
                               )
         return Response(res.data)
 
@@ -1213,7 +1214,9 @@ class FollowViewSet(ViewSet):
         if a == 'already follows':
             return Response("already follow")
         send_notification(sender=self.request.user, receiver=other_user, title="Follow",
-                          message=f"{self.request.user.username} start following you")
+                          message=f"{self.request.user.username} start following you", post_id=None,
+                          extra={"sender": request.user.id, "receiver": other_user.id}
+                          )
         return Response("Added")
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
@@ -1409,7 +1412,9 @@ class ReportAPostViewSet(ModelViewSet):
         self.perform_create(serializer)
         post = Post.objects.filter(id=post_id).first()
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
-                          message=f"Your post is reported by {self.request.user.username}", post_id=post)
+                          message=f"Your post is reported by {self.request.user.username}", post_id=post,
+                          extra={"post_id": post.id, "sender": request.user.id, "receiver": post.user.id}
+                          )
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
 
 
@@ -1432,7 +1437,9 @@ class ReportACommentViewSet(ModelViewSet):
         self.perform_create(serializer)
         comment = Comment.objects.filter(id=comment_id).first()
         send_notification(sender=self.request.user, receiver=comment.user, title="Report Comment",
-                          message=f"Your comment is reported by {self.request.user.username}")
+                          message=f"Your comment is reported by {self.request.user.username}", post_id=None,
+                          extra={"post_id": comment.post.id, "sender": request.user.id, "receiver": comment.user.id, "comment_id": comment.id}
+                          )
         return Response({"data": "Comment Reported successfully"}, status=status.HTTP_201_CREATED)
 
 

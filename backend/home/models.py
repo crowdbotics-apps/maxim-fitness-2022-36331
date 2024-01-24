@@ -383,7 +383,9 @@ class Post(models.Model):
         else:
             if not (user == self.user):
                 send_notification(sender=user, receiver=self.user,
-                                  title="Like Post", message=f"{user.username} like your post.", post_id=self)
+                                  title="Like Post", message=f"{user.username} like your post.", post_id=self,
+                                  extra={"post_id": self.id, "sender": user.id, "receiver": self.user.id}
+                                  )
 
     def get_like(self, user):
         like = Like.objects.filter(post=self, user=user)

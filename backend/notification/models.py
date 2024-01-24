@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
@@ -13,6 +14,7 @@ class Notification(models.Model):
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    extra_data = JSONField(null=True, blank=True)
     # for handling delete post's notifications on resolved and resolved report_a_post object
     post = models.ForeignKey(
         "home.Post", on_delete=models.CASCADE,
@@ -36,6 +38,6 @@ def send_notification(sender, instance, created, **kwargs):
 
 
         if devices:
-            devices.send_message(title=instance.title, body=instance.message)
+            devices.send_message(title=instance.title, body=instance.message, data=instance.extra_data if instance.extra_data else None)
 
 

@@ -266,6 +266,7 @@ SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
 
+
 # if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
 #     # output email to console instead of sending
 #     if not DEBUG:
@@ -343,3 +344,14 @@ FCM_DJANGO_SETTINGS = {
 CRONJOBS = [
     ('0 0 * * *', 'home.cron.send_weight_update_notification')
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "apple": {
+        "APP": {
+            "client_id": env.str("APPLE_CLIENT_ID", ""),
+            "secret": env.str("APPLE_SECRET_KEY", ""),
+            "key": env.str("APPLE_APP_ID", ""),
+            "certificate_key": env.str("APPLE_CERTIFICATE", "")
+        }
+    }
+}
