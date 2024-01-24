@@ -1221,9 +1221,11 @@ class FollowViewSet(ViewSet):
         a = Following.add_follower(request.user, other_user)
         if a == 'already follows':
             return Response("already follow")
+        sender_detail = UserSerializer(request.user)
         send_notification(sender=self.request.user, receiver=other_user, title="Follow",
                           message=f"{self.request.user.username} start following you", post_id=None,
-                          extra={"sender": request.user.id, "receiver": other_user.id}
+                          extra={"sender": request.user.id, "receiver": other_user.id,
+                                 'sender_detail': sender_detail.data}
                           )
         return Response("Added")
 
