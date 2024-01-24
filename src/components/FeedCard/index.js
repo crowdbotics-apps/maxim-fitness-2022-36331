@@ -15,7 +15,7 @@ import Text from "../Text"
 import { Images } from "src/theme"
 import { calculatePostTime, letterCapitalize } from "src/utils/functions"
 import { SliderBox } from "react-native-image-slider-box"
-import { API_URL } from "../../config/app"
+import { DEEP_LINKING_API_URL } from "../../config/app"
 import Share from "react-native-share"
 import { connect } from "react-redux"
 import { routeData } from "../../ScreenRedux/profileRedux"
@@ -80,7 +80,7 @@ const FeedCard = props => {
   }
 
   const sharePost = async item => {
-    const data = { message: `${API_URL + "/" + item?.id}/` }
+    const data = { message: `${DEEP_LINKING_API_URL + "/post/" + item?.id}/` }
     await Share.open(data)
       .then(res => {})
       .catch(err => {})

@@ -143,7 +143,7 @@ const MealRegulator = props => {
             Layout.justifyContentCenter,
             Layout.alignItemsEnd
           ]}
-          onPress={() => navigation.navigate("SelectBrand")}
+          onPress={() => navigation.navigate("BarCodeScreen")}
         >
           <Image style={styles.barCodeStyle} source={Images.barCode} />
         </TouchableOpacity>

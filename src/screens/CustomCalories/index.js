@@ -37,7 +37,7 @@ import { TabOne, TabThree } from "./components"
 import { updateAnswer } from "../Questions/Redux/index"
 import {
   getCustomCalRequest,
-  getMealsRequest
+  getMealsHistoryRequest
 } from "../../ScreenRedux/customCalRedux"
 
 import { submitQuestionRequest } from "../Questions/Redux"
@@ -85,7 +85,7 @@ const CustomCalories = props => {
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
-      props.getMealsRequest()
+      props.getMealsHistoryRequest()
     })
     return unsubscribe
   }, [props.navigation])
@@ -93,7 +93,7 @@ const CustomCalories = props => {
   const isFocused = useIsFocused()
 
   useEffect(() => {
-    isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
+    // isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
     props.getNotificationCount()
   }, [meals, isFocused])
 
@@ -161,6 +161,7 @@ const CustomCalories = props => {
     regularHMargin,
     regularVMargin,
     regularTMargin,
+    smallBMargin,
     mediumVMargin,
     smallHMargin
   } = Gutters
@@ -760,6 +761,7 @@ const CustomCalories = props => {
         >
           <TouchableOpacity
             onPress={() => setShowModalHistory(!showModalHistory)}
+            style={smallBMargin}
           >
             <Icon type="FontAwesome5" name="times" size={25} />
           </TouchableOpacity>
@@ -944,7 +946,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   getCalories: state.customCalReducer.getCalories,
-  meals: state.customCalReducer.meals,
+  meals: state.customCalReducer.mealsHistory,
   profile: state.login.userDetail,
   unreadCount: state.nutritionReducer.unreadCount,
   todaySessions: state.programReducer.todaySessions,
@@ -957,7 +959,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
-  getMealsRequest: () => dispatch(getMealsRequest()),
+  getMealsHistoryRequest: () => dispatch(getMealsHistoryRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),
   submitQuestionRequest: (profile, data, isCheck) =>
     dispatch(submitQuestionRequest(profile, data, isCheck)),

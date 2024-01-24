@@ -17,6 +17,9 @@ const GET_MEALS_REQUEST = "CUSTOM_CAL_SCREEN/GET_MEALS_REQUEST"
 const GET_MEALS_SUCCESS = "CUSTOM_CAL_SCREEN/GET_MEALS_SUCCESS"
 const GET_MEALS_FAILURE = "CUSTOM_CAL_SCREEN/GET_MEALS_FAILURE"
 
+const GET_MEALS_HISTORY_REQUEST = "CUSTOM_CAL_SCREEN/GET_MEALS_HISTORY_REQUEST"
+const GET_MEALS_HISTORY_SUCCESS = "CUSTOM_CAL_SCREEN/GET_MEALS_HISTORY_SUCCESS"
+
 const REQUIRED_CALORIES_REQUEST = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_REQUEST"
 const REQUIRED_CALORIES_SUCCESS = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_SUCCESS"
 const REQUIRED_CALORIES_FAILURE = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_FAILURE"
@@ -32,7 +35,8 @@ const initialState = {
 
   rCalRequest: false,
   requiredCalories: false,
-  requiredCalError: false
+  requiredCalError: false,
+  mealsHistory: false
 }
 
 //Actions
@@ -57,6 +61,15 @@ export const getMealsRequest = () => ({
 
 export const getMealsSuccess = data => ({
   type: GET_MEALS_SUCCESS,
+  data
+})
+
+export const getMealsHistoryRequest = () => ({
+  type: GET_MEALS_HISTORY_REQUEST
+})
+
+export const getMealsHistorySuccess = data => ({
+  type: GET_MEALS_HISTORY_SUCCESS,
   data
 })
 
@@ -98,6 +111,7 @@ export const customCalReducer = (state = initialState, action) => {
       }
 
     case GET_MEALS_REQUEST:
+    case GET_MEALS_HISTORY_REQUEST:
       return {
         ...state,
         mealRequesting: true
@@ -106,6 +120,13 @@ export const customCalReducer = (state = initialState, action) => {
       return {
         ...state,
         meals: action.data,
+        mealRequesting: false
+      }
+
+    case GET_MEALS_HISTORY_SUCCESS:
+      return {
+        ...state,
+        mealsHistory: action.data,
         mealRequesting: false
       }
 
@@ -201,6 +222,29 @@ function* getMeals() {
   }
 }
 
+async function getMealsHistoryAPI() {
+  const URL = `${API_URL}/meal/history/`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token  ${token}`
+    }
+  }
+
+  return XHR(URL, options)
+}
+
+function* getMealsHistiry() {
+  try {
+    const response = yield call(getMealsHistoryAPI)
+    yield put(getMealsHistorySuccess(response.data))
+  } catch (e) {
+    yield put(getMealsHistorySuccess(false))
+  }
+}
+
 async function postRequiredCalAPI(id, data) {
   const URL = `${API_URL}/calories-required/${id}/`
   const token = await AsyncStorage.getItem("authToken")
@@ -229,5 +273,6 @@ function* postRequiredCal({ id, data }) {
 export default all([
   takeLatest(REQUIRED_CALORIES_REQUEST, postRequiredCal),
   takeLatest(GET_CALORIES_REQUEST, getCustomCal),
-  takeLatest(GET_MEALS_REQUEST, getMeals)
+  takeLatest(GET_MEALS_REQUEST, getMeals),
+  takeLatest(GET_MEALS_HISTORY_REQUEST, getMealsHistiry)
 ])
