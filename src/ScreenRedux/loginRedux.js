@@ -17,6 +17,7 @@ import XHR from "src/utils/XHR"
 const LOGIN = "SCREEN/LOGIN"
 const FACEBOOK_LOGIN = "SCREEN/FACEBOOK_LOGIN"
 const GOOGLE_LOGIN = "SCREEN/GOOGLE_LOGIN"
+const APPLE_LOGIN = "SCREEN/APPLE_LOGIN"
 const SET_ACCESS_TOKEN = "SCREEN/SET_ACCESS_TOKEN"
 const SET_USER_DETAIL = "SCREEN/SET_USER_DETAIL"
 const SUBSCRIPTION_DATA = "SCREEN/SUBSCRIPTION_DATA"
@@ -34,7 +35,8 @@ const initialState = {
   googleRequesting: false,
   faceBookRequesting: false,
   subscriptionData: false,
-  forgotRequest: false
+  forgotRequest: false,
+  appleRequesting: false
 }
 
 //Actions
@@ -50,6 +52,11 @@ export const facebookLoginUser = data => ({
 
 export const googleLoginUser = data => ({
   type: GOOGLE_LOGIN,
+  data
+})
+
+export const appleLoginUser = data => ({
+  type: APPLE_LOGIN,
   data
 })
 
@@ -100,6 +107,11 @@ export const loginReducer = (state = initialState, action) => {
         ...state,
         googleRequesting: true
       }
+    case APPLE_LOGIN:
+      return {
+        ...state,
+        appleRequesting: true
+      }
 
     case FACEBOOK_LOGIN:
       return {
@@ -138,7 +150,8 @@ export const loginReducer = (state = initialState, action) => {
         requesting: false,
         googleRequesting: false,
         faceBookRequesting: false,
-        forgotRequest: false
+        forgotRequest: false,
+        appleRequesting: false
       }
 
     default:
@@ -249,6 +262,33 @@ function* googleLogin({ data }) {
   }
 }
 
+function appleLoginAPI(data) {
+  const URL = `${API_URL}/login/apple/`
+  const options = {
+    method: "POST",
+    data
+  }
+
+  return XHR(URL, options)
+}
+
+function* appleLogin({ data }) {
+  try {
+    const res = yield call(appleLoginAPI, data)
+    AsyncStorage.setItem("authToken", res.data.key)
+    yield put(setAccessToken(res.data.key))
+    yield put(setUserDetail(res.data.user_detail))
+    RemotePushController(res.data.key, res?.data?.user_detail?.id)
+    showMessage({
+      message: "Apple login successfully",
+      type: "success"
+    })
+  } catch (e) {
+    const { response } = e
+  } finally {
+    yield put(reset())
+  }
+}
 async function logoutAPI(token) {
   const registrationToken = await messaging().getToken()
   const URL = `${API_URL}/logout/`
@@ -339,6 +379,7 @@ export default all([
   takeLatest(LOGIN, login),
   takeLatest(FACEBOOK_LOGIN, facebookLogin),
   takeLatest(GOOGLE_LOGIN, googleLogin),
+  takeLatest(APPLE_LOGIN, appleLogin),
   takeLatest(LOGOUT_USER, logoutUser),
   takeLatest(FORGOT_PASSWORD, forgetPassWordRequest),
   takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest)

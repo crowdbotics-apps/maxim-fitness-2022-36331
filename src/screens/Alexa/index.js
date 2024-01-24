@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import Modal from 'react-native-modal';
-import { Button, Text } from '../../components';
-import { Colors, Global, Gutters, Layout, Images } from '../../theme';
-import { WebView } from 'react-native-webview';
+import React, { useState } from "react"
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Alert
+} from "react-native"
+import Modal from "react-native-modal"
+import { Button, Text } from "../../components"
+import { Colors, Global, Gutters, Layout, Images } from "../../theme"
+import { WebView } from "react-native-webview"
 
 const Alexa = props => {
-  const { navigation } = props;
-  const [isVisible, setIsVisible] = useState(true);
-  const [currentTab, setCurrentTab] = useState(true);
+  const { navigation } = props
+  const [isVisible, setIsVisible] = useState(false)
+  const [currentTab, setCurrentTab] = useState(true)
 
-  const [openWebView, setOpenWebView] = useState(false);
-  const [webViewUrls, setWebViewUrls] = useState('');
+  const [openWebView, setOpenWebView] = useState(false)
+  const [webViewUrls, setWebViewUrls] = useState("")
 
   const {
     row,
@@ -19,9 +26,9 @@ const Alexa = props => {
     justifyContentCenter,
     alignItemsCenter,
     justifyContentBetween,
-    justifyContentAround,
-  } = Layout;
-  const { secondaryBg, topLRBorderRadius20, halfOpacityBg } = Global;
+    justifyContentAround
+  } = Layout
+  const { secondaryBg, topLRBorderRadius20, halfOpacityBg } = Global
   const {
     regularVMargin,
     zeroMargin,
@@ -29,11 +36,11 @@ const Alexa = props => {
     mediumTMargin,
     smallVMargin,
     largeTPadding,
-    largeBPadding,
-  } = Gutters;
+    largeBPadding
+  } = Gutters
 
   return (
-    <View style={{ backgroundColor: 'white', flex: 1 }}>
+    <View style={{ backgroundColor: "white", flex: 1 }}>
       {!openWebView ? (
         <View>
           {currentTab ? (
@@ -41,36 +48,56 @@ const Alexa = props => {
               contentContainerStyle={{ flexGrow: 1 }}
               showsVerticalScrollIndicator={false}
             >
-              <View style={[fill, alignItemsCenter, secondaryBg, zeroMargin, zeroPadding]}>
-                <View style={[fill, justifyContentAround, largeTPadding, largeBPadding]}>
+              <View
+                style={[
+                  fill,
+                  alignItemsCenter,
+                  secondaryBg,
+                  zeroMargin,
+                  zeroPadding
+                ]}
+              >
+                <View
+                  style={[
+                    fill,
+                    justifyContentAround,
+                    largeTPadding,
+                    largeBPadding
+                  ]}
+                >
                   <View style={[row, fill, justifyContentBetween]}>
                     <Image
                       source={Images.avatarIcon}
-                      style={{ width: 90, height: 90, resizeMode: 'contain' }}
+                      style={{ width: 90, height: 90, resizeMode: "contain" }}
                     />
                     <Image
                       source={Images.loading}
-                      style={{ width: 140, height: 100, resizeMode: 'contain' }}
+                      style={{ width: 140, height: 100, resizeMode: "contain" }}
                     />
                     <Image
                       source={Images.alexa3}
-                      style={{ width: 120, height: 120, resizeMode: 'contain' }}
+                      style={{ width: 120, height: 120, resizeMode: "contain" }}
                     />
                   </View>
                   <Text
                     style={styles.topTextStyle4}
                     bold
                     center
-                    text={'Link Orum Training\n' + 'With Alexa'}
+                    text={"Link Orum Training\n" + "With Alexa"}
                   />
                 </View>
-                <View center style={[fill, justifyContentBetween, alignItemsCenter]}>
+                <View
+                  center
+                  style={[fill, justifyContentBetween, alignItemsCenter]}
+                >
                   <View style={[fill, justifyContentBetween]}>
                     <Text
                       style={[mediumTMargin, styles.topTextStyle]}
                       bold
                       center
-                      text={'Enable the Orum Training skill\n and link your account with Alexa'}
+                      text={
+                        "Enable the Orum Training skill\n and link your account with Alexa"
+                      }
                     />
                   </View>
                   <View style={[fill, justifyContentBetween]}>
@@ -78,9 +105,9 @@ const Alexa = props => {
                       style={[smallVMargin, styles.topTextStyle3]}
                       center
                       text={
-                        'To unlink your account at anytime,\n' +
-                        'disable the Orum Training skill\n' +
-                        'in the Alexa app'
+                        "To unlink your account at anytime,\n" +
+                        "disable the Orum Training skill\n" +
+                        "in the Alexa app"
                       }
                     />
                   </View>
@@ -90,7 +117,7 @@ const Alexa = props => {
                       row,
                       alignItemsCenter,
                       justifyContentBetween,
-                      { marginHorizontal: 15, marginTop: '30%' },
+                      { marginHorizontal: 15, marginTop: "30%" }
                     ]}
                   >
                     <Button
@@ -101,13 +128,17 @@ const Alexa = props => {
                         {
                           height: 60,
                           // marginHorizontal: 20,
-                          backgroundColor: '#d5d5d5',
-                          borderColor: '#d5d5d5',
-                        },
+                          backgroundColor: "#d5d5d5",
+                          borderColor: "#d5d5d5"
+                        }
                       ]}
-                      text={'Cancel'}
-                      textStyle={{ fontSize: 20, lineHeight: 22, color: '#000' }}
-                      onPress={() => navigation.navigate('Profile')}
+                      text={"Cancel"}
+                      textStyle={{
+                        fontSize: 20,
+                        lineHeight: 22,
+                        color: "#000"
+                      }}
+                      onPress={() => navigation.goBack()}
                     />
                     <View style={{ width: 15 }} />
                     <Button
@@ -118,13 +149,17 @@ const Alexa = props => {
                         {
                           height: 60,
                           // marginHorizontal: 20,
-                          backgroundColor: '#56c1ff',
-                          borderColor: '#56c1ff',
-                        },
+                          backgroundColor: "#56c1ff",
+                          borderColor: "#56c1ff"
+                        }
                       ]}
-                      textStyle={{ fontSize: 20, lineHeight: 22, color: 'white' }}
-                      text={'Link'}
-                      onPress={() => Alert.alert('Feature not available')}
+                      textStyle={{
+                        fontSize: 20,
+                        lineHeight: 22,
+                        color: "white"
+                      }}
+                      text={"Link"}
+                      onPress={() => setIsVisible(true)}
                     />
                   </View>
                 </View>
@@ -135,44 +170,86 @@ const Alexa = props => {
               contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
               showsVerticalScrollIndicator={false}
             >
-              <View style={[fill, alignItemsCenter, secondaryBg, zeroMargin, zeroPadding]}>
-                <View style={[fill, justifyContentCenter, largeTPadding, largeBPadding]}>
-                  <Text style={styles.topTextStyle5} bold center text={'Congratulations!'} />
+              <View
+                style={[
+                  fill,
+                  alignItemsCenter,
+                  secondaryBg,
+                  zeroMargin,
+                  zeroPadding
+                ]}
+              >
+                <View
+                  style={[
+                    fill,
+                    justifyContentCenter,
+                    largeTPadding,
+                    largeBPadding
+                  ]}
+                >
+                  <Text
+                    style={styles.topTextStyle5}
+                    bold
+                    center
+                    text={"Congratulations!"}
+                  />
                   <Text
                     style={[largeTPadding, styles.topTextStyle3]}
                     center
                     text={
-                      'To unlink your account at anytime,\n' +
-                      'disable the Orum Training skill\n' +
-                      'in the Alexa app'
+                      "To unlink your account at anytime,\n" +
+                      "disable the Orum Training skill\n" +
+                      "in the Alexa app"
                     }
                   />
                 </View>
-                <View center style={[fill, justifyContentBetween, alignItemsCenter]}>
-                  <View style={[fill, largeBPadding, largeTPadding, justifyContentBetween]}>
+                <View
+                  center
+                  style={[fill, justifyContentBetween, alignItemsCenter]}
+                >
+                  <View
+                    style={[
+                      fill,
+                      largeBPadding,
+                      largeTPadding,
+                      justifyContentBetween
+                    ]}
+                  >
                     <Text
                       style={[mediumTMargin, styles.topTextStyle]}
                       bold
                       center
-                      text={'Enable the Orum Training skill\n and link your account with Alexa'}
+                      text={
+                        "Enable the Orum Training skill\n and link your account with Alexa"
+                      }
                     />
                   </View>
                   <View style={[row, fill, justifyContentBetween]}>
                     <Image
                       source={Images.alexa3}
-                      style={{ width: 120, height: 120, resizeMode: 'contain' }}
+                      style={{ width: 120, height: 120, resizeMode: "contain" }}
                     />
                   </View>
-                  <View style={[fill, largeBPadding, largeTPadding, justifyContentBetween]}>
+                  <View
+                    style={[
+                      fill,
+                      largeBPadding,
+                      largeTPadding,
+                      justifyContentBetween
+                    ]}
+                  >
                     <Text
                       style={[smallVMargin, styles.topTextStyle3]}
                       center
                       text={
-                        'Start by saying: “Alexa, log my\n' + 'first meal on the Orum Training app'
+                        "Start by saying: “Alexa, log my\n" +
+                        "first meal on the Orum Training app"
                       }
                     />
                   </View>
-                  <View style={[fill, row, alignItemsCenter, justifyContentBetween]}>
+                  <View
+                    style={[fill, row, alignItemsCenter, justifyContentBetween]}
+                  >
                     <Button
                       border
                       block
@@ -181,15 +258,19 @@ const Alexa = props => {
                         {
                           height: 60,
                           marginHorizontal: 20,
-                          backgroundColor: '#d5d5d5',
-                          borderColor: '#d5d5d5',
-                        },
+                          backgroundColor: "#d5d5d5",
+                          borderColor: "#d5d5d5"
+                        }
                       ]}
-                      text={'Close'}
-                      textStyle={{ fontSize: 20, color: '#000', lineHeight: 22 }}
+                      text={"Close"}
+                      textStyle={{
+                        fontSize: 20,
+                        color: "#000",
+                        lineHeight: 22
+                      }}
                       onPress={() => {
-                        setCurrentTab(!currentTab);
-                        navigation.navigate('Profile');
+                        setCurrentTab(!currentTab)
+                        navigation.navigate("Profile")
                       }}
                     />
                   </View>
@@ -199,10 +280,10 @@ const Alexa = props => {
           )}
           <Modal
             transparent={true}
-            animationType="slide"
+            animationType="false"
             visible={isVisible}
             onRequestClose={() => {
-              setIsVisible(!isVisible);
+              setIsVisible(!isVisible)
             }}
             style={[zeroMargin, zeroPadding, halfOpacityBg]}
           >
@@ -211,7 +292,7 @@ const Alexa = props => {
               showsVerticalScrollIndicator={false}
             >
               <TouchableOpacity
-                style={{ height: '12%' }}
+                style={{ height: "12%" }}
                 onPress={() => setIsVisible(!isVisible)}
               />
               <View
@@ -221,31 +302,44 @@ const Alexa = props => {
                   secondaryBg,
                   zeroMargin,
                   zeroPadding,
-                  topLRBorderRadius20,
+                  topLRBorderRadius20
                 ]}
               >
                 <Text
                   style={[mediumTMargin, styles.topTextStyle]}
                   bold
                   center
-                  text={'Tracking your diet\n is now easier'}
+                  text={"Tracking your diet\n is now easier"}
                 />
                 <Image source={Images.alexa} />
                 <Image source={Images.alexa2} />
-                <Text style={[smallVMargin, styles.topTextStyle2]} center text={'amazon alexa'} />
+                <Text
+                  style={[smallVMargin, styles.topTextStyle2]}
+                  center
+                  text={"amazon alexa"}
+                />
                 <Text
                   style={[mediumTMargin, styles.topTextStyle]}
                   bold
                   center
-                  text={'Want to connect to Alexa?'}
+                  text={"Want to connect to Alexa?"}
                 />
                 <Text center style={mediumTMargin}>
-                  <Text style={[smallVMargin, styles.topTextStyle3]} center text={'Click '} />
-                  <Text style={[smallVMargin, styles.topTextStyle3]} center bold text={'Allow '} />
                   <Text
                     style={[smallVMargin, styles.topTextStyle3]}
                     center
-                    text={' to link\n' + 'Orum Training to Alexa'}
+                    text={"Click "}
+                  />
+                  <Text
+                    style={[smallVMargin, styles.topTextStyle3]}
+                    center
+                    bold
+                    text={"Allow "}
+                  />
+                  <Text
+                    style={[smallVMargin, styles.topTextStyle3]}
+                    center
+                    text={" to link\n" + "Orum Training to Alexa"}
                   />
                 </Text>
                 <Button
@@ -256,15 +350,15 @@ const Alexa = props => {
                     {
                       height: 60,
                       marginHorizontal: 30,
-                      backgroundColor: '#56c1ff',
-                      borderColor: '#56c1ff',
-                    },
+                      backgroundColor: "#56c1ff",
+                      borderColor: "#56c1ff"
+                    }
                   ]}
-                  textStyle={{ fontSize: 20, lineHeight: 22, color: 'white' }}
-                  text={'Allow'}
+                  textStyle={{ fontSize: 20, lineHeight: 22, color: "white" }}
+                  text={"Allow"}
                   onPress={() => {
-                    setOpenWebView(true);
-                    setIsVisible(!isVisible);
+                    setOpenWebView(true)
+                    setIsVisible(!isVisible)
                     // Linking.openURL('https://orumtraining-23610.botics.co/o/authorize/?response_type=code&client_id=cOfn7YQGjnKboiTSIYXzkssbuNqyHwz7whNuJdxc&redirect_uri=https://orumtraining-23610.botics.co/')
                     // <WebView source={{ uri: 'https://orumtraining-23610.botics.co/o/authorize/?response_type=code&client_id=cOfn7YQGjnKboiTSIYXzkssbuNqyHwz7whNuJdxc&redirect_uri=https://orumtraining-23610.botics.co/' }} />
                   }}
@@ -277,13 +371,13 @@ const Alexa = props => {
                     {
                       height: 60,
                       marginHorizontal: 30,
-                      backgroundColor: '#fff',
-                      borderColor: '#ff654f',
-                    },
+                      backgroundColor: "#fff",
+                      borderColor: "#ff654f"
+                    }
                   ]}
                   text={"Don't Allow"}
-                  textStyle={{ fontSize: 20, lineHeight: 22, color: '#ff654f' }}
-                  onPress={() => navigation.navigate('Profile')}
+                  textStyle={{ fontSize: 20, lineHeight: 22, color: "#ff654f" }}
+                  onPress={() => setIsVisible(false)}
                 />
               </View>
             </ScrollView>
@@ -293,10 +387,10 @@ const Alexa = props => {
         <View style={{ flex: 1 }}>
           <WebView
             source={{
-              uri: 'https://orumtraining-23610.botics.co/o/authorize/?response_type=code&client_id=cOfn7YQGjnKboiTSIYXzkssbuNqyHwz7whNuJdxc&redirect_uri=https://orumtraining-23610.botics.co/',
+              uri: "https://orumtraining-23610.botics.co/o/authorize/?response_type=code&client_id=cOfn7YQGjnKboiTSIYXzkssbuNqyHwz7whNuJdxc&redirect_uri=https://orumtraining-23610.botics.co/"
             }}
             onNavigationStateChange={navState => {
-              setWebViewUrls(navState.url);
+              setWebViewUrls(navState.url)
             }}
             javaScriptEnabled={true}
             domStorageEnabled={true}
@@ -305,74 +399,74 @@ const Alexa = props => {
         </View>
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   topTextStyle: {
     fontSize: 24,
     lineHeight: 26,
-    color: 'rgba(0,0,0,0.8)',
+    color: "rgba(0,0,0,0.8)"
   },
   topTextStyle2: {
     fontSize: 24,
     lineHeight: 26,
-    color: 'rgba(0,0,0,0.8)',
+    color: "rgba(0,0,0,0.8)"
   },
   topTextStyle3: {
     fontSize: 24,
     lineHeight: 26,
-    color: 'rgba(0,0,0,0.8)',
+    color: "rgba(0,0,0,0.8)"
   },
   topTextStyle4: {
     fontSize: 28,
     lineHeight: 30,
-    color: 'rgba(0,0,0,0.8)',
+    color: "rgba(0,0,0,0.8)"
   },
   topTextStyle5: {
     fontSize: 38,
     lineHeight: 42,
-    color: '#000',
+    color: "#000"
   },
   doneWrapper: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center"
   },
   imageWrapper: {
     width: 20,
-    height: 20,
+    height: 20
   },
   mainImage: {
-    width: '100%',
+    width: "100%",
     height: 200,
-    resizeMode: 'cover',
+    resizeMode: "cover"
   },
   lineStyle: { borderWidth: 1, width: 40, height: 1 },
   inputModalStyle: {
     paddingHorizontal: 8,
     borderRadius: 6,
-    borderColor: Colors.nobel,
+    borderColor: Colors.nobel
   },
   modalButton: { height: 50 },
-  inputStyle: { height: 50, backgroundColor: '#f5f5f5' },
+  inputStyle: { height: 50, backgroundColor: "#f5f5f5" },
   modalCrossIcon: { margin: 10 },
   buttonWrapper: {
-    marginTop: 2,
+    marginTop: 2
   },
   modalImageStyle: {
     borderRadius: 20,
     width: 170,
     height: 170,
-    resizeMode: 'contain',
+    resizeMode: "contain"
   },
   leftIconStyle: {
     left: 20,
     zIndex: 22,
-    top: 0,
+    top: 0
   },
-  leftImageStyle: { width: 30, height: 30, resizeMode: 'contain' },
-  timerStyle: { height: 30 },
-});
+  leftImageStyle: { width: 30, height: 30, resizeMode: "contain" },
+  timerStyle: { height: 30 }
+})
 
-export default Alexa;
+export default Alexa

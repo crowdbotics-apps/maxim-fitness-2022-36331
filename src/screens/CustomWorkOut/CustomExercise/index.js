@@ -68,9 +68,6 @@ const CustomExercise = props => {
     }
   }, [])
 
-  const ex1 = "Exercise 1"
-  const ex2 = "Exercise 2"
-
   const duplicateSet = () => {
     if (numberOfExercise === 1) {
       const newArray = [...sets, sets[currentIndex]]
@@ -118,19 +115,117 @@ const CustomExercise = props => {
     setDualReps(tempObj)
   }
 
-  const keepRes = () => {
-    setDualReps({
-      ...dualReps,
-      state1: reps,
-      state2: reps
-    })
+  const remaingSameDualKeep = () => {
+    if (numberOfExercise === 1) {
+      //Drop sets, Triple sets and Single sets
+      if (activeSet?.item === "Drop Set") {
+        setDroupSets({
+          ...droupSet,
+          state1: reps,
+          state2: reps
+        })
+      } else {
+        setDroupSets({
+          ...droupSet,
+          state1: reps,
+          state2: reps,
+          state3: reps
+        })
+      }
+    } else {
+      if (activeSet?.value === 4) {
+        setDualReps({
+          ...dualReps,
+          state1: temporaryReps,
+          state2: temporaryReps,
+          state3: temporaryReps
+        })
+      } else {
+        setDualReps({
+          ...dualReps,
+          state1: temporaryReps,
+          state2: temporaryReps
+        })
+      }
+    }
   }
-  const dualKeep = () => {
-    setDualSetState({
-      ...dualSetState,
-      state1: reps,
-      state2: reps
-    })
+
+  const remaingRestSameDualKeep = () => {
+    if (numberOfExercise === 1) {
+      //Drop sets, Triple sets and Single sets
+      if (activeSet?.item === "Drop Set") {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            sec1: seconds,
+            sec2: seconds
+          },
+          mints: {
+            mint1: minutes,
+            mint2: minutes
+          }
+        }))
+      } else {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            sec1: seconds,
+            sec2: seconds,
+            sec3: seconds
+          },
+          mints: {
+            mint1: minutes,
+            mint2: minutes,
+            mint3: minutes
+          }
+        }))
+      }
+    } else {
+      if (activeSet?.value === 4) {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            sec1: seconds,
+            sec2: seconds,
+            sec3: seconds
+          },
+          mints: {
+            mint1: minutes,
+            mint2: minutes,
+            mint3: minutes
+          }
+        }))
+      } else {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            sec1: seconds,
+            sec2: seconds
+          },
+          mints: {
+            mint1: minutes,
+            mint2: minutes
+          }
+        }))
+      }
+    }
+  }
+
+  const renderInputValue = key => {
+    if (numberOfExercise === 1) {
+      const val = droupSet[`state${key + 1}`]
+      val ? setReps(val) : setReps("")
+    } else {
+      const val = dualReps[`state${key}`]
+      val ? setTemporaryReps(val) : setTemporaryReps("")
+    }
+  }
+
+  const renderRestInputValue = key => {
+    const mints = timeData.mints[`mint${key}`]
+    const second = timeData.seconds[`sec${key}`]
+    mints ? setMinutes(mints) : setMinutes("")
+    second ? setSeconds(second) : setSeconds("")
   }
 
   const updateDroupSets = value => {
@@ -305,7 +400,7 @@ const CustomExercise = props => {
           </View>
           <View style={Gutters.smallTMargin}>
             {numberOfExercise === 1 &&
-              sets.map((item, i) => (
+              sets?.map((item, i) => (
                 <TouchableOpacity
                   onPress={() => setCurrentIndex(i)}
                   style={[
@@ -334,7 +429,7 @@ const CustomExercise = props => {
                 </TouchableOpacity>
               ))}
             {numberOfExercise > 1 &&
-              dualSets.map((item, i) => (
+              dualSets?.map((item, i) => (
                 <TouchableOpacity
                   style={[
                     Global.borderR10,
@@ -685,7 +780,9 @@ const CustomExercise = props => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    keepRes()
+                    if (reps !== "") {
+                      remaingSameDualKeep()
+                    }
                   }}
                 >
                   <Image source={radioBlue} style={{ width: 20, height: 20 }} />
@@ -710,9 +807,8 @@ const CustomExercise = props => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    if (sets[sets?.length - 1]?.rest) {
-                      setMinutes(Math.floor(sets[sets?.length - 1]?.rest / 60))
-                      setSeconds(sets[sets?.length - 1]?.rest % 60)
+                    if (seconds !== "" || minutes !== "") {
+                      remaingRestSameDualKeep()
                     }
                   }}
                 >
@@ -780,8 +876,8 @@ const CustomExercise = props => {
                       refRBSheet.current.close()
                       resetValues()
                     }
-
-                    setReps("")
+                    renderInputValue(selectIndex + 1)
+                    renderRestInputValue(selectIndex + 1)
                   } else {
                     setSets(prevValues => [
                       ...prevValues,
@@ -873,12 +969,8 @@ const CustomExercise = props => {
                       style={styles.dotHeight}
                       onPress={() => {
                         setDualSetState(index + 1)
-                        // setSelectIndex(index + 1);
-                        const entries = Object.entries(dualReps)
-                        const checkIndex = index < entries.length
-                        checkIndex
-                          ? setTemporaryReps(entries?.[index][1])
-                          : setTemporaryReps("")
+                        renderInputValue(index + 1)
+                        renderRestInputValue(index + 1)
                       }}
                     >
                       <View
@@ -935,7 +1027,7 @@ const CustomExercise = props => {
                       minWidth: 40
                       // marginTop: 15
                     }}
-                    value={temporaryReps}
+                    value={`${temporaryReps}`}
                     keyboardType="number-pad"
                     onChangeText={val => {
                       updateDualReps(val)
@@ -952,12 +1044,8 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (dualSets?.length) {
-                        setTemporaryReps(
-                          dualSetState === 1
-                            ? dualSets[dualSets?.length - 1]?.exerciseA?.reps
-                            : dualSets[dualSets?.length - 1]?.exerciseB?.reps
-                        )
+                      if (temporaryReps !== "") {
+                        remaingSameDualKeep()
                       }
                     }}
                   >
@@ -1069,18 +1157,8 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (
-                        dualSetState === 2 &&
-                        dualSets[dualSets?.length - 1]?.exerciseB?.rest
-                      ) {
-                        setMinutes(
-                          Math.floor(
-                            dualSets[dualSets?.length - 1]?.exerciseB?.rest / 60
-                          )
-                        )
-                        setSeconds(
-                          dualSets[dualSets?.length - 1]?.exerciseB?.rest % 60
-                        )
+                      if (seconds !== "" || minutes !== "") {
+                        remaingRestSameDualKeep()
                       }
                     }}
                   >
@@ -1119,11 +1197,10 @@ const CustomExercise = props => {
                 onPress={() => {
                   if (dualSetState < (activeSet?.value === 4 ? 3 : 2)) {
                     setDualSetState(dualSetState + 1)
+                    renderInputValue(dualSetState + 1)
+                    renderRestInputValue(dualSetState + 1)
                     // resetValues();
                     // setTemporaryReps();
-                    setTemporaryReps("")
-                    setMinutes("")
-                    setSeconds("")
                   } else {
                     refRBSheetDual.current.close()
                     setDualSetState(1)

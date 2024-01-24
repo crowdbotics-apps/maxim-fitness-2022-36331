@@ -963,7 +963,8 @@ const ExerciseScreen = props => {
                   height40,
                   tiny2xHPadding,
                   {
-                    width: "40%"
+                    width: "45%",
+                    backgroundColor: "red"
                   }
                 ]}
               >
