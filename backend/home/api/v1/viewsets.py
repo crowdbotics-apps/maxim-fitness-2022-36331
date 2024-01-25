@@ -588,6 +588,7 @@ class MealViewSet(ModelViewSet):
         data = []
         meals_ids = FoodItem.objects.filter(meal__user=user).distinct("meal").values_list("meal_id", flat=True)
         unique_dates = Meal.objects.filter(user=user, id__in=meals_ids).order_by("-date_time__date").distinct("date_time__date").values_list("date_time__date", flat=True)
+        req_calories = CaloriesRequired.objects.filter(user=self.request.user).last()
         for date in unique_dates:
             if date == current_datetime.date():
                 query = Meal.objects.filter(date_time__lte=current_datetime, user=user, date_time__date=date)
@@ -596,10 +597,57 @@ class MealViewSet(ModelViewSet):
                 else:
                     serializer = MealSerializer(query, many=True)
                     data.append({str(date): serializer.data})
+                    cal_data = serializer.data
+                    total_calories = 0
+                    total_proteins = 0
+                    total_carbohydrates = 0
+                    total_fat = 0
+
+                    # Iterate through meals and food items
+                    for meal in cal_data:
+                        for food_item in meal["food_items"]:
+                            total_calories += food_item["calories"]
+                            total_proteins += food_item["protein"]
+                            total_carbohydrates += food_item["carbohydrate"]
+                            total_fat += food_item["fat"]
+                    consume_calories = ConsumeCalories.objects.filter(
+                        user=self.request.user, created=date)
+                    if consume_calories:
+                        consume_calories.update(calories=total_calories,
+                                                protein=total_proteins,
+                                                carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
+                    else:
+                        ConsumeCalories.objects.create(calories=total_calories,
+                                                protein=total_proteins,user_id=request.user.id,
+                                                carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
+
             else:
                 query = Meal.objects.filter(date_time__date=date, user=user)
                 serializer = MealSerializer(query, many=True)
                 data.append({str(date): serializer.data})
+                cal_data = serializer.data
+                total_calories = 0
+                total_proteins = 0
+                total_carbohydrates = 0
+                total_fat = 0
+
+                # Iterate through meals and food items
+                for meal in cal_data:
+                    for food_item in meal["food_items"]:
+                        total_calories += food_item["calories"]
+                        total_proteins += food_item["protein"]
+                        total_carbohydrates += food_item["carbohydrate"]
+                        total_fat += food_item["fat"]
+                consume_calories = ConsumeCalories.objects.filter(
+                    user=self.request.user, created=date)
+                if consume_calories:
+                    consume_calories.update(calories=total_calories,
+                                            protein=total_proteins,
+                                            carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
+                else:
+                    ConsumeCalories.objects.create(calories=total_calories,user_id=request.user.id,
+                                                   protein=total_proteins,
+                                                   carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
         return Response(data)
 
     @action(detail=True, methods=['post'])
@@ -1307,9 +1355,13 @@ class ConsumeCaloriesViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return ConsumeCalories.objects.filter(
+        queryset = ConsumeCalories.objects.filter(
             user=self.request.user
         ).select_related('user', 'goals_values').order_by('-created')
+        date = self.request.query_params.get('date')
+        if date:
+            queryset = queryset.filter(created=date)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         queryset = self.get_queryset()
