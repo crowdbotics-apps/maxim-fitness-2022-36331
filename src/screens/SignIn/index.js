@@ -27,7 +27,8 @@ import { useIsFocused } from "@react-navigation/native"
 import {
   loginUser,
   googleLoginUser,
-  facebookLoginUser
+  facebookLoginUser,
+  appleLoginUser
 } from "../../ScreenRedux/loginRedux"
 import appleAuth, {
   AppleButton
@@ -165,8 +166,8 @@ const SignIn = props => {
         code: appleAuthRequestResponse.authorizationCode,
         id_token: appleAuthRequestResponse.identityToken
       }
-      console.log("data APPLE: ", data)
-      // await props.loginActionViaAppleAction(data);
+
+      props.appleLoginUser(data)
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log("SIGN IN CANCEL ", error)
@@ -277,16 +278,23 @@ const SignIn = props => {
                 { width: "100%", marginTop: 20, borderRadius: 10 }
               ]}
             >
-              <AppleButton
-                buttonStyle={AppleButton.Style.BLACK}
-                buttonType={AppleButton.Type.SIGN_IN}
-                style={{
-                  alignSelf: "center",
-                  width: "100%", // You must specify a width
-                  height: 45 // You must specify a height
-                }}
-                onPress={signInApple}
-              />
+              {props.appleRequesting ? (
+                <ActivityIndicator
+                  style={{ flex: 6, marginRight: 30 }}
+                  color="black"
+                />
+              ) : (
+                <AppleButton
+                  buttonStyle={AppleButton.Style.BLACK}
+                  buttonType={AppleButton.Type.SIGN_IN}
+                  style={{
+                    alignSelf: "center",
+                    width: "100%", // You must specify a width
+                    height: 45 // You must specify a height
+                  }}
+                  onPress={signInApple}
+                />
+              )}
             </View>
           )}
           <Text style={styles.loginTextStyle}>Or Login with</Text>
@@ -444,13 +452,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   requesting: state.login.requesting,
   googleRequesting: state.login.googleRequesting,
-  faceBookRequesting: state.login.faceBookRequesting
+  faceBookRequesting: state.login.faceBookRequesting,
+  appleRequesting: state.login.appleRequesting
   // user: state.login.userDetail
 })
 
 const mapDispatchToProps = dispatch => ({
   loginUser: data => dispatch(loginUser(data)),
   googleLoginUser: data => dispatch(googleLoginUser(data)),
-  facebookLoginUser: data => dispatch(facebookLoginUser(data))
+  facebookLoginUser: data => dispatch(facebookLoginUser(data)),
+  applekLoginUser: data => dispatch(appleLoginUser(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(SignIn)

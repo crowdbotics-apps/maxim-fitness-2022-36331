@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Provider as ReduxProvider } from "react-redux"
 import { LogBox } from "react-native"
 import "react-native-gesture-handler"
@@ -13,7 +13,6 @@ import { PubNubProvider } from "pubnub-react"
 import PubNub from "pubnub"
 import { PUBNUB_PUBLISH_KEY, PUBNUB_SUBSCRIBE_KEY } from "@env"
 import { MenuProvider } from "react-native-popup-menu"
-import { navigate } from "./src/navigation/NavigationService"
 
 LogBox.ignoreLogs(["Warning: ..."])
 LogBox.ignoreAllLogs()
@@ -30,17 +29,6 @@ const pubnub = new PubNub({
 
 const App = () => {
   const persistor = persistStore(store)
-
-  // messaging().setBackgroundMessageHandler(async payload => {
-  //   if (payload?.data?.post) {
-  //   }
-  // })
-
-  messaging().onNotificationOpenedApp(remoteMessage => {
-    if (remoteMessage?.data?.post) {
-      navigate("ViewPost", remoteMessage?.data?.post)
-    }
-  })
 
   return (
     <PubNubProvider client={pubnub}>
