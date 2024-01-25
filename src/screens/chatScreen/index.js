@@ -15,9 +15,10 @@ import { connect } from "react-redux"
 import moment from "moment"
 import { launchImageLibrary } from "react-native-image-picker"
 import ImageView from "react-native-image-viewing"
+import EmojiPicker from "rn-emoji-keyboard"
 
 import { Images } from "src/theme"
-import { Text, Header } from "../../components"
+import { Text, Header, Loader } from "../../components"
 import { usePubNub } from "pubnub-react"
 import {
   useStore,
@@ -32,7 +33,6 @@ const { width } = Dimensions.get("window")
 const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images
 const ChatScreen = props => {
   const { navigation, profileUserData, requesting, userProfile, route } = props
-
   const pubnub = usePubNub()
 
   const { state, dispatch } = useStore()
@@ -41,6 +41,8 @@ const ChatScreen = props => {
   const channel = state.channels[route.params.item.id]
   const [visible, setIsVisible] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
+  const [isUpload, setIsUpload] = useState(false)
 
   const [loading, setLoading] = useState(false)
 
@@ -71,6 +73,25 @@ const ChatScreen = props => {
     }
   }, [channel])
 
+  const handleFileMessage = event => {
+    const message = event
+    if (messages) {
+      const combinedData = {
+        channel: message.channel,
+        subscription: message.subscription,
+        timetoken: message.timetoken,
+        publisher: message.publisher,
+        message: {
+          message: message.message,
+          file: message.file
+        }
+      }
+      setMessages(messages => [...messages, combinedData])
+    } else {
+      setMessages([message])
+    }
+  }
+
   const handleMessage = event => {
     const message = event
     if (messages) {
@@ -90,8 +111,11 @@ const ChatScreen = props => {
 
   const subscribePubNub = () => {
     if (channel && channel?.id) {
-      pubnub.addListener({ message: handleMessage })
-      pubnub.subscribe({ channels: [`${channel?.id}`] })
+      pubnub.addListener({
+        message: handleMessage,
+        file: handleFileMessage
+      })
+      pubnub.subscribe({ channels: [`${channel?.id}`], withPresence: true })
     }
   }
 
@@ -108,7 +132,7 @@ const ChatScreen = props => {
             : ""
         },
         receiverProfile: {
-          image_url: ""
+          image_url: item?.custom?.otherUserImage || ""
         },
         message: textInput.trim(),
         timestamp: moment().unix()
@@ -136,45 +160,9 @@ const ChatScreen = props => {
       })
       .then(res => {})
   }
-
-  const pickImage = () => {
-    launchImageLibrary({ mediaType: "photo" }).then(res => {
-      if (res?.didCancel) {
-        return
-      }
-
-      if (res.assets[0].fileSize > 4900000) {
-        alert("File size must be less then 5mb.")
-        return
-      }
-      const data = {
-        channel: item.id,
-        message: {
-          message: {
-            createdAt: new Date(),
-            type: "image",
-            sender: userProfile?.id,
-            receiver: item?.id && item?.id?.split("-")[1],
-            senderProfile: {
-              image_url: userProfile?.profile_picture
-            },
-            receiverProfile: {
-              image_url: ""
-            },
-            timestamp: moment().unix()
-          },
-          file: {
-            name: res.assets[0].fileName,
-            image: res.assets[0].uri
-          }
-        }
-      }
-
-      const tmpMessages = cloneArray(messages)
-      tmpMessages.push(data)
-      setMessages(tmpMessages)
-
-      pubnub.sendFile({
+  const fileUpload = async (item, res) => {
+    try {
+      await pubnub.sendFile({
         channel: item.id,
         message: {
           createdAt: new Date(),
@@ -195,7 +183,53 @@ const ChatScreen = props => {
           mimeType: res.assets[0].type
         }
       })
+      setIsUpload(false)
+    } catch (e) {}
+  }
+
+  const pickImage = () => {
+    launchImageLibrary({ mediaType: "photo" }).then(res => {
+      if (res?.didCancel) {
+        return
+      }
+
+      if (res.assets[0].fileSize > 4900000) {
+        alert("File size must be less then 5mb.")
+        return
+      }
+      // const data = {
+      //   channel: item.id,
+      //   message: {
+      //     message: {
+      //       createdAt: new Date(),
+      //       type: "image",
+      //       sender: userProfile?.id,
+      //       receiver: item?.id && item?.id?.split("-")[1],
+      //       senderProfile: {
+      //         image_url: userProfile?.profile_picture
+      //       },
+      //       receiverProfile: {
+      //         image_url: item?.custom?.otherUserImage || ""
+      //       },
+      //       timestamp: moment().unix()
+      //     },
+      //     file: {
+      //       name: res.assets[0].fileName,
+      //       image: res.assets[0].uri
+      //     }
+      //   }
+      // }
+
+      // const tmpMessages = cloneArray(messages)
+      // tmpMessages.push(data)
+      // setMessages(tmpMessages)
+      setIsUpload(true)
+      fileUpload(item, res)
     })
+  }
+
+  const handleOnEmojiSelected = emoji => {
+    setTextInput(prev => prev + emoji.emoji)
   }
 
   const renderMessageImage = props => {
@@ -232,6 +266,7 @@ const ChatScreen = props => {
   return (
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        {isUpload && <Loader />}
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}
           showsVerticalScrollIndicator={false}
@@ -306,15 +341,21 @@ const ChatScreen = props => {
                   {(item?.message?.sender || item?.message?.message?.sender) ===
                   userProfile.id ? (
                     <>
-                      <View style={styles.senderStyle}>
+                      <View style={[styles.senderStyle]}>
                         {item?.message?.file ? (
                           renderMessageImage(item?.message?.file)
                         ) : (
-                          <Text
-                            text={item?.message?.message}
-                            bold
-                            style={{ fontSize: 14 }}
-                          />
+                          <View
+                            style={{
+                              alignItems: "flex-end"
+                            }}
+                          >
+                            <Text
+                              text={item?.message?.message}
+                              bold
+                              style={{ fontSize: 14 }}
+                            />
+                          </View>
                         )}
                       </View>
                       <Image
@@ -330,8 +371,10 @@ const ChatScreen = props => {
                     <>
                       <Image
                         source={
-                          item?.receiverProfile?.image_url
-                            ? { uri: item?.receiverProfile?.image_url }
+                          item?.message?.receiverProfile?.image_url
+                            ? {
+                                uri: item?.message?.receiverProfile?.image_url
+                              }
                             : profile
                         }
                         style={styles.imageStyle}
@@ -354,7 +397,6 @@ const ChatScreen = props => {
             )}
           </View>
         </ScrollView>
-
         <View
           style={{
             backgroundColor: "#FFF",
@@ -377,20 +419,31 @@ const ChatScreen = props => {
             onChangeText={val => setTextInput(val)}
             value={textInput}
           />
+
           <View
             style={{
               flexDirection: "row",
               flex: 1,
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginHorizontal: 5
             }}
           >
+            <TouchableOpacity onPress={() => setIsOpen(true)}>
+              <Image
+                source={Images.emoji}
+                style={{
+                  height: (25 / 375) * width,
+                  width: (25 / 375) * width
+                }}
+              />
+            </TouchableOpacity>
             <TouchableOpacity onPress={pickImage}>
               <Image
                 source={uploadMedia}
                 style={{
-                  height: (35 / 375) * width,
-                  width: (35 / 375) * width,
-                  marginLeft: 15
+                  height: (25 / 375) * width,
+                  width: (25 / 375) * width
                 }}
               />
             </TouchableOpacity>
@@ -398,8 +451,8 @@ const ChatScreen = props => {
               <Image
                 source={sendMessage}
                 style={{
-                  height: (35 / 375) * width,
-                  width: (35 / 375) * width
+                  height: (25 / 375) * width,
+                  width: (25 / 375) * width
                 }}
               />
             </TouchableOpacity>
@@ -426,6 +479,13 @@ const ChatScreen = props => {
             )}
           />
         )}
+        <EmojiPicker
+          onEmojiSelected={handleOnEmojiSelected}
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          enableSearchBar
+          enableRecentlyUsed={false}
+        />
       </SafeAreaView>
     </>
   )
@@ -439,7 +499,7 @@ const styles = StyleSheet.create({
   },
   senderStyle: {
     backgroundColor: "#add8e6",
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 10,
     width: "85%",
     marginRight: 10,
@@ -452,7 +512,7 @@ const styles = StyleSheet.create({
   },
   receiverStyle: {
     backgroundColor: "#D3D3D3",
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 10,
     width: "85%",
     marginLeft: 10,

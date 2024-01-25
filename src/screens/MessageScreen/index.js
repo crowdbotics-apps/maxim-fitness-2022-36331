@@ -71,8 +71,10 @@ const MessageScreen = props => {
   }, [])
 
   useEffect(() => {
-    const DATA = makeChannelsList(state.channels)
-    setConversationList(DATA)
+    if (state?.channels) {
+      const DATA = makeChannelsList(state.channels)
+      setConversationList(DATA)
+    }
   }, [state.channels])
 
   const unreadMessage = () => {
@@ -115,8 +117,17 @@ const MessageScreen = props => {
         id,
         ...rest
       }))
-      const filterChannels = channels.filter(channel =>
-        channel.name.split("-")[1].toLowerCase().includes(search.toLowerCase())
+      const filterChannels = channels.filter(
+        channel =>
+          channel.name
+            .split("-")[1]
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          (channel?.custom?.firstLastName &&
+            channel?.custom?.firstLastName
+              .split("/")[1]
+              .toLowerCase()
+              .includes(search.toLowerCase()))
       )
       const DATA = makeChannelsList(filterChannels)
       setConversationList(DATA)
@@ -190,6 +201,20 @@ const MessageScreen = props => {
     })
   }
 
+  const userProfileData = item => {
+    if (item?.custom?.userOne?.length) {
+      const userOne = JSON.parse(item?.custom?.userOne)
+      const userTwo = JSON.parse(item?.custom?.userTwo)
+      if (item?.custom?.owner === userOne.id) {
+        return userTwo
+      } else if (item?.custom?.owner === userTwo.id) {
+        return userOne
+      }
+    } else {
+      return null
+    }
+  }
+
   const ListItem = item => {
     return (
       <TouchableOpacity
@@ -203,7 +228,11 @@ const MessageScreen = props => {
       >
         <View style={{ flexDirection: "row" }}>
           <Image
-            source={profile}
+            source={
+              userProfileData(item) && userProfileData(item)?.image
+                ? { uri: userProfileData(item)?.image }
+                : profile
+            }
             style={{
               height: (61 / 375) * width,
               width: (61 / 375) * width,
@@ -214,14 +243,21 @@ const MessageScreen = props => {
           <View style={{ justifyContent: "center", marginLeft: 15 }}>
             <Text
               text={
-                item.name?.split("-")[
+                item?.custom?.firstLastName?.split("/")[
                   userProfile?.id === item.custom.owner ? 1 : 0
                 ]
               }
               bold
               style={{ fontSize: 12 }}
             />
-            {/* <Text text="THE ROCK" style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
+            <Text
+              text={
+                item.name?.split("-")[
+                  userProfile?.id === item.custom.owner ? 1 : 0
+                ]
+              }
+              style={{ color: "#D3D3D3", fontSize: 12 }}
+            />
           </View>
         </View>
         {item.last_seen && (
@@ -238,83 +274,81 @@ const MessageScreen = props => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <ScrollView
+      {/* <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
+      > */}
+      <View
+        style={{
+          paddingHorizontal: 20,
+          flexDirection: "row",
+          marginTop: 20,
+          justifyContent: "space-between"
+        }}
       >
+        <TouchableOpacity
+          style={{ justifyContent: "center" }}
+          onPress={() => navigation.goBack()}
+        >
+          <Image source={backImage} style={{ height: 20, width: 30 }} />
+        </TouchableOpacity>
+        <Text text="Messages" style={{ fontSize: 22 }} bold />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SearchProfile", { isFeed: true })}
+        >
+          <Image source={messageImage} style={{ height: 30, width: 30 }} />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{ paddingHorizontal: 20, marginTop: 30, flexDirection: "row" }}
+      >
+        <TextInput
+          style={{
+            height: 40,
+            borderRadius: 20,
+            borderColor: "#D3D3D3",
+            borderWidth: 1,
+            paddingHorizontal: 60,
+            width: "100%",
+            position: "relative"
+          }}
+          placeholder="Search People"
+          onChangeText={e => setSearch(e)}
+        />
         <View
           style={{
-            paddingHorizontal: 20,
-            flexDirection: "row",
-            marginTop: 20,
-            justifyContent: "space-between"
+            position: "absolute",
+            marginTop: 5,
+            paddingLeft: 40,
+            justifyContent: "center",
+            alignItems: "center"
           }}
         >
-          <TouchableOpacity
-            style={{ justifyContent: "center" }}
-            onPress={() => navigation.goBack()}
-          >
-            <Image source={backImage} style={{ height: 20, width: 30 }} />
-          </TouchableOpacity>
-          <Text text="Messages" style={{ fontSize: 22 }} bold />
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("SearchProfile", { isFeed: true })
-            }
-          >
-            <Image source={messageImage} style={{ height: 30, width: 30 }} />
-          </TouchableOpacity>
+          <Image source={searchImage} style={{ height: 30, width: 30 }} />
         </View>
+      </View>
+
+      {!conversationList?.length && !loading ? (
         <View
-          style={{ paddingHorizontal: 20, marginTop: 30, flexDirection: "row" }}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
         >
-          <TextInput
+          <Text
             style={{
-              height: 40,
-              borderRadius: 20,
-              borderColor: "#D3D3D3",
-              borderWidth: 1,
-              paddingHorizontal: 60,
-              width: "100%",
-              position: "relative"
-            }}
-            placeholder="Search People"
-            onChangeText={e => setSearch(e)}
-          />
-          <View
-            style={{
-              position: "absolute",
-              marginTop: 5,
-              paddingLeft: 40,
-              justifyContent: "center",
-              alignItems: "center"
+              fontSize: 20,
+              fontWeight: "bold",
+              marginBottom: 10
             }}
           >
-            <Image source={searchImage} style={{ height: 30, width: 30 }} />
-          </View>
+            No User Found
+          </Text>
         </View>
-
-        {!conversationList[1]?.data?.length && !loading && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                marginBottom: 10
-              }}
-            >
-              No User Found
-            </Text>
-          </View>
-        )}
-
+      ) : (
         <SectionList
+          keyboardShouldPersistTaps="handled"
           refreshing={loading}
           onRefresh={async () => {
             await bootstrap()
@@ -322,8 +356,10 @@ const MessageScreen = props => {
           sections={conversationList}
           keyExtractor={(item, index) => item + index}
           renderItem={({ item }) => ListItem(item)}
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
-      </ScrollView>
+      )}
+      {/* </ScrollView> */}
     </SafeAreaView>
   )
 }

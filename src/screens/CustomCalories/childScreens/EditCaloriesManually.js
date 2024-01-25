@@ -134,7 +134,7 @@ const EditCaloriesManually = props => {
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Math.round(param?.protein / profile?.number_of_meal)}
+                    text={Math.round(param?.protein / 4)}
                     color="nonary"
                     bold
                     medium
@@ -182,7 +182,7 @@ const EditCaloriesManually = props => {
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Math.round(param?.carbs / profile?.number_of_meal)}
+                    text={Math.round(param?.carbs / 4)}
                     style={{ color: "#f0bc40" }}
                     bold
                     medium
@@ -228,9 +228,7 @@ const EditCaloriesManually = props => {
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
-                    text={Math.round(
-                      (param?.fat / profile?.number_of_meal) * 2
-                    )}
+                    text={Math.round(param?.fat / 9)}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium

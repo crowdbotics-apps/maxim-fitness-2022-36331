@@ -117,96 +117,168 @@ const CustomExercise = props => {
 
   const remaingSameDualKeep = () => {
     if (numberOfExercise === 1) {
-      //Drop sets, Triple sets and Single sets
       if (activeSet?.item === "Drop Set") {
-        setDroupSets({
-          ...droupSet,
-          state1: reps,
-          state2: reps
-        })
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state1: reps,
+            state2: reps
+          })
+        } else {
+          setDroupSets({
+            ...droupSet,
+            state2: reps
+          })
+        }
       } else {
-        setDroupSets({
-          ...droupSet,
-          state1: reps,
-          state2: reps,
-          state3: reps
-        })
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state1: reps,
+            state2: reps,
+            state3: reps
+          })
+        } else if (selectIndex + 1 === 2) {
+          setDroupSets({
+            ...droupSet,
+            state2: reps,
+            state3: reps
+          })
+        } else {
+          setDroupSets({
+            ...droupSet,
+            state3: reps
+          })
+        }
       }
     } else {
       if (activeSet?.value === 4) {
-        setDualReps({
-          ...dualReps,
-          state1: temporaryReps,
-          state2: temporaryReps,
-          state3: temporaryReps
-        })
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state1: temporaryReps,
+            state2: temporaryReps,
+            state3: temporaryReps
+          })
+        } else if (dualSetState === 2) {
+          setDualReps({
+            ...dualReps,
+            state2: temporaryReps,
+            state3: temporaryReps
+          })
+        } else {
+          setDualReps({
+            ...dualReps,
+            state3: temporaryReps
+          })
+        }
       } else {
-        setDualReps({
-          ...dualReps,
-          state1: temporaryReps,
-          state2: temporaryReps
-        })
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state1: temporaryReps,
+            state2: temporaryReps
+          })
+        } else {
+          setDualReps({
+            ...dualReps,
+            state2: temporaryReps
+          })
+        }
       }
     }
   }
 
   const remaingRestSameDualKeep = () => {
     if (numberOfExercise === 1) {
-      //Drop sets, Triple sets and Single sets
       if (activeSet?.item === "Drop Set") {
-        setTimeData(prevState => ({
-          ...prevState,
-          seconds: {
-            sec1: seconds,
-            sec2: seconds
-          },
-          mints: {
-            mint1: minutes,
-            mint2: minutes
-          }
-        }))
+        if (selectIndex + 1 === 1) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec1: seconds,
+              sec2: seconds
+            },
+            mints: {
+              mint1: minutes,
+              mint2: minutes
+            }
+          }))
+        }
       } else {
-        setTimeData(prevState => ({
-          ...prevState,
-          seconds: {
-            sec1: seconds,
-            sec2: seconds,
-            sec3: seconds
-          },
-          mints: {
-            mint1: minutes,
-            mint2: minutes,
-            mint3: minutes
-          }
-        }))
+        if (selectIndex + 1 === 1) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec1: seconds,
+              sec2: seconds,
+              sec3: seconds
+            },
+            mints: {
+              mint1: minutes,
+              mint2: minutes,
+              mint3: minutes
+            }
+          }))
+        }
+        if (selectIndex + 1 === 2) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec2: seconds,
+              sec3: seconds
+            },
+            mints: {
+              mint2: minutes,
+              mint3: minutes
+            }
+          }))
+        }
       }
     } else {
       if (activeSet?.value === 4) {
-        setTimeData(prevState => ({
-          ...prevState,
-          seconds: {
-            sec1: seconds,
-            sec2: seconds,
-            sec3: seconds
-          },
-          mints: {
-            mint1: minutes,
-            mint2: minutes,
-            mint3: minutes
-          }
-        }))
+        if (dualSetState === 1) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec1: seconds,
+              sec2: seconds,
+              sec3: seconds
+            },
+            mints: {
+              mint1: minutes,
+              mint2: minutes,
+              mint3: minutes
+            }
+          }))
+        }
+        if (dualSetState === 2) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec2: seconds,
+              sec3: seconds
+            },
+            mints: {
+              mint2: minutes,
+              mint3: minutes
+            }
+          }))
+        }
       } else {
-        setTimeData(prevState => ({
-          ...prevState,
-          seconds: {
-            sec1: seconds,
-            sec2: seconds
-          },
-          mints: {
-            mint1: minutes,
-            mint2: minutes
-          }
-        }))
+        if (dualSetState === 1) {
+          setTimeData(prevState => ({
+            ...prevState,
+            seconds: {
+              sec1: seconds,
+              sec2: seconds
+            },
+            mints: {
+              mint1: minutes,
+              mint2: minutes
+            }
+          }))
+        }
       }
     }
   }

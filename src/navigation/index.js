@@ -10,9 +10,8 @@ import messaging from "@react-native-firebase/messaging"
 import AuthStackScreen from "./AuthScreens"
 import MainNavigator from "./Main"
 import QuestionStackScreen from "./QuestionScreens"
-import { profileData } from "../ScreenRedux/profileRedux"
+import { profileData, routeData } from "../ScreenRedux/profileRedux"
 import { navigate } from "../navigation/NavigationService"
-import { routeData } from "../ScreenRedux/profileRedux"
 
 const authStack = createStackNavigator()
 const mainStack = createStackNavigator()
@@ -20,6 +19,7 @@ const questionStack = createStackNavigator()
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
+  const { routeData } = props
   messaging().onNotificationOpenedApp(remoteMessage => {
     if (remoteMessage?.data?.post_id) {
       navigate("ViewPost", remoteMessage?.data?.post_id)
@@ -27,11 +27,13 @@ const Navigation = props => {
       if (remoteMessage?.data?.sender_detail) {
         const newData = {
           follow: true,
-          user: remoteMessage?.data?.sender_detail
-        }.routeData(newData)
+          user: JSON.parse(remoteMessage?.data?.sender_detail)
+        }
+
+        routeData(newData)
         navigate("ProfileScreen", {
           item: newData,
-          backScreenName: "NotificationScreen"
+          backScreenName: "Feed"
         })
       }
     }

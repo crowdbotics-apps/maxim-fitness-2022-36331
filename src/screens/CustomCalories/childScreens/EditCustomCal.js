@@ -17,9 +17,9 @@ import { showMessage } from "react-native-flash-message"
 
 const EditCustomCal = props => {
   const { profile, consumeCalories } = props
-  const [protein, setProtein] = useState(0.5)
-  const [carbs, setCarbs] = useState(0.5)
-  const [fat, setFat] = useState(0.5)
+  const [protein, setProtein] = useState(0)
+  const [carbs, setCarbs] = useState(0)
+  const [fat, setFat] = useState(0)
   const [calories, setCalories] = useState(0.5)
 
   const {
@@ -48,7 +48,7 @@ const EditCustomCal = props => {
       consumeCalories[0]?.goals_values?.carbs &&
         setCarbs(consumeCalories[0]?.goals_values?.carbs / 40 / 100)
       consumeCalories[0]?.goals_values?.fat &&
-        setFat(consumeCalories[0]?.goals_values?.fat / 20 / 100)
+        setFat(consumeCalories[0]?.goals_values?.fat / 90 / 100)
       consumeCalories[0]?.goals_values?.calories &&
         setCalories(consumeCalories[0]?.goals_values?.calories)
     }
@@ -72,7 +72,7 @@ const EditCustomCal = props => {
         message: "Carbs value should be greater then 0",
         type: "danger"
       })
-    } else if (Number((fat.toFixed(3) * 100 * 20).toFixed(2)).toFixed(0) <= 0) {
+    } else if (Number((fat.toFixed(3) * 100 * 90).toFixed(2)).toFixed(0) <= 0) {
       showMessage({
         message: "Fat value should be greater then 0",
         type: "danger"
@@ -85,15 +85,15 @@ const EditCustomCal = props => {
         //   : Number(consumeCalories[0]?.goals_values?.calories),
         protein: Math.round(protein.toFixed(3) * 100 * 40),
         carbs: Math.round(carbs.toFixed(3) * 100 * 40),
-        fat: Math.round(fat.toFixed(3) * 100 * 20)
+        fat: Math.round(fat.toFixed(3) * 100 * 90)
       }
       props.navigation.navigate("EditCaloriesManually", data)
     }
   }
 
   const calculateCalories = (val, type) => {
-    const persentage = val.toFixed(3) * 100
-    const dd = persentage * (type === "fats" ? 20 : 40)
+    const persentage = val?.toFixed(3) * 100
+    const dd = persentage * (type === "fats" ? 90 : 40)
     return Math.round(dd)
   }
 
@@ -257,9 +257,7 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={Math.round(
-                      calculateCalories(protein) / profile?.number_of_meal
-                    )}
+                    text={Math.round(calculateCalories(protein) / 4)}
                     color="nonary"
                     bold
                     medium
@@ -338,9 +336,7 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={Math.round(
-                      calculateCalories(carbs) / profile?.number_of_meal
-                    )}
+                    text={Math.round(calculateCalories(carbs) / 4)}
                     style={{ color: "#f0bc40" }}
                     bold
                     medium
@@ -419,9 +415,7 @@ const EditCustomCal = props => {
                   ]}
                 >
                   <Text
-                    text={Math.round(
-                      calculateCalories(fat) / profile?.number_of_meal
-                    )}
+                    text={Math.round(calculateCalories(fat, "fats") / 9)}
                     style={{ color: "#ed6d57" }}
                     bold
                     medium
@@ -504,9 +498,7 @@ const EditCustomCal = props => {
                   }}
                 />
                 <Text
-                  text={Math.round(
-                    calculateCalories(protein) / profile?.number_of_meal
-                  )}
+                  text={Math.round(calculateCalories(protein) / 4)}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,
@@ -536,9 +528,7 @@ const EditCustomCal = props => {
                   }}
                 />
                 <Text
-                  text={Math.round(
-                    calculateCalories(carbs) / profile?.number_of_meal
-                  )}
+                  text={Math.round(calculateCalories(carbs) / 4)}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,
@@ -567,10 +557,9 @@ const EditCustomCal = props => {
                     color: "black"
                   }}
                 />
+
                 <Text
-                  text={Math.round(
-                    calculateCalories(fat) / profile?.number_of_meal
-                  )}
+                  text={Math.round(calculateCalories(fat, "fats") / 9)}
                   style={{
                     fontSize: 20,
                     opacity: 0.7,

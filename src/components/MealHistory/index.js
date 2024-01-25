@@ -274,7 +274,7 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
         <View style={[fill, center]}>
           <Text
             text={`Meals not found for ${moment(activeTab).format(
-              "MM/DD/YY"
+              "YYYY/MM/DD"
             )} day`}
             bold
             style={{ color: "black" }}

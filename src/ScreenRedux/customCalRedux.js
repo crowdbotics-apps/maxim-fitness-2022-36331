@@ -7,6 +7,7 @@ import { API_URL } from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
+import moment from "moment"
 
 //Types
 const GET_CALORIES_REQUEST = "CUSTOM_CAL_SCREEN/GET_CALORIES_REQUEST"
@@ -170,7 +171,8 @@ async function postCustomAPI(data) {
 }
 
 async function getCustomCalAPI() {
-  const URL = `${API_URL}/consume-calories/`
+  const newDate = moment(new Date()).format("YYYY-MM-DD")
+  const URL = `${API_URL}/consume-calories/?date=${newDate}`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "GET",
