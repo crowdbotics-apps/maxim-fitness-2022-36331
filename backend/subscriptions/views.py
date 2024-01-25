@@ -682,6 +682,6 @@ def get_apple_app_association_json(request):
     if os.path.exists(json_file_path):
         with open(json_file_path, 'r') as file:
             json_data = json.load(file)
-            return JsonResponse(json_data, safe=False)
+            return JsonResponse(json_data[0])
     else:
         return JsonResponse({'error': 'JSON file not found'}, status=404)
