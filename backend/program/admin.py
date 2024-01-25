@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.shortcuts import redirect, render
 from django import forms
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 from .models import *
 
@@ -14,7 +16,6 @@ class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
 
 
-admin.site.register(ExerciseType)
 
 
 class ProgramSetInline(nested_admin.NestedTabularInline):
@@ -184,14 +185,20 @@ class WorkoutAdmin(admin.ModelAdmin):
     list_display = ["id", "session", "exercise"]
 
 
-class ExerciseAdmin(admin.ModelAdmin):
+class ExerciseSource(resources.ModelResource):
+    class Meta:
+        model = Exercise
+
+
+class ExerciseAdmin(ImportExportModelAdmin):
     '''
-        Admin View for
+    Admin View for Exercise
     '''
     inlines = [ExerciseImagesInline]
     list_display = ['name', 'exercise_id']
     search_fields = ['name', 'exercise_id']
     list_filter = ['exercise_type']
+    resource_class = ExerciseSource
 
 
 admin.site.register(Exercise, ExerciseAdmin)
@@ -234,3 +241,13 @@ admin.site.register(ProgramSet)
 # admin.site.register(Workout)
 admin.site.register(Set)
 admin.site.register(ProgramExerciseReplacement, ProgramExerciseReplacementAdmin)
+
+
+class ExerciseTypeSource(resources.ModelResource):
+    class Meta:
+        model = ExerciseType
+
+
+@admin.register(ExerciseType)
+class ExerciseTypeAdmin(ImportExportModelAdmin):
+    resource_class = ExerciseTypeSource
