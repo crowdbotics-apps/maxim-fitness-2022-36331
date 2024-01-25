@@ -96,6 +96,7 @@ THIRD_PARTY_APPS = [
     "solo",
     "djstripe",
     "fcm_django",
+    "import_export",
 
     # end fcm_django push notifications
     "push_notifications",

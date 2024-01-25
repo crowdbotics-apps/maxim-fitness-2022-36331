@@ -36,8 +36,5 @@ def send_notification(sender, instance, created, **kwargs):
         else:
             devices = FCMDevice.objects.filter(active=True)
 
-
         if devices:
             devices.send_message(title=instance.title, body=instance.message, data=instance.extra_data if instance.extra_data else None)
-
-
