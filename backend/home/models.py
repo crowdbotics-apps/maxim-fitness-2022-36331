@@ -206,7 +206,7 @@ class FoodItem(models.Model):
     portion = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], )
     unit = models.ForeignKey(ProductUnit, on_delete=models.SET_NULL, null=True)
     meal = models.ForeignKey('Meal', related_name='food_items', on_delete=models.CASCADE)
-    created = models.DateField(editable=True, null=True, blank=True)
+    created = models.DateTimeField(editable=True, null=True, blank=True)
 
     def __str__(self):
         return self.food.name
