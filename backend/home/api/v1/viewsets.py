@@ -586,31 +586,29 @@ class MealViewSet(ModelViewSet):
         user = self.request.user
         current_datetime = timezone.now()
         data = []
-        unique_dates = FoodItem.objects.filter(meal__user=user).order_by("-created").distinct("created").values_list("created", flat=True)
+        unique_dates = FoodItem.objects.filter(meal__user=user).order_by("-created__date").distinct("created__date").values_list("created", flat=True)
         req_calories = CaloriesRequired.objects.filter(user=self.request.user).last()
         for date in unique_dates:
-            if date == current_datetime.date():
-                food_item_meals_ids = FoodItem.objects.filter(created=date, meal__user=user).distinct(
-                    "meal__id").values_list("meal__id", flat=True)
-                query = Meal.objects.filter(id__in=food_item_meals_ids, user=user)
-                if not query.exists():
+            if date.date() == current_datetime.date():
+                food_item_meals = FoodItem.objects.filter(
+                    created__date=current_datetime.date(), meal__user=user,
+                    created__lte=current_datetime)
+                if not food_item_meals.exists():
                     pass
                 else:
-                    serializer = MealSerializer(query, many=True)
-                    data.append({str(date): serializer.data})
+                    serializer = FoodItemSerializer(food_item_meals, many=True)
+                    data.append({str(date.date()): serializer.data})
                     cal_data = serializer.data
                     total_calories = 0
                     total_proteins = 0
                     total_carbohydrates = 0
                     total_fat = 0
 
-                    # Iterate through meals and food items
-                    for meal in cal_data:
-                        for food_item in meal["food_items"]:
-                            total_calories += food_item["calories"]
-                            total_proteins += food_item["protein"]
-                            total_carbohydrates += food_item["carbohydrate"]
-                            total_fat += food_item["fat"]
+                    for food_item in cal_data:
+                        total_calories += food_item["calories"]
+                        total_proteins += food_item["protein"]
+                        total_carbohydrates += food_item["carbohydrate"]
+                        total_fat += food_item["fat"]
                     consume_calories = ConsumeCalories.objects.filter(
                         user=self.request.user, created=date)
                     if consume_calories:
@@ -623,11 +621,9 @@ class MealViewSet(ModelViewSet):
                                                 carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
 
             else:
-                food_item_meals_ids = FoodItem.objects.filter(created=date, meal__user=user).distinct(
-                    "meal__id").values_list("meal__id", flat=True)
-                query = Meal.objects.filter(id__in=food_item_meals_ids, user=user)
-                serializer = MealSerializer(query, many=True)
-                data.append({str(date): serializer.data})
+                food_items = FoodItem.objects.filter(created__date=date, meal__user=user)
+                serializer = FoodItemSerializer(food_items, many=True)
+                data.append({str(date.date()): serializer.data})
                 cal_data = serializer.data
                 total_calories = 0
                 total_proteins = 0
@@ -635,12 +631,11 @@ class MealViewSet(ModelViewSet):
                 total_fat = 0
 
                 # Iterate through meals and food items
-                for meal in cal_data:
-                    for food_item in meal["food_items"]:
-                        total_calories += food_item["calories"]
-                        total_proteins += food_item["protein"]
-                        total_carbohydrates += food_item["carbohydrate"]
-                        total_fat += food_item["fat"]
+                for food_item in cal_data:
+                    total_calories += food_item["calories"]
+                    total_proteins += food_item["protein"]
+                    total_carbohydrates += food_item["carbohydrate"]
+                    total_fat += food_item["fat"]
                 consume_calories = ConsumeCalories.objects.filter(
                     user=self.request.user, created=date)
                 if consume_calories:
