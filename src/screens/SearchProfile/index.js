@@ -89,6 +89,24 @@ const SearchProfile = props => {
 
   const createChat = async item => {
     try {
+      const firstLastName =
+        userProfile.first_name +
+        " " +
+        userProfile.last_name +
+        "/" +
+        item?.user_detail?.first_name +
+        " " +
+        item?.user_detail?.last_name
+
+      const userOne = {
+        id: userProfile?.id,
+        image: userProfile?.profile_picture || ""
+      }
+      const userTwo = {
+        id: item?.user_detail?.id,
+        image: item?.user_detail?.profile_picture || ""
+      }
+
       setLoading(true)
       const res = await createDirectChannel(
         pubnub,
@@ -100,7 +118,10 @@ const SearchProfile = props => {
             type: 0,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.user_detail?.username
+            otherUserName: item?.user_detail?.username,
+            firstLastName: firstLastName,
+            userOne: JSON.stringify(userOne),
+            userTwo: JSON.stringify(userTwo)
           }
         }
       )
@@ -114,7 +135,10 @@ const SearchProfile = props => {
               type: ChannelType.Direct,
               owner: userProfile?.id,
               otherUserImage: item?.user_detail?.profile_picture,
-              otherUserName: item?.user_detail?.username
+              otherUserName: item?.user_detail?.username,
+              firstLastName: firstLastName,
+              userOne: JSON.stringify(userOne),
+              userTwo: JSON.stringify(userTwo)
             }
           }
         }
@@ -128,7 +152,10 @@ const SearchProfile = props => {
             type: ChannelType.Direct,
             owner: userProfile?.id,
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.user_detail?.username
+            otherUserName: item?.user_detail?.username,
+            firstLastName: firstLastName,
+            userOne: JSON.stringify(userOne),
+            userTwo: JSON.stringify(userTwo)
           }
         }
       })

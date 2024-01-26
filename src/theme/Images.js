@@ -91,5 +91,6 @@ export default {
   barCode: require("src/assets/images/barcode.png"),
   close: require("src/assets/images/close.png"),
   closeBtn: require("src/assets/images/closeBtn.png"),
-  sendIcon: require("src/assets/images/sendIcon.png")
+  sendIcon: require("src/assets/images/sendIcon.png"),
+  emoji: require("src/assets/images/emoji.png")
 }

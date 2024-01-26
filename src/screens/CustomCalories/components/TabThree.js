@@ -143,10 +143,7 @@ const TabThree = ({
             />
             <Text
               text={` ${
-                Math.round(
-                  consumeCalories[0]?.goals_values?.protein /
-                    profileData?.number_of_meal
-                ) || 0
+                Math.round(consumeCalories[0]?.goals_values?.protein / 4) || 0
               }g`}
               style={fontSize15TextCenter}
             />
@@ -184,10 +181,7 @@ const TabThree = ({
             />
             <Text
               text={` ${
-                Math.round(
-                  consumeCalories[0]?.goals_values?.carbs /
-                    profileData?.number_of_meal
-                ) || 0
+                Math.round(consumeCalories[0]?.goals_values?.carbs / 4) || 0
               }g`}
               style={fontSize15TextCenter}
             />
@@ -225,10 +219,7 @@ const TabThree = ({
             />
             <Text
               text={` ${
-                Math.round(
-                  consumeCalories[0]?.goals_values?.fat /
-                    profileData?.number_of_meal
-                ) * 2 || 0
+                Math.round(consumeCalories[0]?.goals_values?.fat / 9) || 0
               }g`}
               style={fontSize15TextCenter}
             />

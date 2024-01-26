@@ -218,14 +218,6 @@ export const makeChannelsList = list => {
   }))
   const DATA = [
     {
-      title: "Channels",
-      data: channels
-        .filter(item => {
-          return item.custom.type === 1
-        })
-        .map(obj => ({ ...obj }))
-    },
-    {
       title: "Direct Chats",
       data: channels
         .filter(item => {
