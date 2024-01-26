@@ -1380,6 +1380,11 @@ class ConsumeCaloriesViewSet(ModelViewSet):
         date = self.request.query_params.get('date')
         if date:
             queryset = queryset.filter(created=date)
+        if queryset.exists():
+            pass
+        else:
+            id = CaloriesRequired.objects.filter(user=self.request.user).order_by('-id').first().id
+            return Response([{"goals_values":{"id": id} }])
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
