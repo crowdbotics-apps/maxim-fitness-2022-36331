@@ -148,7 +148,7 @@ const MealEmptyItem = ({
           </View>
         </View>
 
-        {mealItems.length > 0
+        {mealItems?.length > 0
           ? mealItems?.map((item, i) => {
               let currentD = moment(new Date()).format("YYYY-MM-DD")
               return (

@@ -281,6 +281,7 @@ const EditCaloriesManually = props => {
                   width: 100
                 }
               ]}
+              loaderColor="#FFFF"
               onPress={postEditCal}
               loading={props.rCalRequest}
             />

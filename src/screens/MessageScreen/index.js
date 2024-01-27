@@ -139,8 +139,8 @@ const MessageScreen = props => {
 
   useFocusEffect(
     useCallback(() => {
-      // getLastSeen()
-    }, [state.channels])
+      getLastSeen()
+    }, [state?.channels])
   )
 
   const getLastSeen = () => {
@@ -158,9 +158,13 @@ const MessageScreen = props => {
           },
           (status, response) => {
             const tmp = getByValue(channels, channel)
+
             if (tmp) {
-              tmp.last_seen =
-                response.channels[channel]?.occupants[0]?.state?.last_seen
+              if (response?.channels[channel]?.occupants[0]?.state?.last_seen) {
+                tmp.last_seen =
+                  response?.channels[channel]?.occupants[0]?.state?.last_seen
+              }
+
               const DATA = [
                 {
                   title: "Direct Chats",
@@ -226,7 +230,7 @@ const MessageScreen = props => {
           justifyContent: "space-between"
         }}
       >
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", flex: 1 }}>
           <Image
             source={
               userProfileData(item) && userProfileData(item)?.image
@@ -240,7 +244,13 @@ const MessageScreen = props => {
             }}
           />
 
-          <View style={{ justifyContent: "center", marginLeft: 15 }}>
+          <View
+            style={{
+              justifyContent: "center",
+              marginLeft: 15,
+              flex: 1
+            }}
+          >
             <Text
               text={
                 item?.custom?.firstLastName?.split("/")[
@@ -250,24 +260,29 @@ const MessageScreen = props => {
               bold
               style={{ fontSize: 12 }}
             />
-            <Text
-              text={
-                item.name?.split("-")[
-                  userProfile?.id === item.custom.owner ? 1 : 0
-                ]
-              }
-              style={{ color: "#D3D3D3", fontSize: 12 }}
-            />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              <Text
+                text={
+                  item.name?.split("-")[
+                    userProfile?.id === item.custom.owner ? 1 : 0
+                  ]
+                }
+                style={{ color: "#D3D3D3", fontSize: 12 }}
+              />
+              {"last_seen" in item && item.last_seen && (
+                <Text style={styles.LastSeenText}>
+                  {timeSince(new Date(item?.last_seen).getTime())}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
-        {item.last_seen && (
-          <View style={{ justifyContent: "center" }}>
-            <Text
-              text={timeSince(new Date(item?.last_seen).getTime())}
-              style={{ color: "#D3D3D3", fontSize: 12 }}
-            />
-          </View>
-        )}
       </TouchableOpacity>
     )
   }

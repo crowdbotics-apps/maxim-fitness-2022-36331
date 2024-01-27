@@ -54,6 +54,7 @@ const MealRegulator = props => {
     //Stops listening for speech
     try {
       await Voice.stop()
+      Voice.destroy().then(Voice.removeAllListeners)
     } catch (e) {}
   }
 

@@ -310,7 +310,7 @@ const SearchProfile = props => {
             <Image source={searchImage} style={{ height: 30, width: 30 }} />
           </View>
         </View>
-        {requesting ? (
+        {requesting && profileUserData?.length === 0 ? (
           <View style={{ marginHorizontal: 25, marginTop: 10 }}>
             {Array(8)
               .fill()

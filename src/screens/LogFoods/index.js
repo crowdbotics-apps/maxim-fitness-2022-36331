@@ -19,6 +19,7 @@ import SwipeCommonItem from "../../components/LogFoodsComponents/SwipeCommonItem
 import SwipeSpeechItem from "../../components/LogFoodsComponents/SwipeSpeechItem"
 
 import SwipeDeleteButton from "../../components/LogFoodsComponents/SwipeDeleteButton"
+import { calculateTotalValue } from "../../utils/utils"
 
 import GradientButton from "../../components/LogFoodsComponents/GradientButton"
 import TableColumn from "./TableColumn"
@@ -44,6 +45,7 @@ const LogFoods = props => {
     navigation,
     scannedProduct,
     resetFoodItems,
+    meals,
 
     speechState,
     brandedState,
@@ -161,6 +163,7 @@ const LogFoods = props => {
   useEffect(() => {
     if (commonState && commonState.length) {
       commonState["total_quantity"] = commonState.serving_qty
+      commonState["localCal"] = commonState.nf_calories
       setCommonData(commonState)
     }
   }, [commonState])
@@ -464,11 +467,12 @@ const LogFoods = props => {
         common: common,
         branded: branded,
         voice: speakVoice,
-        scan: scan
+        scan: scan,
+        meal_time_id: selectedMeal?.id
       }
     ]
 
-    await props.postLogFoodRequest(selectedMeal?.id, data)
+    await props.postLogFoodRequest(meals?.id, data)
     clearAllData()
   }
 
@@ -480,6 +484,21 @@ const LogFoods = props => {
   const calculateCalories = cal => {
     const data = (cal?.nf_calories / cal.serving_qty) * cal.total_quantity
     return data
+  }
+  const countCal = (val, items) => {
+    // const altMear = items?.alt_measures?.find(item => item?.measure === val)
+    // const foodServing_weight_grams =
+    //   items?.serving_weight_grams * items?.total_quantity
+    // const totalCal =
+    //   calculateTotalValue(items?.full_nutrients) * items?.total_quantity
+    // const newData =
+    //   (altMear?.serving_weight / foodServing_weight_grams) * totalCal
+    // let arr = [...commonData]
+    // const index = arr.findIndex(item => item.id === items.id)
+    // let objToUpdate = arr[index]
+    // ;(objToUpdate.localCal = newData * items?.total_quantity),
+    //   (arr[index] = objToUpdate)
+    // setCommonData(arr)
   }
 
   const onChangeSpeech = (e, index) => {
@@ -1058,6 +1077,7 @@ const mapStateToProps = state => ({
   brandedState: state.nutritionReducer.brandedState,
   selectedMeal: state.nutritionReducer.selectedMeal,
   scannedProduct: state.nutritionReducer.scannedProduct,
+  meals: state.customCalReducer.meals,
   loaderLogFood: state.nutritionReducer.loader,
   getMealsFood: state.nutritionReducer.getMealsFoodState
 })

@@ -126,7 +126,7 @@ const ProfileComponent = ({
             size={25}
             // color="#000"
           />
-          {true && (
+          {false && (
             <View style={styles.messageStyle}>
               <Text text={"2"} style={styles.messageStyleText} />
             </View>
