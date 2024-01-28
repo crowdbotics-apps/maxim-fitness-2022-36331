@@ -23,7 +23,8 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
-    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply, AltMeasure
+    PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply, AltMeasure, MealTime, \
+    MealHistory
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
 from users.models import Settings, UserPhoto, UserVideo
@@ -277,10 +278,42 @@ class FoodItemSerializer(serializers.ModelSerializer):
     unit = ProductUnitSerializer()
     alt_measures = AltMeasureSerializer(read_only=True, many=True, source='food_items')
 
-
     class Meta:
         model = FoodItem
         fields = '__all__'
+
+
+class MealTimeSerializer(serializers.ModelSerializer):
+    food_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MealTime
+        fields = '__all__'
+
+    def get_food_items(self, obj):
+        current_date = self.context.get('current_date')
+        if current_date:
+            food_items = obj.food_items_times.filter(created__date=current_date)
+            serializer = FoodItemSerializer(food_items, many=True)
+            return serializer.data
+
+
+class MealHistorySerializer(serializers.ModelSerializer):
+    food_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MealHistory
+        fields = '__all__'
+
+    def get_food_items(self, obj):
+        current_date = self.context.get('current_date')
+        unique_date = self.context.get('unique_date')
+        if current_date:
+            food_items = obj.food_items_history.filter(created__lte=current_date, created__date=current_date.date())
+        else:
+            food_items = obj.food_items_history.filter(created__date=unique_date)
+        serializer = FoodItemSerializer(food_items, many=True)
+        return serializer.data
 
 
 class FoodItemPostSerializer(serializers.Serializer):
@@ -291,7 +324,7 @@ class FoodItemPostSerializer(serializers.Serializer):
 
 
 class MealSerializer(serializers.ModelSerializer):
-    food_items = FoodItemSerializer(many=True, read_only=True)
+    meal_time = MealTimeSerializer(many=True, read_only=True, source='time_meals')
 
     class Meta:
         model = Meal

@@ -2,6 +2,8 @@ from django.db import models
 
 import wget
 import os
+
+from django.utils import timezone
 from friendship.models import FollowingManager, Follow, bust_cache
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -115,37 +117,41 @@ class Product(models.Model):
         return food
 
     @staticmethod
-    def get_or_add_food_from_sentence(meal, query):
+    def get_or_add_food_from_sentence(meal_history, meal_time, query):
         if query[0]["common"]:
             food_items = query[0]["common"]
-            add_food_items(food_items, meal)
+            add_food_items(food_items, meal_history, meal_time)
         if query[0]["branded"]:
             food_items = query[0]["branded"]
-            add_food_items(food_items, meal)
+            add_food_items(food_items, meal_history, meal_time)
         if query[0]["voice"]:
             food_items = query[0]["voice"]
-            add_food_items(food_items, meal)
+            add_food_items(food_items, meal_history, meal_time)
         if query[0]["scan"]:
             food_items = query[0]["scan"]
-            add_food_items(food_items, meal)
+            add_food_items(food_items, meal_history, meal_time)
         return "food item added"
 
 
-def add_food_items(food_items, meal):
+def add_food_items(food_items, meal_history, meal_time):
     for food_item in food_items:
         final_food = Product.get_or_add_product_from_nix(food_item)
         unit, created = ProductUnit.objects.get_or_create(product=final_food, name=food_item['serving_unit'])
         unit.weight = food_item['weight']
         unit.quantity = food_item['serving_qty']
         unit.save()
-        food = FoodItem.objects.create(meal=meal, food=final_food, portion=food_item['serving_qty'], unit=unit,
-                                            created=food_item["created"])
+        if meal_time.date_time.date() < timezone.now().date():
+            created = timezone.now()
+        else:
+            created = meal_time.date_time
+        food = FoodItem.objects.create(meal_history=meal_history, food=final_food, portion=food_item['serving_qty'], unit=unit,
+                                            created=created, meal_time=meal_time)
         if food_item['alt_measures']:
             alt_measures = food_item['alt_measures']
             for measure in alt_measures:
                 AltMeasure.objects.create(
                     serving_weight=measure['serving_weight'],
-                    measure=measure['measure'], food_item=food, meal=meal, product=final_food,
+                    measure=measure['measure'], food_item=food, meal_history=meal_history, product=final_food,
                     seq=measure['seq'], qty=measure['qty'])
 
     return "Food item added."
@@ -205,8 +211,11 @@ class FoodItem(models.Model):
     food = models.ForeignKey('Product', related_name='food_food_items', on_delete=models.CASCADE)
     portion = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], )
     unit = models.ForeignKey(ProductUnit, on_delete=models.SET_NULL, null=True)
-    meal = models.ForeignKey('Meal', related_name='food_items', on_delete=models.CASCADE)
-    created = models.DateTimeField(editable=True, null=True, blank=True)
+    # meal = models.ForeignKey('Meal', related_name='food_items', on_delete=models.CASCADE)
+    meal_time = models.ForeignKey('MealTime', related_name='food_items_times', on_delete=models.CASCADE, null=True, blank=True)
+    meal_history = models.ForeignKey('MealHistory', null=True, blank=True,
+                                     related_name='food_items_history', on_delete=models.CASCADE)
+    created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.food.name
@@ -244,7 +253,9 @@ class AltMeasure(models.Model):
     serving_weight = models.FloatField()
     measure = models.CharField(max_length=255)
     food_item = models.ForeignKey('FoodItem', on_delete=models.CASCADE, null=True, blank=True, related_name='food_items')
-    meal = models.ForeignKey('Meal', on_delete=models.CASCADE, null=True, blank=True, related_name='meal_measures')
+    # meal = models.ForeignKey('Meal', on_delete=models.CASCADE, null=True, blank=True, related_name='meal_measures')
+    meal_history = models.ForeignKey('MealHistory', on_delete=models.CASCADE, null=True, blank=True,
+                                     related_name='meal_history_measures')
     product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
     seq = models.IntegerField(null=True, blank=True)
     qty = models.FloatField()
@@ -255,10 +266,29 @@ class AltMeasure(models.Model):
 
 class Meal(models.Model):
     user = models.ForeignKey(User, related_name='meals', on_delete=models.CASCADE)
-    date_time = models.DateTimeField(null=True, blank=True)
+    no_of_meals = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.user} -> {self.date_time}'
+        return f'{self.user} -> {self.no_of_meals}'
+
+
+class MealTime(models.Model):
+    meal = models.ForeignKey(Meal, related_name="time_meals", on_delete=models.CASCADE)
+    date_time = models.DateTimeField(null=True, blank=True)
+    meal_name = models.CharField(max_length=50, null=True, blank=True, default="")
+    # is_deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.date_time}__{self.id}"
+
+
+class MealHistory(models.Model):
+    meal = models.ForeignKey(Meal, related_name="meals_history", on_delete=models.CASCADE)
+    meal_date_time = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey(User, related_name='meals_history_user', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.meal_date_time}_{self.user}"
 
 
 class Category(models.Model):
