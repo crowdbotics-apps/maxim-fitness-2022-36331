@@ -31,7 +31,7 @@ from datetime import datetime, date, timedelta
 # import datetime
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Chat, PostImage, PostCommentReply, PostCommentLike, \
-    PostVideo, ReportAUser, ReportAComment, ReportCommentReply
+    PostVideo, ReportAUser, ReportAComment, ReportCommentReply, MealTime, MealHistory
 from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -57,7 +57,7 @@ from home.api.v1.serializers import (
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
     ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer,
-    ReportCommentReplySerializer
+    ReportCommentReplySerializer, MealTimeSerializer, MealHistorySerializer
 )
 from .permissions import (
     RecipePermission,
@@ -140,16 +140,22 @@ class ProfileViewSet(ModelViewSet):
         fat = ((calories * 20) / 100) / 9
 
         new_values = {
-            'calories': calories if calories > 0 else 0,
-            'carbs': carbs if carbs > 0 else 0,
-            'protein': protein if protein > 0 else 0,
-            'fat': fat if fat > 0 else 0
+            'calories': calories,
+            'carbs': carbs,
+            'protein': protein,
+            'fat': fat
         }
-        CaloriesRequired.objects.update_or_create(
+        object, created = CaloriesRequired.objects.update_or_create(
             user=self.request.user,
             created=date,
             defaults=new_values
         )
+        consume_cal = ConsumeCalories.objects.filter(user=self.request.user, created=timezone.now().date())
+        if consume_cal.exists():
+            ConsumeCalories.objects.update(goals_values=object)
+        else:
+            ConsumeCalories.objects.create(goals_values=object, user=self.request.user, carbs=0, fat=0, protein=0, calories=0)
+
 
     def update(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -221,11 +227,16 @@ class ProfileViewSet(ModelViewSet):
             u = unit.split("/")
             u = u[0]
             date_time = self.request.data["date_time"]
+            meal = Meal.objects.filter(user=self.request.user)
             meal_list = []
-            Meal.objects.filter(user=self.request.user).delete()
+            if meal.exists():
+                meal_id = meal.last().id
+            else:
+                meal_id = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
             for i in date_time:
-                meal_list.append(Meal(user=self.request.user, date_time=i["mealTime"]))
-            Meal.objects.bulk_create(meal_list)
+                meal_list.append(MealTime(meal_id=meal_id,
+                                          date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
+            MealTime.objects.bulk_create(meal_list)
 
             obj.number_of_meal = len(date_time)
             obj.save()
@@ -257,11 +268,14 @@ class ProfileViewSet(ModelViewSet):
             fitness_goal = self.request.data['fitness_goal']
             activity_level = self.request.data['activity_level']
             meal = Meal.objects.filter(user=self.request.user)
-            if meal:
-                meal.delete()
+            if meal.exists():
+                meal_id = meal.last().id
+            else:
+                meal_id = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
             for i in date_time:
-                meal_list.append(Meal(user=self.request.user, date_time=i["mealTime"]))
-            Meal.objects.bulk_create(meal_list)
+                meal_list.append(MealTime(meal_id=meal_id,
+                                          date_time=i["mealTime"], meal_name=f"meal_{date_time}"))
+            MealTime.objects.bulk_create(meal_list)
             if Settings.objects.filter(user=self.request.user).exists():
                 Settings.objects.update(diet_tracking_voice=True, diet_tracking_text=True,
                                         diet_tracking_barcode=True, diet_dynamic_feed=True,
@@ -289,22 +303,25 @@ class ProfileViewSet(ModelViewSet):
             u = unit.split("/")
             u = u[0]
         if u == 'Feet':
-            weight = float(weight) / 2.2
+            weight = float(weight) * 0.453592
             height = (float(height) * 30.48)
-
+        else:
+            weight = weight
+            height = float(height) * 100
+        bmr = 1
         if gender == 'Male':
-            male = (9.99 * float(weight)) + (6.25 * float(height)) - (4.92 * age) + 5
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
         if gender == 'Female':
-            female = (9.99 * float(weight)) + (6.25 * float(height)) - (4.92 * age) - 161
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
 
         if activity_level == 1:
-            rma = male * 1.2 if male > 0 else female * 1.2
+            rma = bmr * 1.2
         if activity_level == 2:
-            rma = male * 1.5 if male > 0 else female * 1.5
+            rma = bmr * 1.375
         if activity_level == 3:
-            rma = male * 1.75 if male > 0 else female * 1.75
+            rma = bmr * 1.55
         if activity_level == 4:
-            rma = male * 2.3 if male > 0 else female * 2.3
+            rma = bmr * 1.725
 
         calories = rma
         if fitness_goal == 1:
@@ -556,6 +573,13 @@ class FoodViewSet(ViewSet):
             return Response(nix.food_detail(query))
         return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'], url_path="speech")
+    def search_food(self, request):
+        query = request.data.get('query')
+        if query:
+            return Response(nix.food_detail(query))
+        return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MealViewSet(ModelViewSet):
     """
@@ -576,84 +600,107 @@ class MealViewSet(ModelViewSet):
         return MealSerializer
 
     def get_queryset(self):
-        return Meal.objects.filter(user=self.request.user).order_by("date_time")
+        return Meal.objects.filter(user=self.request.user).order_by("-id")
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        meal_time = request.data.get('meal_time')
+        instance.no_of_meals = len(meal_time)
+        meal_list = []
+        user = instance.user
+        user.number_of_meal = len(meal_time)
+        user.save()
+        for i in meal_time:
+            meal_list.append(MealTime(user=self.request.user, meal_id=instance.id,
+                                      date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
+        MealTime.objects.bulk_create(meal_list)
+        return Response()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        user = queryset.first().user
+        no_of_meals = user.number_of_meal
+        current_date = timezone.now().date()
+        meal_times = MealTime.objects.filter(meal_id=queryset.first().id).order_by('-date_time')[:no_of_meals]
+        data = []
+        data_object = {}
+        meals_serializer = MealTimeSerializer(meal_times, many=True, context={'current_date': current_date})
+        data_object.update(
+            {
+                "id": queryset.first().id,
+                "no_of_meals": queryset.first().no_of_meals,
+                "meal_times": meals_serializer.data,
+            }
+        )
+        data.append(data_object)
+        return Response(data_object)
+
     @action(detail=False, methods=['get'])
     def history(self, request, pk=None):
         user = self.request.user
+        meal_id = Meal.objects.filter(user=user).last().id
         current_datetime = timezone.now()
         data = []
-        unique_dates = FoodItem.objects.filter(meal__user=user).order_by("-created__date").distinct("created__date").values_list("created", flat=True)
+        #.annotate(
+            # food_items_count=Count('food_items_times')).filter(food_items_count__gt=0)
+        user_meal_times_ids = MealTime.objects.filter(meal__user=user).order_by("-date_time__date").values_list("id", flat=True)
+        unique_dates = FoodItem.objects.filter(meal_time_id__in=user_meal_times_ids).order_by(
+            "-created__date").distinct("created__date").values_list("created__date", flat=True)
+        # serializer = MealTimeSerializer(all_meal_times, many=True, context={'current_date': current_datetime})
+        # return Response(serializer.data)
+        # unique_dates = MealTime.objects.filter(meal__user=user).order_by("-date_time__date").distinct(
+        #     "date_time__date").values_list("date_time__date", flat=True)
         req_calories = CaloriesRequired.objects.filter(user=self.request.user).last()
         for date in unique_dates:
-            if date.date() == current_datetime.date():
-                food_item_meals = FoodItem.objects.filter(
-                    created__date=current_datetime.date(), meal__user=user,
-                    created__lte=current_datetime)
-                if not food_item_meals.exists():
-                    pass
-                else:
-                    serializer = FoodItemSerializer(food_item_meals, many=True)
-                    data.append({str(date.date()): serializer.data})
-                    cal_data = serializer.data
-                    total_calories = 0
-                    total_proteins = 0
-                    total_carbohydrates = 0
-                    total_fat = 0
-
-                    for food_item in cal_data:
-                        total_calories += food_item["calories"]
-                        total_proteins += food_item["protein"]
-                        total_carbohydrates += food_item["carbohydrate"]
-                        total_fat += food_item["fat"]
-                    consume_calories = ConsumeCalories.objects.filter(
-                        user=self.request.user, created=date)
-                    if consume_calories:
-                        consume_calories.update(calories=total_calories,
-                                                protein=total_proteins,
-                                                carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
+            new_data = []
+            if date == current_datetime.date():
+                for meal_time in user_meal_times_ids:
+                    food_item_meals = FoodItem.objects.filter(
+                                created__date=current_datetime.date(), meal_time_id=meal_time,
+                                created__lte=current_datetime).order_by("meal_time__date_time")
+                    if not food_item_meals.exists():
+                        pass
                     else:
-                        ConsumeCalories.objects.create(calories=total_calories,
-                                                protein=total_proteins,user_id=request.user.id,
-                                                carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
-
+                        serializer = FoodItemSerializer(food_item_meals, many=True)
+                        new_data.append({"id": food_item_meals.first().meal_time.id,
+                                         "date_time": food_item_meals.first().meal_time.date_time,
+                                             "food_items": serializer.data})
+                data.append({str(date): new_data})
             else:
-                food_items = FoodItem.objects.filter(created__date=date, meal__user=user)
-                serializer = FoodItemSerializer(food_items, many=True)
-                data.append({str(date.date()): serializer.data})
-                cal_data = serializer.data
-                total_calories = 0
-                total_proteins = 0
-                total_carbohydrates = 0
-                total_fat = 0
+                for meal_time in user_meal_times_ids:
+                    food_item_meals = FoodItem.objects.filter(
+                        created__date=current_datetime.date(), meal_time_id=meal_time).order_by("meal_time__date_time")
+                    if not food_item_meals.exists():
+                        pass
+                    else:
+                        new_data = []
+                        serializer = FoodItemSerializer(food_item_meals, many=True)
+                        new_data.append({"id": food_item_meals.first().meal_time.id,
+                                         "date_time": food_item_meals.first().meal_time.date_time,
+                                         "food_items": serializer.data})
+                data.append({str(date): new_data})
 
-                # Iterate through meals and food items
-                for food_item in cal_data:
-                    total_calories += food_item["calories"]
-                    total_proteins += food_item["protein"]
-                    total_carbohydrates += food_item["carbohydrate"]
-                    total_fat += food_item["fat"]
-                consume_calories = ConsumeCalories.objects.filter(
-                    user=self.request.user, created=date)
-                if consume_calories:
-                    consume_calories.update(calories=total_calories,
-                                            protein=total_proteins,
-                                            carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
-                else:
-                    ConsumeCalories.objects.create(calories=total_calories,user_id=request.user.id,
-                                                   protein=total_proteins,
-                                                   carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories)
         return Response(data)
 
     @action(detail=True, methods=['post'])
     def add_log_food(self, request, pk):
         meal = Meal.objects.get(pk=pk)
+        meal_history = MealHistory.objects.filter(meal_id=meal.id, meal_date_time__date=timezone.now().date())
+        if not meal_history.exists():
+            meal_history = MealHistory.objects.create(meal_id=meal.id, meal_date_time=timezone.now(), user=meal.user)
+        else:
+            meal_history = meal_history.last()
         message = ''
-        if request.data:
-            message = Product.get_or_add_food_from_sentence(meal, request.data)
+        data = request.data
+        if data:
+            meal_time_id = request.data[0]['meal_time_id']
+            if meal_time_id:
+                meal_time = MealTime.objects.get(id=meal_time_id)
+                message = Product.get_or_add_food_from_sentence(meal_history, meal_time, data)
         return Response(message)
 
         # message = ''
@@ -702,22 +749,23 @@ class MealViewSet(ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def get_by_date(self, request, pk=None):
+        current_date = timezone.now().date()
         today = datetime.strptime(request.GET.get('date'), "%Y-%m-%d")
         # meal = Meal.objects.filter(date_time__date=today, user=request.user).order_by('-date_time')
-        m_id = request.GET.get('id')
-        if m_id:
-            meal = Meal.objects.filter(id=m_id).prefetch_related(
-                Prefetch("food_items", queryset=FoodItem.objects.filter(created=today))
+        meal_time_id = request.GET.get('id')
+        if meal_time_id:
+            meal = MealTime.objects.filter(id=meal_time_id).prefetch_related(
+                Prefetch("food_items_times", queryset=FoodItem.objects.filter(created__date=today))
             ).distinct()
             if meal:
-                serializer = MealSerializer(meal, many=True)
+                serializer = MealTimeSerializer(meal, many=True, context={'current_date': current_date})
                 return Response(serializer.data)
 
-        meal = Meal.objects.filter(user=request.user).prefetch_related(
-            Prefetch("food_items", queryset=FoodItem.objects.filter(created=today))
+        meal = MealTime.objects.filter(user=request.user).prefetch_related(
+            Prefetch("food_items_times", queryset=FoodItem.objects.filter(created__date=today))
         ).distinct()
         if meal:
-            serializer = MealSerializer(meal, many=True)
+            serializer = MealTimeSerializer(meal, many=True, context={'current_date': current_date})
             return Response(serializer.data)
         return Response({'error': "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1372,14 +1420,30 @@ class ConsumeCaloriesViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        total_calories = 0
+        total_proteins = 0
+        total_carbohydrates = 0
+        total_fat = 0
+        req_calories = CaloriesRequired.objects.filter(user=self.request.user).order_by('-id').first()
         date = self.request.query_params.get('date')
         if date:
             queryset = queryset.filter(created=date)
         if queryset.exists():
-            pass
+            meal_times = MealTime.objects.filter(meal__user=self.request.user).order_by('-date_time')
+            meals_serializer = MealTimeSerializer(meal_times, many=True, context={'current_date': timezone.now().date()})
+            cal_data = meals_serializer.data
+            for food_items in cal_data:
+                for food_item in food_items['food_items']:
+                    total_calories = food_item["calories"] + total_calories
+                    total_proteins = food_item["protein"] + total_proteins
+                    total_carbohydrates = food_item["carbohydrate"] + total_carbohydrates
+                    total_fat = food_item["fat"] + total_fat
+            queryset.update(calories=total_calories, protein=total_proteins,
+                            carbs=total_carbohydrates, fat=total_fat, goals_values=req_calories
+                            )
+
         else:
-            id = CaloriesRequired.objects.filter(user=self.request.user).order_by('-id').first().id
-            return Response([{"goals_values":{"id": id} }])
+            return Response([{"goals_values":{"id": req_calories.id} }])
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 from .models import Product, ProductUnit, Food, Meal, FoodItem, Category, Recipe, \
     RecipeItem, Post, Comment, Form, QuestionType, Question, Answer, UserProgram, CaloriesRequired, Like, \
     ConsumeCalories, ReportAPost, BlockUser, PostImage, PostCommentReply, PostCommentLike, PostVideo, ReportAComment, \
-    ReportCommentReply
+    ReportCommentReply, MealHistory, MealTime
 import nested_admin
 
 
@@ -50,7 +50,7 @@ class MealAdmin(admin.ModelAdmin):
     '''
         Admin View for
     '''
-    inlines = [FoodItemInline]
+    # inlines = [FoodItemInline]
 
 
 admin.site.register(Meal, MealAdmin)
@@ -82,6 +82,8 @@ class CommentAdmin(admin.ModelAdmin):
 admin.site.register(Recipe, RecipeAdmin)
 
 admin.site.register(Category)
+admin.site.register(MealHistory)
+admin.site.register(MealTime)
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
@@ -103,7 +105,7 @@ class FormAdmin(nested_admin.NestedModelAdmin):
 
 
 class FoodItemAdmin(admin.ModelAdmin):
-    list_display = ["id", "food", "created"]
+    list_display = ["id", "food","meal_time", "meal_history", "created"]
 
 
 class CaloriesRequiredAdmin(admin.ModelAdmin):
