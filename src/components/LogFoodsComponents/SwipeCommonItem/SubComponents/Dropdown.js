@@ -2,14 +2,24 @@ import React from "react"
 import { View, Text, Image, StyleSheet } from "react-native"
 import ModalDropdown from "react-native-modal-dropdown"
 import { Images } from "../../../../theme"
-const SubDropDown = ({ item, onSelect, unitText }) => {
+const SubDropDown = ({
+  item,
+  onSelect,
+  unitText,
+  foodItem,
+  updateNutritions,
+  type
+}) => {
   return (
     <ModalDropdown
       style={styles.dropdownContainer}
       options={item?.map(val => val?.measure)}
       dropdownStyle={styles.dropdownStyle}
       dropdownTextStyle={styles.dropdownTextStyle}
-      onSelect={(value, items) => onSelect(value, items)}
+      onSelect={(value, items) => {
+        onSelect(value, items)
+        updateNutritions && updateNutritions(items, foodItem, type)
+      }}
       showsVerticalScrollIndicator={true}
     >
       <View style={styles.modalButtonStyle}>

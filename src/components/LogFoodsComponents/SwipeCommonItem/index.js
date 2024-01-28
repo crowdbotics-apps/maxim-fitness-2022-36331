@@ -11,7 +11,9 @@ const SwipeCommonItem = ({
   onChangeText,
   caloriesCalc,
   commonData,
-  setCommonData
+  setCommonData,
+  updateNutritions,
+  type
 }) => {
   const [unitText, setUnitText] = useState(item.serving_unit)
   const [calories, setCalories] = useState(item.nf_calories)
@@ -65,6 +67,9 @@ const SwipeCommonItem = ({
                 item={item?.alt_measures}
                 onSelect={onSelect}
                 unitText={unitText}
+                foodItem={item}
+                updateNutritions={updateNutritions}
+                type={type}
               />
             </View>
           </View>

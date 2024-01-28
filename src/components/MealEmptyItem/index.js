@@ -150,42 +150,38 @@ const MealEmptyItem = ({
 
         {mealItems?.length > 0
           ? mealItems?.map((item, i) => {
-              let currentD = moment(new Date()).format("YYYY-MM-DD")
               return (
                 <View key={i}>
-                  {moment(item && item.created).format("YYYY-MM-DD") ===
-                  currentD ? (
-                    <View
-                      style={[
-                        row,
-                        regularHPadding,
-                        smallVPadding,
-                        alignItemsCenter,
-                        styles.innerContainer
-                      ]}
-                    >
-                      <Image
-                        style={[smallRMargin, styles.imageWrapper]}
-                        source={{ uri: item && item.food.thumb }}
-                      />
-                      <View style={[row, fill, justifyContentBetween]}>
-                        <View style={fill}>
-                          <Text
-                            text={item.food.name ? item.food.name : "name"}
-                            bold
-                            numberOfLines={1}
-                          />
-                        </View>
-                        <View style={[fill, row, justifyContentEnd]}>
-                          <Text
-                            text={item.unit && item.unit.name}
-                            bold
-                            numberOfLines={1}
-                          />
-                        </View>
+                  <View
+                    style={[
+                      row,
+                      regularHPadding,
+                      smallVPadding,
+                      alignItemsCenter,
+                      styles.innerContainer
+                    ]}
+                  >
+                    <Image
+                      style={[smallRMargin, styles.imageWrapper]}
+                      source={{ uri: item && item.food.thumb }}
+                    />
+                    <View style={[row, fill, justifyContentBetween]}>
+                      <View style={fill}>
+                        <Text
+                          text={item.food.name ? item.food.name : "name"}
+                          bold
+                          numberOfLines={1}
+                        />
+                      </View>
+                      <View style={[fill, row, justifyContentEnd]}>
+                        <Text
+                          text={item.unit && item.unit.name}
+                          bold
+                          numberOfLines={1}
+                        />
                       </View>
                     </View>
-                  ) : null}
+                  </View>
                 </View>
               )
             })
