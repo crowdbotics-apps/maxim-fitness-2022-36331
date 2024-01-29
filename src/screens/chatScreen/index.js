@@ -95,6 +95,7 @@ const ChatScreen = props => {
 
   const handleMessage = event => {
     const message = event
+
     if (messages) {
       setMessages(messages => [...messages, message])
     } else {

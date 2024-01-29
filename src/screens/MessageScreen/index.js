@@ -61,13 +61,11 @@ const MessageScreen = props => {
     if (!dispatch) {
       return
     }
-    bootstrap()
-
     pubnub.addListener({
-      message: () => {
-        unreadMessage()
-      }
+      message: unreadMessage
     })
+
+    bootstrap()
   }, [])
 
   useEffect(() => {
@@ -137,34 +135,26 @@ const MessageScreen = props => {
     }
   }, [search])
 
-  useFocusEffect(
-    useCallback(() => {
-      unreadMessage()
-      // getLastSeen()
-    }, [state?.channels])
-  )
-
   const chatNavigate = item => {
     navigation.navigate("ChatScreen", { item: item })
-
-    // pubnub.history({ channel: item?.id }).then(res => {
-    //   if (res?.endTimeToken) {
-    //     pubnub.objects
-    //       .setMemberships({
-    //         channels: [
-    //           {
-    //             id: item?.id,
-    //             custom: {
-    //               lastReadTimetoken: res?.endTimeToken
-    //             }
-    //           }
-    //         ]
-    //       })
-    //       .then(res => {
-    //         unreadMessage()
-    //       })
-    //   }
-    // })
+    pubnub.history({ channel: item?.id }).then(res => {
+      if (res?.endTimeToken) {
+        pubnub.objects
+          .setMemberships({
+            channels: [
+              {
+                id: item?.id,
+                custom: {
+                  lastReadTimetoken: res?.endTimeToken
+                }
+              }
+            ]
+          })
+          .then(res => {
+            unreadMessage()
+          })
+      }
+    })
   }
 
   const userProfileData = item => {
@@ -209,30 +199,23 @@ const MessageScreen = props => {
               borderRadius: (31 / 375) * width
             }}
           />
-
-          <View
-            style={{
-              justifyContent: "center",
-              marginLeft: 15,
-              flex: 1
-            }}
-          >
-            <Text
-              text={
-                item?.custom?.firstLastName?.split("/")[
-                  userProfile?.id === item.custom.owner ? 1 : 0
-                ]
-              }
-              bold
-              style={{ fontSize: 12 }}
-            />
+          <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between"
+                justifyContent: "center",
+                marginLeft: 15,
+                flex: 1
               }}
             >
+              <Text
+                text={
+                  item?.custom?.firstLastName?.split("/")[
+                    userProfile?.id === item.custom.owner ? 1 : 0
+                  ]
+                }
+                bold
+                style={{ fontSize: 12 }}
+              />
               <Text
                 text={
                   item.name?.split("-")[
@@ -241,10 +224,15 @@ const MessageScreen = props => {
                 }
                 style={{ color: "#D3D3D3", fontSize: 12 }}
               />
-              {countUnRead(item) ? (
-                <Text style={styles.LastSeenText}>{countUnRead(item)}</Text>
-              ) : null}
             </View>
+
+            {countUnRead(item) ? (
+              <View style={styles.countStyle}>
+                <Text style={{ fontSize: 15, color: "white" }}>
+                  {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </TouchableOpacity>
@@ -330,6 +318,7 @@ const MessageScreen = props => {
           keyboardShouldPersistTaps="handled"
           refreshing={loading}
           onRefresh={async () => {
+            unreadMessage()
             await bootstrap()
           }}
           sections={conversationList}
@@ -356,6 +345,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 20
+  },
+  countStyle: {
+    height: 30,
+    width: 30,
+    backgroundColor: "red",
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center"
   }
 })
 
