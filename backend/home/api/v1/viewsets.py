@@ -140,7 +140,7 @@ class ProfileViewSet(ModelViewSet):
         fat = ((calories * 20) / 100) / 9
 
         new_values = {
-            'calories': calories,
+            'calories': round(carbs + protein + fat),
             'carbs': carbs,
             'protein': protein,
             'fat': fat
@@ -232,7 +232,8 @@ class ProfileViewSet(ModelViewSet):
             if meal.exists():
                 meal_id = meal.last().id
             else:
-                meal_id = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                meal_id = meal.id
             for i in date_time:
                 meal_list.append(MealTime(meal_id=meal_id,
                                           date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
@@ -271,10 +272,11 @@ class ProfileViewSet(ModelViewSet):
             if meal.exists():
                 meal_id = meal.last().id
             else:
-                meal_id = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                meal_id = meal.id
             for i in date_time:
                 meal_list.append(MealTime(meal_id=meal_id,
-                                          date_time=i["mealTime"], meal_name=f"meal_{date_time}"))
+                                          date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
             MealTime.objects.bulk_create(meal_list)
             if Settings.objects.filter(user=self.request.user).exists():
                 Settings.objects.update(diet_tracking_voice=True, diet_tracking_text=True,
@@ -758,14 +760,14 @@ class MealViewSet(ModelViewSet):
                 Prefetch("food_items_times", queryset=FoodItem.objects.filter(created__date=today))
             ).distinct()
             if meal:
-                serializer = MealTimeSerializer(meal, many=True, context={'current_date': current_date})
+                serializer = MealTimeSerializer(meal, many=True, context={'current_date': today})
                 return Response(serializer.data)
 
         meal = MealTime.objects.filter(user=request.user).prefetch_related(
             Prefetch("food_items_times", queryset=FoodItem.objects.filter(created__date=today))
         ).distinct()
         if meal:
-            serializer = MealTimeSerializer(meal, many=True, context={'current_date': current_date})
+            serializer = MealTimeSerializer(meal, many=True, context={'current_date': today})
             return Response(serializer.data)
         return Response({'error': "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
 
