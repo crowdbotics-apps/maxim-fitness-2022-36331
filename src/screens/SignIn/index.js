@@ -279,10 +279,12 @@ const SignIn = props => {
               ]}
             >
               {props.appleRequesting ? (
-                <ActivityIndicator
-                  style={{ flex: 6, marginRight: 30 }}
-                  color="black"
-                />
+                <View style={{ paddingVertical: 15 }}>
+                  <ActivityIndicator
+                    style={{ flex: 6, marginRight: 30 }}
+                    color="black"
+                  />
+                </View>
               ) : (
                 <AppleButton
                   buttonStyle={AppleButton.Style.BLACK}
@@ -461,6 +463,6 @@ const mapDispatchToProps = dispatch => ({
   loginUser: data => dispatch(loginUser(data)),
   googleLoginUser: data => dispatch(googleLoginUser(data)),
   facebookLoginUser: data => dispatch(facebookLoginUser(data)),
-  applekLoginUser: data => dispatch(appleLoginUser(data))
+  appleLoginUser: data => dispatch(appleLoginUser(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(SignIn)

@@ -87,7 +87,8 @@ export const fetchChannels = (pubnub, userId) => {
     const channels = {}
     const metadata = await pubnub.objects.getAllChannelMetadata({
       filter: `id LIKE "*${userId}*"`,
-      include: { customFields: true }
+      include: { customFields: true },
+      sort: { updated: "desc" }
     })
 
     metadata.data.forEach(({ id, name, updated, custom }) => {

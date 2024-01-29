@@ -18,15 +18,7 @@ const SwipeSelectedItem = ({
   const { border } = Global
   const [unitText, setUnitText] = useState(item?.unit?.name)
   const onSelect = (val, product) => {
-    // const seletecObj = item.units[val]
     setUnitText(product)
-    // calculateCalories(seletecObj)
-
-    // let arr = [...commonData]
-    // let objToUpdate = arr[index]
-    // objToUpdate.serving_unit = product
-    // arr[index] = objToUpdate
-    // setCommonData(arr)
   }
 
   return (

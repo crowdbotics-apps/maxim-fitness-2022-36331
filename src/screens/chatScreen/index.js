@@ -74,15 +74,6 @@ const ChatScreen = props => {
     }
   }, [channel])
 
-  useEffect(() => {
-    pubnub.setState({
-      state: {
-        last_seen: new Date().getTime()
-      },
-      channels: [item.id]
-    })
-  }, [])
-
   const handleFileMessage = event => {
     const message = event
     if (messages) {
@@ -92,7 +83,7 @@ const ChatScreen = props => {
         timetoken: message.timetoken,
         publisher: message.publisher,
         message: {
-          message: message.message,
+          message: message?.message,
           file: message.file
         }
       }
@@ -123,13 +114,7 @@ const ChatScreen = props => {
     if (channel && channel?.id) {
       pubnub.addListener({
         message: handleMessage,
-        file: handleFileMessage,
-        presence: event => {
-          if (event.channel in state.channels) {
-            state.channels[event.channel].last_seen = event?.state?.last_seen
-            dispatch({ channels: state.channels })
-          }
-        }
+        file: handleFileMessage
       })
       pubnub.subscribe({ channels: [`${channel?.id}`], withPresence: true })
     }
@@ -172,7 +157,8 @@ const ChatScreen = props => {
               lastReadTimetoken: res?.timetoken
             }
           }
-        ]
+        ],
+        uuid: profile.id
       })
       .then(res => {})
   }

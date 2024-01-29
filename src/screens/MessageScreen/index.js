@@ -139,70 +139,32 @@ const MessageScreen = props => {
 
   useFocusEffect(
     useCallback(() => {
-      getLastSeen()
+      unreadMessage()
+      // getLastSeen()
     }, [state?.channels])
   )
 
-  const getLastSeen = () => {
-    if (Object.keys(state.channels).length > 0) {
-      const channels = Object.entries(state.channels).map(([id, rest]) => ({
-        id,
-        ...rest
-      }))
-      Object.keys(state.channels).forEach(channel => {
-        pubnub.hereNow(
-          {
-            channels: [channel],
-            includeUUIDs: true,
-            includeState: true
-          },
-          (status, response) => {
-            const tmp = getByValue(channels, channel)
-
-            if (tmp) {
-              if (response?.channels[channel]?.occupants[0]?.state?.last_seen) {
-                tmp.last_seen =
-                  response?.channels[channel]?.occupants[0]?.state?.last_seen
-              }
-
-              const DATA = [
-                {
-                  title: "Direct Chats",
-                  data: channels
-                    .filter(item => {
-                      return item.custom.type === 0
-                    })
-                    .map(obj => ({ ...obj }))
-                }
-              ]
-              setConversationList(DATA)
-            }
-          }
-        )
-      })
-    }
-  }
-
   const chatNavigate = item => {
     navigation.navigate("ChatScreen", { item: item })
-    pubnub.history({ channel: item?.id }).then(res => {
-      if (res?.endTimeToken) {
-        pubnub.objects
-          .setMemberships({
-            channels: [
-              {
-                id: item?.id,
-                custom: {
-                  lastReadTimetoken: res?.endTimeToken
-                }
-              }
-            ]
-          })
-          .then(res => {
-            unreadMessage()
-          })
-      }
-    })
+
+    // pubnub.history({ channel: item?.id }).then(res => {
+    //   if (res?.endTimeToken) {
+    //     pubnub.objects
+    //       .setMemberships({
+    //         channels: [
+    //           {
+    //             id: item?.id,
+    //             custom: {
+    //               lastReadTimetoken: res?.endTimeToken
+    //             }
+    //           }
+    //         ]
+    //       })
+    //       .then(res => {
+    //         unreadMessage()
+    //       })
+    //   }
+    // })
   }
 
   const userProfileData = item => {
@@ -219,6 +181,10 @@ const MessageScreen = props => {
     }
   }
 
+  const countUnRead = item => {
+    const count = channelCount && channelCount?.find(val => val.id === item.id)
+    return count && count?.count
+  }
   const ListItem = item => {
     return (
       <TouchableOpacity
@@ -275,11 +241,9 @@ const MessageScreen = props => {
                 }
                 style={{ color: "#D3D3D3", fontSize: 12 }}
               />
-              {"last_seen" in item && item.last_seen && (
-                <Text style={styles.LastSeenText}>
-                  {timeSince(new Date(item?.last_seen).getTime())}
-                </Text>
-              )}
+              {countUnRead(item) ? (
+                <Text style={styles.LastSeenText}>{countUnRead(item)}</Text>
+              ) : null}
             </View>
           </View>
         </View>
