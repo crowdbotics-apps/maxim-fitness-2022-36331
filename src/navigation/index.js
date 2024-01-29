@@ -12,6 +12,9 @@ import MainNavigator from "./Main"
 import QuestionStackScreen from "./QuestionScreens"
 import { profileData, routeData } from "../ScreenRedux/profileRedux"
 import { navigate } from "../navigation/NavigationService"
+import { PubNubProvider } from "pubnub-react"
+import PubNub from "pubnub"
+import { PUBNUB_PUBLISH_KEY, PUBNUB_SUBSCRIBE_KEY } from "@env"
 
 const authStack = createStackNavigator()
 const mainStack = createStackNavigator()
@@ -19,7 +22,7 @@ const questionStack = createStackNavigator()
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
-  const { routeData } = props
+  const { routeData, renderTab, profile, accessToken } = props
   messaging().onNotificationOpenedApp(remoteMessage => {
     if (remoteMessage?.data?.post_id) {
       navigate("ViewPost", remoteMessage?.data?.post_id)
@@ -39,8 +42,6 @@ const Navigation = props => {
     }
   })
 
-  const { renderTab, profile, accessToken } = props
-
   const config = {
     screens: {
       MainStack: {
@@ -58,33 +59,41 @@ const Navigation = props => {
     config: config
   }
 
+  const pubnub = new PubNub({
+    publishKey: PUBNUB_PUBLISH_KEY,
+    subscribeKey: PUBNUB_SUBSCRIBE_KEY,
+    uuid: `${profile?.id}`
+  })
+
   return (
-    <NavigationContainer
-      linking={LinkingConfig}
-      ref={navigationRef}
-      theme={{
-        ...DefaultTheme,
-        colors: {
-          ...DefaultTheme.colors
-        }
-      }}
-    >
-      <authStack.Navigator screenOptions={{ headerShown: false }}>
-        {accessToken ? (
-          profile?.is_survey ? (
-            <mainStack.Screen name="MainStack" component={MainNavigator} />
+    <PubNubProvider client={pubnub}>
+      <NavigationContainer
+        linking={LinkingConfig}
+        ref={navigationRef}
+        theme={{
+          ...DefaultTheme,
+          colors: {
+            ...DefaultTheme.colors
+          }
+        }}
+      >
+        <authStack.Navigator screenOptions={{ headerShown: false }}>
+          {accessToken ? (
+            profile?.is_survey ? (
+              <mainStack.Screen name="MainStack" component={MainNavigator} />
+            ) : (
+              <questionStack.Screen
+                name="QuestionStack"
+                component={QuestionStackScreen}
+              />
+            )
           ) : (
-            <questionStack.Screen
-              name="QuestionStack"
-              component={QuestionStackScreen}
-            />
-          )
-        ) : (
-          <authStack.Screen name="AuthStack" component={AuthStackScreen} />
-          //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
-        )}
-      </authStack.Navigator>
-    </NavigationContainer>
+            <authStack.Screen name="AuthStack" component={AuthStackScreen} />
+            //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
+          )}
+        </authStack.Navigator>
+      </NavigationContainer>
+    </PubNubProvider>
   )
 }
 

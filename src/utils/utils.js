@@ -31,6 +31,18 @@ export const exerciseArray = [
   }
 ]
 
+export const calculateTotalValue = nutrientsArray => {
+  let totalValue = 0
+
+  for (const nutrient of nutrientsArray) {
+    if (nutrient.attr_id === 208) {
+      totalValue += nutrient.value
+    }
+  }
+
+  return totalValue
+}
+
 export const getServerError = (errorObject, errorMessage) => {
   if (errorObject) {
     try {

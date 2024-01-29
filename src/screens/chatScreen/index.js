@@ -43,6 +43,7 @@ const ChatScreen = props => {
   const [imageUrl, setImageUrl] = useState("")
   const [isOpen, setIsOpen] = useState(false)
   const [isUpload, setIsUpload] = useState(false)
+  const [currentlySelected, setCurrentlySelected] = useState([])
 
   const [loading, setLoading] = useState(false)
 
@@ -72,6 +73,15 @@ const ChatScreen = props => {
       setLoading(false)
     }
   }, [channel])
+
+  useEffect(() => {
+    pubnub.setState({
+      state: {
+        last_seen: new Date().getTime()
+      },
+      channels: [item.id]
+    })
+  }, [])
 
   const handleFileMessage = event => {
     const message = event
@@ -113,7 +123,13 @@ const ChatScreen = props => {
     if (channel && channel?.id) {
       pubnub.addListener({
         message: handleMessage,
-        file: handleFileMessage
+        file: handleFileMessage,
+        presence: event => {
+          if (event.channel in state.channels) {
+            state.channels[event.channel].last_seen = event?.state?.last_seen
+            dispatch({ channels: state.channels })
+          }
+        }
       })
       pubnub.subscribe({ channels: [`${channel?.id}`], withPresence: true })
     }
@@ -230,6 +246,9 @@ const ChatScreen = props => {
 
   const handleOnEmojiSelected = emoji => {
     setTextInput(prev => prev + emoji.emoji)
+    if (emoji.alreadySelected)
+      setCurrentlySelected(prev => prev.filter(a => a !== emoji.name))
+    else setCurrentlySelected(prev => [...prev, emoji.name])
   }
 
   const renderMessageImage = props => {
@@ -482,9 +501,13 @@ const ChatScreen = props => {
         <EmojiPicker
           onEmojiSelected={handleOnEmojiSelected}
           open={isOpen}
-          onClose={() => setIsOpen(false)}
+          onClose={() => {
+            setIsOpen(false), setCurrentlySelected([])
+          }}
           enableSearchBar
           enableRecentlyUsed={false}
+          allowMultipleSelections={true}
+          selectedEmojis={currentlySelected}
         />
       </SafeAreaView>
     </>

@@ -145,9 +145,8 @@ const BarCodeScreen = props => {
           <>
             <View style={{ height: 400 }}>
               <Camera
-                {...props}
                 device={device}
-                isActive={true}
+                isActive={!requestingScan}
                 style={{ flex: 1 }}
                 codeScanner={codeScanner}
               />

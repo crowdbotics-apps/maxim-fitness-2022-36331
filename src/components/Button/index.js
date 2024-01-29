@@ -1,9 +1,9 @@
-import React from 'react'
-import { Button as NBButton } from 'native-base'
-import { Text, ActivityIndicator } from 'react-native'
+import React from "react"
+import { Button as NBButton } from "native-base"
+import { Text, ActivityIndicator } from "react-native"
 
 // styles
-import styles from './styles'
+import styles from "./styles"
 
 const Button = ({
   color,
@@ -18,19 +18,20 @@ const Button = ({
   border,
   bordered,
   disabled,
-  loading,
+  loaderColor,
+  loading
 }) => {
-  const { buttonText, button, disabledStyle, borderStyle } = styles;
+  const { buttonText, button, disabledStyle, borderStyle } = styles
 
   return (
     <NBButton
       style={[
         button,
         border && borderStyle,
-      
+
         styles[`${color}Bg`],
         (loading || disabled) && disabledStyle,
-        style,
+        style
       ]}
       full={full}
       rounded={rounded}
@@ -40,17 +41,21 @@ const Button = ({
       onPress={onPress}
       icon={icon}
       transparent={true}
-      
     >
       <>
         {loading ? (
-          <ActivityIndicator size="small" color="#000" />
+          <ActivityIndicator
+            size="small"
+            color={loaderColor ? loaderColor : '#000"'}
+          />
         ) : (
-          <Text style={[buttonText, styles[color], textStyle && textStyle]}>{text}</Text>
+          <Text style={[buttonText, styles[color], textStyle && textStyle]}>
+            {text}
+          </Text>
         )}
       </>
     </NBButton>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

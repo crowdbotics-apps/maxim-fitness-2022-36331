@@ -256,10 +256,12 @@ const CustomExercise = props => {
           setTimeData(prevState => ({
             ...prevState,
             seconds: {
+              sec1: prevState.seconds.sec1,
               sec2: seconds,
               sec3: seconds
             },
             mints: {
+              mint1: prevState.mints.mint1,
               mint2: minutes,
               mint3: minutes
             }
@@ -292,6 +294,7 @@ const CustomExercise = props => {
       val ? setTemporaryReps(val) : setTemporaryReps("")
     }
   }
+  console.log("timeDatatimeData", timeData)
 
   const renderRestInputValue = key => {
     const mints = timeData.mints[`mint${key}`]

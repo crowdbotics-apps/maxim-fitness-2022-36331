@@ -17,8 +17,10 @@ import SwipeScanItem from "../../components/LogFoodsComponents/SwipeScanItem"
 import SwipeBrandedItem from "../../components/LogFoodsComponents/SwipeBrandedItem"
 import SwipeCommonItem from "../../components/LogFoodsComponents/SwipeCommonItem"
 import SwipeSpeechItem from "../../components/LogFoodsComponents/SwipeSpeechItem"
+import { getNutritions } from "../../utils/api"
 
 import SwipeDeleteButton from "../../components/LogFoodsComponents/SwipeDeleteButton"
+import { calculateTotalValue } from "../../utils/utils"
 
 import GradientButton from "../../components/LogFoodsComponents/GradientButton"
 import TableColumn from "./TableColumn"
@@ -44,6 +46,7 @@ const LogFoods = props => {
     navigation,
     scannedProduct,
     resetFoodItems,
+    meals,
 
     speechState,
     brandedState,
@@ -161,6 +164,7 @@ const LogFoods = props => {
   useEffect(() => {
     if (commonState && commonState.length) {
       commonState["total_quantity"] = commonState.serving_qty
+      commonState["localCal"] = commonState.nf_calories
       setCommonData(commonState)
     }
   }, [commonState])
@@ -187,16 +191,17 @@ const LogFoods = props => {
     if (data && data.length) {
       data.forEach(item => {
         totalCalc += Math.round(
-          (item?.food?.calories / item.unit.quantity) * item.total_quantity
+          (item?.food?.calories / item?.unit?.quantity) * item.total_quantity
         )
         totalProteinCalc += Math.round(
-          (item?.food?.proteins / item.unit.quantity) * item.total_quantity
+          (item?.food?.proteins / item?.unit?.quantity) * item.total_quantity
         )
         totalCarbsCalc += Math.round(
-          (item?.food?.carbohydrate / item.unit.quantity) * item.total_quantity
+          (item?.food?.carbohydrate / item?.unit?.quantity) *
+            item.total_quantity
         )
         totalFatCalc += Math.round(
-          (item?.food?.fat / item.unit.quantity) * item.total_quantity
+          (item?.food?.fat / item?.unit?.quantity) * item.total_quantity
         )
       })
     }
@@ -464,14 +469,55 @@ const LogFoods = props => {
         common: common,
         branded: branded,
         voice: speakVoice,
-        scan: scan
+        scan: scan,
+        meal_time_id: selectedMeal?.id
       }
     ]
 
-    await props.postLogFoodRequest(selectedMeal?.id, data)
+    await props.postLogFoodRequest(meals?.id, data)
     clearAllData()
   }
 
+  const updateNutritions = async (value, item, type) => {
+    const query = `${
+      item?.total_quantity ? item?.total_quantity : 1
+    } ${value} ${item?.food?.name ? item?.food?.name : item.food_name}`
+
+    const selectedData = item.alt_measures.find(
+      items => items.measure === value
+    )
+
+    try {
+      const data = await getNutritions(query)
+      const foodData = type === "all" ? mealsFood : commonData
+      let index = foodData && foodData.findIndex(items => items.id === item?.id)
+
+      foodData[index] = data?.foods[0]
+      foodData[index]["total_quantity"] = item?.total_quantity
+        ? item?.total_quantity
+        : 1
+      foodData[index]["id"] = item?.id
+      foodData[index]["food"] = {
+        calories: data?.foods[0].nf_calories,
+        carbohydrate: data?.foods[0].nf_total_carbohydrate,
+        fat: data?.foods[0].nf_total_fat,
+        name: data?.foods[0].food_name,
+        proteins: data?.foods[0]?.nf_protein,
+        thumb: item.thumb,
+        weight: data?.foods[0]?.serving_weight_grams
+      }
+
+      foodData[index]["unit"] = {
+        id: selectedData.id,
+        name: selectedData?.measure,
+        product: selectedData.product,
+        quantity: item?.total_quantity,
+        weight: selectedData?.serving_weight
+      }
+
+      type === "all" ? setMealsFood(foodData) : setCommonData(foodData)
+    } catch (err) {}
+  }
   const selectedCalories = f => {
     const data = (f?.food.calories / f?.unit?.quantity) * f.total_quantity
     return data
@@ -679,6 +725,8 @@ const LogFoods = props => {
                             <SwipeSelectedItem
                               item={item}
                               index={index}
+                              updateNutritions={updateNutritions}
+                              type="all"
                               value={
                                 item?.total_quantity.toString() ||
                                 qtySelected.toString()
@@ -807,6 +855,8 @@ const LogFoods = props => {
                               setCommonData={setCommonData}
                               item={item}
                               index={index}
+                              type="common"
+                              updateNutritions={updateNutritions}
                               value={
                                 item?.total_quantity?.toString() ||
                                 qtyCommon.toString()
@@ -1058,6 +1108,7 @@ const mapStateToProps = state => ({
   brandedState: state.nutritionReducer.brandedState,
   selectedMeal: state.nutritionReducer.selectedMeal,
   scannedProduct: state.nutritionReducer.scannedProduct,
+  meals: state.customCalReducer.meals,
   loaderLogFood: state.nutritionReducer.loader,
   getMealsFood: state.nutritionReducer.getMealsFoodState
 })

@@ -4,7 +4,15 @@ import Font from "../../../assets/images/fonts"
 import { Gutters, Layout, Global } from "../../../theme"
 import SubDropDown from "../../LogFoodsComponents/SwipeCommonItem/SubComponents/Dropdown"
 
-const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
+const SwipeSelectedItem = ({
+  item,
+  index,
+  value,
+  onChangeText,
+  calories,
+  updateNutritions,
+  type
+}) => {
   const { smallBMargin, smallVMargin, smallLPadding, smallRPadding } = Gutters
   const { row, center } = Layout
   const { border } = Global
@@ -47,6 +55,9 @@ const SwipeSelectedItem = ({ item, index, value, onChangeText, calories }) => {
                 item={item?.alt_measures}
                 onSelect={onSelect}
                 unitText={unitText}
+                foodItem={item}
+                updateNutritions={updateNutritions}
+                type={type}
               />
             </View>
           </View>

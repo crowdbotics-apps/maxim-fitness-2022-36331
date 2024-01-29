@@ -74,6 +74,12 @@ const HomeScreen = props => {
   const pp = new Date(todaySessions?.id && todaySessions?.date_time)
   const weekDay = pp?.getDay()
 
+  const sortData = data => {
+    const compareDates = (a, b) => new Date(a.date_time) - new Date(b.date_time)
+    const sortedData = data?.sort(compareDates)
+    return sortedData
+  }
+
   return (
     <SafeAreaView style={[secondaryBg, fill]}>
       <HeaderForDrawer hideHamburger />
@@ -213,7 +219,7 @@ const HomeScreen = props => {
           <View style={styles.loaderStyle}>
             <ActivityIndicator size="large" color="green" />
           </View>
-        ) : meals.length > 0 ? (
+        ) : meals?.meal_times?.length > 0 ? (
           <FlatList
             refreshControl={
               <RefreshControl
@@ -223,7 +229,7 @@ const HomeScreen = props => {
                 progressViewOffset={20}
               />
             }
-            data={meals}
+            data={meals?.meal_times && sortData(meals?.meal_times)}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
             keyboardShouldPersistTaps={"handled"}
