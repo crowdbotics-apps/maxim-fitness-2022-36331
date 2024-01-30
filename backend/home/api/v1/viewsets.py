@@ -306,9 +306,9 @@ class ProfileViewSet(ModelViewSet):
             u = u[0]
         if u == 'Feet':
             weight = float(weight) * 0.453592
-            height = (float(height) * 30.48)
+            height = float(height) * 30.48
         else:
-            weight = weight
+            weight = float(weight)  # Convert to float here
             height = float(height) * 100
         bmr = 1
         if gender == 'Male':
@@ -675,7 +675,7 @@ class MealViewSet(ModelViewSet):
             else:
                 for meal_time in user_meal_times_ids:
                     food_item_meals = FoodItem.objects.filter(
-                        created__date=current_datetime.date(), meal_time_id=meal_time).order_by("meal_time__date_time")
+                        created__date=date, meal_time_id=meal_time).order_by("meal_time__date_time")
                     if not food_item_meals.exists():
                         pass
                     else:
