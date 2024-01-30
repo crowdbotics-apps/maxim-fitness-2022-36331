@@ -9,9 +9,7 @@ const Comment = () => {
   const bottomSheetRef = useRef(null)
   const snapPoints = useMemo(() => ["75%"], [])
 
-  const handleSheetChanges = useCallback(index => {
-    console.log("handleSheetChanges", index)
-  }, [])
+  const handleSheetChanges = useCallback(index => {}, [])
 
   return (
     <View>
