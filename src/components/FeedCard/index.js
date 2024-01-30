@@ -81,7 +81,7 @@ const FeedCard = props => {
   }
 
   const sharePost = async item => {
-    const title = "Maxim Fitness"
+    const title = "Orum Training"
     const url = `${DEEP_LINKING_API_URL + "/post/" + item?.id}/`
     const options = Platform.select({
       ios: {

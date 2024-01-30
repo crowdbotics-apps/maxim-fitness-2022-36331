@@ -205,7 +205,7 @@ const FatLoseProgram = props => {
       <ScrollView>
         <View style={[smallVMargin, regularHMargin]}>
           <Text style={styles.heading}>
-            {letterCapitalize(profile?.first_name)}'s{" "}
+            {letterCapitalize(profile?.first_name || profile?.username)}'s{" "}
             {exerciseArray[profile?.fitness_goal - 1]?.heading + " Program"}
           </Text>
           {!todayRequest && getWeekSessions?.query?.length > 0 && (
