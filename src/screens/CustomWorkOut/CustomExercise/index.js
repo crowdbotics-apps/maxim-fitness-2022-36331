@@ -294,7 +294,6 @@ const CustomExercise = props => {
       val ? setTemporaryReps(val) : setTemporaryReps("")
     }
   }
-  console.log("timeDatatimeData", timeData)
 
   const renderRestInputValue = key => {
     const mints = timeData.mints[`mint${key}`]

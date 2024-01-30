@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
-  SafeAreaView
+  SafeAreaView,
+  Platform
 } from "react-native"
 import Text from "../Text"
 import { Images } from "src/theme"
@@ -80,8 +81,30 @@ const FeedCard = props => {
   }
 
   const sharePost = async item => {
-    const data = { message: `${DEEP_LINKING_API_URL + "/post/" + item?.id}/` }
-    await Share.open(data)
+    const title = "Maxim Fitness"
+    const url = `${DEEP_LINKING_API_URL + "/post/" + item?.id}/`
+    const options = Platform.select({
+      ios: {
+        activityItemSources: [
+          {
+            placeholderItem: { type: "url", content: url },
+            item: {
+              default: { type: "url", content: url }
+            },
+            subject: {
+              default: title
+            },
+            linkMetadata: { originalUrl: url, url, title }
+          }
+        ]
+      },
+      default: {
+        title,
+        subject: title,
+        message: url
+      }
+    })
+    await Share.open(options)
       .then(res => {})
       .catch(err => {})
   }
