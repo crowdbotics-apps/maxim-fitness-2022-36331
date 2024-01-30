@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Provider as ReduxProvider } from "react-redux"
-import { LogBox, Appearance } from "react-native"
+import { LogBox } from "react-native"
 import "react-native-gesture-handler"
 import { theme } from "@options"
 import FlashMessage from "react-native-flash-message"
@@ -16,24 +16,12 @@ LogBox.ignoreAllLogs()
 import { store } from "src/redux/store"
 
 const App = () => {
-  const [themes, setThemes] = useState(theme)
-
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setThemes(colorScheme)
-    })
-
-    return () => {
-      subscription.remove()
-    }
-  }, [])
-
   const persistor = persistStore(store)
 
   return (
     <ReduxProvider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <NativeBaseProvider theme={themes}>
+        <NativeBaseProvider theme={theme}>
           <MenuProvider>
             <Navigation />
           </MenuProvider>

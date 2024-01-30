@@ -87,7 +87,8 @@ export const fetchChannels = (pubnub, userId) => {
     const channels = {}
     const metadata = await pubnub.objects.getAllChannelMetadata({
       filter: `id LIKE "*${userId}*"`,
-      include: { customFields: true }
+      include: { customFields: true },
+      sort: { updated: "desc" }
     })
 
     metadata.data.forEach(({ id, name, updated, custom }) => {
@@ -277,4 +278,5 @@ export const getPubNubTimetoken = () => {
   const now = Math.floor(Date.now() / 1000)
   const currentDate = new Date(now * 1000)
   const timetoken = currentDate.getTime() * 10000
+  return timetoken
 }

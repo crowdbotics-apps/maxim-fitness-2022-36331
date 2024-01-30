@@ -11,7 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:maxim-fitness-2022-36331.botics.co</string>
-		<string>applinks:"https://maxim-fitness-2022-36331.botics.co</string>
+		<string>applinks:https://maxim-fitness-2022-36331.botics.co</string>
 	</array>
 </dict>
 </plist>

@@ -489,10 +489,12 @@ const LogFoods = props => {
 
     try {
       const data = await getNutritions(query)
-      const foodData = type === "all" ? mealsFood : commonData
+
+      let foodData = type === "all" ? [...mealsFood] : [...commonData]
       let index = foodData && foodData.findIndex(items => items.id === item?.id)
 
       foodData[index] = data?.foods[0]
+      foodData[index]["alt_measures"] = item?.alt_measures
       foodData[index]["total_quantity"] = item?.total_quantity
         ? item?.total_quantity
         : 1
@@ -503,19 +505,28 @@ const LogFoods = props => {
         fat: data?.foods[0].nf_total_fat,
         name: data?.foods[0].food_name,
         proteins: data?.foods[0]?.nf_protein,
-        thumb: item.thumb,
+        thumb: data?.foods[0]?.photo?.thumb,
         weight: data?.foods[0]?.serving_weight_grams
       }
 
       foodData[index]["unit"] = {
-        id: selectedData.id,
+        id: item?.unit?.id,
         name: selectedData?.measure,
         product: selectedData.product,
         quantity: item?.total_quantity,
         weight: selectedData?.serving_weight
       }
 
-      type === "all" ? setMealsFood(foodData) : setCommonData(foodData)
+      if (type === "all") {
+        setMealsFood(foodData)
+        const itemData = foodData[index]
+
+        if (itemData?.total_quantity > 0) {
+          productUnitAction(item?.unit?.id, itemData?.total_quantity, itemData)
+        }
+      } else {
+        setCommonData(foodData)
+      }
     } catch (err) {}
   }
   const selectedCalories = f => {
@@ -566,7 +577,7 @@ const LogFoods = props => {
   const onChangeSelected = (e, index, item) => {
     let arr = [...mealsFood]
     let objToUpdate = arr[index]
-    let itemId = objToUpdate.food.units[0].id
+    let itemId = objToUpdate.unit.id
     objToUpdate.total_quantity = e
     arr[index] = objToUpdate
     setQtySelected(e)

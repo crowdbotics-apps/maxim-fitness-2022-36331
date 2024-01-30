@@ -61,13 +61,11 @@ const MessageScreen = props => {
     if (!dispatch) {
       return
     }
-    bootstrap()
-
     pubnub.addListener({
-      message: () => {
-        unreadMessage()
-      }
+      message: unreadMessage
     })
+
+    bootstrap()
   }, [])
 
   useEffect(() => {
@@ -137,52 +135,6 @@ const MessageScreen = props => {
     }
   }, [search])
 
-  useFocusEffect(
-    useCallback(() => {
-      getLastSeen()
-    }, [state?.channels])
-  )
-
-  const getLastSeen = () => {
-    if (Object.keys(state.channels).length > 0) {
-      const channels = Object.entries(state.channels).map(([id, rest]) => ({
-        id,
-        ...rest
-      }))
-      Object.keys(state.channels).forEach(channel => {
-        pubnub.hereNow(
-          {
-            channels: [channel],
-            includeUUIDs: true,
-            includeState: true
-          },
-          (status, response) => {
-            const tmp = getByValue(channels, channel)
-
-            if (tmp) {
-              if (response?.channels[channel]?.occupants[0]?.state?.last_seen) {
-                tmp.last_seen =
-                  response?.channels[channel]?.occupants[0]?.state?.last_seen
-              }
-
-              const DATA = [
-                {
-                  title: "Direct Chats",
-                  data: channels
-                    .filter(item => {
-                      return item.custom.type === 0
-                    })
-                    .map(obj => ({ ...obj }))
-                }
-              ]
-              setConversationList(DATA)
-            }
-          }
-        )
-      })
-    }
-  }
-
   const chatNavigate = item => {
     navigation.navigate("ChatScreen", { item: item })
     pubnub.history({ channel: item?.id }).then(res => {
@@ -219,6 +171,10 @@ const MessageScreen = props => {
     }
   }
 
+  const countUnRead = item => {
+    const count = channelCount && channelCount?.find(val => val.id === item.id)
+    return count && count?.count
+  }
   const ListItem = item => {
     return (
       <TouchableOpacity
@@ -243,30 +199,23 @@ const MessageScreen = props => {
               borderRadius: (31 / 375) * width
             }}
           />
-
-          <View
-            style={{
-              justifyContent: "center",
-              marginLeft: 15,
-              flex: 1
-            }}
-          >
-            <Text
-              text={
-                item?.custom?.firstLastName?.split("/")[
-                  userProfile?.id === item.custom.owner ? 1 : 0
-                ]
-              }
-              bold
-              style={{ fontSize: 12 }}
-            />
+          <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between"
+                justifyContent: "center",
+                marginLeft: 15,
+                flex: 1
               }}
             >
+              <Text
+                text={
+                  item?.custom?.firstLastName?.split("/")[
+                    userProfile?.id === item.custom.owner ? 1 : 0
+                  ]
+                }
+                bold
+                style={{ fontSize: 12 }}
+              />
               <Text
                 text={
                   item.name?.split("-")[
@@ -275,12 +224,15 @@ const MessageScreen = props => {
                 }
                 style={{ color: "#D3D3D3", fontSize: 12 }}
               />
-              {"last_seen" in item && item.last_seen && (
-                <Text style={styles.LastSeenText}>
-                  {timeSince(new Date(item?.last_seen).getTime())}
-                </Text>
-              )}
             </View>
+
+            {countUnRead(item) ? (
+              <View style={styles.countStyle}>
+                <Text style={{ fontSize: 15, color: "white" }}>
+                  {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </TouchableOpacity>
@@ -366,6 +318,7 @@ const MessageScreen = props => {
           keyboardShouldPersistTaps="handled"
           refreshing={loading}
           onRefresh={async () => {
+            unreadMessage()
             await bootstrap()
           }}
           sections={conversationList}
@@ -392,6 +345,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 20
+  },
+  countStyle: {
+    height: 30,
+    width: 30,
+    backgroundColor: "red",
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center"
   }
 })
 
