@@ -679,10 +679,9 @@ class MealViewSet(ModelViewSet):
                     if not food_item_meals.exists():
                         pass
                     else:
-                        new_data = []
                         serializer = FoodItemSerializer(food_item_meals, many=True)
                         new_data.append({"id": food_item_meals.first().meal_time.id,
-                                         "date_time": food_item_meals.first().meal_time.date_time,
+                                         "date_time": str(food_item_meals.first().meal_time.date_time),
                                          "food_items": serializer.data})
                 data.append({str(date): new_data})
 
