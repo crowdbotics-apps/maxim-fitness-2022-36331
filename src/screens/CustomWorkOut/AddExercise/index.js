@@ -13,6 +13,7 @@ import {
   Linking
 } from "react-native"
 import { Text, BottomSheet, Button, InputField } from "../../../components"
+import VideoPlayer from "react-native-video-player"
 import Video from "react-native-video"
 import Modal from "react-native-modal"
 
@@ -263,11 +264,11 @@ const AddExercies = props => {
                       source={
                         item?.pictures[0]?.image
                           ? { uri: item?.pictures[0]?.image }
-                          : item?.video
-                          ? { uri: item?.video }
+                          : item?.video_thumbnail
+                          ? { uri: item?.video_thumbnail }
                           : foodImage
                       }
-                      style={{ width: 80, height: 40 }}
+                      style={{ width: 80, height: 45 }}
                     />
                   </View>
                   <View style={[center, { marginRight: 50, flex: 1 }]}>
@@ -370,11 +371,14 @@ const AddExercies = props => {
             ]}
           />
         </View>
-        <View style={[styles.dualView, center]}>
-          <Video
-            resizeMode="contain"
-            source={{ uri: desription?.video }}
-            style={{ width: 200, height: 140 }}
+        <View style={[styles.dualView]}>
+          <VideoPlayer
+            video={{
+              uri: desription?.video
+            }}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="stretch"
+            thumbnail={{ uri: desription?.video_thumbnail }}
           />
         </View>
         <ScrollView
@@ -383,7 +387,7 @@ const AddExercies = props => {
           keyboardShouldPersistTaps="handled"
         >
           {desription &&
-            desription?.description?.split("\n").map((item, i) => {
+            desription?.description?.split("/n").map((item, i) => {
               return (
                 <View style={styles.dualList}>
                   <View>
@@ -395,7 +399,9 @@ const AddExercies = props => {
                     style={{
                       justifyContent: "center",
                       marginLeft: 30,
-                      marginHorizontal: 40
+                      marginHorizontal: 40,
+                      paddingVertical: 10,
+                      flex: 1
                     }}
                   >
                     <Text
@@ -577,7 +583,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginTop: 20,
     height: 200,
-    marginHorizontal: 10,
+    padding: 10,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -592,7 +598,7 @@ const styles = StyleSheet.create({
   },
   dualList: {
     backgroundColor: "white",
-    height: 70,
+    // height: 70,
 
     marginHorizontal: 8,
     borderRadius: 15,

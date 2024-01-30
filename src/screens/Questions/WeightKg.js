@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 //Components
 import { Text, Button, InputField } from "../../components"
 import HeaderTitle from "./Components/HeaderTitle"
+import { handleTextChange } from "../../utils/utils"
 
 //Themes
 import { Global, Layout, Gutters, Fonts, Colors } from "../../theme"
@@ -71,7 +72,7 @@ const WeightKg = props => {
                 }
               ]}
               value={kilograms}
-              onChangeText={val => setKilograms(val)}
+              onChangeText={val => handleTextChange(val, setKilograms)}
               placeholder="Kilograms"
               autoCapitalize="none"
               keyboardType="numeric"

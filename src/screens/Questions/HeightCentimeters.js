@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 //Components
 import { Text, Button, InputField } from "../../components"
 import HeaderTitle from "./Components/HeaderTitle"
+import { handleTextChange } from "../../utils/utils"
 
 //Themes
 import { Global, Layout, Gutters, Fonts, Colors } from "../../theme"
@@ -71,7 +72,7 @@ const HeightCentimeters = props => {
                 }
               ]}
               value={height}
-              onChangeText={val => setHeight(val)}
+              onChangeText={val => handleTextChange(val, setHeight)}
               placeholder="Height"
               autoCapitalize="none"
               keyboardType="numeric"
