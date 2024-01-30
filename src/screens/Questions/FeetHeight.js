@@ -73,9 +73,7 @@ const FeetHeight = props => {
                 }
               ]}
               value={feet}
-              onChangeText={val => {
-                handleTextChange(val, setFeet)
-              }}
+              onChangeText={val => setFeet(val.replace(/[^0-9]/g, ""))}
               placeholder="Feet"
               autoCapitalize="none"
               keyboardType="numeric"
@@ -101,7 +99,7 @@ const FeetHeight = props => {
                 }
               ]}
               value={inches}
-              onChangeText={val => handleTextChange(val, setInches)}
+              onChangeText={val => setInches(val.replace(/[^0-9]/g, ""))}
               placeholder="Inches"
               autoCapitalize="none"
               keyboardType="numeric"
