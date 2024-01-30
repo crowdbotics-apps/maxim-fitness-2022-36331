@@ -292,10 +292,14 @@ class MealTimeSerializer(serializers.ModelSerializer):
 
     def get_food_items(self, obj):
         current_date = self.context.get('current_date')
+        current_time = self.context.get('current_time')
         if current_date:
             food_items = obj.food_items_times.filter(created__date=current_date)
-            serializer = FoodItemSerializer(food_items, many=True)
-            return serializer.data
+        if current_time:
+            food_items = obj.food_items_times.filter(created__date=current_date, created__lte=current_time)
+
+        serializer = FoodItemSerializer(food_items, many=True)
+        return serializer.data
 
 
 class MealHistorySerializer(serializers.ModelSerializer):

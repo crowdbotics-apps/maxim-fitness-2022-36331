@@ -1431,7 +1431,8 @@ class ConsumeCaloriesViewSet(ModelViewSet):
             queryset = queryset.filter(created=date)
         if queryset.exists():
             meal_times = MealTime.objects.filter(meal__user=self.request.user).order_by('-date_time')
-            meals_serializer = MealTimeSerializer(meal_times, many=True, context={'current_date': timezone.now().date()})
+            meals_serializer = MealTimeSerializer(meal_times, many=True,
+                                        context={'current_date': timezone.now().date(), "current_time": timezone.now()})
             cal_data = meals_serializer.data
             for food_items in cal_data:
                 for food_item in food_items['food_items']:
