@@ -13,6 +13,12 @@ export const getDisplayNameFromFieldName = name => {
   }
 }
 
+export const handleTextChange = (text, setValue) => {
+  if (text.match(/^([0-9]{1,})?(\.)?([0-9]{1,})?$/)) {
+    text === "." ? setValue("") : setValue(text)
+  }
+}
+
 export const exerciseArray = [
   {
     value: 1,
