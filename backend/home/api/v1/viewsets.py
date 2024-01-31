@@ -2,6 +2,7 @@ import base64
 import json
 from collections import OrderedDict
 
+from django.db import transaction
 from django.db.models import Prefetch, Q, Exists, OuterRef
 from django.utils import timezone
 from drf_yasg import openapi
@@ -158,181 +159,189 @@ class ProfileViewSet(ModelViewSet):
 
 
     def update(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        request_from = self.request.data.get('request_type', None)
-        height = self.request.data.get('height', 0)
-        weight = self.request.data.get('weight', 0)
-        male, female, rma, calories, age, fitness_goal, gender, activity_level = 0, 0, 0, 0, 0, 0, 0, 0
-        u = ''
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        if request_from and request_from == "goal":
-            fitness_goal = self.request.data["fitness_goal"]
-            obj = queryset[0]
-            if fitness_goal:
-                #     if int(fitness_goal) == obj.fitness_goal:
-                #         if Session.objects.filter(user_id=obj.id, is_active=True).exists():
-                #             return Response({"message": "Can't revised same fitness goal."},
-                #                             status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            queryset = self.get_queryset()
+            request_from = self.request.data.get('request_type', None)
+            height = self.request.data.get('height',None)
+            weight = self.request.data.get('weight', None)
+            male, female, rma, calories, age, fitness_goal, gender, activity_level = 0, 0, 0, 0, 0, 0, 0, 0
+            u = ''
+            current_date = datetime.now().strftime('%Y-%m-%d')
+            if request_from and request_from == "goal":
+                fitness_goal = self.request.data["fitness_goal"]
+                obj = queryset[0]
+                if fitness_goal:
+                    if int(fitness_goal) == obj.fitness_goal:
+                        return Response({"message": "Can't revised same fitness goal."},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                    today = date.today()
+                    age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
+                    program = AnswerProgram.objects.filter(
+                        age_min__lte=age,
+                        age_max__gte=age,
+                        exercise_level=obj.exercise_level,
+                        number_of_training_days=obj.number_of_training_days,
+                        fitness_goal=int(fitness_goal)
+                    ).first()
+                    if not program:
+                        return Response({"message": "No program currently aligns with selected fitness goal."},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    obj.fitness_goal = self.request.data["fitness_goal"]
+                    obj.save()
+            if request_from and request_from == "days":
+                obj = queryset[0]
                 today = date.today()
                 age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
-                program = AnswerProgram.objects.filter(
-                    age_min__lte=age,
-                    age_max__gte=age,
-                    exercise_level=obj.exercise_level,
-                    number_of_training_days=obj.number_of_training_days,
-                    fitness_goal=int(fitness_goal)
-                ).first()
-                if not program:
-                    return Response({"message": "No program currently aligns with selected fitness goal."},
-                                    status=status.HTTP_400_BAD_REQUEST)
-                obj.fitness_goal = self.request.data["fitness_goal"]
-                obj.save()
-        if request_from and request_from == "days":
-            obj = queryset[0]
-            today = date.today()
-            age = today.year - obj.dob.year - ((today.month, today.day) < (obj.dob.month, obj.dob.day))
-            days = self.request.data["number_of_training_days"]
-            if days:
-                if int(days) == obj.number_of_training_days:
-                    if Session.objects.filter(user_id=obj.id, is_active=True).exists():
-                        return Response({"message": "Already have same number of training days."},
+                days = self.request.data["number_of_training_days"]
+                if days:
+                    if int(days) == obj.number_of_training_days:
+                        if Session.objects.filter(user_id=obj.id, is_active=True).exists():
+                            return Response({"message": "Already have same number of training days."},
+                                            status=status.HTTP_400_BAD_REQUEST)
+                    program = AnswerProgram.objects.filter(
+                        age_min__lte=age,
+                        age_max__gte=age,
+                        exercise_level=obj.exercise_level,
+                        number_of_training_days=int(self.request.data["number_of_training_days"]),
+                        fitness_goal=obj.fitness_goal
+                    ).first()
+                    if not program:
+                        return Response({"message": "No program currently aligns with this training days."},
                                         status=status.HTTP_400_BAD_REQUEST)
-                program = AnswerProgram.objects.filter(
-                    age_min__lte=age,
-                    age_max__gte=age,
-                    exercise_level=obj.exercise_level,
-                    number_of_training_days=int(self.request.data["number_of_training_days"]),
-                    fitness_goal=obj.fitness_goal
-                ).first()
-                if not program:
-                    return Response({"message": "No program currently aligns with this training days."},
-                                    status=status.HTTP_400_BAD_REQUEST)
-                obj.number_of_training_days = self.request.data["number_of_training_days"]
+                    obj.number_of_training_days = self.request.data["number_of_training_days"]
+                    obj.save()
+            if request_from and request_from == 'mealTime':
+                obj = queryset[0]
+                no_meal = obj.number_of_meal
+                height = obj.height
+                weight = obj.weight
+                # obj.last_update = current_date
+                # obj.save()
+                dob = obj.dob
+                gender = obj.gender
+                unit = obj.unit
+                activity_level = obj.activity_level
+                fitness_goal = obj.fitness_goal
+
+                d2 = datetime.strptime(current_date, "%Y-%m-%d")
+                age = relativedelta(d2, dob).years
+                u = unit.split("/")
+                u = u[0]
+                date_time = self.request.data["date_time"]
+                meal = Meal.objects.filter(user=self.request.user)
+                meal_list = []
+                if meal.exists():
+                    meal_id = meal.last().id
+                else:
+                    meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                    meal_id = meal.id
+                for i in date_time:
+                    meal_list.append(MealTime(meal_id=meal_id,
+                                              date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
+                MealTime.objects.bulk_create(meal_list)
+
+                obj.number_of_meal = len(date_time)
                 obj.save()
-        if request_from and request_from == 'mealTime':
-            obj = queryset[0]
-            no_meal = obj.number_of_meal
-            height = obj.height
-            weight = obj.weight
-            # obj.last_update = current_date
-            # obj.save()
-            dob = obj.dob
-            gender = obj.gender
-            unit = obj.unit
-            activity_level = obj.activity_level
-            fitness_goal = obj.fitness_goal
 
-            d2 = datetime.strptime(current_date, "%Y-%m-%d")
-            age = relativedelta(d2, dob).years
-            u = unit.split("/")
-            u = u[0]
-            date_time = self.request.data["date_time"]
-            meal = Meal.objects.filter(user=self.request.user)
-            meal_list = []
-            if meal.exists():
-                meal_id = meal.last().id
+            if request_from and request_from == 'question':
+                obj = queryset[0]
+                obj.dob = self.request.data["dob"]
+                obj.height = self.request.data["height"]
+                obj.weight = self.request.data["weight"]
+                obj.unit = self.request.data["unit"]
+                obj.gender = self.request.data["gender"]
+                obj.exercise_level = self.request.data["exercise_level"]
+                obj.activity_level = self.request.data["activity_level"]
+                obj.understanding_level = self.request.data["understanding_level"]
+                obj.number_of_training_days = self.request.data["number_of_training_days"]
+                obj.fitness_goal = self.request.data["fitness_goal"]
+                obj.is_survey = True
+                obj.consultations = self.request.data["consultations"]
+                no_meal = obj.number_of_meal
+                total_meal = self.request.data["number_of_meal"]
+                obj.number_of_meal = total_meal
+                obj.last_update = current_date
+                obj.save()
+                meal_list = []
+                date_time = self.request.data["date_time"]
+                birth_date = self.request.data['dob']
+                gender = self.request.data['gender']
+                unit = self.request.data['unit']
+                fitness_goal = self.request.data['fitness_goal']
+                activity_level = self.request.data['activity_level']
+                meal = Meal.objects.filter(user=self.request.user)
+                if meal.exists():
+                    meal_id = meal.last().id
+                else:
+                    meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
+                    meal_id = meal.id
+                for i in date_time:
+                    meal_list.append(MealTime(meal_id=meal_id,
+                                              date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
+                MealTime.objects.bulk_create(meal_list)
+                if Settings.objects.filter(user=self.request.user).exists():
+                    Settings.objects.update(diet_tracking_voice=True, diet_tracking_text=True,
+                                            diet_tracking_barcode=True, diet_dynamic_feed=True,
+                                            program_custom=True)
+
+                d1 = datetime.strptime(birth_date, "%Y-%m-%d")
+                d2 = datetime.strptime(current_date, "%Y-%m-%d")
+                age = relativedelta(d2, d1).years
+                u = unit.split("/")
+                u = u[0]
+            if request_from and request_from == 'weightUpdate':
+                obj = queryset[0]
+                height = obj.height
+                obj.weight = weight
+                obj.last_update = current_date
+                obj.save()
+                dob = obj.dob
+                gender = obj.gender
+                unit = obj.unit
+                activity_level = obj.activity_level
+                fitness_goal = obj.fitness_goal
+
+                d2 = datetime.strptime(current_date, "%Y-%m-%d")
+                age = relativedelta(d2, dob).years
+                u = unit.split("/")
+                u = u[0]
+            if not height and not weight:
+                height = obj.height
+                weight = obj.weight
+                gender = obj.gender
+                activity_level = obj.activity_level
+                u = obj.unit.split("/")
+                u = u[0]
+            if u == 'Feet':
+                weight = float(weight) * 0.453592
+                height = float(height) * 30.48
             else:
-                meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
-                meal_id = meal.id
-            for i in date_time:
-                meal_list.append(MealTime(meal_id=meal_id,
-                                          date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
-            MealTime.objects.bulk_create(meal_list)
+                weight = float(weight)  # Convert to float here
+                height = float(height) * 100
+            bmr = 1
+            if gender == 'Male':
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
+            if gender == 'Female':
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
 
-            obj.number_of_meal = len(date_time)
-            obj.save()
+            if activity_level == 1:
+                rma = bmr * 1.2
+            if activity_level == 2:
+                rma = bmr * 1.375
+            if activity_level == 3:
+                rma = bmr * 1.55
+            if activity_level == 4:
+                rma = bmr * 1.725
 
-        if request_from and request_from == 'question':
-            obj = queryset[0]
-            obj.dob = self.request.data["dob"]
-            obj.height = self.request.data["height"]
-            obj.weight = self.request.data["weight"]
-            obj.unit = self.request.data["unit"]
-            obj.gender = self.request.data["gender"]
-            obj.exercise_level = self.request.data["exercise_level"]
-            obj.activity_level = self.request.data["activity_level"]
-            obj.understanding_level = self.request.data["understanding_level"]
-            obj.number_of_training_days = self.request.data["number_of_training_days"]
-            obj.fitness_goal = self.request.data["fitness_goal"]
-            obj.is_survey = True
-            obj.consultations = self.request.data["consultations"]
-            no_meal = obj.number_of_meal
-            total_meal = self.request.data["number_of_meal"]
-            obj.number_of_meal = total_meal
-            obj.last_update = current_date
-            obj.save()
-            meal_list = []
-            date_time = self.request.data["date_time"]
-            birth_date = self.request.data['dob']
-            gender = self.request.data['gender']
-            unit = self.request.data['unit']
-            fitness_goal = self.request.data['fitness_goal']
-            activity_level = self.request.data['activity_level']
-            meal = Meal.objects.filter(user=self.request.user)
-            if meal.exists():
-                meal_id = meal.last().id
-            else:
-                meal = Meal.objects.create(user=self.request.user, no_of_meals=len(date_time))
-                meal_id = meal.id
-            for i in date_time:
-                meal_list.append(MealTime(meal_id=meal_id,
-                                          date_time=i["mealTime"], meal_name=f"meal_{i['mealTime']}"))
-            MealTime.objects.bulk_create(meal_list)
-            if Settings.objects.filter(user=self.request.user).exists():
-                Settings.objects.update(diet_tracking_voice=True, diet_tracking_text=True,
-                                        diet_tracking_barcode=True, diet_dynamic_feed=True,
-                                        program_custom=True)
+            calories = rma
+            if fitness_goal == 1:
+                calories = rma - 1000
+            elif fitness_goal == 2:
+                calories = rma + 1000
+            self.create_calories(calories, current_date)
 
-            d1 = datetime.strptime(birth_date, "%Y-%m-%d")
-            d2 = datetime.strptime(current_date, "%Y-%m-%d")
-            age = relativedelta(d2, d1).years
-            u = unit.split("/")
-            u = u[0]
-        if request_from and request_from == 'weightUpdate':
-            obj = queryset[0]
-            height = obj.height
-            obj.weight = weight
-            obj.last_update = current_date
-            obj.save()
-            dob = obj.dob
-            gender = obj.gender
-            unit = obj.unit
-            activity_level = obj.activity_level
-            fitness_goal = obj.fitness_goal
-
-            d2 = datetime.strptime(current_date, "%Y-%m-%d")
-            age = relativedelta(d2, dob).years
-            u = unit.split("/")
-            u = u[0]
-        if u == 'Feet':
-            weight = float(weight) * 0.453592
-            height = float(height) * 30.48
-        else:
-            weight = float(weight)  # Convert to float here
-            height = float(height) * 100
-        bmr = 1
-        if gender == 'Male':
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
-        if gender == 'Female':
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
-
-        if activity_level == 1:
-            rma = bmr * 1.2
-        if activity_level == 2:
-            rma = bmr * 1.375
-        if activity_level == 3:
-            rma = bmr * 1.55
-        if activity_level == 4:
-            rma = bmr * 1.725
-
-        calories = rma
-        if fitness_goal == 1:
-            calories = rma - 1000
-        elif fitness_goal == 2:
-            calories = rma + 1000
-        self.create_calories(calories, current_date)
-
-        return Response("data updated")
+            return Response("data updated")
 
     @action(methods=['get'], detail=True, url_path='follower', url_name='follower')
     def get_follower(self, request, pk):
@@ -627,7 +636,7 @@ class MealViewSet(ModelViewSet):
         user = queryset.first().user
         no_of_meals = user.number_of_meal
         current_date = timezone.now().date()
-        meal_times = MealTime.objects.filter(meal_id=queryset.first().id).order_by('-date_time')[:no_of_meals]
+        meal_times = MealTime.objects.filter(meal_id=queryset.first().id).order_by('-id')[:no_of_meals]
         data = []
         data_object = {}
         meals_serializer = MealTimeSerializer(meal_times, many=True, context={'current_date': current_date})

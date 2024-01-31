@@ -28,7 +28,8 @@ class Session(models.Model):
     name = models.CharField(max_length=500, null=True)
     program = models.ForeignKey("Program", related_name='sessions', on_delete=models.CASCADE, null=True)
 
-    cardio = models.BooleanField(default=False, null=True, blank=True)
+    cardio = models.BooleanField(default=False)
+    strength = models.BooleanField(default=False)
     cardio_length = models.PositiveIntegerField(null=True, blank=True)
     cardio_frequency = models.PositiveIntegerField(null=True, blank=True)
     heart_rate = models.PositiveIntegerField(null=True, blank=True)
@@ -81,7 +82,7 @@ class Exercise(models.Model):
     name = models.CharField(max_length=150)
     exercise_id = models.CharField(max_length=150)
     exercise_type = models.ForeignKey('ExerciseType', related_name='exercises', on_delete=models.CASCADE, null=True)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True, default="")
     video = models.FileField(upload_to='videos/', null=True, blank=True)
     video_thumbnail = models.FileField(upload_to='exercise_video/thumbnail', null=True, blank=True)
 
@@ -140,6 +141,7 @@ class Program(models.Model):
                 date_time = self.get_date_time(days_gap)
                 session = Session.objects.create(
                     user=user,
+                    strength=day.strength,
                     date_time=date_time,
                     program=self,
                     cardio=day.cardio,
@@ -187,7 +189,7 @@ class Week(models.Model):
 class Day(models.Model):
     week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="days")
     day = models.PositiveIntegerField()
-
+    strength = models.BooleanField(default=False)
     cardio = models.BooleanField(default=False)
     cardio_length = models.PositiveIntegerField()
     cardio_frequency = models.PositiveIntegerField()
