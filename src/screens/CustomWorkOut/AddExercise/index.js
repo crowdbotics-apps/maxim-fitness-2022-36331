@@ -13,7 +13,7 @@ import {
   Linking
 } from "react-native"
 import { Text, BottomSheet, Button, InputField } from "../../../components"
-import VideoPlayer from "react-native-video-player"
+import VideoPlayer from "../../../components/VideoPlayer"
 import Video from "react-native-video"
 import Modal from "react-native-modal"
 
