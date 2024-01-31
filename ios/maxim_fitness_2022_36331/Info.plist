@@ -6,10 +6,6 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Orum Training</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict/>
-	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
