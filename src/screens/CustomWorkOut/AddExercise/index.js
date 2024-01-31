@@ -372,14 +372,29 @@ const AddExercies = props => {
           />
         </View>
         <View style={[styles.dualView]}>
-          <VideoPlayer
-            video={{
-              uri: desription?.video
-            }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="stretch"
-            thumbnail={{ uri: desription?.video_thumbnail }}
-          />
+          {desription?.video ? (
+            <VideoPlayer
+              video={{
+                uri: desription?.video
+              }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="stretch"
+              thumbnail={{ uri: desription?.video_thumbnail }}
+              disableFullscreen={false}
+            />
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                flex: 1,
+                alignItems: "center"
+              }}
+            >
+              <Text bold style={{ fontSize: 20 }}>
+                {"No video found"}
+              </Text>
+            </View>
+          )}
         </View>
         <ScrollView
           style={{ marginTop: 40 }}
