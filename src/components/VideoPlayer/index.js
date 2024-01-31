@@ -562,7 +562,7 @@ export default class VideoPlayer extends Component {
           >
             <Icon
               style={[styles.extraControl, customStyles.controlIcon]}
-              name="fullscreen"
+              name="expand"
               size={32}
             />
           </TouchableOpacity>
