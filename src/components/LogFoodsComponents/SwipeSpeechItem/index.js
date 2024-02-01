@@ -11,21 +11,15 @@ const SwipeSpeechItem = ({
   onChangeText,
   caloriesCalc,
   speechData,
-  setSpeechData
+  setSpeechData,
+  updateNutritions,
+  type
 }) => {
   const [unitText, setUnitText] = useState(item.serving_unit)
   const [calories, setCalories] = useState(item.nf_calories)
 
   const onSelect = (value, product) => {
-    const seletecObj = item.alt_measures[value]
     setUnitText(product)
-    calculateCalories(seletecObj)
-
-    let arr = [...speechData]
-    let objToUpdate = arr[index]
-    objToUpdate.serving_unit = product
-    arr[index] = objToUpdate
-    setSpeechData(arr)
   }
 
   const calculateCalories = obj => {
@@ -80,6 +74,10 @@ const SwipeSpeechItem = ({
                 item={item?.alt_measures}
                 onSelect={onSelect}
                 unitText={unitText}
+                foodItem={item}
+                updateNutritions={updateNutritions}
+                type={type}
+                index={index}
               />
             </View>
           </View>

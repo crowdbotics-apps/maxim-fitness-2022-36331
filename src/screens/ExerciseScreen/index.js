@@ -28,6 +28,7 @@ import {
 } from "../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../theme"
 import LinearGradient from "react-native-linear-gradient"
+import VideoPlayer from "../../components/VideoPlayer"
 import {
   getAllSessionRequest,
   repsWeightRequest,
@@ -456,19 +457,27 @@ const ExerciseScreen = props => {
           if (active === index) {
             return (
               <View style={[fill]}>
-                <View style={[row, center, { backgroundColor: "#F2F2F2" }]}>
-                  <VideoExercise
-                    videoUrl={{
-                      uri: item?.exercise?.video
-                    }}
-                    onLoadStart={() => setVideoLoader(true)}
-                    onLoad={() => setVideoLoader(false)}
-                  />
-                  {videoLoader && (
+                <View style={[{ backgroundColor: "#F2F2F2" }]}>
+                  {item?.exercise?.video ? (
+                    <VideoPlayer
+                      video={{
+                        uri: item?.exercise?.video
+                      }}
+                      resizeMode="stretch"
+                      thumbnail={{ uri: item?.exercise?.video_thumbnail }}
+                      disableFullscreen={false}
+                    />
+                  ) : (
                     <View
-                      style={{ left: "45%", top: "45%", position: "absolute" }}
+                      style={{
+                        justifyContent: "center",
+                        flex: 1,
+                        alignItems: "center"
+                      }}
                     >
-                      <ActivityIndicator size="large" color="White" />
+                      <Text bold style={{ fontSize: 20 }}>
+                        {"No video found"}
+                      </Text>
                     </View>
                   )}
                 </View>

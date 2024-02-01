@@ -33,8 +33,12 @@ const MealRegulator = props => {
     }
   }, [])
 
-  const onSpeechEnd = e => {
-    onStop()
+  const onSpeechEnd = async e => {
+    setIsRecording(false)
+    Voice.destroy().then(Voice.removeAllListeners)
+    try {
+      await Voice.stop()
+    } catch (e) {}
   }
 
   const onSpeechPartialResults = e => {
@@ -45,14 +49,6 @@ const MealRegulator = props => {
     try {
       await Voice.start("en-US")
       setPartialResults([])
-    } catch (e) {}
-  }
-
-  const stopRecognizing = async () => {
-    //Stops listening for speech
-    try {
-      await Voice.stop()
-      Voice.destroy().then(Voice.removeAllListeners)
     } catch (e) {}
   }
 
@@ -84,12 +80,16 @@ const MealRegulator = props => {
     }
   }
 
-  const onStop = () => {
-    stopRecognizing()
+  const onStop = async () => {
     setIsRecording(false)
+    Voice.destroy().then(Voice.removeAllListeners)
+    try {
+      await Voice.stop()
+    } catch (e) {}
   }
 
   const reviewFood = () => {
+    onStop()
     props.getSpeechRequest(partialResults)
     navigation.navigate("LogFoods")
     setPartialResults([])

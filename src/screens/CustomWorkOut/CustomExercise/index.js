@@ -433,14 +433,15 @@ const CustomExercise = props => {
             //<Text text="Barbell bench press" style={styles.exerciseName} />
             //</View>
             // ) :
+
             route?.params?.exercises?.map((exe, i) => {
               return (
                 <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
                   <View style={Layout.row}>
                     <Image
                       source={
-                        exe?.video
-                          ? { uri: exe.video }
+                        exe?.video_thumbnail
+                          ? { uri: exe?.video_thumbnail }
                           : Images.profileBackGround
                       }
                       style={styles.exerciseImage1}

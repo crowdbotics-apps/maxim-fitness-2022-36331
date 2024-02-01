@@ -70,6 +70,7 @@ const SwipeCommonItem = ({
                 foodItem={item}
                 updateNutritions={updateNutritions}
                 type={type}
+                index={index}
               />
             </View>
           </View>
