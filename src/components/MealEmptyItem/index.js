@@ -83,7 +83,7 @@ const MealEmptyItem = ({
         selectedMealsRequest(item)
         getMealFoodRequest(dateTime, id)
         let currentD = moment(new Date()).format("YYYY-MM-DD")
-        if (mealItems.length && currentD) {
+        if (mealItems?.length && currentD) {
           navigation.navigate("LogFoods")
         } else {
           navigation.navigate("MealRegulator")
