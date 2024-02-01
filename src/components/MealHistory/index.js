@@ -11,6 +11,7 @@ import moment from "moment"
 // components
 import Text from "../Text"
 import { Gutters, Layout, Global, Colors, Images } from "../../theme"
+import { sortData } from "../../utils/utils"
 
 import { ScrollView as Content } from "native-base"
 
@@ -133,137 +134,145 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
                       </TouchableOpacity>
                       {Object.keys(selectedDate)?.[0] ===
                         Object.keys(item)?.[0] &&
-                        item[Object.keys(item)?.[0]]?.map((items, i) => (
-                          <View key={i} style={smallHMargin}>
-                            <View
-                              style={[
-                                smallVPadding,
-                                regularHMargin,
-                                styles.titleContainerStyle
-                              ]}
-                            >
-                              <Text
-                                style={styles.mealText}
-                                text={`Meal ${i + 1}`}
-                              />
-                            </View>
-                            <View
-                              style={[
-                                border,
-                                secondaryBg,
-                                smallBMargin,
-                                // smallHMargin,
-                                regularHMargin,
-                                regularVPadding,
-                                styles.itemContainer
-                              ]}
-                            >
+                        sortData(item[Object.keys(item)?.[0]])?.map(
+                          (items, i) => (
+                            <View key={i} style={smallHMargin}>
                               <View
                                 style={[
-                                  fill,
-                                  column,
-                                  justifyContentCenter,
-                                  regularLPadding
+                                  smallVPadding,
+                                  regularHMargin,
+                                  styles.titleContainerStyle
                                 ]}
                               >
                                 <Text
-                                  style={styles.clockContainer}
-                                  text={moment(
-                                    items && items?.date_time
-                                  ).format("h:mm a")}
+                                  style={styles.mealText}
+                                  text={`Meal ${i + 1}`}
                                 />
                               </View>
-                              <View style={[row, alignItemsCenter]}>
-                                <View style={[regularHMargin, smallVPadding]}>
-                                  <View style={row}>
-                                    <Text
-                                      style={[
-                                        styles.textWrapper,
-                                        { color: "#00a1ff" }
-                                      ]}
-                                      text={`${
-                                        Math.ceil(getPortien([items])) || "0"
-                                      } g`}
-                                    />
-                                    <Text
-                                      style={[
-                                        styles.textWrapper,
-                                        { color: "#fbe232" }
-                                      ]}
-                                      text={`${
-                                        Math.ceil(getCarbs([items])) || "0"
-                                      } g`}
-                                    />
-                                    <Text
-                                      style={[
-                                        styles.textWrapper,
-                                        { color: "#ee230d" }
-                                      ]}
-                                      text={`${
-                                        Math.ceil(getFat([items])) || "0"
-                                      } g`}
-                                    />
-                                  </View>
-                                  <View style={row}>
-                                    <Text
-                                      style={styles.textWrapper}
-                                      text="Protein"
-                                    />
-                                    <Text
-                                      style={styles.textWrapper}
-                                      text="Carb"
-                                    />
-                                    <Text
-                                      style={styles.textWrapper}
-                                      text="Fat"
-                                    />
+                              <View
+                                style={[
+                                  border,
+                                  secondaryBg,
+                                  smallBMargin,
+                                  // smallHMargin,
+                                  regularHMargin,
+                                  regularVPadding,
+                                  styles.itemContainer
+                                ]}
+                              >
+                                <View
+                                  style={[
+                                    fill,
+                                    column,
+                                    justifyContentCenter,
+                                    regularLPadding
+                                  ]}
+                                >
+                                  <Text
+                                    style={styles.clockContainer}
+                                    text={moment(
+                                      items && items?.date_time
+                                    ).format("h:mm a")}
+                                  />
+                                </View>
+                                <View style={[row, alignItemsCenter]}>
+                                  <View style={[regularHMargin, smallVPadding]}>
+                                    <View style={row}>
+                                      <Text
+                                        style={[
+                                          styles.textWrapper,
+                                          { color: "#00a1ff" }
+                                        ]}
+                                        text={`${
+                                          Math.ceil(getPortien([items])) || "0"
+                                        } g`}
+                                      />
+                                      <Text
+                                        style={[
+                                          styles.textWrapper,
+                                          { color: "#fbe232" }
+                                        ]}
+                                        text={`${
+                                          Math.ceil(getCarbs([items])) || "0"
+                                        } g`}
+                                      />
+                                      <Text
+                                        style={[
+                                          styles.textWrapper,
+                                          { color: "#ee230d" }
+                                        ]}
+                                        text={`${
+                                          Math.ceil(getFat([items])) || "0"
+                                        } g`}
+                                      />
+                                    </View>
+                                    <View style={row}>
+                                      <Text
+                                        style={styles.textWrapper}
+                                        text="Protein"
+                                      />
+                                      <Text
+                                        style={styles.textWrapper}
+                                        text="Carb"
+                                      />
+                                      <Text
+                                        style={styles.textWrapper}
+                                        text="Fat"
+                                      />
+                                    </View>
                                   </View>
                                 </View>
-                              </View>
-                              {items?.food_items
-                                ? items.food_items.map((c, i) => {
-                                    return (
-                                      <View
-                                        key={i}
-                                        style={[
-                                          row,
-                                          regularHPadding,
-                                          smallVPadding,
-                                          alignItemsCenter,
-                                          styles.innerContainer
-                                        ]}
-                                      >
-                                        <Image
-                                          style={[
-                                            smallRMargin,
-                                            styles.imageWrapper
-                                          ]}
-                                          source={{ uri: c && c.food.thumb }}
-                                        />
+                                {items?.food_items
+                                  ? items.food_items.map((c, i) => {
+                                      return (
                                         <View
+                                          key={i}
                                           style={[
                                             row,
-                                            fill,
-                                            justifyContentBetween
+                                            regularHPadding,
+                                            smallVPadding,
+                                            alignItemsCenter,
+                                            styles.innerContainer
                                           ]}
                                         >
-                                          <Text
-                                            text={c.food && c.food.name}
-                                            style={fill}
-                                            bold
+                                          <Image
+                                            style={[
+                                              smallRMargin,
+                                              styles.imageWrapper
+                                            ]}
+                                            source={{ uri: c && c.food.thumb }}
                                           />
-                                          <Text
-                                            text={c.unit && c.unit.name}
-                                            bold
-                                          />
+                                          <View
+                                            style={[
+                                              row,
+                                              fill,
+                                              justifyContentBetween,
+                                              alignItemsCenter
+                                            ]}
+                                          >
+                                            <Text
+                                              text={c.food && c.food.name}
+                                              style={[fill]}
+                                              bold
+                                            />
+                                            <Text
+                                              style={[
+                                                c.unit &&
+                                                  c.unit.name.length > 20 &&
+                                                  fill
+                                              ]}
+                                              text={c.unit && c.unit.name}
+                                              bold
+                                            />
+                                          </View>
                                         </View>
-                                      </View>
-                                    )
-                                  })
-                                : null}
+                                      )
+                                    })
+                                  : null}
+                              </View>
                             </View>
-                          </View>
-                        ))}
+                          )
+                        )}
                     </>
                   )
                 })}

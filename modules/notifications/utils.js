@@ -1,4 +1,4 @@
-import { Platform, PermissionsAndroid } from "react-native"
+import { Platform, PermissionsAndroid, Alert, Linking } from "react-native"
 import { getUniqueId, getAndroidId, getModel } from "react-native-device-info"
 import { registerDeviceInfoAPI } from "./api"
 import messaging from "@react-native-firebase/messaging"
@@ -10,20 +10,9 @@ import { check, request, PERMISSIONS } from "react-native-permissions"
  * @return {Promise}
  */
 const RemotePushController = async (authToken, userID) => {
-  // const authStatus = await messaging().requestPermission()
-
-  // const ENABLED_STATUSES = [
-  //   messaging.AuthorizationStatus.AUTHORIZED,
-  //   messaging.AuthorizationStatus.PROVISIONAL
-  // ]
-  // const isEnabled = ENABLED_STATUSES.includes(authStatus)
-  // Checks if required permissions are allowed or not
-
-  // if (isEnabled) {
   const registrationToken = await messaging().getToken()
   const androidId = await getAndroidId()
   const iosId = await getUniqueId()
-  // API which registers the device details and FCM token in backend
   await registerDeviceInfoAPI(
     {
       user: userID,
@@ -37,15 +26,41 @@ const RemotePushController = async (authToken, userID) => {
     },
     authToken
   )
+  if (Platform.OS === "android") {
+    check(PERMISSIONS.ANDROID.POST_NOTIFICATIONS).then(async status => {
+      if (
+        status === PermissionsAndroid.RESULTS.DENIED ||
+        status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+      ) {
+        await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS)
+      }
+    })
+  } else {
+    const authorizationStatus = await messaging().requestPermission()
 
-  check(PERMISSIONS.ANDROID.POST_NOTIFICATIONS).then(async status => {
-    if (
-      status === PermissionsAndroid.RESULTS.DENIED ||
-      status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+    if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+    } else if (
+      authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
     ) {
-      await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS)
+    } else {
+      Alert.alert(
+        "Notification Permission Denied",
+        "To use this feature, you need to grant permission. Do you want to go to app settings?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "OK",
+            onPress: () => Linking.openURL("app-settings:")
+          }
+        ],
+        { cancelable: false }
+      )
     }
-  })
+  }
+
   // }
 }
 

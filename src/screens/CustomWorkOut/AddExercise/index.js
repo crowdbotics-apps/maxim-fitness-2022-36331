@@ -13,7 +13,7 @@ import {
   Linking
 } from "react-native"
 import { Text, BottomSheet, Button, InputField } from "../../../components"
-import VideoPlayer from "react-native-video-player"
+import VideoPlayer from "../../../components/VideoPlayer"
 import Video from "react-native-video"
 import Modal from "react-native-modal"
 
@@ -372,14 +372,29 @@ const AddExercies = props => {
           />
         </View>
         <View style={[styles.dualView]}>
-          <VideoPlayer
-            video={{
-              uri: desription?.video
-            }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="stretch"
-            thumbnail={{ uri: desription?.video_thumbnail }}
-          />
+          {desription?.video ? (
+            <VideoPlayer
+              video={{
+                uri: desription?.video
+              }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="stretch"
+              thumbnail={{ uri: desription?.video_thumbnail }}
+              disableFullscreen={false}
+            />
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                flex: 1,
+                alignItems: "center"
+              }}
+            >
+              <Text bold style={{ fontSize: 20 }}>
+                {"No video found"}
+              </Text>
+            </View>
+          )}
         </View>
         <ScrollView
           style={{ marginTop: 40 }}

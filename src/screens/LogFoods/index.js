@@ -216,8 +216,7 @@ const LogFoods = props => {
       (speechData && speechData.length) ||
       (commonData && commonData.length) ||
       (brandedData && brandedData.length) ||
-      (scanData && scanData.length) ||
-      (mealsFood && mealsFood.length)
+      (scanData && scanData.length)
     ) {
       let array = [...speechData, ...commonData, ...brandedData, ...scanData]
       calProteinCarbsFat(array || 0)
@@ -271,6 +270,9 @@ const LogFoods = props => {
     setTotalProteinFirst(0)
     setTotalCarbsFirst(0)
     setTotalFatFirst(0)
+
+    let array = [...speechData, ...commonData, ...brandedData, ...scanData]
+    calProteinCarbsFat(array)
   }
   const onDeleteAllProduct = () => {
     setMealsFood([])
@@ -313,6 +315,10 @@ const LogFoods = props => {
     setTotalProteinFirst(0)
     setTotalCarbsFirst(0)
     setTotalFatFirst(0)
+    if (mealsFood?.length) {
+      let array = [...mealsFood]
+      calcCalProteinCarbsFat(array)
+    }
   }
 
   const onDeleteCommon = item => {
@@ -331,6 +337,10 @@ const LogFoods = props => {
     setTotalProteinFirst(0)
     setTotalCarbsFirst(0)
     setTotalFatFirst(0)
+    if (mealsFood?.length) {
+      let array = [...mealsFood]
+      calcCalProteinCarbsFat(array)
+    }
   }
 
   const onDeleteBranded = () => {
@@ -346,6 +356,10 @@ const LogFoods = props => {
     setTotalProteinFirst(0)
     setTotalCarbsFirst(0)
     setTotalFatFirst(0)
+    if (mealsFood?.length) {
+      let array = [...mealsFood]
+      calcCalProteinCarbsFat(array)
+    }
   }
 
   const onDeleteScan = () => {
@@ -362,6 +376,10 @@ const LogFoods = props => {
     setTotalProteinFirst(0)
     setTotalCarbsFirst(0)
     setTotalFatFirst(0)
+    if (mealsFood?.length) {
+      let array = [...mealsFood]
+      calcCalProteinCarbsFat(array)
+    }
   }
 
   const {
@@ -495,6 +513,7 @@ const LogFoods = props => {
 
       foodData[index] = data?.foods[0]
       foodData[index]["alt_measures"] = item?.alt_measures
+      foodData[index]["serving_unit"] = selectedData?.measure
       foodData[index]["total_quantity"] = item?.total_quantity
         ? item?.total_quantity
         : 1

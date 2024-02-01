@@ -49,6 +49,12 @@ export const calculateTotalValue = nutrientsArray => {
   return totalValue
 }
 
+export const sortData = data => {
+  const compareDates = (a, b) => new Date(a.date_time) - new Date(b.date_time)
+  const sortedData = data?.sort(compareDates)
+  return sortedData
+}
+
 export const getServerError = (errorObject, errorMessage) => {
   if (errorObject) {
     try {

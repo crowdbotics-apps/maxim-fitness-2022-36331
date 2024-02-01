@@ -12,6 +12,7 @@ import { connect } from "react-redux"
 import LinearGradient from "react-native-linear-gradient"
 import moment from "moment"
 import Icon from "react-native-vector-icons/FontAwesome5"
+import { sortData } from "../../utils/utils"
 // components
 import { HeaderForDrawer, MealEmptyItem, Text } from "../../components"
 import { Gutters, Layout, Global } from "../../theme"
@@ -73,12 +74,6 @@ const HomeScreen = props => {
 
   const pp = new Date(todaySessions?.id && todaySessions?.date_time)
   const weekDay = pp?.getDay()
-
-  const sortData = data => {
-    const compareDates = (a, b) => new Date(a.date_time) - new Date(b.date_time)
-    const sortedData = data?.sort(compareDates)
-    return sortedData
-  }
 
   return (
     <SafeAreaView style={[secondaryBg, fill]}>

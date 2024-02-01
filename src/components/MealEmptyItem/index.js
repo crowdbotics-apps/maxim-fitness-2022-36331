@@ -139,6 +139,7 @@ const MealEmptyItem = ({
           >
             <TouchableOpacity
               onPress={() => {
+                getMealFoodRequest(dateTime, id)
                 selectedMealsRequest(item)
                 navigation.navigate("MealRegulator")
               }}

@@ -639,7 +639,8 @@ const ExerciseScreen = props => {
                         colorsGradient={["#3180BD", "#6EC2FA"]}
                         colorsGradientDisable={["#d3d3d3", "#838383"]}
                         disabled={
-                          timmer || (item?.sets && item?.sets[activeSet].done)
+                          timmer ||
+                          (item?.sets && item?.sets?.[activeSet]?.done)
                         }
                         onPress={() => {
                           if (item?.sets && item?.sets?.[activeSet].done) {
@@ -660,7 +661,7 @@ const ExerciseScreen = props => {
                         setStartTimer(false)
                         setTimmer(false)
                       }}
-                      resetTime={item?.sets && item?.sets?.[activeSet].timer}
+                      resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
                       onFinish={() => {
                         setTimmer(false)
                         setStartTimer(false)

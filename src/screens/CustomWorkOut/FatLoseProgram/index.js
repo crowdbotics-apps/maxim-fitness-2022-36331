@@ -325,23 +325,27 @@ const FatLoseProgram = props => {
                         </View>
                         {d?.name !== "Rest" ? (
                           <View style={row}>
-                            <View
-                              style={{
-                                backgroundColor: "red",
-                                height: 6,
-                                width: 6,
-                                borderRadius: 10
-                              }}
-                            />
-                            <View
-                              style={{
-                                backgroundColor: "blue",
-                                left: 2,
-                                height: 6,
-                                width: 6,
-                                borderRadius: 10
-                              }}
-                            />
+                            {d?.cardio && (
+                              <View
+                                style={{
+                                  backgroundColor: "red",
+                                  height: 6,
+                                  width: 6,
+                                  borderRadius: 10
+                                }}
+                              />
+                            )}
+                            {d?.strength && (
+                              <View
+                                style={{
+                                  backgroundColor: "blue",
+                                  left: 2,
+                                  height: 6,
+                                  width: 6,
+                                  borderRadius: 10
+                                }}
+                              />
+                            )}
                           </View>
                         ) : null}
                       </TouchableOpacity>
