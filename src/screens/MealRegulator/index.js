@@ -160,10 +160,16 @@ const MealRegulator = props => {
       </View>
       <View>
         {isRecording && (
-          <Image source={Images.high_amplitude} style={{ height: 200 }} />
+          <Image
+            source={Images.high_amplitude}
+            style={{ height: 200, width: "100%" }}
+          />
         )}
         {!isRecording && (
-          <Image source={Images.low_amplitude} style={{ height: 200 }} />
+          <Image
+            source={Images.low_amplitude}
+            style={{ height: 200, width: "100%" }}
+          />
         )}
       </View>
       <View style={styles.container}>
