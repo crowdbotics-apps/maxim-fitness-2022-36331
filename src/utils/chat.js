@@ -81,6 +81,13 @@ export const cloneArray = data => {
   return JSON.parse(JSON.stringify(data))
 }
 
+export const setChannelMetadata = (pubnub, channelId, data) => {
+  return pubnub.objects.setChannelMetadata({
+    channel: channelId,
+    data: data
+  })
+}
+
 export const fetchChannels = (pubnub, userId) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async resolve => {
@@ -270,6 +277,18 @@ export const sendMessages = (pubnub, channelId, message) => {
 export const pubnubTimeTokenToDatetime = timestamp => {
   var momentObj = moment(timestamp)
   var formattedDateTime = momentObj.format("MMM D h:mm a")
+
+  return formattedDateTime
+}
+
+export const messageTimeTokene = timestamp => {
+  var timeDate = new Date((timestamp / 10000000) * 1000)
+  var momentObj = moment(timeDate)
+  if (momentObj.isSame(moment(), "day")) {
+    formattedDateTime = momentObj.format("h:mm A")
+  } else {
+    formattedDateTime = momentObj.format("MMM D, YYYY h:mm A")
+  }
 
   return formattedDateTime
 }

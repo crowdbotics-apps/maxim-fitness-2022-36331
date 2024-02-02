@@ -89,24 +89,6 @@ const SearchProfile = props => {
 
   const createChat = async item => {
     try {
-      const firstLastName =
-        userProfile.first_name +
-        " " +
-        userProfile.last_name +
-        "/" +
-        item?.user_detail?.first_name +
-        " " +
-        item?.user_detail?.last_name
-
-      const userOne = {
-        id: userProfile?.id,
-        image: userProfile?.profile_picture || ""
-      }
-      const userTwo = {
-        id: item?.user_detail?.id,
-        image: item?.user_detail?.profile_picture || ""
-      }
-
       setLoading(true)
       const res = await createDirectChannel(
         pubnub,
@@ -117,11 +99,12 @@ const SearchProfile = props => {
           custom: {
             type: 0,
             owner: userProfile?.id,
+            ownerImage: userProfile?.profile_picture,
+            ownerName: userProfile.first_name + " " + userProfile.last_name,
+
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.user_detail?.username,
-            firstLastName: firstLastName,
-            userOne: JSON.stringify(userOne),
-            userTwo: JSON.stringify(userTwo)
+            otherUserName:
+              item?.user_detail?.first_name + " " + item?.user_detail?.last_name
           }
         }
       )
@@ -134,11 +117,13 @@ const SearchProfile = props => {
             custom: {
               type: ChannelType.Direct,
               owner: userProfile?.id,
+              ownerImage: userProfile?.profile_picture,
+              ownerName: userProfile.first_name + " " + userProfile.last_name,
               otherUserImage: item?.user_detail?.profile_picture,
-              otherUserName: item?.user_detail?.username,
-              firstLastName: firstLastName,
-              userOne: JSON.stringify(userOne),
-              userTwo: JSON.stringify(userTwo)
+              otherUserName:
+                item?.user_detail?.first_name +
+                " " +
+                item?.user_detail?.last_name
             }
           }
         }
@@ -151,11 +136,12 @@ const SearchProfile = props => {
           custom: {
             type: ChannelType.Direct,
             owner: userProfile?.id,
+            ownerImage: userProfile?.profile_picture,
+            ownerName: userProfile.first_name + " " + userProfile.last_name,
+
             otherUserImage: item?.user_detail?.profile_picture,
-            otherUserName: item?.user_detail?.username,
-            firstLastName: firstLastName,
-            userOne: JSON.stringify(userOne),
-            userTwo: JSON.stringify(userTwo)
+            otherUserName:
+              item?.user_detail?.first_name + " " + item?.user_detail?.last_name
           }
         }
       })

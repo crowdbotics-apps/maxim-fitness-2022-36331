@@ -56,10 +56,11 @@ export const getProfileSuccess = data => ({
   data
 })
 
-export const editProfile = (data, id) => ({
+export const editProfile = (data, id, callBack) => ({
   type: EDIT_PROFILE,
   data,
-  id
+  id,
+  callBack
 })
 
 export const editProfileSuccess = data => ({
@@ -267,12 +268,13 @@ async function updateProfile(data, id) {
   return XHR(URL, options)
 }
 
-function* updateUserData({ data, id }) {
+function* updateUserData({ data, id, callBack }) {
   try {
     const response = yield call(updateProfile, data, id)
     showMessage({ message: "Profile updated successfully", type: "success" })
     yield put(setUserDetail(response.data))
     goBack()
+    callBack(response.data)
   } catch (e) {
     const { response } = e
     showMessage({ message: "Something went wrong", type: "danger" })

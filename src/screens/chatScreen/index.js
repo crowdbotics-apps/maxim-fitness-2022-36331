@@ -25,7 +25,9 @@ import {
   loadHistory,
   cloneArray,
   sendMessages,
-  pubnubTimeTokenToDatetime
+  pubnubTimeTokenToDatetime,
+  messageTimeTokene,
+  getPubNubTimetoken
 } from "../../utils/chat"
 
 const { width } = Dimensions.get("window")
@@ -128,16 +130,12 @@ const ChatScreen = props => {
       const payload = {
         sender: userProfile?.id,
         receiver: item?.id && item?.id?.split("-")[1],
-        senderProfile: {
-          image_url: userProfile?.profile_picture
-            ? userProfile?.profile_picture
-            : ""
-        },
-        receiverProfile: {
-          image_url: item?.custom?.otherUserImage || ""
-        },
+        senderProfile: userProfile?.profile_picture
+          ? userProfile?.profile_picture
+          : "",
+        receiverProfile: item?.custom?.otherUserImage || "",
         message: textInput.trim(),
-        timestamp: moment().unix()
+        timestamp: getPubNubTimetoken()
       }
       const channel = item.id
       sendMessages(pubnub, channel, payload).then(res => {
@@ -172,12 +170,10 @@ const ChatScreen = props => {
           type: "image",
           sender: userProfile?.id,
           receiver: item?.id && item?.id?.split("-")[1],
-          senderProfile: {
-            image_url: userProfile?.profile_picture
-          },
-          receiverProfile: {
-            image_url: ""
-          },
+          senderProfile: userProfile?.profile_picture
+            ? userProfile?.profile_picture
+            : "",
+          receiverProfile: item?.custom?.otherUserImage || "",
           timestamp: moment().unix()
         },
         file: {
@@ -200,32 +196,7 @@ const ChatScreen = props => {
         alert("File size must be less then 5mb.")
         return
       }
-      // const data = {
-      //   channel: item.id,
-      //   message: {
-      //     message: {
-      //       createdAt: new Date(),
-      //       type: "image",
-      //       sender: userProfile?.id,
-      //       receiver: item?.id && item?.id?.split("-")[1],
-      //       senderProfile: {
-      //         image_url: userProfile?.profile_picture
-      //       },
-      //       receiverProfile: {
-      //         image_url: item?.custom?.otherUserImage || ""
-      //       },
-      //       timestamp: moment().unix()
-      //     },
-      //     file: {
-      //       name: res.assets[0].fileName,
-      //       image: res.assets[0].uri
-      //     }
-      //   }
-      // }
 
-      // const tmpMessages = cloneArray(messages)
-      // tmpMessages.push(data)
-      // setMessages(tmpMessages)
       setIsUpload(true)
       fileUpload(item, res)
     })
@@ -316,12 +287,22 @@ const ChatScreen = props => {
           <View style={{ alignItems: "center", marginTop: 10 }}>
             <Text
               text={
+                userProfile?.id === item?.custom?.owner
+                  ? item?.custom?.otherUserName
+                  : item?.custom?.ownerName
+              }
+              owner
+              bold
+              style={{ fontSize: 20 }}
+            />
+
+            <Text
+              text={
                 item?.name?.split("-")[
                   userProfile?.id === item.custom.owner ? 1 : 0
                 ]
               }
-              bold
-              style={{ fontSize: 20 }}
+              style={{ fontSize: 16, opacity: 0.5, marginTop: 5 }}
             />
             {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
             {item?.updated && (
@@ -347,39 +328,56 @@ const ChatScreen = props => {
                   {(item?.message?.sender || item?.message?.message?.sender) ===
                   userProfile.id ? (
                     <>
-                      <View style={[styles.senderStyle]}>
-                        {item?.message?.file ? (
-                          renderMessageImage(item?.message?.file)
-                        ) : (
-                          <View
-                            style={{
-                              alignItems: "flex-end"
-                            }}
-                          >
-                            <Text
-                              text={item?.message?.message}
-                              bold
-                              style={{ fontSize: 14 }}
-                            />
-                          </View>
-                        )}
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "flex-end",
+                          flex: 1
+                        }}
+                      >
+                        <View style={[styles.senderStyle]}>
+                          {item?.message?.file ? (
+                            renderMessageImage(item?.message?.file)
+                          ) : (
+                            <View
+                              style={{
+                                alignItems: "flex-end"
+                              }}
+                            >
+                              <Text
+                                text={item?.message?.message}
+                                bold
+                                style={{ fontSize: 14 }}
+                              />
+                              <Text
+                                text={`${messageTimeTokene(item?.timetoken)}`}
+                                bold
+                                style={{ fontSize: 12, opacity: 0.6 }}
+                              />
+                            </View>
+                          )}
+                        </View>
+                        <Image
+                          source={
+                            userProfile?.profile_picture
+                              ? { uri: userProfile?.profile_picture }
+                              : profile
+                          }
+                          style={styles.imageStyle}
+                        />
                       </View>
-                      <Image
-                        source={
-                          userProfile?.profile_picture
-                            ? { uri: userProfile?.profile_picture }
-                            : profile
-                        }
-                        style={styles.imageStyle}
-                      />
                     </>
                   ) : (
-                    <>
+                    <View
+                      style={{
+                        flexDirection: "row"
+                      }}
+                    >
                       <Image
                         source={
-                          item?.message?.receiverProfile?.image_url
+                          item?.message?.receiverProfile
                             ? {
-                                uri: item?.message?.receiverProfile?.image_url
+                                uri: item?.message?.receiverProfile
                               }
                             : profile
                         }
@@ -389,14 +387,21 @@ const ChatScreen = props => {
                         {item?.message?.file ? (
                           renderMessageImage(item?.message?.file)
                         ) : (
-                          <Text
-                            text={item?.message?.message}
-                            bold
-                            style={{ fontSize: 14 }}
-                          />
+                          <View>
+                            <Text
+                              text={item?.message?.message}
+                              bold
+                              style={{ fontSize: 14 }}
+                            />
+                            <Text
+                              text={`${messageTimeTokene(item?.timetoken)}`}
+                              bold
+                              style={{ fontSize: 12, opacity: 0.6 }}
+                            />
+                          </View>
                         )}
                       </View>
-                    </>
+                    </View>
                   )}
                 </View>
               ))
@@ -511,7 +516,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#add8e6",
     paddingVertical: 15,
     paddingHorizontal: 10,
-    width: "85%",
+    maxWidth: "85%",
     marginRight: 10,
     borderRadius: 10
   },
@@ -524,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D3D3D3",
     paddingVertical: 15,
     paddingHorizontal: 10,
-    width: "85%",
+    maxWidth: "85%",
     marginLeft: 10,
     borderRadius: 10
   },
