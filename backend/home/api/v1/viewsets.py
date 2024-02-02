@@ -141,7 +141,7 @@ class ProfileViewSet(ModelViewSet):
         fat = ((calories * 20) / 100) / 9
 
         new_values = {
-            'calories': round(carbs + protein + fat),
+            'calories': round(calories),
             'carbs': carbs,
             'protein': protein,
             'fat': fat
@@ -336,9 +336,9 @@ class ProfileViewSet(ModelViewSet):
 
             calories = rma
             if fitness_goal == 1:
-                calories = rma - 1000
+                calories = rma - 500
             elif fitness_goal == 2:
-                calories = rma + 1000
+                calories = rma + 500
             self.create_calories(calories, current_date)
 
             return Response("data updated")
