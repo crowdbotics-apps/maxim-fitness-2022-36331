@@ -247,8 +247,8 @@ class ProfileViewSet(ModelViewSet):
             if request_from and request_from == 'question':
                 obj = queryset[0]
                 obj.dob = self.request.data["dob"]
-                obj.height = self.request.data["height"]
-                obj.weight = self.request.data["weight"]
+                obj.height = str(self.request.data["height"])
+                obj.weight = str(self.request.data["weight"])
                 obj.unit = self.request.data["unit"]
                 obj.gender = self.request.data["gender"]
                 obj.exercise_level = self.request.data["exercise_level"]
@@ -315,7 +315,9 @@ class ProfileViewSet(ModelViewSet):
                 u = u[0]
             if u == 'Feet':
                 weight = float(weight) * 0.453592
-                height = float(height) * 30.48
+                feet_inch = height.split(".")
+                total_inch = (float(feet_inch[0]) * 12) + float(feet_inch[1])
+                height = total_inch * 2.54
             else:
                 weight = float(weight)  # Convert to float here
                 height = float(height) * 100
@@ -954,6 +956,7 @@ class SessionViewSet(ModelViewSet):
             session_id = self.request.data.get("session_id")
             w_session = Session.objects.get(id=session_id)
             w_session.name = workout_title
+            w_session.cardio = True if not w_session.strength else False
             w_session.save()
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 

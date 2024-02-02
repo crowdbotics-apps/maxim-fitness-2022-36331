@@ -183,7 +183,7 @@ class Week(models.Model):
     week = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.program.name}_{self.id}>{self.week}"
+        return f"{self.program}__{self.week}"
 
 
 class Day(models.Model):
@@ -200,13 +200,16 @@ class Day(models.Model):
     carb_casual = models.FloatField()
     name = models.CharField(max_length=500, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.id}_{self.week}"
+
 
 class ProgramExercise(models.Model):
     day = models.ForeignKey("Day", on_delete=models.CASCADE, null=True, related_name="day_exercises")
     exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.exercise)
+        return f"{self.day}__{self.exercise}__{self.id}"
 
 
 class ProgramExerciseReplacement(models.Model):
