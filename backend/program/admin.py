@@ -214,7 +214,7 @@ class WorkoutInline(nested_admin.NestedStackedInline):
 
 
 class SessionAdmin(nested_admin.NestedModelAdmin):
-    list_display = ['name', 'date_time', 'user', 'program']
+    list_display = ['name', 'date_time', 'user', 'program', 'cardio', 'strength']
     inlines = [WorkoutInline]
 
 
@@ -223,7 +223,7 @@ class ProgramExerciseReplacementAdmin(admin.ModelAdmin):
 
 
 class DayAdmin(admin.ModelAdmin):
-    list_display = ["id", "week", 'name', 'cardio', 'cardio_length', 'cardio_frequency', 'heart_rate', 'location']
+    list_display = ["id", "week", 'name', 'cardio', 'strength', 'cardio_length', 'cardio_frequency', 'heart_rate', 'location']
 
 
 class WeekAdmin(admin.ModelAdmin):
