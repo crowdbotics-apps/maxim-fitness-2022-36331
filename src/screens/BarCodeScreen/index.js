@@ -16,6 +16,7 @@ import {
   useCodeScanner,
   useCameraDevice
 } from "react-native-vision-camera"
+import debounce from "lodash/debounce"
 
 // components
 import { Gutters, Images } from "../../theme"
@@ -26,14 +27,20 @@ const BarCodeScreen = props => {
   const [hasPermission, setHasPermission] = useState(false)
   const { navigation, requestingScan } = props
 
+  const debouncedSetScannedState = debounce(handleApi, 300)
+
   const codeScanner = useCodeScanner({
     codeTypes: ["qr", "ean-13"],
     onCodeScanned: codes => {
       if (!requestingScan) {
-        props.getScanFoodsRequest(codes[0].value)
+        debouncedSetScannedState(codes[0].value)
       }
     }
   })
+
+  const handleApi = code => {
+    props.getScanFoodsRequest(code)
+  }
 
   useEffect(() => {
     ;(async () => {
