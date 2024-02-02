@@ -29,6 +29,7 @@ import {
   messageTimeTokene,
   getPubNubTimetoken
 } from "../../utils/chat"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 const { width } = Dimensions.get("window")
 
@@ -39,6 +40,7 @@ const ChatScreen = props => {
 
   const { state, dispatch } = useStore()
   const { item } = route.params
+  const scrollViewRef = useRef()
   const [messages, setMessages] = useState([])
   const channel = state.channels[route.params.item.id]
   const [visible, setIsVisible] = useState(false)
@@ -244,46 +246,48 @@ const ChatScreen = props => {
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         {isUpload && <Loader />}
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}
-          showsVerticalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
-            {
-              useNativeDriver: false
-            }
-          )}
-        >
-          <View
-            style={{
-              paddingHorizontal: 20,
-              flexDirection: "row",
-              marginTop: 20
-            }}
-          >
-            <TouchableOpacity
-              style={{ justifyContent: "center", flex: 1 }}
-              onPress={() => navigation.goBack()}
-            >
-              <Image source={backImage} style={{ height: 20, width: 30 }} />
-            </TouchableOpacity>
-            <View style={{ flex: 1.5 }}>
-              <Image
-                source={
-                  item?.custom?.otherUserImage
-                    ? { uri: item?.custom?.otherUserImage }
-                    : profile
-                }
-                style={{
-                  height: (61 / 375) * width,
-                  width: (61 / 375) * width,
-                  borderRadius: (31 / 375) * width
-                }}
-              />
-            </View>
-          </View>
 
+        <View
+          style={{
+            paddingHorizontal: 20,
+            flexDirection: "row",
+            marginTop: 20
+          }}
+        >
+          <TouchableOpacity
+            style={{ justifyContent: "center", flex: 1 }}
+            onPress={() => navigation.goBack()}
+          >
+            <Image source={backImage} style={{ height: 20, width: 30 }} />
+          </TouchableOpacity>
+          <View style={{ flex: 1.5 }}>
+            <Image
+              source={
+                userProfile?.id === item?.custom?.owner &&
+                item?.custom?.otherUserImage
+                  ? { uri: item?.custom?.otherUserImage }
+                  : userProfile?.id !== item?.custom?.owner &&
+                    item?.custom?.ownerImage
+                  ? { uri: item?.custom?.ownerImage }
+                  : profile
+              }
+              style={{
+                height: (61 / 375) * width,
+                width: (61 / 375) * width,
+                borderRadius: (31 / 375) * width
+              }}
+            />
+          </View>
+        </View>
+        <KeyboardAwareScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{ paddingBottom: 10, flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() =>
+            scrollViewRef?.current?.scrollToEnd({ animated: true })
+          }
+        >
           <View style={{ alignItems: "center", marginTop: 10 }}>
             <Text
               text={
@@ -291,7 +295,6 @@ const ChatScreen = props => {
                   ? item?.custom?.otherUserName
                   : item?.custom?.ownerName
               }
-              owner
               bold
               style={{ fontSize: 20 }}
             />
@@ -323,10 +326,10 @@ const ChatScreen = props => {
               </View>
             ) : (
               messages &&
-              messages?.map(item => (
+              messages?.map(items => (
                 <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                  {(item?.message?.sender || item?.message?.message?.sender) ===
-                  userProfile.id ? (
+                  {(items?.message?.sender ||
+                    items?.message?.message?.sender) === userProfile.id ? (
                     <>
                       <View
                         style={{
@@ -336,8 +339,8 @@ const ChatScreen = props => {
                         }}
                       >
                         <View style={[styles.senderStyle]}>
-                          {item?.message?.file ? (
-                            renderMessageImage(item?.message?.file)
+                          {items?.message?.file ? (
+                            renderMessageImage(items?.message?.file)
                           ) : (
                             <View
                               style={{
@@ -345,12 +348,12 @@ const ChatScreen = props => {
                               }}
                             >
                               <Text
-                                text={item?.message?.message}
+                                text={items?.message?.message}
                                 bold
                                 style={{ fontSize: 14 }}
                               />
                               <Text
-                                text={`${messageTimeTokene(item?.timetoken)}`}
+                                text={`${messageTimeTokene(items?.timetoken)}`}
                                 bold
                                 style={{ fontSize: 12, opacity: 0.6 }}
                               />
@@ -375,26 +378,28 @@ const ChatScreen = props => {
                     >
                       <Image
                         source={
-                          item?.message?.receiverProfile
-                            ? {
-                                uri: item?.message?.receiverProfile
-                              }
+                          userProfile?.id === item?.custom?.owner &&
+                          item?.custom?.otherUserImage
+                            ? { uri: item?.custom?.otherUserImage }
+                            : userProfile?.id !== item?.custom?.owner &&
+                              item?.custom?.ownerImage
+                            ? { uri: item?.custom?.ownerImage }
                             : profile
                         }
                         style={styles.imageStyle}
                       />
                       <View style={styles.receiverStyle}>
-                        {item?.message?.file ? (
-                          renderMessageImage(item?.message?.file)
+                        {items?.message?.file ? (
+                          renderMessageImage(items?.message?.file)
                         ) : (
                           <View>
                             <Text
-                              text={item?.message?.message}
+                              text={items?.message?.message}
                               bold
                               style={{ fontSize: 14 }}
                             />
                             <Text
-                              text={`${messageTimeTokene(item?.timetoken)}`}
+                              text={`${messageTimeTokene(items?.timetoken)}`}
                               bold
                               style={{ fontSize: 12, opacity: 0.6 }}
                             />
@@ -407,7 +412,7 @@ const ChatScreen = props => {
               ))
             )}
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <View
           style={{
             backgroundColor: "#FFF",
