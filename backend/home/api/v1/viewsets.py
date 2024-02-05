@@ -1569,7 +1569,7 @@ class ReportAPostViewSet(ModelViewSet):
             return Response({"is_report": True}, status=status.HTTP_200_OK)
         serializer = ReportAPostSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        self.perform_create(serializ  Wireless Headphoneser)
         post = Post.objects.filter(id=post_id).first()
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
                           message=f"Your post is reported by {self.request.user.username}", post_id=post,

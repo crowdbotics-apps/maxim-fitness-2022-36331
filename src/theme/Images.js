@@ -92,5 +92,7 @@ export default {
   close: require("src/assets/images/close.png"),
   closeBtn: require("src/assets/images/closeBtn.png"),
   sendIcon: require("src/assets/images/sendIcon.png"),
-  emoji: require("src/assets/images/emoji.png")
+  emoji: require("src/assets/images/emoji.png"),
+  high_amplitude: require("src/assets/images/high_amplitude_code.gif"),
+  low_amplitude: require("src/assets/images/low_amplitude_code.gif")
 }

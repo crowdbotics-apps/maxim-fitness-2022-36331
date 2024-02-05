@@ -132,9 +132,7 @@ const ExerciseCard = ({ route }) => {
                   >
                     <Image
                       source={{
-                        uri: item.exercise.pictures[0]?.image
-                          .split("?", 1)
-                          .toString()
+                        uri: item.exercise?.video_thumbnail
                       }}
                       style={styles.imageWrapper}
                     />
@@ -210,9 +208,10 @@ const styles = StyleSheet.create({
     borderRadius: 20
   },
   imageWrapper: {
-    width: 90,
-    height: 90,
-    resizeMode: "contain"
+    height: 100,
+    width: 110,
+    borderRadius: 10
+    // resizeMode: "stretch"
   },
   borderR10: {
     borderRadius: 10

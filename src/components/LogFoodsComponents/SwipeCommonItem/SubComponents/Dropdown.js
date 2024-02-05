@@ -8,7 +8,8 @@ const SubDropDown = ({
   unitText,
   foodItem,
   updateNutritions,
-  type
+  type,
+  index
 }) => {
   return (
     <ModalDropdown
@@ -18,7 +19,7 @@ const SubDropDown = ({
       dropdownTextStyle={styles.dropdownTextStyle}
       onSelect={(value, items) => {
         onSelect(value, items)
-        updateNutritions && updateNutritions(items, foodItem, type)
+        updateNutritions && updateNutritions(items, foodItem, type, index)
       }}
       showsVerticalScrollIndicator={true}
     >

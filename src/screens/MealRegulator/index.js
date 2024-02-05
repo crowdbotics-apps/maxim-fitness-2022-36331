@@ -14,7 +14,6 @@ import {
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import { connect } from "react-redux"
-import LottieView from "lottie-react-native"
 import Voice from "@react-native-voice/voice"
 import { Images, Layout, Gutters, Global } from "../../theme"
 import { getSpeechRequest } from "../../ScreenRedux/nutritionRedux"
@@ -30,13 +29,16 @@ const MealRegulator = props => {
     Voice.onSpeechPartialResults = onSpeechPartialResults
 
     return () => {
-      //destroy the process after switching the screen
       Voice.destroy().then(Voice.removeAllListeners)
     }
   }, [])
 
-  const onSpeechEnd = e => {
-    onStop()
+  const onSpeechEnd = async e => {
+    setIsRecording(false)
+    Voice.destroy().then(Voice.removeAllListeners)
+    try {
+      await Voice.stop()
+    } catch (e) {}
   }
 
   const onSpeechPartialResults = e => {
@@ -47,14 +49,6 @@ const MealRegulator = props => {
     try {
       await Voice.start("en-US")
       setPartialResults([])
-    } catch (e) {}
-  }
-
-  const stopRecognizing = async () => {
-    //Stops listening for speech
-    try {
-      await Voice.stop()
-      Voice.destroy().then(Voice.removeAllListeners)
     } catch (e) {}
   }
 
@@ -86,12 +80,16 @@ const MealRegulator = props => {
     }
   }
 
-  const onStop = () => {
-    stopRecognizing()
+  const onStop = async () => {
     setIsRecording(false)
+    Voice.destroy().then(Voice.removeAllListeners)
+    try {
+      await Voice.stop()
+    } catch (e) {}
   }
 
   const reviewFood = () => {
+    onStop()
     props.getSpeechRequest(partialResults)
     navigation.navigate("LogFoods")
     setPartialResults([])
@@ -162,19 +160,15 @@ const MealRegulator = props => {
       </View>
       <View>
         {isRecording && (
-          <LottieView
-            source={require("./High_amplitude_code.json")}
-            autoPlay
-            loop
-            style={{ height: 265 }}
+          <Image
+            source={Images.high_amplitude}
+            style={{ height: 265, width: "100%" }}
           />
         )}
         {!isRecording && (
-          <LottieView
-            source={require("./Low_amplitude_code.json")}
-            autoPlay
-            loop
-            style={{ height: 265 }}
+          <Image
+            source={Images.low_amplitude}
+            style={{ height: 265, width: "100%" }}
           />
         )}
       </View>

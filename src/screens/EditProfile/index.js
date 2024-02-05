@@ -17,15 +17,33 @@ import { Images, Colors } from "src/theme"
 import { connect } from "react-redux"
 import ImagePicker from "react-native-image-crop-picker"
 import { editProfile } from "../../ScreenRedux/profileRedux"
+import { usePubNub } from "pubnub-react"
+import {
+  setChannelMetadata,
+  useStore,
+  fetchChannels,
+  makeChannelsList
+} from "../../utils/chat"
 
 //useForm
 import useForm from "../../utils/useForm"
 import validator from "../../utils/validation"
 
 const EditProfile = props => {
+  const { dispatch } = useStore()
   const { profileBackGround, cameraIcon, backArrow } = Images
   const { navigation, userDetail, editRequesting } = props
   const { width, height } = Dimensions.get("window")
+  const pubnub = usePubNub()
+  const [channelData, setchannelData] = useState([])
+
+  useEffect(() => {
+    fetchChannels(pubnub, userDetail?.id).then(channels => {
+      dispatch({ channels })
+      const DATA = makeChannelsList(channels)
+      setchannelData(DATA?.[0])
+    })
+  }, [])
 
   const stateSchema = {
     firstName: {
@@ -114,7 +132,38 @@ const EditProfile = props => {
         name: state.backgroundImage.value.path
       })
     }
-    props.editProfile(formData, userDetail.id)
+    props.editProfile(formData, userDetail.id, callBack)
+  }
+
+  const callBack = async userData => {
+    if (channelData?.data?.length)
+      channelData?.data.map(async (item, i) => {
+        if (item?.custom?.owner === userDetail?.id) {
+          await setChannelMetadata(pubnub, `${item?.id}`, {
+            name: `${item?.name}`,
+            custom: {
+              otherUserImage: item?.custom?.otherUserImage,
+              otherUserName: item?.custom?.otherUserName,
+              owner: item?.custom?.owner,
+              ownerImage: userData?.profile_picture,
+              ownerName: userData?.first_name + " " + userData?.last_name,
+              type: item?.custom?.type
+            }
+          })
+        } else {
+          await setChannelMetadata(pubnub, `${item?.id}`, {
+            name: `${item?.name}`,
+            custom: {
+              otherUserImage: userData?.profile_picture,
+              otherUserName: userData?.first_name + " " + userData?.last_name,
+              owner: item?.custom?.owner,
+              ownerImage: item?.custom?.ownerImage,
+              ownerName: item?.custom?.ownerName,
+              type: item?.custom?.type
+            }
+          })
+        }
+      })
   }
 
   const onChangeProfileImage = () => {
@@ -369,6 +418,6 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  editProfile: (data, id) => dispatch(editProfile(data, id))
+  editProfile: (data, id, callBack) => dispatch(editProfile(data, id, callBack))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(EditProfile)

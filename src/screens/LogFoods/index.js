@@ -20,7 +20,6 @@ import SwipeSpeechItem from "../../components/LogFoodsComponents/SwipeSpeechItem
 import { getNutritions } from "../../utils/api"
 
 import SwipeDeleteButton from "../../components/LogFoodsComponents/SwipeDeleteButton"
-import { calculateTotalValue } from "../../utils/utils"
 
 import GradientButton from "../../components/LogFoodsComponents/GradientButton"
 import TableColumn from "./TableColumn"
@@ -34,7 +33,8 @@ import {
   postLogFoodRequest,
   resetFoodItems,
   deleteAllMeals,
-  productUnitAction
+  productUnitAction,
+  getMealFoodSuccess
   // updateFoodItems
 } from "../../ScreenRedux/nutritionRedux"
 
@@ -148,23 +148,29 @@ const LogFoods = props => {
   }, [getMealsFood])
 
   useEffect(() => {
-    if (speechState && speechState.length) {
-      speechState["total_quantity"] = speechState.serving_qty
+    if (speechState && speechState?.length) {
+      const newArray = speechState.map(item => ({
+        ...item,
+        total_quantity: item.serving_qty,
+        localCal: item.nf_calories
+      }))
 
-      setSpeechData(speechState)
+      setSpeechData(newArray)
     }
   }, [speechState])
   useEffect(() => {
     if (brandedState) {
       brandedState["total_quantity"] = brandedState.serving_qty
+      brandedState["localCal"] = brandedState.nf_calories
       setBrandedData([brandedState])
     }
   }, [brandedState])
 
   useEffect(() => {
-    if (commonState && commonState.length) {
-      commonState["total_quantity"] = commonState.serving_qty
+    if (commonState && commonState) {
+      commonState["total_quantity"] = commonState?.serving_qty
       commonState["localCal"] = commonState.nf_calories
+
       setCommonData(commonState)
     }
   }, [commonState])
@@ -172,6 +178,7 @@ const LogFoods = props => {
   useEffect(() => {
     if (scannedProduct) {
       scannedProduct["total_quantity"] = scannedProduct.serving_qty
+      scannedProduct["localCal"] = scannedProduct.nf_calories
       setScanData([scannedProduct])
     }
   }, [scannedProduct])
@@ -257,6 +264,7 @@ const LogFoods = props => {
       food_id: item.id,
       id: selectedMeal.id
     }
+    props.getMealFoodSuccess(newData)
     props.deleteAllMeals(data)
 
     resetFoodItems()
@@ -496,7 +504,7 @@ const LogFoods = props => {
     clearAllData()
   }
 
-  const updateNutritions = async (value, item, type) => {
+  const updateNutritions = async (value, item, type, index) => {
     const query = `${
       item?.total_quantity ? item?.total_quantity : 1
     } ${value} ${item?.food?.name ? item?.food?.name : item.food_name}`
@@ -508,8 +516,12 @@ const LogFoods = props => {
     try {
       const data = await getNutritions(query)
 
-      let foodData = type === "all" ? [...mealsFood] : [...commonData]
-      let index = foodData && foodData.findIndex(items => items.id === item?.id)
+      let foodData =
+        type === "all"
+          ? [...mealsFood]
+          : type === "speech"
+          ? [...speechData]
+          : [...commonData]
 
       foodData[index] = data?.foods[0]
       foodData[index]["alt_measures"] = item?.alt_measures
@@ -517,7 +529,10 @@ const LogFoods = props => {
       foodData[index]["total_quantity"] = item?.total_quantity
         ? item?.total_quantity
         : 1
-      foodData[index]["id"] = item?.id
+      if (item?.id) {
+        foodData[index]["id"] = item?.id
+      }
+
       foodData[index]["food"] = {
         calories: data?.foods[0].nf_calories,
         carbohydrate: data?.foods[0].nf_total_carbohydrate,
@@ -544,7 +559,11 @@ const LogFoods = props => {
           productUnitAction(item?.unit?.id, itemData?.total_quantity, itemData)
         }
       } else {
-        setCommonData(foodData)
+        if (type === "speech") {
+          setSpeechData(foodData)
+        } else {
+          setCommonData(foodData)
+        }
       }
     } catch (err) {}
   }
@@ -690,7 +709,13 @@ const LogFoods = props => {
               <Image style={styles.leftArrowStyle} source={Images.leftArrow} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.navigate("SelectBrand")}
+              onPress={() => {
+                setQtyScan(0)
+                setQtyVoice(0)
+                setQtyCommon(0)
+                setQtyBranded(0)
+                navigation.navigate("SelectBrand")
+              }}
               style={{
                 flex: 4,
                 alignItems: "flex-start",
@@ -927,6 +952,8 @@ const LogFoods = props => {
                             <SwipeSpeechItem
                               speechData={speechData}
                               setSpeechData={setSpeechData}
+                              type="speech"
+                              updateNutritions={updateNutritions}
                               item={item}
                               index={index}
                               value={
@@ -1149,7 +1176,8 @@ const mapDispatchToProps = dispatch => ({
   deleteAllMeals: (data, screenName) =>
     dispatch(deleteAllMeals(data, screenName)),
   productUnitAction: (itemId, value, data) =>
-    dispatch(productUnitAction(itemId, value, data))
+    dispatch(productUnitAction(itemId, value, data)),
+  getMealFoodSuccess: data => dispatch(getMealFoodSuccess(data))
   // updateFoodItems: data => dispatch(updateFoodItems(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(LogFoods)

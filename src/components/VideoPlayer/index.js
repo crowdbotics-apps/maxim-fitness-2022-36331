@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
   },
   playButton: {
     backgroundColor: "rgba(0, 0, 0, 0.6)",
-    width: 64,
-    height: 64,
+    width: 55,
+    height: 55,
     borderRadius: 32,
     justifyContent: "center",
     alignItems: "center"
@@ -433,7 +433,7 @@ export default class VideoPlayer extends Component {
         <Icon
           style={[styles.playArrow, customStyles.playArrow]}
           name="play"
-          size={30}
+          size={25}
         />
       </TouchableOpacity>
     )
@@ -563,7 +563,7 @@ export default class VideoPlayer extends Component {
             <Icon
               style={[styles.extraControl, customStyles.controlIcon]}
               name="expand"
-              size={32}
+              size={20}
             />
           </TouchableOpacity>
         )}

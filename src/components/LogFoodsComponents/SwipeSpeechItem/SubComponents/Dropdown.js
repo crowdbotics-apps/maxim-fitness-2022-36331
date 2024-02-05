@@ -2,14 +2,25 @@ import React from "react"
 import { View, Text, Image, StyleSheet } from "react-native"
 import ModalDropdown from "react-native-modal-dropdown"
 import { Images } from "../../../../theme"
-const SubDropDown = ({ item, onSelect, unitText }) => {
+const SubDropDown = ({
+  item,
+  onSelect,
+  unitText,
+  foodItem,
+  updateNutritions,
+  type,
+  index
+}) => {
   return (
     <ModalDropdown
       style={styles.dropdownContainer}
       options={item?.map(val => val.measure)}
       dropdownStyle={styles.dropdownStyle}
       dropdownTextStyle={styles.dropdownTextStyle}
-      onSelect={(value, items) => onSelect(value, items)}
+      onSelect={(value, items) => {
+        onSelect(value, items)
+        updateNutritions && updateNutritions(items, foodItem, type, index)
+      }}
     >
       <View style={styles.modalButtonStyle}>
         <View style={{ flex: 2 }}>
@@ -26,7 +37,7 @@ const SubDropDown = ({ item, onSelect, unitText }) => {
             paddingBottom: 3
           }}
         >
-          <Image source={Images.dropdownIcon} style={styles.dropdownImage} />
+          <Image source={Images.dropDownIcon} style={styles.dropdownImage} />
         </View>
       </View>
     </ModalDropdown>

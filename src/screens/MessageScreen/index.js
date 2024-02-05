@@ -189,8 +189,12 @@ const MessageScreen = props => {
         <View style={{ flexDirection: "row", flex: 1 }}>
           <Image
             source={
-              userProfileData(item) && userProfileData(item)?.image
-                ? { uri: userProfileData(item)?.image }
+              userProfile?.id === item?.custom?.owner &&
+              item?.custom?.otherUserImage
+                ? { uri: item?.custom?.otherUserImage }
+                : userProfile?.id !== item?.custom?.owner &&
+                  item?.custom?.ownerImage
+                ? { uri: item?.custom?.ownerImage }
                 : profile
             }
             style={{
@@ -209,9 +213,9 @@ const MessageScreen = props => {
             >
               <Text
                 text={
-                  item?.custom?.firstLastName?.split("/")[
-                    userProfile?.id === item.custom.owner ? 1 : 0
-                  ]
+                  userProfile?.id === item?.custom?.owner
+                    ? item?.custom?.otherUserName
+                    : item?.custom?.ownerName
                 }
                 bold
                 style={{ fontSize: 12 }}
