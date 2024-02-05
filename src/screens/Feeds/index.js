@@ -188,48 +188,53 @@ const Feeds = props => {
       <Modal
         isVisible={showModal}
         onBackdropPress={() => setShowModal(false)}
-        style={{ flex: 1, margin: 0 }}
+        style={{ flex: 1, margin: 0, padding: 0 }}
       >
-        <View style={styles.imageModal}>
-          <TouchableOpacity
-            onPress={() => setShowModal(false)}
-            style={{
-              alignItems: "flex-end",
-              marginTop: Platform.OS === "android" ? 0 : 20
-            }}
-          >
-            <Image
-              source={Images.closeBtn}
-              style={{
-                height: 35,
-                width: 35
-              }}
-            />
-          </TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            {loading && <ActivityIndicator size="large" color="white" />}
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.imageModal}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {loading && <ActivityIndicator size="large" color="white" />}
 
-            <Video
-              source={{
-                uri: videoUri?.video
+              <Video
+                source={{
+                  uri: videoUri?.video
+                }}
+                muted={false}
+                repeat={true}
+                resizeMode="stretch"
+                style={{ height: "100%", width: "100%" }}
+                rate={1}
+                posterResizeMode="stretch"
+                playInBackground={true}
+                playWhenInactive={true}
+                ignoreSilentSwitch="ignore"
+                disableFocus={true}
+                mixWithOthers={"mix"}
+                controls={true}
+                onLoadStart={() => setLoading(true)}
+                onLoad={() => setLoading(false)}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
+              style={{
+                justifyContent: "flex-end",
+                right: 20,
+                alignItems: "flex-end",
+                position: "absolute",
+                marginTop: 20
               }}
-              muted={false}
-              repeat={true}
-              resizeMode="stretch"
-              style={{ height: "100%", width: "100%" }}
-              rate={1}
-              posterResizeMode="stretch"
-              playInBackground={true}
-              playWhenInactive={true}
-              ignoreSilentSwitch="ignore"
-              disableFocus={true}
-              mixWithOthers={"mix"}
-              controls={true}
-              onLoadStart={() => setLoading(true)}
-              onLoad={() => setLoading(false)}
-            />
+            >
+              <Image
+                source={Images.closeBtn}
+                style={{
+                  height: 35,
+                  width: 35
+                }}
+              />
+            </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
       <Modal
         isVisible={isModalVisible}
