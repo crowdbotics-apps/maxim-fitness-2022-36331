@@ -141,7 +141,7 @@ class ProfileViewSet(ModelViewSet):
         fat = ((calories * 20) / 100) / 9
 
         new_values = {
-            'calories': round(carbs + protein + fat),
+            'calories': round(calories),
             'carbs': carbs,
             'protein': protein,
             'fat': fat
@@ -247,8 +247,8 @@ class ProfileViewSet(ModelViewSet):
             if request_from and request_from == 'question':
                 obj = queryset[0]
                 obj.dob = self.request.data["dob"]
-                obj.height = self.request.data["height"]
-                obj.weight = self.request.data["weight"]
+                obj.height = str(self.request.data["height"])
+                obj.weight = str(self.request.data["weight"])
                 obj.unit = self.request.data["unit"]
                 obj.gender = self.request.data["gender"]
                 obj.exercise_level = self.request.data["exercise_level"]
@@ -315,7 +315,9 @@ class ProfileViewSet(ModelViewSet):
                 u = u[0]
             if u == 'Feet':
                 weight = float(weight) * 0.453592
-                height = float(height) * 30.48
+                feet_inch = height.split(".")
+                total_inch = (float(feet_inch[0]) * 12) + float(feet_inch[1])
+                height = total_inch * 2.54
             else:
                 weight = float(weight)  # Convert to float here
                 height = float(height) * 100
@@ -336,9 +338,9 @@ class ProfileViewSet(ModelViewSet):
 
             calories = rma
             if fitness_goal == 1:
-                calories = rma - 1000
+                calories = rma - 500
             elif fitness_goal == 2:
-                calories = rma + 1000
+                calories = rma + 500
             self.create_calories(calories, current_date)
 
             return Response("data updated")
@@ -954,6 +956,7 @@ class SessionViewSet(ModelViewSet):
             session_id = self.request.data.get("session_id")
             w_session = Session.objects.get(id=session_id)
             w_session.name = workout_title
+            w_session.cardio = True if not w_session.strength else False
             w_session.save()
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
@@ -1566,7 +1569,7 @@ class ReportAPostViewSet(ModelViewSet):
             return Response({"is_report": True}, status=status.HTTP_200_OK)
         serializer = ReportAPostSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        self.perform_create(serializ  Wireless Headphoneser)
         post = Post.objects.filter(id=post_id).first()
         send_notification(sender=self.request.user, receiver=post.user, title="Report Post",
                           message=f"Your post is reported by {self.request.user.username}", post_id=post,
