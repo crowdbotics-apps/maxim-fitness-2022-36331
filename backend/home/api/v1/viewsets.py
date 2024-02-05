@@ -970,14 +970,15 @@ class SessionViewSet(ModelViewSet):
                 )
                 order = order + 1
                 for set in sets:
-                    s_ = Set.objects.create(
-                        workout=workout,
-                        set_no=set["set_no"],
-                        reps=set["reps"],
-                        weight=set["weight"],
-                        timer=set["timer"],
-                        set_type=set["set_type"],
-                    )
+                    if set["ex_id"] == exercise.id:
+                        s_ = Set.objects.create(
+                            workout=workout,
+                            set_no=set["set_no"],
+                            reps=set["reps"],
+                            weight=set["weight"],
+                            timer=set["timer"],
+                            set_type=set["set_type"],
+                        )
             return Response("data save successful")
 
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
