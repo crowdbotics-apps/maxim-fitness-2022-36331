@@ -689,13 +689,13 @@ const ProfileScreen = props => {
               source={{
                 uri: videoUri
               }}
-              style={{ height: 300, width: "100%" }}
+              style={{ height: "100%", width: "100%" }}
               muted={false}
               repeat={true}
               // onEnd={() => setStart(false)}
-              resizeMode="cover"
+              resizeMode="stretch"
               rate={1}
-              posterResizeMode="cover"
+              posterResizeMode="stretch"
               playInBackground={true}
               playWhenInactive={true}
               ignoreSilentSwitch="ignore"

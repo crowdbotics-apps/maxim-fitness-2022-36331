@@ -137,7 +137,10 @@ const ExerciseScreen = props => {
         )
       case "r":
         return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Sigle Sets"} />
+          <SetsComponents
+            colors={["#60d937", "#60d937"]}
+            text={"Single Sets"}
+          />
         )
       default:
         break
@@ -403,7 +406,7 @@ const ExerciseScreen = props => {
               selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
-                    disabled={timmer}
+                    // disabled={timmer}
                     onPress={() => selectExercise(item, i)}
                     style={[
                       row,
@@ -565,7 +568,7 @@ const ExerciseScreen = props => {
                               "#d3d3d3"
                             }
                             repsWeightState={repsWeightState}
-                            disabled={timmer}
+                            // disabled={timmer}
                           />
                         ))}
                       </ScrollView>
@@ -597,7 +600,7 @@ const ExerciseScreen = props => {
                           loadingReps={props.loader}
                           repsColor={repsColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader || timmer}
+                          disabled={props.loader}
                         />
                         <FatExerciseButton
                           weight
@@ -619,7 +622,7 @@ const ExerciseScreen = props => {
                           loadingWeight={props.loader}
                           weightColor={weightColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader || timmer}
+                          disabled={props.loader}
                         />
                       </View>
                     )}
@@ -634,7 +637,7 @@ const ExerciseScreen = props => {
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        disabled={timmer}
+                        // disabled={timmer}
                       />
                       <FatGradientIconButton
                         buttonText={
@@ -675,7 +678,7 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                         setStartTimer(false)
                       }}
-                      isDisable={timmer || !checkDoneExcercise()}
+                      isDisable={timmer}
                     />
                   </ScrollView>
                 </View>
@@ -694,7 +697,12 @@ const ExerciseScreen = props => {
         >
           <View style={[center, regularHMargin]}>
             {selectedSession?.[active]?.exercise?.description ? (
-              <Text text={selectedSession?.[active]?.exercise.description} />
+              <Text
+                text={selectedSession?.[active]?.exercise?.description?.replace(
+                  /\/n/g,
+                  ""
+                )}
+              />
             ) : (
               <Text text={"No Description is available!"} />
             )}
@@ -927,10 +935,11 @@ const ExerciseScreen = props => {
                           }. ${exercise?.name}`}
                         />
                       </View>
+
                       <View style={center}>
                         <Image
                           source={{
-                            uri: exercise?.pictures[0]?.image_url
+                            uri: exercise?.video_thumbnail
                           }}
                           style={styles.modalImageStyle}
                         />
@@ -948,11 +957,11 @@ const ExerciseScreen = props => {
                     text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                   />
                 </View>
+
                 <View style={center}>
                   <Image
                     source={{
-                      uri: selectedSession?.[active]?.exercise?.pictures[0]
-                        ?.image_url
+                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />

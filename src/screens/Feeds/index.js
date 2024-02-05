@@ -208,17 +208,17 @@ const Feeds = props => {
           </TouchableOpacity>
           <View style={{ flex: 1, justifyContent: "center" }}>
             {loading && <ActivityIndicator size="large" color="white" />}
+
             <Video
               source={{
                 uri: videoUri?.video
               }}
-              style={{ height: 300, width: "100%" }}
               muted={false}
               repeat={true}
-              // onEnd={() => setStart(false)}
-              resizeMode="cover"
+              resizeMode="stretch"
+              style={{ height: "100%", width: "100%" }}
               rate={1}
-              posterResizeMode="cover"
+              posterResizeMode="stretch"
               playInBackground={true}
               playWhenInactive={true}
               ignoreSilentSwitch="ignore"

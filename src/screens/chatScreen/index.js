@@ -125,8 +125,6 @@ const ChatScreen = props => {
     }
   }
 
-  let scrollOffsetY = useRef(new Animated.Value(100)).current
-
   const onSend = () => {
     if (textInput.trim()) {
       const payload = {
@@ -158,8 +156,7 @@ const ChatScreen = props => {
               lastReadTimetoken: res?.timetoken
             }
           }
-        ],
-        uuid: profile.id
+        ]
       })
       .then(res => {})
   }

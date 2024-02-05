@@ -31,6 +31,7 @@ import Icon from "react-native-vector-icons/FontAwesome5"
 import { Layout, Global, Gutters, Colors, Images, Fonts } from "../../theme"
 import { calculatePostTime } from "../../utils/functions"
 import { exerciseArray } from "../../utils/utils"
+import { usePubNub } from "pubnub-react"
 
 import { TabOne, TabThree } from "./components"
 //Actions
@@ -73,6 +74,8 @@ const CustomCalories = props => {
 
   let refWeight = useRef("")
   let refTrainingDay = useRef("")
+  const pubnub = usePubNub()
+
   const { state, dispatch } = useStore()
   const [tab, setTab] = useState(2)
   const [value, setValue] = useState(false)
@@ -81,10 +84,12 @@ const CustomCalories = props => {
   const [showModalHistory, setShowModalHistory] = useState(false)
   const [exerciseLevel, setExerciseLevel] = useState(false)
   const [typeData, setTypeData] = useState(false)
+  const [channelCount, setChannelCount] = useState()
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
+
       props.getMealsHistoryRequest()
     })
     return unsubscribe
@@ -93,6 +98,7 @@ const CustomCalories = props => {
   const isFocused = useIsFocused()
 
   useEffect(() => {
+    unreadMessage()
     // isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
     props.getNotificationCount()
   }, [meals, isFocused])
@@ -275,6 +281,49 @@ const CustomCalories = props => {
     refTrainingDay.current.close()
   }
 
+  const unreadMessage = () => {
+    pubnub.objects
+      .getMemberships({
+        include: {
+          customFields: true
+        }
+      })
+      .then(res => {
+        let countData = []
+        res?.data?.map(item => {
+          if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
+            pubnub
+              .messageCounts({
+                channels: [item?.channel?.id],
+                channelTimetokens: [item?.custom?.lastReadTimetoken]
+              })
+              .then(resMsg => {
+                Object.entries(resMsg?.channels)
+                  .map(([id, rest]) => ({
+                    id,
+                    rest
+                  }))
+                  .map(obj => {
+                    countData.push({ id: obj?.id, count: obj?.rest })
+                  })
+              })
+          }
+        })
+        setTimeout(() => {
+          setChannelCount(countData)
+        }, 1000)
+      })
+  }
+
+  const countUnread = () => {
+    if (channelCount) {
+      var sum = channelCount?.reduce(function (total, obj) {
+        return total + obj.count
+      }, 0)
+      return sum
+    }
+  }
+
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
       {(updateLoader || loader) && <Loader />}
@@ -287,6 +336,7 @@ const CustomCalories = props => {
         onPressNotify={() => props.navigation.navigate("NotificationScreen")}
         unreadCount={unreadCount ? unreadCount : false}
         profile={profile}
+        countUnread={countUnread()}
       />
       <View
         style={[

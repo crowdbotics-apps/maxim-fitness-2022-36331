@@ -448,7 +448,11 @@ const CustomExercise = props => {
                     />
                     <Text
                       style={styles.exerciseName1}
-                      text={`${list[i]}. ${exe.name}`}
+                      text={
+                        route?.params?.exercises?.length === 1
+                          ? `${exe.name}`
+                          : `${list[i]}. ${exe.name}`
+                      }
                     />
                   </View>
 
