@@ -193,7 +193,16 @@ const Feeds = props => {
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.imageModal}>
             <View style={{ flex: 1, justifyContent: "center" }}>
-              {loading && <ActivityIndicator size="large" color="white" />}
+              {loading && (
+                <View
+                  style={{
+                    alignSelf: "center",
+                    position: "absolute"
+                  }}
+                >
+                  <ActivityIndicator size="large" color="white" />
+                </View>
+              )}
 
               <Video
                 source={{
