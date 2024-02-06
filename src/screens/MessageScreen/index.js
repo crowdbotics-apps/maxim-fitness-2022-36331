@@ -16,9 +16,11 @@ import { Text } from "../../components"
 import { useFocusEffect } from "@react-navigation/native"
 import { usePubNub } from "pubnub-react"
 import {
+  fetchAndAddTimeTokens,
   fetchChannels,
   getByValue,
   makeChannelsList,
+  messageTimeTokene,
   timeSince,
   useStore
 } from "../../utils/chat"
@@ -52,9 +54,16 @@ const MessageScreen = props => {
           return { ...obj }
         })
 
-      dispatch({ channels })
-      setLoading(false)
+      fetchAndAddTimeTokens(channels, pubnub)
+        .then(updatedData => {
+          dispatch({ channels: updatedData })
+          setLoading(false)
+        })
+        .catch(error => {
+          setLoading(false)
+        })
     })
+
     unreadMessage()
   }
 
@@ -63,16 +72,21 @@ const MessageScreen = props => {
       return
     }
     pubnub.addListener({
-      message: unreadMessage
+      message: () => {
+        unreadMessage()
+      }
     })
-
-    bootstrap()
   }, [])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      bootstrap()
+    }, [])
+  )
 
   useEffect(() => {
     if (state?.channels) {
       const DATA = makeChannelsList(state.channels)
-
       setConversationList(DATA)
     }
   }, [state.channels])
@@ -131,17 +145,19 @@ const MessageScreen = props => {
         id,
         ...rest
       }))
+
       const filterChannels = channels.filter(
         channel =>
-          channel.name
+          channel?.name
             .split("-")[1]
             .toLowerCase()
             .includes(search.toLowerCase()) ||
-          (channel?.custom?.firstLastName &&
-            channel?.custom?.firstLastName
-              .split("/")[1]
-              .toLowerCase()
-              .includes(search.toLowerCase()))
+          (channel?.custom?.owner === profile.id
+            ? channel?.custom?.otherUserName
+            : channel?.custom?.ownerName
+          )
+            .toLowerCase()
+            .includes(search.toLowerCase())
       )
       const DATA = makeChannelsList(filterChannels)
       setConversationList(DATA)
@@ -239,6 +255,11 @@ const MessageScreen = props => {
                 </Text>
               </View>
             ) : null}
+            {item?.timeToken && (
+              <Text style={styles.LastSeenText}>
+                {messageTimeTokene(item?.timeToken)}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -323,9 +344,9 @@ const MessageScreen = props => {
         <SectionList
           keyboardShouldPersistTaps="handled"
           refreshing={loading}
-          onRefresh={async () => {
+          onRefresh={() => {
             unreadMessage()
-            await bootstrap()
+            bootstrap()
           }}
           sections={conversationList}
           keyExtractor={(item, index) => item + index}

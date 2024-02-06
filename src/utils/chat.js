@@ -94,8 +94,7 @@ export const fetchChannels = (pubnub, userId) => {
     const channels = {}
     const metadata = await pubnub.objects.getAllChannelMetadata({
       filter: `id LIKE "*${userId}*"`,
-      include: { customFields: true },
-      sort: { updated: "desc" }
+      include: { customFields: true }
     })
 
     metadata.data.forEach(({ id, name, updated, custom }) => {
@@ -108,6 +107,35 @@ export const fetchChannels = (pubnub, userId) => {
     })
     resolve(channels)
   })
+}
+
+export const fetchAndAddTimeTokens = async (data, pubnub) => {
+  const updatedData = {} // Initialize an empty object to store the updated data
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      const item = data[key]
+      try {
+        const response = await new Promise((resolve, reject) => {
+          pubnub.fetchMessages(
+            {
+              channels: [item.id],
+              count: 1
+            },
+            (_, response) => {
+              if (response?.channels[item.id]) {
+                resolve(response.channels[item.id][0].timetoken)
+              } else {
+                reject("Error fetching messages")
+              }
+            }
+          )
+        })
+        const updatedItem = { ...item, timeToken: response }
+        updatedData[key] = updatedItem
+      } catch (error) {}
+    }
+  }
+  return updatedData
 }
 
 export const timeSince = date => {
@@ -220,20 +248,29 @@ export const listener = (state, dispatch) => ({
 })
 
 export const makeChannelsList = list => {
-  const channels = Object.entries(list).map(([id, rest]) => ({
-    id,
-    ...rest
-  }))
+  const updatedChannels = Object.values(list)
+
+  updatedChannels.sort((a, b) => {
+    const timeTokenA = parseInt(a.timeToken || 0)
+    const timeTokenB = parseInt(b.timeToken || 0)
+
+    if (isNaN(timeTokenA)) return 1
+    if (isNaN(timeTokenB)) return -1
+
+    return timeTokenB - timeTokenA
+  })
+
   const DATA = [
     {
       title: "Direct Chats",
-      data: channels
+      data: updatedChannels
         .filter(item => {
           return item.custom.type === 0
         })
         .map(obj => ({ ...obj }))
     }
   ]
+
   return DATA
 }
 
@@ -284,8 +321,12 @@ export const pubnubTimeTokenToDatetime = timestamp => {
 export const messageTimeTokene = timestamp => {
   var timeDate = new Date((timestamp / 10000000) * 1000)
   var momentObj = moment(timeDate)
+  var formattedDateTime = ""
+
   if (momentObj.isSame(moment(), "day")) {
     formattedDateTime = momentObj.format("h:mm A")
+  } else if (momentObj.isSame(moment().subtract(1, "days"), "day")) {
+    formattedDateTime = "Yesterday"
   } else {
     formattedDateTime = momentObj.format("MMM D, YYYY h:mm A")
   }

@@ -309,7 +309,7 @@ const ExerciseScreen = props => {
   }
 
   const callBack = item => {
-    setTimmer(false)
+    // setTimmer(false)
     if (item?.set_type?.toLowerCase() === "ss") {
       setModal("ss")
       refModal.current.open()
@@ -935,18 +935,17 @@ const ExerciseScreen = props => {
                           }. ${exercise?.name}`}
                         />
                       </View>
-
-                      <View style={center}>
-                        <Image
-                          source={{
-                            uri: exercise?.video_thumbnail
-                          }}
-                          style={styles.modalImageStyle}
-                        />
-                      </View>
                     </View>
                   )
                 })}
+                <View style={center}>
+                  <Image
+                    source={{
+                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
+                    }}
+                    style={styles.modalImageStyle}
+                  />
+                </View>
               </>
             ) : (
               <>
@@ -957,7 +956,10 @@ const ExerciseScreen = props => {
                     text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                   />
                 </View>
-
+                {console.log(
+                  "ssssssssssssss",
+                  selectedSession?.[active]?.exercise?.video_thumbnail
+                )}
                 <View style={center}>
                   <Image
                     source={{
@@ -1030,9 +1032,9 @@ const styles = StyleSheet.create({
   modalCrossIcon: { margin: 10 },
   modalImageStyle: {
     borderRadius: 20,
-    width: 170,
+    width: 220,
     height: 170,
-    resizeMode: "contain"
+    resizeMode: "stretch"
   },
   leftIconStyle: {
     left: 0,
