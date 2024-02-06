@@ -309,7 +309,7 @@ const ExerciseScreen = props => {
   }
 
   const callBack = item => {
-    // setTimmer(false)
+    setTimmer(false)
     if (item?.set_type?.toLowerCase() === "ss") {
       setModal("ss")
       refModal.current.open()
@@ -917,32 +917,53 @@ const ExerciseScreen = props => {
           <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
             {modal === "ss" || modal === "gs" ? (
               <>
-                {repsWeightState?.exercises?.map((exercise, index) => {
-                  return (
-                    <View key={index} style={justifyContentCenter}>
-                      <View style={[row, fill, regularVMargin]}>
-                        <Text
-                          regularTitle
-                          color="quinary"
-                          text={`${
-                            (index + 1 === 1 && "a") ||
-                            (index + 1 === 2 && "b") ||
-                            (index + 1 === 3 && "c") ||
-                            (index + 1 === 4 && "d")
-                          }. ${exercise?.name}`}
-                        />
+                {repsWeightState?.exercises?.length > 0 ? (
+                  repsWeightState?.exercises?.map((exercise, index) => {
+                    return (
+                      <View key={index} style={justifyContentCenter}>
+                        <View style={[row, fill, regularVMargin]}>
+                          <Text
+                            regularTitle
+                            color="quinary"
+                            text={`${
+                              (index + 1 === 1 && "a") ||
+                              (index + 1 === 2 && "b") ||
+                              (index + 1 === 3 && "c") ||
+                              (index + 1 === 4 && "d")
+                            }. ${exercise?.name}`}
+                          />
+                        </View>
+                        <View style={center}>
+                          <Image
+                            source={{
+                              uri: exercise?.video_thumbnail
+                            }}
+                            style={styles.modalImageStyle}
+                          />
+                        </View>
                       </View>
+                    )
+                  })
+                ) : (
+                  <>
+                    <View style={[row, fill, regularVMargin]}>
+                      <Text
+                        regularTitle
+                        color="quinary"
+                        text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                      />
                     </View>
-                  )
-                })}
-                <View style={center}>
-                  <Image
-                    source={{
-                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
-                    }}
-                    style={styles.modalImageStyle}
-                  />
-                </View>
+                    <View style={center}>
+                      <Image
+                        source={{
+                          uri: selectedSession?.[active]?.exercise
+                            ?.video_thumbnail
+                        }}
+                        style={styles.modalImageStyle}
+                      />
+                    </View>
+                  </>
+                )}
               </>
             ) : (
               <>
