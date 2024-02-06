@@ -290,23 +290,37 @@ const CustomCalories = props => {
       })
       .then(res => {
         let countData = []
-        res?.data?.map(item => {
+        res?.data?.forEach(item => {
           if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
-            pubnub
-              .messageCounts({
+            pubnub.fetchMessages(
+              {
                 channels: [item?.channel?.id],
-                channelTimetokens: [item?.custom?.lastReadTimetoken]
-              })
-              .then(resMsg => {
-                Object.entries(resMsg?.channels)
-                  .map(([id, rest]) => ({
-                    id,
-                    rest
-                  }))
-                  .map(obj => {
-                    countData.push({ id: obj?.id, count: obj?.rest })
-                  })
-              })
+                count: 1
+              },
+              (_, response) => {
+                if (response?.channels) {
+                  const lastMessage = response.channels[item.channel.id][0]
+
+                  if (lastMessage?.message?.sender !== profile?.id) {
+                    pubnub
+                      .messageCounts({
+                        channels: [item?.channel?.id],
+                        channelTimetokens: [item?.custom?.lastReadTimetoken]
+                      })
+                      .then(resMsg => {
+                        Object.entries(resMsg?.channels)
+                          .map(([id, rest]) => ({
+                            id,
+                            rest
+                          }))
+                          .map(obj => {
+                            countData.push({ id: obj?.id, count: obj?.rest })
+                          })
+                      })
+                  }
+                }
+              }
+            )
           }
         })
         setTimeout(() => {

@@ -55,6 +55,7 @@ const MessageScreen = props => {
       dispatch({ channels })
       setLoading(false)
     })
+    unreadMessage()
   }
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const MessageScreen = props => {
   useEffect(() => {
     if (state?.channels) {
       const DATA = makeChannelsList(state.channels)
+
       setConversationList(DATA)
     }
   }, [state.channels])
@@ -84,23 +86,37 @@ const MessageScreen = props => {
       })
       .then(res => {
         let countData = []
-        res?.data?.map(item => {
+        res?.data?.forEach(item => {
           if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
-            pubnub
-              .messageCounts({
+            pubnub.fetchMessages(
+              {
                 channels: [item?.channel?.id],
-                channelTimetokens: [item?.custom?.lastReadTimetoken]
-              })
-              .then(resMsg => {
-                Object.entries(resMsg?.channels)
-                  .map(([id, rest]) => ({
-                    id,
-                    rest
-                  }))
-                  .map(obj => {
-                    countData.push({ id: obj?.id, count: obj?.rest })
-                  })
-              })
+                count: 1
+              },
+              (_, response) => {
+                if (response?.channels) {
+                  const lastMessage = response.channels[item.channel.id][0]
+
+                  if (lastMessage?.message?.sender !== userProfile?.id) {
+                    pubnub
+                      .messageCounts({
+                        channels: [item?.channel?.id],
+                        channelTimetokens: [item?.custom?.lastReadTimetoken]
+                      })
+                      .then(resMsg => {
+                        Object.entries(resMsg?.channels)
+                          .map(([id, rest]) => ({
+                            id,
+                            rest
+                          }))
+                          .map(obj => {
+                            countData.push({ id: obj?.id, count: obj?.rest })
+                          })
+                      })
+                  }
+                }
+              }
+            )
           }
         })
         setTimeout(() => {
@@ -155,20 +171,6 @@ const MessageScreen = props => {
           })
       }
     })
-  }
-
-  const userProfileData = item => {
-    if (item?.custom?.userOne?.length) {
-      const userOne = JSON.parse(item?.custom?.userOne)
-      const userTwo = JSON.parse(item?.custom?.userTwo)
-      if (item?.custom?.owner === userOne.id) {
-        return userTwo
-      } else if (item?.custom?.owner === userTwo.id) {
-        return userOne
-      }
-    } else {
-      return null
-    }
   }
 
   const countUnRead = item => {
