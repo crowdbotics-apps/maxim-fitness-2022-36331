@@ -87,7 +87,7 @@ class Exercise(models.Model):
     video_thumbnail = models.FileField(upload_to='exercise_video/thumbnail', null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"name: {self.name} ex_type: {self.exercise_type.name}"
 
 
 @receiver(post_save, sender=Exercise)
@@ -134,7 +134,7 @@ class Program(models.Model):
         print('weeks', weeks)
         days_gap = 0
         for week in weeks:
-            days = week.days.all()
+            days = week.days.all().order_by("id")
             print('total_days', days)
             # days_gap = 0
             for day in days:
@@ -183,7 +183,7 @@ class Week(models.Model):
     week = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.program}__{self.week}"
+        return f"{self.program}"
 
 
 class Day(models.Model):
@@ -201,7 +201,7 @@ class Day(models.Model):
     name = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.id}_{self.week}"
+        return f"{self.id}_{self.week}  name: {self.name}"
 
 
 class ProgramExercise(models.Model):
@@ -209,7 +209,7 @@ class ProgramExercise(models.Model):
     exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.day}__{self.exercise}__{self.id}"
+        return f"{self.exercise} >> day: {self.day}"
 
 
 class ProgramExerciseReplacement(models.Model):
