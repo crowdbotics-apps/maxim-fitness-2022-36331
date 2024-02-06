@@ -13,6 +13,7 @@ import {
   ActivityIndicator
 } from "react-native"
 import { connect } from "react-redux"
+import { showMessage } from "react-native-flash-message"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 //Components
@@ -339,15 +340,19 @@ const CustomExercise = props => {
 
   // Flatten the array
   const addDataCustomEx = () => {
-    const payload = {
-      title: title ? title : "title",
-      session_date: todaySessions?.date_time,
-      exercise_ids: route?.params?.exercises?.map((ex, i) => ex.id),
-      set: numberOfExercise === 1 ? sets : resultArray(),
-      adding_exercise_in_workout: true,
-      session_id: todaySessions?.id
+    if (title === "Rest" || title === "rest") {
+      showMessage({ message: "Title should not be Rest", type: "danger" })
+    } else {
+      const payload = {
+        title: title ? title : "title",
+        session_date: todaySessions?.date_time,
+        exercise_ids: route?.params?.exercises?.map((ex, i) => ex.id),
+        set: numberOfExercise === 1 ? sets : resultArray(),
+        adding_exercise_in_workout: true,
+        session_id: todaySessions?.id
+      }
+      props.postCustomExRequest(payload)
     }
-    props.postCustomExRequest(payload)
   }
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]

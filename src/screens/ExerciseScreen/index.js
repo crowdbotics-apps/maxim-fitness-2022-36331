@@ -474,7 +474,7 @@ const ExerciseScreen = props => {
                     <View
                       style={{
                         justifyContent: "center",
-                        flex: 1,
+                        height: 220,
                         alignItems: "center"
                       }}
                     >
@@ -695,14 +695,11 @@ const ExerciseScreen = props => {
           behavior="padding"
           style={[fill, { width: "100%", marginTop: 20 }]}
         >
-          <View style={[center, regularHMargin]}>
+          <View style={[regularHMargin]}>
             {selectedSession?.[active]?.exercise?.description ? (
-              <Text
-                text={selectedSession?.[active]?.exercise?.description?.replace(
-                  /\/n/g,
-                  ""
-                )}
-              />
+              selectedSession?.[active]?.exercise?.description
+                ?.split("/n")
+                .map(item => <Text text={item} />)
             ) : (
               <Text text={"No Description is available!"} />
             )}
@@ -956,10 +953,7 @@ const ExerciseScreen = props => {
                     text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                   />
                 </View>
-                {console.log(
-                  "ssssssssssssss",
-                  selectedSession?.[active]?.exercise?.video_thumbnail
-                )}
+
                 <View style={center}>
                   <Image
                     source={{
