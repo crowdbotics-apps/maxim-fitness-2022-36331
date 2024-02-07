@@ -386,7 +386,22 @@ const ChatScreen = props => {
                       >
                         <View style={[styles.senderStyle]}>
                           {items?.message?.file ? (
-                            renderMessageImage(items?.message?.file)
+                            <>
+                              {renderMessageImage(items?.message?.file)}
+                              <View
+                                style={{
+                                  alignItems: "flex-end"
+                                }}
+                              >
+                                <Text
+                                  text={`${messageTimeTokene(
+                                    items?.timetoken
+                                  )}`}
+                                  bold
+                                  style={{ fontSize: 12, opacity: 0.6 }}
+                                />
+                              </View>
+                            </>
                           ) : (
                             <View
                               style={{
@@ -436,7 +451,14 @@ const ChatScreen = props => {
                       />
                       <View style={styles.receiverStyle}>
                         {items?.message?.file ? (
-                          renderMessageImage(items?.message?.file)
+                          <>
+                            {renderMessageImage(items?.message?.file)}
+                            <Text
+                              text={`${messageTimeTokene(items?.timetoken)}`}
+                              bold
+                              style={{ fontSize: 12, opacity: 0.6 }}
+                            />
+                          </>
                         ) : (
                           <View>
                             <Text
