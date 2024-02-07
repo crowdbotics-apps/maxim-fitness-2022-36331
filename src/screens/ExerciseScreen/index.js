@@ -24,7 +24,8 @@ import {
   BottomSheet,
   InputField,
   Button,
-  ModalInput
+  ModalInput,
+  StaticTimer
 } from "../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../theme"
 import LinearGradient from "react-native-linear-gradient"
@@ -378,7 +379,7 @@ const ExerciseScreen = props => {
           <Image style={styles.leftImageStyle} source={Images.backArrow} />
         </TouchableOpacity>
         <View style={[row, alignItemsEnd, styles.timerStyle]}>
-          {/* <StaticTimer
+          <StaticTimer
             startTimer={startTimer}
             minutes={minutes}
             setMinutes={setMinutes}
@@ -386,7 +387,7 @@ const ExerciseScreen = props => {
             setSeconds={setSeconds}
             hours={hours}
             setHours={setHours}
-          /> */}
+          />
         </View>
         <View />
       </View>
