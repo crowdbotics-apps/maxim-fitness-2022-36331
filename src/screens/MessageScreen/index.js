@@ -107,7 +107,6 @@ const MessageScreen = props => {
               (_, response) => {
                 if (response?.channels) {
                   const lastMessage = response.channels[item.channel.id][0]
-
                   if (lastMessage?.message?.sender !== userProfile?.id) {
                     pubnub
                       .messageCounts({
