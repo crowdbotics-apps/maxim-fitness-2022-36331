@@ -183,7 +183,7 @@ class Week(models.Model):
     week = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.program}"
+        return f"{self.program}  week:{self.week}"
 
 
 class Day(models.Model):
@@ -201,7 +201,7 @@ class Day(models.Model):
     name = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.id}_{self.week}  name: {self.name}"
+        return f"{self.id} week: {self.week}  name: {self.name}"
 
 
 class ProgramExercise(models.Model):

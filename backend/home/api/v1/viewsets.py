@@ -956,7 +956,6 @@ class SessionViewSet(ModelViewSet):
             session_id = self.request.data.get("session_id")
             w_session = Session.objects.get(id=session_id)
             w_session.name = workout_title
-            w_session.cardio = True if not w_session.strength else False
             w_session.save()
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
@@ -988,6 +987,7 @@ class SessionViewSet(ModelViewSet):
                 date_time=session_date,
                 program=session.program,
                 cardio=session.cardio,
+                strength=session.strength,
                 cardio_length=session.cardio_length,
                 cardio_frequency=session.cardio_frequency,
                 heart_rate=session.heart_rate,
