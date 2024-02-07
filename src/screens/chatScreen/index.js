@@ -157,7 +157,7 @@ const ChatScreen = props => {
       }
       const channel = item.id
       sendMessages(pubnub, channel, payload).then(res => {
-        // memberships(res)
+        memberships(res)
         setTextInput("")
       })
     } else {
@@ -171,7 +171,7 @@ const ChatScreen = props => {
           {
             id: item?.id,
             custom: {
-              lastReadTimetoken: res?.timetoken
+              lastReadTimetoken: res?.response?.timetoken
             }
           }
         ]
