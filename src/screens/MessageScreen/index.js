@@ -68,9 +68,6 @@ const MessageScreen = props => {
   }
 
   useEffect(() => {
-    if (!dispatch) {
-      return
-    }
     pubnub.addListener({
       message: () => {
         unreadMessage()

@@ -27,7 +27,8 @@ import {
   sendMessages,
   pubnubTimeTokenToDatetime,
   messageTimeTokene,
-  getPubNubTimetoken
+  getPubNubTimetoken,
+  fetchChannels
 } from "../../utils/chat"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
@@ -52,9 +53,26 @@ const ChatScreen = props => {
   const [loading, setLoading] = useState(false)
 
   const [textInput, setTextInput] = useState("")
+  const bootstrap = () => {
+    fetchChannels(pubnub, userProfile?.id).then(channels => {
+      Object.entries(channels)
+        .map(([id, rest]) => ({
+          id,
+          ...rest
+        }))
+        .filter(item => {
+          return item.name
+        })
+        .map(obj => {
+          obj?.id && pubnub.subscribe({ channels: [obj?.id] })
+          return { ...obj }
+        })
+    })
+  }
 
   useEffect(() => {
     setLoading(true)
+    bootstrap()
     try {
       pubnub.fetchMessages(
         {
@@ -139,7 +157,7 @@ const ChatScreen = props => {
       }
       const channel = item.id
       sendMessages(pubnub, channel, payload).then(res => {
-        memberships(res)
+        // memberships(res)
         setTextInput("")
       })
     } else {
