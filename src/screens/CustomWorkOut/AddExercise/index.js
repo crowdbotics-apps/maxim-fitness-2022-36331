@@ -165,7 +165,11 @@ const AddExercies = props => {
                   key={i}
                   onPress={() => {
                     setSelectedItem([])
-                    setActiveSet(set)
+                    if (activeSet?.id === set?.id) {
+                      setActiveSet("")
+                    } else {
+                      setActiveSet(set)
+                    }
                   }}
                   style={[
                     styles.pillStyle,

@@ -142,7 +142,7 @@ const EditProfile = props => {
           await setChannelMetadata(pubnub, `${item?.id}`, {
             name: `${item?.name}`,
             custom: {
-              otherUserImage: item?.custom?.otherUserImage,
+              otherUserImage: item?.custom?.otherUserImage || "",
               otherUserName: item?.custom?.otherUserName,
               owner: item?.custom?.owner,
               ownerImage: userData?.profile_picture,
@@ -157,7 +157,7 @@ const EditProfile = props => {
               otherUserImage: userData?.profile_picture,
               otherUserName: userData?.first_name + " " + userData?.last_name,
               owner: item?.custom?.owner,
-              ownerImage: item?.custom?.ownerImage,
+              ownerImage: item?.custom?.ownerImage || "",
               ownerName: item?.custom?.ownerName,
               type: item?.custom?.type
             }

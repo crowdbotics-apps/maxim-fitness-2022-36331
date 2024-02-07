@@ -13,7 +13,8 @@ const ProfileComponent = ({
   onPressMsg,
   onPressSocial,
   unreadCount,
-  profile
+  profile,
+  countUnread
 }) => {
   const {
     row,
@@ -126,11 +127,11 @@ const ProfileComponent = ({
             size={25}
             // color="#000"
           />
-          {false && (
+          {countUnread ? (
             <View style={styles.messageStyle}>
-              <Text text={"2"} style={styles.messageStyleText} />
+              <Text text={countUnread} style={styles.messageStyleText} />
             </View>
-          )}
+          ) : null}
         </TouchableOpacity>
       </View>
     </View>

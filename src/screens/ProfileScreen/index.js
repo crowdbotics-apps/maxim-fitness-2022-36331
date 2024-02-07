@@ -659,54 +659,68 @@ const ProfileScreen = props => {
         onBackdropPress={() => setShowModal(false)}
         style={{ flex: 1, margin: 0 }}
       >
-        <View
-          style={{
-            backgroundColor: "black",
-            paddingHorizontal: 5,
-            flex: 1,
-            paddingTop: 20
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => setShowModal(false)}
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
             style={{
-              alignItems: "flex-end",
-              marginTop: Platform.OS === "android" ? 0 : 20
+              backgroundColor: "black",
+              paddingHorizontal: 5,
+              flex: 1,
+              paddingTop: 20
             }}
           >
-            <Image
-              source={Images.closeBtn}
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {loading && (
+                <View
+                  style={{
+                    alignSelf: "center",
+                    position: "absolute"
+                  }}
+                >
+                  <ActivityIndicator size="large" color="white" />
+                </View>
+              )}
+
+              <Video
+                source={{
+                  uri: videoUri
+                }}
+                style={{ height: "100%", width: "100%" }}
+                muted={false}
+                repeat={true}
+                // onEnd={() => setStart(false)}
+                resizeMode="stretch"
+                rate={1}
+                posterResizeMode="stretch"
+                playInBackground={true}
+                playWhenInactive={true}
+                ignoreSilentSwitch="ignore"
+                disableFocus={true}
+                mixWithOthers={"mix"}
+                controls={true}
+                onLoadStart={() => setLoading(true)}
+                onLoad={() => setLoading(false)}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
               style={{
-                height: 35,
-                width: 35
-                // borderWidth: 1
+                justifyContent: "flex-end",
+                right: 20,
+                alignItems: "flex-end",
+                position: "absolute",
+                marginTop: 20
               }}
-            />
-          </TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            {loading && <ActivityIndicator size="large" color="white" />}
-            <Video
-              source={{
-                uri: videoUri
-              }}
-              style={{ height: 300, width: "100%" }}
-              muted={false}
-              repeat={true}
-              // onEnd={() => setStart(false)}
-              resizeMode="cover"
-              rate={1}
-              posterResizeMode="cover"
-              playInBackground={true}
-              playWhenInactive={true}
-              ignoreSilentSwitch="ignore"
-              disableFocus={true}
-              mixWithOthers={"mix"}
-              controls={true}
-              onLoadStart={() => setLoading(true)}
-              onLoad={() => setLoading(false)}
-            />
+            >
+              <Image
+                source={Images.closeBtn}
+                style={{
+                  height: 35,
+                  width: 35
+                }}
+              />
+            </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     </>
   )

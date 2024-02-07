@@ -24,7 +24,8 @@ import {
   BottomSheet,
   InputField,
   Button,
-  ModalInput
+  ModalInput,
+  StaticTimer
 } from "../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../theme"
 import LinearGradient from "react-native-linear-gradient"
@@ -137,7 +138,10 @@ const ExerciseScreen = props => {
         )
       case "r":
         return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Sigle Sets"} />
+          <SetsComponents
+            colors={["#60d937", "#60d937"]}
+            text={"Single Sets"}
+          />
         )
       default:
         break
@@ -375,7 +379,7 @@ const ExerciseScreen = props => {
           <Image style={styles.leftImageStyle} source={Images.backArrow} />
         </TouchableOpacity>
         <View style={[row, alignItemsEnd, styles.timerStyle]}>
-          {/* <StaticTimer
+          <StaticTimer
             startTimer={startTimer}
             minutes={minutes}
             setMinutes={setMinutes}
@@ -383,7 +387,7 @@ const ExerciseScreen = props => {
             setSeconds={setSeconds}
             hours={hours}
             setHours={setHours}
-          /> */}
+          />
         </View>
         <View />
       </View>
@@ -403,7 +407,7 @@ const ExerciseScreen = props => {
               selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
-                    disabled={timmer}
+                    // disabled={timmer}
                     onPress={() => selectExercise(item, i)}
                     style={[
                       row,
@@ -471,7 +475,7 @@ const ExerciseScreen = props => {
                     <View
                       style={{
                         justifyContent: "center",
-                        flex: 1,
+                        height: 220,
                         alignItems: "center"
                       }}
                     >
@@ -565,7 +569,7 @@ const ExerciseScreen = props => {
                               "#d3d3d3"
                             }
                             repsWeightState={repsWeightState}
-                            disabled={timmer}
+                            // disabled={timmer}
                           />
                         ))}
                       </ScrollView>
@@ -597,7 +601,7 @@ const ExerciseScreen = props => {
                           loadingReps={props.loader}
                           repsColor={repsColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader || timmer}
+                          disabled={props.loader}
                         />
                         <FatExerciseButton
                           weight
@@ -619,7 +623,7 @@ const ExerciseScreen = props => {
                           loadingWeight={props.loader}
                           weightColor={weightColor}
                           repsWeightState={repsWeightState}
-                          disabled={props.loader || timmer}
+                          disabled={props.loader}
                         />
                       </View>
                     )}
@@ -634,7 +638,7 @@ const ExerciseScreen = props => {
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        disabled={timmer}
+                        // disabled={timmer}
                       />
                       <FatGradientIconButton
                         buttonText={
@@ -675,7 +679,7 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                         setStartTimer(false)
                       }}
-                      isDisable={timmer || !checkDoneExcercise()}
+                      isDisable={timmer}
                     />
                   </ScrollView>
                 </View>
@@ -692,9 +696,11 @@ const ExerciseScreen = props => {
           behavior="padding"
           style={[fill, { width: "100%", marginTop: 20 }]}
         >
-          <View style={[center, regularHMargin]}>
+          <View style={[regularHMargin]}>
             {selectedSession?.[active]?.exercise?.description ? (
-              <Text text={selectedSession?.[active]?.exercise.description} />
+              selectedSession?.[active]?.exercise?.description
+                ?.split("/n")
+                .map(item => <Text text={item} />)
             ) : (
               <Text text={"No Description is available!"} />
             )}
@@ -912,32 +918,53 @@ const ExerciseScreen = props => {
           <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
             {modal === "ss" || modal === "gs" ? (
               <>
-                {repsWeightState?.exercises?.map((exercise, index) => {
-                  return (
-                    <View key={index} style={justifyContentCenter}>
-                      <View style={[row, fill, regularVMargin]}>
-                        <Text
-                          regularTitle
-                          color="quinary"
-                          text={`${
-                            (index + 1 === 1 && "a") ||
-                            (index + 1 === 2 && "b") ||
-                            (index + 1 === 3 && "c") ||
-                            (index + 1 === 4 && "d")
-                          }. ${exercise?.name}`}
-                        />
+                {repsWeightState?.exercises?.length > 0 ? (
+                  repsWeightState?.exercises?.map((exercise, index) => {
+                    return (
+                      <View key={index} style={justifyContentCenter}>
+                        <View style={[row, fill, regularVMargin]}>
+                          <Text
+                            regularTitle
+                            color="quinary"
+                            text={`${
+                              (index + 1 === 1 && "a") ||
+                              (index + 1 === 2 && "b") ||
+                              (index + 1 === 3 && "c") ||
+                              (index + 1 === 4 && "d")
+                            }. ${exercise?.name}`}
+                          />
+                        </View>
+                        <View style={center}>
+                          <Image
+                            source={{
+                              uri: exercise?.video_thumbnail
+                            }}
+                            style={styles.modalImageStyle}
+                          />
+                        </View>
                       </View>
-                      <View style={center}>
-                        <Image
-                          source={{
-                            uri: exercise?.pictures[0]?.image_url
-                          }}
-                          style={styles.modalImageStyle}
-                        />
-                      </View>
+                    )
+                  })
+                ) : (
+                  <>
+                    <View style={[row, fill, regularVMargin]}>
+                      <Text
+                        regularTitle
+                        color="quinary"
+                        text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                      />
                     </View>
-                  )
-                })}
+                    <View style={center}>
+                      <Image
+                        source={{
+                          uri: selectedSession?.[active]?.exercise
+                            ?.video_thumbnail
+                        }}
+                        style={styles.modalImageStyle}
+                      />
+                    </View>
+                  </>
+                )}
               </>
             ) : (
               <>
@@ -948,11 +975,11 @@ const ExerciseScreen = props => {
                     text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                   />
                 </View>
+
                 <View style={center}>
                   <Image
                     source={{
-                      uri: selectedSession?.[active]?.exercise?.pictures[0]
-                        ?.image_url
+                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />
@@ -1021,9 +1048,9 @@ const styles = StyleSheet.create({
   modalCrossIcon: { margin: 10 },
   modalImageStyle: {
     borderRadius: 20,
-    width: 170,
+    width: 220,
     height: 170,
-    resizeMode: "contain"
+    resizeMode: "stretch"
   },
   leftIconStyle: {
     left: 0,

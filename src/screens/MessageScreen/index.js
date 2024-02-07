@@ -16,9 +16,11 @@ import { Text } from "../../components"
 import { useFocusEffect } from "@react-navigation/native"
 import { usePubNub } from "pubnub-react"
 import {
+  fetchAndAddTimeTokens,
   fetchChannels,
   getByValue,
   makeChannelsList,
+  messageTimeTokene,
   timeSince,
   useStore
 } from "../../utils/chat"
@@ -52,9 +54,17 @@ const MessageScreen = props => {
           return { ...obj }
         })
 
-      dispatch({ channels })
-      setLoading(false)
+      fetchAndAddTimeTokens(channels, pubnub)
+        .then(updatedData => {
+          dispatch({ channels: updatedData })
+          setLoading(false)
+        })
+        .catch(error => {
+          setLoading(false)
+        })
     })
+
+    unreadMessage()
   }
 
   useEffect(() => {
@@ -62,11 +72,17 @@ const MessageScreen = props => {
       return
     }
     pubnub.addListener({
-      message: unreadMessage
+      message: () => {
+        unreadMessage()
+      }
     })
-
-    bootstrap()
   }, [])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      bootstrap()
+    }, [])
+  )
 
   useEffect(() => {
     if (state?.channels) {
@@ -84,23 +100,37 @@ const MessageScreen = props => {
       })
       .then(res => {
         let countData = []
-        res?.data?.map(item => {
+        res?.data?.forEach(item => {
           if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
-            pubnub
-              .messageCounts({
+            pubnub.fetchMessages(
+              {
                 channels: [item?.channel?.id],
-                channelTimetokens: [item?.custom?.lastReadTimetoken]
-              })
-              .then(resMsg => {
-                Object.entries(resMsg?.channels)
-                  .map(([id, rest]) => ({
-                    id,
-                    rest
-                  }))
-                  .map(obj => {
-                    countData.push({ id: obj?.id, count: obj?.rest })
-                  })
-              })
+                count: 1
+              },
+              (_, response) => {
+                if (response?.channels) {
+                  const lastMessage = response.channels[item.channel.id][0]
+
+                  if (lastMessage?.message?.sender !== userProfile?.id) {
+                    pubnub
+                      .messageCounts({
+                        channels: [item?.channel?.id],
+                        channelTimetokens: [item?.custom?.lastReadTimetoken]
+                      })
+                      .then(resMsg => {
+                        Object.entries(resMsg?.channels)
+                          .map(([id, rest]) => ({
+                            id,
+                            rest
+                          }))
+                          .map(obj => {
+                            countData.push({ id: obj?.id, count: obj?.rest })
+                          })
+                      })
+                  }
+                }
+              }
+            )
           }
         })
         setTimeout(() => {
@@ -115,17 +145,19 @@ const MessageScreen = props => {
         id,
         ...rest
       }))
+
       const filterChannels = channels.filter(
         channel =>
-          channel.name
+          channel?.name
             .split("-")[1]
             .toLowerCase()
             .includes(search.toLowerCase()) ||
-          (channel?.custom?.firstLastName &&
-            channel?.custom?.firstLastName
-              .split("/")[1]
-              .toLowerCase()
-              .includes(search.toLowerCase()))
+          (channel?.custom?.owner === profile.id
+            ? channel?.custom?.otherUserName
+            : channel?.custom?.ownerName
+          )
+            .toLowerCase()
+            .includes(search.toLowerCase())
       )
       const DATA = makeChannelsList(filterChannels)
       setConversationList(DATA)
@@ -155,20 +187,6 @@ const MessageScreen = props => {
           })
       }
     })
-  }
-
-  const userProfileData = item => {
-    if (item?.custom?.userOne?.length) {
-      const userOne = JSON.parse(item?.custom?.userOne)
-      const userTwo = JSON.parse(item?.custom?.userTwo)
-      if (item?.custom?.owner === userOne.id) {
-        return userTwo
-      } else if (item?.custom?.owner === userTwo.id) {
-        return userOne
-      }
-    } else {
-      return null
-    }
   }
 
   const countUnRead = item => {
@@ -237,6 +255,11 @@ const MessageScreen = props => {
                 </Text>
               </View>
             ) : null}
+            {item?.timeToken && (
+              <Text style={styles.LastSeenText}>
+                {messageTimeTokene(item?.timeToken)}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -321,9 +344,9 @@ const MessageScreen = props => {
         <SectionList
           keyboardShouldPersistTaps="handled"
           refreshing={loading}
-          onRefresh={async () => {
+          onRefresh={() => {
             unreadMessage()
-            await bootstrap()
+            bootstrap()
           }}
           sections={conversationList}
           keyExtractor={(item, index) => item + index}
