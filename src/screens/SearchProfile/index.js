@@ -145,6 +145,20 @@ const SearchProfile = props => {
           }
         }
       })
+      pubnub.time().then(item =>
+        pubnub.objects
+          .setMemberships({
+            channels: [
+              {
+                id: res.channel,
+                custom: {
+                  lastReadTimetoken: item.timetoken
+                }
+              }
+            ]
+          })
+          .then(res => {})
+      )
     } catch (err) {}
   }
 
