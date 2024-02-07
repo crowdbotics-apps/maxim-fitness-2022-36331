@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  BackHandler
 } from "react-native"
 import { connect } from "react-redux"
 import moment from "moment"
@@ -52,6 +53,41 @@ const ChatScreen = props => {
   const [loading, setLoading] = useState(false)
 
   const [textInput, setTextInput] = useState("")
+
+  function handleBackButtonClick() {
+    handleBack()
+    return true
+  }
+
+  const handleBack = () => {
+    navigation.goBack()
+    if (messages?.length) {
+      pubnub.objects
+        .setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: parseInt(
+                  messages?.[messages?.length - 1]?.timetoken
+                )
+              }
+            }
+          ]
+        })
+        .then(res => {})
+    }
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        "hardwareBackPress",
+        handleBackButtonClick
+      )
+    }
+  }, [])
 
   useEffect(() => {
     setLoading(true)
@@ -162,7 +198,7 @@ const ChatScreen = props => {
   }
   const fileUpload = async (item, res) => {
     try {
-      await pubnub.sendFile({
+      const data = await pubnub.sendFile({
         channel: item.id,
         message: {
           createdAt: new Date(),
@@ -181,7 +217,20 @@ const ChatScreen = props => {
           mimeType: res.assets[0].type
         }
       })
+
       setIsUpload(false)
+      if (data?.timetoken) {
+        pubnub.objects.setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: parseInt(data?.timetoken)
+              }
+            }
+          ]
+        })
+      }
     } catch (e) {}
   }
 
@@ -232,7 +281,7 @@ const ChatScreen = props => {
       >
         <Image
           style={styles.ImageContainer}
-          resizeMode="cover"
+          // resizeMode="cover"
           source={{ uri: result }}
         />
       </TouchableOpacity>
@@ -253,7 +302,7 @@ const ChatScreen = props => {
         >
           <TouchableOpacity
             style={{ justifyContent: "center", flex: 1 }}
-            onPress={() => navigation.goBack()}
+            onPress={() => handleBack()}
           >
             <Image source={backImage} style={{ height: 20, width: 30 }} />
           </TouchableOpacity>
@@ -539,7 +588,7 @@ const styles = StyleSheet.create({
     padding: 5
   },
   ImageContainer: {
-    width: "100%",
+    width: (270 / 375) * width,
     height: 150
   },
   closeBtn: {

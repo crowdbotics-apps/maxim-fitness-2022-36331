@@ -1,31 +1,31 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { all, call, put, takeLatest } from "redux-saga/effects"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 // config
-import { API_URL } from '../config/app';
-import { setAccessToken } from './loginRedux'
-import { navigate } from '../navigation/NavigationService';
-
+import { API_URL } from "../config/app"
+import { setAccessToken } from "./loginRedux"
+import { navigate } from "../navigation/NavigationService"
 
 // utils
-import XHR from 'src/utils/XHR';
+import XHR from "src/utils/XHR"
 
 //Types
-const GET_PLAN_REQUEST = 'SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST';
-const GET_PLAN_SUCCESS = 'SUBSCRIPTION_SCREEN/GET_PLAN_SUCCESS';
-const GET_PLAN_FAILURE = 'SUBSCRIPTION_SCREEN/GET_PLAN_FAILURE';
-const NEW_SUBSCRIPTION = 'SUBSCRIPTION_SCREEN/NEW_SUBSCRIPTION';
-const RESET = 'SUBSCRIPTION_SCREEN/RESET';
+const GET_PLAN_REQUEST = "SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST"
+const GET_PLAN_SUCCESS = "SUBSCRIPTION_SCREEN/GET_PLAN_SUCCESS"
+const GET_PLAN_FAILURE = "SUBSCRIPTION_SCREEN/GET_PLAN_FAILURE"
+const NEW_SUBSCRIPTION = "SUBSCRIPTION_SCREEN/NEW_SUBSCRIPTION"
+const RESET = "SUBSCRIPTION_SCREEN/RESET"
 
+const GET_CUSTOMERID_REQUEST = "SUBSCRIPTION_SCREEN/GET_CUSTOMERID_REQUEST"
+const GET_CUSTOMERID_SUCCESS = "SUBSCRIPTION_SCREEN/GET_CUSTOMERID_SUCCESS"
+const GET_CUSTOMERID_FAILURE = "SUBSCRIPTION_SCREEN/GET_CUSTOMERID_FAILURE"
 
-
-const GET_CUSTOMERID_REQUEST = 'SUBSCRIPTION_SCREEN/GET_CUSTOMERID_REQUEST';
-const GET_CUSTOMERID_SUCCESS = 'SUBSCRIPTION_SCREEN/GET_CUSTOMERID_SUCCESS';
-const GET_CUSTOMERID_FAILURE = 'SUBSCRIPTION_SCREEN/GET_CUSTOMERID_FAILURE';
-
-const POST_SUBSCRIPTION_REQUEST = 'SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_REQUEST';
-const POST_SUBSCRIPTION_SUCCESS = 'SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_SUCCESS';
-const POST_SUBSCRIPTION_FAILURE = 'SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_FAILURE';
+const POST_SUBSCRIPTION_REQUEST =
+  "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_REQUEST"
+const POST_SUBSCRIPTION_SUCCESS =
+  "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_SUCCESS"
+const POST_SUBSCRIPTION_FAILURE =
+  "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_FAILURE"
 
 const initialState = {
   requesting: false,
@@ -94,10 +94,8 @@ export const newSubScription = data => ({
 })
 
 export const reset = () => ({
-  type: RESET,
+  type: RESET
 })
-
-
 
 //Reducers
 export const subscriptionReducer = (state = initialState, action) => {
@@ -159,17 +157,17 @@ export const subscriptionReducer = (state = initialState, action) => {
         requesting: false
       }
 
-   case NEW_SUBSCRIPTION:
+    case NEW_SUBSCRIPTION:
       return {
         ...state,
-        subscriptionData: action.data,
+        subscriptionData: action.data
       }
-      
-      case RESET:
-        return {
-          ...state,
-          requesting: false
-        }
+
+    case RESET:
+      return {
+        ...state,
+        requesting: false
+      }
 
     default:
       return state
@@ -179,11 +177,11 @@ export const subscriptionReducer = (state = initialState, action) => {
 //Saga
 async function getPlanAPI() {
   const URL = `${API_URL}/payment/get_plans/`
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem("authToken")
   const options = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Token  ${token}`
     }
   }
@@ -193,14 +191,11 @@ async function getPlanAPI() {
 function* getFeeds() {
   try {
     const response = yield call(getPlanAPI)
-    console.log('get plan success response----', response);
     yield put(getPlanSuccess(response.data.data))
   } catch (e) {
     const { response } = e
-    console.log('get plan error response----', response);
     yield put(getPlanFailure(e))
-  }
-  finally {
+  } finally {
     yield put(reset())
   }
 }
@@ -208,11 +203,11 @@ function* getFeeds() {
 //Saga
 async function getCustomerIdAPI() {
   const URL = `${API_URL}/payment/get_customer_id/`
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem("authToken")
   const options = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Token  ${token}`
     }
   }
@@ -222,11 +217,11 @@ async function getCustomerIdAPI() {
 function* getCustomerId() {
   try {
     const response = yield call(getCustomerIdAPI)
-    console.log('customer id success response-----', response);
+
     yield put(getCustomerIdSuccess(response.data.data))
   } catch (e) {
-    const { response} = e
-    console.log('get id failure response----', response);
+    const { response } = e
+
     yield put(getCustomerIdFailure(e))
   }
 }
@@ -234,11 +229,11 @@ function* getCustomerId() {
 //Saga
 async function postSubscriptionAPI(data) {
   const URL = `${API_URL}/payment/create_subscription/`
-  const token = await AsyncStorage.getItem('authToken')
+  const token = await AsyncStorage.getItem("authToken")
   const options = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Token  ${token}`
     },
     data
@@ -247,20 +242,17 @@ async function postSubscriptionAPI(data) {
 }
 
 function* postSubscription({ data }) {
-  console.log('subscription data: ', data)
   try {
     const response = yield call(postSubscriptionAPI, data)
-    const token = AsyncStorage.getItem('authToken')
+    const token = AsyncStorage.getItem("authToken")
     yield put(setAccessToken(token))
-    console.log('SUBSCRIPTION RESPONSE: ', response);
+
     yield put(newSubScription(response.data))
-     navigate('Feeds')
+    navigate("Feeds")
   } catch (e) {
-    console.log('SUBSCRIPTION ERROR: ', e);
     const { response } = e
     // yield put(postSubscriptionFailure(e))
-  }
-  finally {
+  } finally {
     yield put(reset())
   }
 }
@@ -268,5 +260,5 @@ function* postSubscription({ data }) {
 export default all([
   takeLatest(GET_PLAN_REQUEST, getFeeds),
   takeLatest(GET_CUSTOMERID_REQUEST, getCustomerId),
-  takeLatest(POST_SUBSCRIPTION_REQUEST, postSubscription),
+  takeLatest(POST_SUBSCRIPTION_REQUEST, postSubscription)
 ])
