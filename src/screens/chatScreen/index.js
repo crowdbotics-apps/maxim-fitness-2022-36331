@@ -8,8 +8,10 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  BackHandler,
+  Platform,
+  KeyboardAvoidingView
 } from "react-native"
 import { connect } from "react-redux"
 import moment from "moment"
@@ -29,7 +31,6 @@ import {
   messageTimeTokene,
   getPubNubTimetoken
 } from "../../utils/chat"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 const { width } = Dimensions.get("window")
 
@@ -52,6 +53,41 @@ const ChatScreen = props => {
   const [loading, setLoading] = useState(false)
 
   const [textInput, setTextInput] = useState("")
+
+  function handleBackButtonClick() {
+    handleBack()
+    return true
+  }
+
+  const handleBack = () => {
+    navigation.goBack()
+    if (messages?.length) {
+      pubnub.objects
+        .setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: parseInt(
+                  messages?.[messages?.length - 1]?.timetoken
+                )
+              }
+            }
+          ]
+        })
+        .then(res => {})
+    }
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick)
+    return () => {
+      BackHandler.removeEventListener(
+        "hardwareBackPress",
+        handleBackButtonClick
+      )
+    }
+  }, [])
 
   useEffect(() => {
     setLoading(true)
@@ -153,7 +189,7 @@ const ChatScreen = props => {
           {
             id: item?.id,
             custom: {
-              lastReadTimetoken: res?.timetoken
+              lastReadTimetoken: res?.response?.timetoken
             }
           }
         ]
@@ -162,7 +198,7 @@ const ChatScreen = props => {
   }
   const fileUpload = async (item, res) => {
     try {
-      await pubnub.sendFile({
+      const data = await pubnub.sendFile({
         channel: item.id,
         message: {
           createdAt: new Date(),
@@ -181,7 +217,20 @@ const ChatScreen = props => {
           mimeType: res.assets[0].type
         }
       })
+
       setIsUpload(false)
+      if (data?.timetoken) {
+        pubnub.objects.setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: parseInt(data?.timetoken)
+              }
+            }
+          ]
+        })
+      }
     } catch (e) {}
   }
 
@@ -232,7 +281,7 @@ const ChatScreen = props => {
       >
         <Image
           style={styles.ImageContainer}
-          resizeMode="cover"
+          // resizeMode="cover"
           source={{ uri: result }}
         />
       </TouchableOpacity>
@@ -243,107 +292,180 @@ const ChatScreen = props => {
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         {isUpload && <Loader />}
-
-        <View
-          style={{
-            paddingHorizontal: 20,
-            flexDirection: "row",
-            marginTop: 20
-          }}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : null}
         >
-          <TouchableOpacity
-            style={{ justifyContent: "center", flex: 1 }}
-            onPress={() => navigation.goBack()}
+          <View
+            style={{
+              paddingHorizontal: 20,
+              flexDirection: "row",
+              marginTop: 20
+            }}
           >
-            <Image source={backImage} style={{ height: 20, width: 30 }} />
-          </TouchableOpacity>
-          <View style={{ flex: 1.5 }}>
-            <Image
-              source={
-                userProfile?.id === item?.custom?.owner &&
-                item?.custom?.otherUserImage
-                  ? { uri: item?.custom?.otherUserImage }
-                  : userProfile?.id !== item?.custom?.owner &&
-                    item?.custom?.ownerImage
-                  ? { uri: item?.custom?.ownerImage }
-                  : profile
-              }
-              style={{
-                height: (61 / 375) * width,
-                width: (61 / 375) * width,
-                borderRadius: (31 / 375) * width
-              }}
-            />
-          </View>
-        </View>
-        <KeyboardAwareScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={{ paddingBottom: 10, flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() =>
-            scrollViewRef?.current?.scrollToEnd({ animated: true })
-          }
-        >
-          <View style={{ alignItems: "center", marginTop: 10 }}>
-            <Text
-              text={
-                userProfile?.id === item?.custom?.owner
-                  ? item?.custom?.otherUserName
-                  : item?.custom?.ownerName
-              }
-              bold
-              style={{ fontSize: 20 }}
-            />
-
-            <Text
-              text={
-                item?.name?.split("-")[
-                  userProfile?.id === item.custom.owner ? 1 : 0
-                ]
-              }
-              style={{ fontSize: 16, opacity: 0.5, marginTop: 5 }}
-            />
-            {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
-            {item?.updated && (
-              <Text
-                text={pubnubTimeTokenToDatetime(item?.updated)}
-                style={{ color: "#D3D3D3", fontSize: 14, marginTop: 20 }}
-              />
-            )}
-          </View>
-          <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
-            {loading ? (
-              <View
+            <TouchableOpacity
+              style={{ justifyContent: "center", flex: 1 }}
+              onPress={() => handleBack()}
+            >
+              <Image source={backImage} style={{ height: 20, width: 30 }} />
+            </TouchableOpacity>
+            <View style={{ flex: 1.5 }}>
+              <Image
+                source={
+                  userProfile?.id === item?.custom?.owner &&
+                  item?.custom?.otherUserImage
+                    ? { uri: item?.custom?.otherUserImage }
+                    : userProfile?.id !== item?.custom?.owner &&
+                      item?.custom?.ownerImage
+                    ? { uri: item?.custom?.ownerImage }
+                    : profile
+                }
                 style={{
-                  marginTop: 30
+                  height: (61 / 375) * width,
+                  width: (61 / 375) * width,
+                  borderRadius: (31 / 375) * width
                 }}
-              >
-                <ActivityIndicator size={"large"} color={"black"} />
-              </View>
-            ) : (
-              messages &&
-              messages?.map(items => (
-                <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                  {(items?.message?.sender ||
-                    items?.message?.message?.sender) === userProfile.id ? (
-                    <>
+              />
+            </View>
+          </View>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={{ paddingBottom: 10, flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={() =>
+              scrollViewRef?.current?.scrollToEnd({ animated: true })
+            }
+          >
+            <View style={{ alignItems: "center", marginTop: 10 }}>
+              <Text
+                text={
+                  userProfile?.id === item?.custom?.owner
+                    ? item?.custom?.otherUserName
+                    : item?.custom?.ownerName
+                }
+                bold
+                style={{ fontSize: 20 }}
+              />
+
+              <Text
+                text={
+                  item?.name?.split("-")[
+                    userProfile?.id === item.custom.owner ? 1 : 0
+                  ]
+                }
+                style={{ fontSize: 16, opacity: 0.5, marginTop: 5 }}
+              />
+              {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
+              {item?.updated && (
+                <Text
+                  text={pubnubTimeTokenToDatetime(item?.updated)}
+                  style={{ color: "#D3D3D3", fontSize: 14, marginTop: 20 }}
+                />
+              )}
+            </View>
+            <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
+              {loading ? (
+                <View
+                  style={{
+                    marginTop: 30
+                  }}
+                >
+                  <ActivityIndicator size={"large"} color={"black"} />
+                </View>
+              ) : (
+                messages &&
+                messages?.map(items => (
+                  <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                    {(items?.message?.sender ||
+                      items?.message?.message?.sender) === userProfile.id ? (
+                      <>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                            flex: 1
+                          }}
+                        >
+                          <View style={[styles.senderStyle]}>
+                            {items?.message?.file ? (
+                              <>
+                                {renderMessageImage(items?.message?.file)}
+                                <View
+                                  style={{
+                                    alignItems: "flex-end"
+                                  }}
+                                >
+                                  <Text
+                                    text={`${messageTimeTokene(
+                                      items?.timetoken
+                                    )}`}
+                                    bold
+                                    style={{ fontSize: 12, opacity: 0.6 }}
+                                  />
+                                </View>
+                              </>
+                            ) : (
+                              <View
+                                style={{
+                                  alignItems: "flex-end"
+                                }}
+                              >
+                                <Text
+                                  text={items?.message?.message}
+                                  bold
+                                  style={{ fontSize: 14 }}
+                                />
+                                <Text
+                                  text={`${messageTimeTokene(
+                                    items?.timetoken
+                                  )}`}
+                                  bold
+                                  style={{ fontSize: 12, opacity: 0.6 }}
+                                />
+                              </View>
+                            )}
+                          </View>
+                          <Image
+                            source={
+                              userProfile?.profile_picture
+                                ? { uri: userProfile?.profile_picture }
+                                : profile
+                            }
+                            style={styles.imageStyle}
+                          />
+                        </View>
+                      </>
+                    ) : (
                       <View
                         style={{
-                          flexDirection: "row",
-                          justifyContent: "flex-end",
-                          flex: 1
+                          flexDirection: "row"
                         }}
                       >
-                        <View style={[styles.senderStyle]}>
+                        <Image
+                          source={
+                            userProfile?.id === item?.custom?.owner &&
+                            item?.custom?.otherUserImage
+                              ? { uri: item?.custom?.otherUserImage }
+                              : userProfile?.id !== item?.custom?.owner &&
+                                item?.custom?.ownerImage
+                              ? { uri: item?.custom?.ownerImage }
+                              : profile
+                          }
+                          style={styles.imageStyle}
+                        />
+                        <View style={styles.receiverStyle}>
                           {items?.message?.file ? (
-                            renderMessageImage(items?.message?.file)
+                            <>
+                              {renderMessageImage(items?.message?.file)}
+                              <Text
+                                text={`${messageTimeTokene(items?.timetoken)}`}
+                                bold
+                                style={{ fontSize: 12, opacity: 0.6 }}
+                              />
+                            </>
                           ) : (
-                            <View
-                              style={{
-                                alignItems: "flex-end"
-                              }}
-                            >
+                            <View>
                               <Text
                                 text={items?.message?.message}
                                 bold
@@ -357,152 +479,107 @@ const ChatScreen = props => {
                             </View>
                           )}
                         </View>
-                        <Image
-                          source={
-                            userProfile?.profile_picture
-                              ? { uri: userProfile?.profile_picture }
-                              : profile
-                          }
-                          style={styles.imageStyle}
-                        />
                       </View>
-                    </>
-                  ) : (
-                    <View
-                      style={{
-                        flexDirection: "row"
-                      }}
-                    >
-                      <Image
-                        source={
-                          userProfile?.id === item?.custom?.owner &&
-                          item?.custom?.otherUserImage
-                            ? { uri: item?.custom?.otherUserImage }
-                            : userProfile?.id !== item?.custom?.owner &&
-                              item?.custom?.ownerImage
-                            ? { uri: item?.custom?.ownerImage }
-                            : profile
-                        }
-                        style={styles.imageStyle}
-                      />
-                      <View style={styles.receiverStyle}>
-                        {items?.message?.file ? (
-                          renderMessageImage(items?.message?.file)
-                        ) : (
-                          <View>
-                            <Text
-                              text={items?.message?.message}
-                              bold
-                              style={{ fontSize: 14 }}
-                            />
-                            <Text
-                              text={`${messageTimeTokene(items?.timetoken)}`}
-                              bold
-                              style={{ fontSize: 12, opacity: 0.6 }}
-                            />
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  )}
-                </View>
-              ))
-            )}
-          </View>
-        </KeyboardAwareScrollView>
-        <View
-          style={{
-            backgroundColor: "#FFF",
-            paddingVertical: 5,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            justifyContent: "space-between"
-          }}
-        >
-          <TextInput
-            style={{
-              borderWidth: 1,
-              width: "74%",
-              borderRadius: 20,
-              borderColor: "gray",
-              paddingLeft: 30,
-              height: 40
-            }}
-            placeholder="Write Message"
-            onChangeText={val => setTextInput(val)}
-            value={textInput}
-          />
-
+                    )}
+                  </View>
+                ))
+              )}
+            </View>
+          </ScrollView>
           <View
             style={{
+              backgroundColor: "#FFF",
+              paddingVertical: 5,
+              paddingHorizontal: 10,
               flexDirection: "row",
-              flex: 1,
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginHorizontal: 5
+              justifyContent: "space-between"
             }}
           >
-            <TouchableOpacity onPress={() => setIsOpen(true)}>
-              <Image
-                source={Images.emoji}
-                style={{
-                  height: (25 / 375) * width,
-                  width: (25 / 375) * width
-                }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={pickImage}>
-              <Image
-                source={uploadMedia}
-                style={{
-                  height: (25 / 375) * width,
-                  width: (25 / 375) * width
-                }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onSend}>
-              <Image
-                source={sendMessage}
-                style={{
-                  height: (25 / 375) * width,
-                  width: (25 / 375) * width
-                }}
-              />
-            </TouchableOpacity>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                width: "74%",
+                borderRadius: 20,
+                borderColor: "gray",
+                paddingLeft: 30,
+                height: 40
+              }}
+              placeholder="Write Message"
+              onChangeText={val => setTextInput(val)}
+              value={textInput}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                flex: 1,
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginHorizontal: 5
+              }}
+            >
+              <TouchableOpacity onPress={() => setIsOpen(true)}>
+                <Image
+                  source={Images.emoji}
+                  style={{
+                    height: (25 / 375) * width,
+                    width: (25 / 375) * width
+                  }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={pickImage}>
+                <Image
+                  source={uploadMedia}
+                  style={{
+                    height: (25 / 375) * width,
+                    width: (25 / 375) * width
+                  }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onSend}>
+                <Image
+                  source={sendMessage}
+                  style={{
+                    height: (25 / 375) * width,
+                    width: (25 / 375) * width
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {imageUrl && (
-          <ImageView
-            images={[{ uri: imageUrl }]}
-            imageIndex={0}
-            visible={visible}
-            onRequestClose={() => {
-              setImageUrl("")
-              setIsVisible(false)
+          {imageUrl && (
+            <ImageView
+              images={[{ uri: imageUrl }]}
+              imageIndex={0}
+              visible={visible}
+              onRequestClose={() => {
+                setImageUrl("")
+                setIsVisible(false)
+              }}
+              HeaderComponent={() => (
+                <View style={styles.closeBtn}>
+                  <TouchableOpacity onPress={() => setIsVisible(false)}>
+                    <Image
+                      source={Images.closeBtn}
+                      style={{ width: 35, height: 35 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          )}
+          <EmojiPicker
+            onEmojiSelected={handleOnEmojiSelected}
+            open={isOpen}
+            onClose={() => {
+              setIsOpen(false), setCurrentlySelected([])
             }}
-            HeaderComponent={() => (
-              <View style={styles.closeBtn}>
-                <TouchableOpacity onPress={() => setIsVisible(false)}>
-                  <Image
-                    source={Images.closeBtn}
-                    style={{ width: 35, height: 35 }}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
+            enableSearchBar
+            enableRecentlyUsed={false}
+            allowMultipleSelections={true}
+            selectedEmojis={currentlySelected}
           />
-        )}
-        <EmojiPicker
-          onEmojiSelected={handleOnEmojiSelected}
-          open={isOpen}
-          onClose={() => {
-            setIsOpen(false), setCurrentlySelected([])
-          }}
-          enableSearchBar
-          enableRecentlyUsed={false}
-          allowMultipleSelections={true}
-          selectedEmojis={currentlySelected}
-        />
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </>
   )
@@ -539,7 +616,7 @@ const styles = StyleSheet.create({
     padding: 5
   },
   ImageContainer: {
-    width: "100%",
+    width: (270 / 375) * width,
     height: 150
   },
   closeBtn: {

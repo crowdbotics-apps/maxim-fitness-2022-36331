@@ -68,9 +68,6 @@ const MessageScreen = props => {
   }
 
   useEffect(() => {
-    if (!dispatch) {
-      return
-    }
     pubnub.addListener({
       message: () => {
         unreadMessage()
@@ -110,7 +107,6 @@ const MessageScreen = props => {
               (_, response) => {
                 if (response?.channels) {
                   const lastMessage = response.channels[item.channel.id][0]
-
                   if (lastMessage?.message?.sender !== userProfile?.id) {
                     pubnub
                       .messageCounts({
@@ -221,7 +217,13 @@ const MessageScreen = props => {
               borderRadius: (31 / 375) * width
             }}
           />
-          <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              alignItems: "center"
+            }}
+          >
             <View
               style={{
                 justifyContent: "center",
@@ -229,37 +231,56 @@ const MessageScreen = props => {
                 flex: 1
               }}
             >
-              <Text
-                text={
-                  userProfile?.id === item?.custom?.owner
-                    ? item?.custom?.otherUserName
-                    : item?.custom?.ownerName
-                }
-                bold
-                style={{ fontSize: 12 }}
-              />
-              <Text
-                text={
-                  item.name?.split("-")[
-                    userProfile?.id === item.custom.owner ? 1 : 0
-                  ]
-                }
-                style={{ color: "#D3D3D3", fontSize: 12 }}
-              />
-            </View>
-
-            {countUnRead(item) ? (
-              <View style={styles.countStyle}>
-                <Text style={{ fontSize: 15, color: "white" }}>
-                  {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
-                </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text
+                  text={
+                    userProfile?.id === item?.custom?.owner
+                      ? item?.custom?.otherUserName
+                      : item?.custom?.ownerName
+                  }
+                  bold
+                  numberOfLines={1}
+                  style={{ fontSize: 12, flex: 1 }}
+                />
+                {item?.timeToken && (
+                  <Text style={styles.LastSeenText}>
+                    {messageTimeTokene(item?.timeToken)}
+                  </Text>
+                )}
               </View>
-            ) : null}
-            {item?.timeToken && (
-              <Text style={styles.LastSeenText}>
-                {messageTimeTokene(item?.timeToken)}
-              </Text>
-            )}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text
+                  text={
+                    item.name?.split("-")[
+                      userProfile?.id === item.custom.owner ? 1 : 0
+                    ]
+                  }
+                  style={{ color: "#D3D3D3", fontSize: 12 }}
+                />
+                {countUnRead(item) ? (
+                  <View style={styles.countStyle}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: "white"
+                      }}
+                    >
+                      {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -374,12 +395,15 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   countStyle: {
-    height: 30,
-    width: 30,
+    height: 25,
+    width: 25,
     backgroundColor: "red",
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center"
+  },
+  LastSeenText: {
+    alignItems: "flex-end"
   }
 })
 

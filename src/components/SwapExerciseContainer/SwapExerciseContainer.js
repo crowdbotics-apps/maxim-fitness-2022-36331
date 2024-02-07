@@ -52,7 +52,6 @@ const SwapExerciseContainer = props => {
       swapExercises(swapData, route?.params?.ScreenData?.date_time)
     }
   }
-  console.log("allExerciseSwapped", allExerciseSwapped)
 
   const renderItem = ({ item, index }) => {
     return (

@@ -17,10 +17,22 @@ export const createDirectChannel = (pubnub, userId, chatWithId, customData) => {
       })
 
       // Set channel members
-      await pubnub.objects.setChannelMembers({
-        channel,
-        uuids: [{ id: `${userId}` }, { id: `${chatWithId}` }]
-      })
+      pubnub.time().then(
+        async item =>
+          await pubnub.objects.setChannelMembers({
+            channel,
+            uuids: [
+              {
+                id: `${userId}`,
+                custom: { lastReadTimetoken: item?.timetoken }
+              },
+              {
+                id: `${chatWithId}`,
+                custom: { lastReadTimetoken: item?.timetoken }
+              }
+            ]
+          })
+      )
 
       //  Add channel to channel group
       // await pubnub.channelGroups.addChannels({
