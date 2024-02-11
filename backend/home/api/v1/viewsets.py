@@ -1240,39 +1240,37 @@ class PostViewSet(ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
+        with transaction.atomic():
+            post_image = []
+            post_video = []
+            image = ''
+            video = ''
+            if request.data.get("image"):
+                image = dict((request.data).lists())['image']
+            if request.data.get("video"):
+                video = dict((request.data).lists())['video']
+            post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
+            serializer = self.get_serializer(data=post_content)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                if image:
+                    for i in image:
+                        data = {'post': serializer.data.get("id"), 'image': i}
+                        post_image.append(data)
+                    post_image_serializer = PostImageSerializer(data=post_image, many=True)
+                    if post_image_serializer.is_valid(raise_exception=True):
+                        post_image_serializer.save()
+                if video:
+                    for v in video:
+                        data = {'post': serializer.data.get("id"), "video": v}
+                        post_video.append(data)
+                    post_video_serializer = PostVideoSerializer(data=post_video, many=True)
+                    if post_video_serializer.is_valid(raise_exception=True):
+                        post_video_serializer.save()
 
-        request_data = request.data
-
-        post_image = []
-        post_video = []
-        image = ''
-        video = ''
-        if request.data.get("image"):
-            image = dict((request.data).lists())['image']
-        if request.data.get("video"):
-            video = dict((request.data).lists())['video']
-        post_content = {"content": self.request.data.get("content") if self.request.data.get("content") else ""}
-        serializer = self.get_serializer(data=post_content)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            if image:
-                for i in image:
-                    data = {'post': serializer.data.get("id"), 'image': i}
-                    post_image.append(data)
-                post_image_serializer = PostImageSerializer(data=post_image, many=True)
-                if post_image_serializer.is_valid(raise_exception=True):
-                    post_image_serializer.save()
-            if video:
-                for v in video:
-                    data = {'post': serializer.data.get("id"), "video": v}
-                    post_video.append(data)
-                post_video_serializer = PostVideoSerializer(data=post_video, many=True)
-                if post_video_serializer.is_valid(raise_exception=True):
-                    post_video_serializer.save()
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def add_comment(self, request, pk=None):
