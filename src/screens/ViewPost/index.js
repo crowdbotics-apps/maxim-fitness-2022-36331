@@ -72,10 +72,9 @@ const ViewPost = props => {
   const [reportType, setReportType] = useState(false)
 
   const inputRef = useRef()
-
   useEffect(() => {
     if (route?.params) {
-      props.getPost(route?.params?.id ? route?.params?.id : route?.params)
+      props.getPost(route?.params?.id ? route?.params?.id : route?.params?.id)
     }
   }, [route?.params])
 

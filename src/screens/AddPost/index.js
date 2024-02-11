@@ -101,7 +101,8 @@ const AddPost = props => {
         // width: 300,
         // height: 400,
         mediaType: "any",
-        multiple: true
+        multiple: true,
+        compressVideoPreset: "Passthrough"
       }).then(image => {
         image.length &&
           image?.slice(0, 5 - imageData?.length).forEach(item => {

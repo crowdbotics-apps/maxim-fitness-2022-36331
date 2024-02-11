@@ -152,7 +152,7 @@ const Feeds = props => {
           data={feedsState}
           refreshing={refresh}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => index.toString()}
           extraData={feedsState}
           onEndReached={onEnd}
           windowSize={250}
