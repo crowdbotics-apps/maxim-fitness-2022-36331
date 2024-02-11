@@ -892,6 +892,7 @@ class SessionViewSet(ModelViewSet):
         how_many_week = queryset.count() / 7
         all_sessions = self.request.query_params.get("all")
         date_in_week_number = 1
+        prev_week_number = 0
         if queryset:
             first_day = queryset.first().date_time
             last_day = queryset.last().date_time
@@ -905,17 +906,21 @@ class SessionViewSet(ModelViewSet):
         if d_no and start_date:
             if d_no <= 7:
                 date_in_week_number = 1
+                prev_week_number = 0
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 14:
                 date_in_week_number = 2
+                prev_week_number = 1
                 first_day = first_day + timedelta(days=7)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 21:
                 date_in_week_number = 3
+                prev_week_number = 2
                 first_day = first_day + timedelta(days=14)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 28:
                 date_in_week_number = 4
+                prev_week_number = 3
                 first_day = first_day + timedelta(days=21)
                 last_day = first_day + timedelta(days=6)
             queryset = queryset.filter(date_time__range=[first_day, last_day])
@@ -941,6 +946,7 @@ class SessionViewSet(ModelViewSet):
         data = {
             "week": int(how_many_week),
             "date_in_week_number": date_in_week_number,
+            "prev_week_number": prev_week_number,
             "query": serializer.data
         }
         return Response(data)
@@ -960,24 +966,25 @@ class SessionViewSet(ModelViewSet):
             workout_obj = Workout.objects.filter(session_id=w_session.id).last()
 
             order = workout_obj.order + 1 if workout_obj else 1
-            for exe_id in exercise_ids:
-                exercise = Exercise.objects.get(id=exe_id)
-                workout = Workout.objects.create(
-                    session=w_session,
-                    exercise=exercise,
-                    order=order
+            payload_exercises = Exercise.objects.filter(id__in=exercise_ids)
+            workout = Workout.objects.create(
+                session=w_session,
+                exercise=payload_exercises.first(),
+                order=order
+            )
+            # for exe_id in exercise_ids:
+                # exercise = Exercise.objects.get(id=exe_id)
+                # order = order + 1
+            for set in sets:
+                s_ = Set.objects.create(
+                    workout=workout,
+                    set_no=set["set_no"],
+                    reps=set["reps"],
+                    weight=set["weight"],
+                    timer=set["timer"],
+                    set_type=set["set_type"],
                 )
-                order = order + 1
-                for set in sets:
-                    if set["ex_id"] == exercise.id:
-                        s_ = Set.objects.create(
-                            workout=workout,
-                            set_no=set["set_no"],
-                            reps=set["reps"],
-                            weight=set["weight"],
-                            timer=set["timer"],
-                            set_type=set["set_type"],
-                        )
+                s_.exercises.set(payload_exercises)
             return Response("data save successful")
 
         session = Session.objects.filter(user=self.request.user, date_time=session_date).first()
