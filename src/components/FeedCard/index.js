@@ -49,7 +49,9 @@ const FeedCard = props => {
     setVideoUri,
     setImageIndex,
     setModalVisible,
-    setItemData
+    setItemData,
+    scrollToIndex,
+    index
   } = props
 
   const [showMore, setShowMore] = useState(false)
@@ -161,7 +163,10 @@ const FeedCard = props => {
       <View style={styles.mainContainer}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("ViewPost", item)}
+          onPress={() => {
+            navigation.navigate("ViewPost", item)
+            scrollToIndex(index)
+          }}
         >
           <View style={styles.cardHeader}>
             <Image

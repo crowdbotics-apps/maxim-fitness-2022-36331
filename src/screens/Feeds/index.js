@@ -16,7 +16,6 @@ import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
 import Video from "react-native-video"
 import { connect } from "react-redux"
-import ImagePicker from "react-native-image-crop-picker"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
 
@@ -27,7 +26,9 @@ import { postReportRequest } from "../../ScreenRedux/feedRedux"
 let deviceHeight = Dimensions.get("window").height
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile, loadingReport } = props
+  const { feeds, requesting, navigation, profile, loadingReport, route } = props
+  const flatListRef = useRef(null)
+
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1)
   const [visible, setIsVisible] = useState(false)
@@ -91,6 +92,10 @@ const Feeds = props => {
     // }, 500)
   }
 
+  const scrollToIndex = index => {
+    flatListRef?.current?.scrollToIndex({ animated: true, index: index })
+  }
+
   const renderItem = ({ item, index }) => {
     return (
       // <TouchableOpacity>
@@ -109,6 +114,7 @@ const Feeds = props => {
         setImageIndex={setImageIndex}
         setModalVisible={setModalVisible}
         setItemData={setItemData}
+        scrollToIndex={scrollToIndex}
       />
       // </TouchableOpacity>
     )
@@ -141,7 +147,7 @@ const Feeds = props => {
         </View>
       ) : feedsState.length > 0 ? (
         <FlatList
-          // ref={flatList}
+          ref={flatListRef}
           onRefresh={onPullToRefresh}
           data={feedsState}
           refreshing={refresh}

@@ -40,7 +40,8 @@ import {
   postLikeRequest,
   postCommentReportRequest,
   postCommentDelete,
-  addComment
+  addComment,
+  getFeedsSuccess
 } from "../../ScreenRedux/feedRedux"
 import Share from "react-native-share"
 
@@ -88,18 +89,18 @@ const ViewPost = props => {
     if (postData && postData?.comments?.length > 0) {
       let data = [
         postData &&
-        postData?.comments?.length &&
-        postData.comments.map(item => ({
-          image: item?.user?.profile_picture,
-          text: item.content,
-          userName: item.user.username,
-          id: item.id,
-          userId: item.user.id,
-          liked: item.liked,
-          likes: item.likes,
-          created_at: item.created,
-          subComment: item.sub_comment.length ? item.sub_comment : []
-        }))
+          postData?.comments?.length &&
+          postData.comments.map(item => ({
+            image: item?.user?.profile_picture,
+            text: item.content,
+            userName: item.user.username,
+            id: item.id,
+            userId: item.user.id,
+            liked: item.liked,
+            likes: item.likes,
+            created_at: item.created,
+            subComment: item.sub_comment.length ? item.sub_comment : []
+          }))
       ]
       setPostComments(data[0])
     } else {
@@ -107,9 +108,12 @@ const ViewPost = props => {
     }
   }, [postData?.comments])
 
-  const callBackFun = status => {
+  const callBackFun = (status, response) => {
     if (status) {
       setCommentData(false)
+    }
+    if (response) {
+      commentsFilter(true, response)
     }
   }
 
@@ -223,15 +227,9 @@ const ViewPost = props => {
       }
     })
     await Share.open(options)
-      .then(res => { })
-      .catch(err => { })
+      .then(res => {})
+      .catch(err => {})
   }
-
-
-
-
-
-
 
   const likeSubComment = item => {
     let apiData = {
@@ -245,7 +243,7 @@ const ViewPost = props => {
   const addLikeAction = () => {
     let feedId = param?.id
     likeFilter(feedId)
-    const callBack = status => { }
+    const callBack = status => {}
 
     const data = { feedId, callBack }
     props.postLikeRequest(data)
@@ -258,12 +256,39 @@ const ViewPost = props => {
     if (param.liked) {
       param.liked = !param.liked
       param.likes = param.likes - 1
+
+      objToUpdate.liked = !objToUpdate.liked
+      objToUpdate.likes = objToUpdate.likes - 1
     } else {
       param.liked = !param.liked
       param.likes = param.likes + 1
+
+      objToUpdate.liked = !objToUpdate.liked
+      objToUpdate.likes = objToUpdate.likes + 1
     }
     updatedFeeds[index] = objToUpdate || param
+    feeds["results"] = updatedFeeds
     setFeedsState(updatedFeeds)
+    props.getFeedsSuccess(feeds)
+  }
+
+  const commentsFilter = (status, response) => {
+    let postId = param?.id
+    const updatedFeeds = [...feeds?.results]
+    const index = updatedFeeds.findIndex(item => item.id === postId)
+    const objToUpdate = updatedFeeds[index]
+    if (status) {
+      objToUpdate["comments"] = [...objToUpdate.comments, response]
+    } else {
+      objToUpdate["comments"] = objToUpdate?.comments?.filter(
+        item => item?.id !== response?.id
+      )
+    }
+
+    updatedFeeds[index] = objToUpdate
+    feeds["results"] = updatedFeeds
+
+    props.getFeedsSuccess(feeds)
   }
 
   const action = (item, type, isReply) => {
@@ -275,6 +300,7 @@ const ViewPost = props => {
         post_id: param?.id
       }
       props.postCommentDelete(isReply ? item.id : data, getComments, isReply)
+      !isReply && commentsFilter(false, data)
     } else {
       setModalVisible(true)
     }
@@ -317,7 +343,7 @@ const ViewPost = props => {
           <>
             <ScrollView
               contentContainerStyle={styles.mainContainer}
-            // keyboardShouldPersistTaps="handled"
+              // keyboardShouldPersistTaps="handled"
             >
               <TouchableOpacity
                 style={styles.leftArrow}
@@ -342,17 +368,17 @@ const ViewPost = props => {
                 <SliderBox
                   images={
                     param &&
-                      (param?.post_image?.length && param?.post_video?.length) > 0
+                    (param?.post_image?.length && param?.post_video?.length) > 0
                       ? [...param.post_image, ...param.post_video].map(item =>
-                        item?.image ? item?.image : item?.video_thumbnail
-                      )
+                          item?.image ? item?.image : item?.video_thumbnail
+                        )
                       : param?.post_image?.length > 0 &&
                         param?.post_video?.length === 0
-                        ? param?.post_image?.map(item => item?.image)
-                        : param?.post_video?.length > 0 &&
-                          param?.post_image?.length === 0
-                          ? param?.post_video.map(item => item?.video_thumbnail)
-                          : []
+                      ? param?.post_image?.map(item => item?.image)
+                      : param?.post_video?.length > 0 &&
+                        param?.post_image?.length === 0
+                      ? param?.post_video.map(item => item?.video_thumbnail)
+                      : []
                   }
                   style={styles.foodImageStyle}
                   sliderBoxHeight={260}
@@ -516,9 +542,9 @@ const ViewPost = props => {
                                 source={
                                   subComment?.user_detail?.profile_picture
                                     ? {
-                                      uri: subComment?.user_detail
-                                        ?.profile_picture
-                                    }
+                                        uri: subComment?.user_detail
+                                          ?.profile_picture
+                                      }
                                     : Images.profile
                                 }
                                 style={styles.profileImg}
@@ -983,6 +1009,7 @@ const mapDispatchToProps = dispatch => ({
   postCommentReportRequest: (data, callback, isReply) =>
     dispatch(postCommentReportRequest(data, callback, isReply)),
   postCommentDelete: (data, callBack, isReply) =>
-    dispatch(postCommentDelete(data, callBack, isReply))
+    dispatch(postCommentDelete(data, callBack, isReply)),
+  getFeedsSuccess: data => dispatch(getFeedsSuccess(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(ViewPost)

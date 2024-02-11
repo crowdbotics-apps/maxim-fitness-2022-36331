@@ -60,22 +60,21 @@ const ChatScreen = props => {
   }
 
   const handleBack = () => {
-    navigation.goBack()
     if (messages?.length) {
-      pubnub.objects
-        .setMemberships({
-          channels: [
-            {
-              id: item?.id,
-              custom: {
-                lastReadTimetoken: parseInt(
-                  messages?.[messages?.length - 1]?.timetoken
-                )
+      pubnub.time()?.then(res =>
+        pubnub.objects
+          .setMemberships({
+            channels: [
+              {
+                id: item?.id,
+                custom: {
+                  lastReadTimetoken: res?.timetoken
+                }
               }
-            }
-          ]
-        })
-        .then(res => {})
+            ]
+          })
+          .then(res => {})
+      )
     }
   }
 
@@ -305,7 +304,10 @@ const ChatScreen = props => {
           >
             <TouchableOpacity
               style={{ justifyContent: "center", flex: 1 }}
-              onPress={() => handleBack()}
+              onPress={() => {
+                navigation.goBack()
+                handleBack()
+              }}
             >
               <Image source={backImage} style={{ height: 20, width: 30 }} />
             </TouchableOpacity>

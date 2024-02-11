@@ -273,7 +273,7 @@ function* addCommentData({ data, postData, callBack }) {
     const response = yield call(addCommentAPI, data)
     postData.comments = [response.data, ...postData.comments]
     yield put(addCommentSuccess(response?.data))
-    callBack(true)
+    callBack(true, response?.data)
   } catch (e) {
     const { response } = e
   } finally {

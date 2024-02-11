@@ -679,7 +679,6 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                         setStartTimer(false)
                       }}
-                      isDisable={timmer}
                     />
                   </ScrollView>
                 </View>
@@ -822,7 +821,7 @@ const ExerciseScreen = props => {
       </BottomSheet>
       {/*===============================================*/}
       <BottomSheet reff={refModal} h={deviceHeight - 100}>
-        <View style={[justifyContentStart, alignItemsCenter, fill4x]}>
+        <View style={[justifyContentStart, fill]}>
           <View style={[row, center, { marginTop: 20 }]}>
             {checkModalType(modal)}
           </View>
@@ -915,14 +914,24 @@ const ExerciseScreen = props => {
             ) : null}
           </>
 
-          <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            contentContainerStyle={fillGrow}
+            showsVerticalScrollIndicator={true}
+          >
             {modal === "ss" || modal === "gs" ? (
               <>
                 {repsWeightState?.exercises?.length > 0 ? (
                   repsWeightState?.exercises?.map((exercise, index) => {
                     return (
-                      <View key={index} style={justifyContentCenter}>
-                        <View style={[row, fill, regularVMargin]}>
+                      <View key={index} style={[justifyContentCenter]}>
+                        <View
+                          style={[
+                            row,
+                            fill,
+                            regularVMargin,
+                            justifyContentCenter
+                          ]}
+                        >
                           <Text
                             regularTitle
                             color="quinary"
