@@ -21,7 +21,7 @@ import { Images } from "src/theme"
 import { connect } from "react-redux"
 
 //action
-import { AddPostData } from "../../ScreenRedux/addPostRequest"
+import { AddPostData, reset } from "../../ScreenRedux/addPostRequest"
 import { useIsFocused } from "@react-navigation/native"
 
 const { closeIcon, colorAddIcon, circleClose } = Images
@@ -145,7 +145,12 @@ const AddPost = props => {
             paddingHorizontal: 20
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              props.reset()
+              navigation.goBack()
+            }}
+          >
             <Image source={closeIcon} style={{ height: 14, width: 14 }} />
           </TouchableOpacity>
           <Text
@@ -285,6 +290,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  AddPostData: data => dispatch(AddPostData(data))
+  AddPostData: data => dispatch(AddPostData(data)),
+  reset: () => dispatch(reset())
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddPost)

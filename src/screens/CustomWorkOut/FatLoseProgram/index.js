@@ -208,6 +208,8 @@ const FatLoseProgram = props => {
 
     return formattedResult
   }
+  const d = new Date()
+  const day = d.getDay()
 
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
@@ -432,7 +434,7 @@ const FatLoseProgram = props => {
               <View style={styles.cardView}>
                 <View style={[row, justifyContentBetween]}>
                   <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
                     color="primary"
                     style={styles.dayText}
                   />
@@ -558,7 +560,7 @@ const FatLoseProgram = props => {
               <View style={styles.cardView}>
                 <View style={[row, justifyContentBetween]}>
                   <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
                     color="primary"
                     style={styles.dayText}
                   />
