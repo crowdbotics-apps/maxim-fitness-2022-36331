@@ -216,7 +216,7 @@ const Feeds = props => {
                 }}
                 muted={false}
                 repeat={true}
-                style={{ height: "50%", width: "100%" }}
+                style={styles.videoStyle}
                 rate={1}
                 posterResizeMode="stretch"
                 playInBackground={true}
@@ -352,6 +352,12 @@ const styles = StyleSheet.create({
   reportStyle: {
     paddingHorizontal: 20,
     paddingVertical: 10
+  },
+  videoStyle: {
+    alignSelf: "center",
+    height: "80%",
+    resizeMode: "contain",
+    width: "100%"
   }
 })
 
