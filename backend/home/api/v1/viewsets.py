@@ -892,7 +892,8 @@ class SessionViewSet(ModelViewSet):
         how_many_week = queryset.count() / 7
         all_sessions = self.request.query_params.get("all")
         date_in_week_number = 1
-        prev_week_number = 0
+        prev_week_number = None
+        next_week_number = None
         if queryset:
             first_day = queryset.first().date_time
             last_day = queryset.last().date_time
@@ -906,16 +907,18 @@ class SessionViewSet(ModelViewSet):
         if d_no and start_date:
             if d_no <= 7:
                 date_in_week_number = 1
-                prev_week_number = 0
+                next_week_number = 2
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 14:
                 date_in_week_number = 2
                 prev_week_number = 1
+                next_week_number = 3
                 first_day = first_day + timedelta(days=7)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 21:
                 date_in_week_number = 3
                 prev_week_number = 2
+                next_week_number = 4
                 first_day = first_day + timedelta(days=14)
                 last_day = first_day + timedelta(days=6)
             elif d_no <= 28:
@@ -947,6 +950,7 @@ class SessionViewSet(ModelViewSet):
             "week": int(how_many_week),
             "date_in_week_number": date_in_week_number,
             "prev_week_number": prev_week_number,
+            "next_week_number": next_week_number,
             "query": serializer.data
         }
         return Response(data)
