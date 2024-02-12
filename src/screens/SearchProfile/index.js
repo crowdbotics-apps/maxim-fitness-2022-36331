@@ -170,7 +170,8 @@ const SearchProfile = props => {
     return (
       <TouchableOpacity
         onPress={() => [
-          route.params?.isFeed ? createChat(item) : movetoNextScreen(item)
+          route.params?.isFeed ? createChat(item) : movetoNextScreen(item),
+          props.getUserProfile("", 1, setNextPage)
         ]}
         style={{
           marginTop: 20,

@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   videoStyle: {
     alignSelf: "center",
-    height: "80%",
+    height: "100%",
     resizeMode: "contain",
     width: "100%"
   }
