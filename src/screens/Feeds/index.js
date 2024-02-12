@@ -216,8 +216,7 @@ const Feeds = props => {
                 }}
                 muted={false}
                 repeat={true}
-                resizeMode="stretch"
-                style={{ height: "100%", width: "100%" }}
+                style={{ height: "50%", width: "100%" }}
                 rate={1}
                 posterResizeMode="stretch"
                 playInBackground={true}

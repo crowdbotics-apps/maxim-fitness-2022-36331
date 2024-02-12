@@ -76,9 +76,18 @@ const FatLoseProgram = props => {
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
+      let dots = []
+      if (d.cardio && d.strength) {
+        dots = [vacation, massage]
+      } else if (d.cardio) {
+        dots = [vacation]
+      } else if (d.strength) {
+        dots = [massage]
+      }
+
       setData(prevState => ({
         ...prevState,
-        [d.date_time]: { dots: [vacation, massage] }
+        [d.date_time]: { ...prevState[d.date_time], dots: dots }
       }))
     })
   }, [getAllSessions])
@@ -219,32 +228,76 @@ const FatLoseProgram = props => {
                     Gutters.small2xTMargin
                   ]}
                 >
-                  <TouchableOpacity
-                    style={row}
-                    onPress={
-                      activeIndex === 1 ? nextExercise : previousExercise
-                    }
-                  >
-                    {activeIndex === 2 ? (
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      style={[
+                        row,
+                        {
+                          marginRight: 10,
+                          opacity:
+                            getWeekSessions?.prev_week_number === 0 ||
+                            getWeekSessions?.prev_week_number === null
+                              ? 0.5
+                              : 1
+                        }
+                      ]}
+                      onPress={previousExercise}
+                      disabled={
+                        getWeekSessions?.prev_week_number === 0 ||
+                        getWeekSessions?.prev_week_number === null
+                      }
+                    >
                       <Icon
                         type="FontAwesome5"
                         name={"chevron-left"}
                         style={styles.IconStyle}
                       />
-                    ) : null}
-                    <Text
-                      color="primary"
-                      text={`Week ${activeIndex === 1 ? 2 : 1}`}
-                      style={[tinyLMargin, styles.smallText]}
-                    />
-                    {activeIndex === 1 ? (
+                      <Text
+                        color="primary"
+                        text={`Week ${
+                          getWeekSessions?.prev_week_number === null
+                            ? 1
+                            : getWeekSessions?.prev_week_number
+                        }`}
+                        style={[tinyLMargin, styles.smallText]}
+                      />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        row,
+                        {
+                          opacity:
+                            getWeekSessions?.next_week_number === 0 ||
+                            getWeekSessions?.next_week_number === null
+                              ? 0.5
+                              : 1
+                        }
+                      ]}
+                      onPress={nextExercise}
+                      disabled={
+                        getWeekSessions?.next_week_number === 0 ||
+                        getWeekSessions?.next_week_number === null
+                      }
+                    >
+                      <Text
+                        color="primary"
+                        text={`Week ${
+                          getWeekSessions?.date_in_week_number === 4
+                            ? 4
+                            : getWeekSessions?.date_in_week_number
+                            ? getWeekSessions?.date_in_week_number + 1
+                            : 4
+                        }`}
+                        style={[tinyLMargin, styles.smallText]}
+                      />
                       <Icon
                         type="FontAwesome5"
                         name={"chevron-right"}
                         style={styles.IconStyle}
                       />
-                    ) : null}
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
 
                   <TouchableOpacity style={row} onPress={openModal}>
                     <Text

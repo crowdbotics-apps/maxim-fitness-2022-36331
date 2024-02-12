@@ -8,7 +8,8 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  SectionList
+  SectionList,
+  ActivityIndicator
 } from "react-native"
 import { connect } from "react-redux"
 import { Images } from "src/theme"
@@ -165,24 +166,22 @@ const MessageScreen = props => {
 
   const chatNavigate = item => {
     navigation.navigate("ChatScreen", { item: item })
-    pubnub.history({ channel: item?.id }).then(res => {
-      if (res?.endTimeToken) {
-        pubnub.objects
-          .setMemberships({
-            channels: [
-              {
-                id: item?.id,
-                custom: {
-                  lastReadTimetoken: res?.endTimeToken
-                }
+    pubnub.time()?.then(res =>
+      pubnub.objects
+        .setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: res?.timetoken
               }
-            ]
-          })
-          .then(res => {
-            unreadMessage()
-          })
-      }
-    })
+            }
+          ]
+        })
+        .then(res => {
+          unreadMessage()
+        })
+    )
   }
 
   const countUnRead = item => {
@@ -343,7 +342,17 @@ const MessageScreen = props => {
         </View>
       </View>
 
-      {!conversationList?.length && !loading ? (
+      {loading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <ActivityIndicator size={"large"} color={"black"} />
+        </View>
+      ) : !conversationList?.length === 0 && !loading ? (
         <View
           style={{
             flex: 1,

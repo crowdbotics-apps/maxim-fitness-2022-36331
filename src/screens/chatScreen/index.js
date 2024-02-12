@@ -134,12 +134,7 @@ const ChatScreen = props => {
 
   const handleMessage = event => {
     const message = event
-
-    if (messages) {
-      setMessages(messages => [...messages, message])
-    } else {
-      setMessages([message])
-    }
+    setMessages(messagesData => [...messagesData, message])
   }
 
   useEffect(() => {
@@ -305,8 +300,10 @@ const ChatScreen = props => {
             <TouchableOpacity
               style={{ justifyContent: "center", flex: 1 }}
               onPress={() => {
-                navigation.goBack()
                 handleBack()
+                setTimeout(() => {
+                  navigation.goBack()
+                }, 300)
               }}
             >
               <Image source={backImage} style={{ height: 20, width: 30 }} />
@@ -503,7 +500,7 @@ const ChatScreen = props => {
                 width: "74%",
                 borderRadius: 20,
                 borderColor: "gray",
-                paddingLeft: 30,
+                paddingHorizontal: 20,
                 height: 40
               }}
               placeholder="Write Message"
