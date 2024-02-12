@@ -216,6 +216,7 @@ const Feeds = props => {
                 }}
                 muted={false}
                 repeat={true}
+                resizeMode="contain"
                 style={styles.videoStyle}
                 rate={1}
                 posterResizeMode="stretch"
@@ -354,7 +355,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10
   },
   videoStyle: {
-    alignSelf: "center",
     height: "100%",
     resizeMode: "contain",
     width: "100%"

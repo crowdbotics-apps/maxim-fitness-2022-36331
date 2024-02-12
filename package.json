@@ -11,7 +11,8 @@
     "test": "jest",
     "lint": "eslint .",
     "web": "react-app-rewired start",
-    "web-build": "react-app-rewired build && mkdir -p backend/web_build && cp -R build/* backend/web_build"
+    "web-build": "react-app-rewired build && mkdir -p backend/web_build && cp -R build/* backend/web_build",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
