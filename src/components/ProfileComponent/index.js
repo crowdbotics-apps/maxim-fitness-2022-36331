@@ -96,12 +96,7 @@ const ProfileComponent = ({
       </View>
       <View style={[row, fill, alignItemsCenter, justifyContentEnd]}>
         <TouchableOpacity onPress={onPressNotify}>
-          <Icon
-            type="FontAwesome5"
-            name="bell"
-            size={25}
-            // color="black"
-          />
+          <Icon type="FontAwesome5" name="bell" size={25} color="#626262" />
           {true && unreadCount && (
             <View
               style={[
@@ -125,7 +120,7 @@ const ProfileComponent = ({
             name="comment-alt"
             // style={{ fontSize: 25, color: "black" }}
             size={25}
-            // color="#000"
+            color="#626262"
           />
           {countUnread ? (
             <View style={styles.messageStyle}>

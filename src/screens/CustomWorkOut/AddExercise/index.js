@@ -144,6 +144,7 @@ const AddExercies = props => {
               <InputField
                 inputStyle={[Global.height40, Fonts.textMedium, { padding: 0 }]}
                 placeholder="search"
+                placeholderTextColor={"#626262"}
                 autoCapitalize="none"
                 value={search}
                 onChangeText={val => {
@@ -192,7 +193,10 @@ const AddExercies = props => {
             })}
           </ScrollView>
           <View style={[{ marginTop: 20 }]}>
-            <Text text="Muscle Group" style={styles.heading} />
+            <Text
+              text="Muscle Group"
+              style={[styles.heading, { color: "#626262" }]}
+            />
             <ScrollView
               horizontal={true}
               contentContainerStyle={{ paddingBottom: 10 }}
@@ -241,7 +245,10 @@ const AddExercies = props => {
             </ScrollView>
           </View>
           <View style={{ marginTop: 25 }}>
-            <Text text="Poupular Exercies" style={styles.heading} />
+            <Text
+              text="Poupular Exercies"
+              style={[styles.heading, { color: "#626262" }]}
+            />
           </View>
         </View>
         <View style={{ marginBottom: 20 }}>
@@ -515,6 +522,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 16,
     marginTop: 5,
+    color: "#626262",
     opacity: 0.7
   },
   btn: {
@@ -528,8 +536,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     lineHeight: 40,
-    marginTop: 10,
-    opacity: 0.8
+    marginTop: 10
   },
   pillStyle: {
     borderWidth: 1,
@@ -563,7 +570,8 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 16,
     lineHeight: 20,
-    fontWeight: "700"
+    fontWeight: "700",
+    color: "#626262"
   },
   smallText: { fontSize: 15, lineHeight: 18 },
   IconStyle: { color: Colors.primary, fontSize: 15, marginLeft: 3 },
@@ -671,7 +679,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20
+    marginTop: 20,
+    color: "#626262"
   }
 })
 const mapStateToProps = state => ({

@@ -174,7 +174,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   sendEmailText: { fontSize: 16, color: "white", fontWeight: "700" }
 })

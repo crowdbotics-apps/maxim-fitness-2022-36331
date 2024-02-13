@@ -480,7 +480,8 @@ const ViewPost = props => {
                                       <Text
                                         style={{
                                           paddingVertical: 6,
-                                          textAlign: "center"
+                                          textAlign: "center",
+                                          color: "#626262"
                                         }}
                                       >
                                         Report comment
@@ -597,7 +598,8 @@ const ViewPost = props => {
                                             <Text
                                               style={{
                                                 paddingVertical: 6,
-                                                textAlign: "center"
+                                                textAlign: "center",
+                                                color: "#626262"
                                               }}
                                             >
                                               Report reply
@@ -704,10 +706,12 @@ const ViewPost = props => {
                 }}
                 onPress={() => setCancelOption(false)}
               >
-                <Text style={{ fontWeight: "700" }}>
+                <Text style={{ fontWeight: "700", color: "#626262" }}>
                   reply to {focusreply && focusreply.name}
                 </Text>
-                <Text style={{ fontWeight: "700" }}>Cancel</Text>
+                <Text style={{ fontWeight: "700", color: "#626262" }}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             )}
             <View
@@ -720,9 +724,10 @@ const ViewPost = props => {
             >
               <TextInput
                 placeholder="Write a comment"
+                placeholderTextColor="#525252"
                 value={commentData}
                 onChangeText={value => setCommentData(value)}
-                style={{ paddingHorizontal: 10, flex: 1 }}
+                style={{ paddingHorizontal: 10, flex: 1, color: "black" }}
                 ref={inputRef}
               />
               <TouchableOpacity
@@ -760,6 +765,7 @@ const ViewPost = props => {
               onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
+              placeholderTextColor="#525252"
             />
 
             <View style={styles.btnStyles}>
@@ -767,7 +773,7 @@ const ViewPost = props => {
                 style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
                 onPress={callback}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "#626262" }}>Cancel</Text>
               </TouchableOpacity>
               <View style={{ paddingHorizontal: 5 }} />
               <TouchableOpacity
@@ -821,13 +827,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 10,
     lineHeight: 14,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   timeText: {
     fontSize: 10,
     marginLeft: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   pageText: {
     fontSize: 12,
@@ -880,7 +888,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 13,
     lineHeight: 15,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    color: "#626262"
   },
   commentSection: {
     flex: 1,
@@ -917,19 +926,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginLeft: 15,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comText1: {
     fontSize: 10,
     marginHorizontal: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comText2: {
     fontSize: 10,
     marginRight: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comImage: {
     width: 22,
@@ -962,14 +974,16 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 18,
     marginVertical: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   inputStyle: {
     height: 53,
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   btnStyles: {
     flexDirection: "row",

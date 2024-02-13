@@ -244,7 +244,7 @@ const MessageScreen = props => {
                   }
                   bold
                   numberOfLines={1}
-                  style={{ fontSize: 12, flex: 1 }}
+                  style={{ fontSize: 12, flex: 1, color: "#626262" }}
                 />
                 {item?.timeToken && (
                   <Text style={styles.LastSeenText}>
@@ -306,7 +306,7 @@ const MessageScreen = props => {
         >
           <Image source={backImage} style={{ height: 20, width: 30 }} />
         </TouchableOpacity>
-        <Text text="Messages" style={{ fontSize: 22 }} bold />
+        <Text text="Messages" style={{ fontSize: 22, color: "#626262" }} bold />
         <TouchableOpacity
           onPress={() => navigation.navigate("SearchProfile", { isFeed: true })}
         >
@@ -324,9 +324,11 @@ const MessageScreen = props => {
             borderWidth: 1,
             paddingHorizontal: 60,
             width: "100%",
-            position: "relative"
+            position: "relative",
+            color: "black"
           }}
           placeholder="Search People"
+          placeholderTextColor="#525252"
           onChangeText={e => setSearch(e)}
         />
         <View
@@ -341,7 +343,6 @@ const MessageScreen = props => {
           <Image source={searchImage} style={{ height: 30, width: 30 }} />
         </View>
       </View>
-
       {loading ? (
         <View
           style={{
@@ -352,7 +353,7 @@ const MessageScreen = props => {
         >
           <ActivityIndicator size={"large"} color={"black"} />
         </View>
-      ) : !conversationList?.length === 0 && !loading ? (
+      ) : conversationList?.[0]?.data?.length === 0 && !loading ? (
         <View
           style={{
             flex: 1,
@@ -364,7 +365,8 @@ const MessageScreen = props => {
             style={{
               fontSize: 20,
               fontWeight: "bold",
-              marginBottom: 10
+              marginBottom: 10,
+              color: "#626262"
             }}
           >
             No User Found
@@ -412,7 +414,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   LastSeenText: {
-    alignItems: "flex-end"
+    alignItems: "flex-end",
+    color: "#626262"
   }
 })
 

@@ -344,7 +344,7 @@ const ChatScreen = props => {
                     : item?.custom?.ownerName
                 }
                 bold
-                style={{ fontSize: 20 }}
+                style={{ fontSize: 20, color: "#626262" }}
               />
 
               <Text
@@ -353,7 +353,12 @@ const ChatScreen = props => {
                     userProfile?.id === item.custom.owner ? 1 : 0
                   ]
                 }
-                style={{ fontSize: 16, opacity: 0.5, marginTop: 5 }}
+                style={{
+                  fontSize: 16,
+                  opacity: 0.5,
+                  marginTop: 5,
+                  color: "#626262"
+                }}
               />
               {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
               {item?.updated && (
@@ -400,7 +405,11 @@ const ChatScreen = props => {
                                       items?.timetoken
                                     )}`}
                                     bold
-                                    style={{ fontSize: 12, opacity: 0.6 }}
+                                    style={{
+                                      fontSize: 12,
+                                      opacity: 0.6,
+                                      color: "#626262"
+                                    }}
                                   />
                                 </View>
                               </>
@@ -413,14 +422,18 @@ const ChatScreen = props => {
                                 <Text
                                   text={items?.message?.message}
                                   bold
-                                  style={{ fontSize: 14 }}
+                                  style={{ fontSize: 14, color: "#626262" }}
                                 />
                                 <Text
                                   text={`${messageTimeTokene(
                                     items?.timetoken
                                   )}`}
                                   bold
-                                  style={{ fontSize: 12, opacity: 0.6 }}
+                                  style={{
+                                    fontSize: 12,
+                                    opacity: 0.6,
+                                    color: "#626262"
+                                  }}
                                 />
                               </View>
                             )}
@@ -460,7 +473,11 @@ const ChatScreen = props => {
                               <Text
                                 text={`${messageTimeTokene(items?.timetoken)}`}
                                 bold
-                                style={{ fontSize: 12, opacity: 0.6 }}
+                                style={{
+                                  fontSize: 12,
+                                  opacity: 0.6,
+                                  color: "#626262"
+                                }}
                               />
                             </>
                           ) : (
@@ -468,12 +485,16 @@ const ChatScreen = props => {
                               <Text
                                 text={items?.message?.message}
                                 bold
-                                style={{ fontSize: 14 }}
+                                style={{ fontSize: 14, color: "#626262" }}
                               />
                               <Text
                                 text={`${messageTimeTokene(items?.timetoken)}`}
                                 bold
-                                style={{ fontSize: 12, opacity: 0.6 }}
+                                style={{
+                                  fontSize: 12,
+                                  opacity: 0.6,
+                                  color: "#626262"
+                                }}
                               />
                             </View>
                           )}
@@ -501,9 +522,11 @@ const ChatScreen = props => {
                 borderRadius: 20,
                 borderColor: "gray",
                 paddingHorizontal: 20,
-                height: 40
+                height: 40,
+                color: "black"
               }}
               placeholder="Write Message"
+              placeholderTextColor="#525252"
               onChangeText={val => setTextInput(val)}
               value={textInput}
             />

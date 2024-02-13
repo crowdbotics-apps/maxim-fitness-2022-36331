@@ -21,7 +21,7 @@ const InputField = ({
       keyboardType={keyboardType}
       secureTextEntry={secureTextEntry}
       style={[styles.textInput, inputStyle]}
-      placeholderTextColor={placeholderTextColor}
+      placeholderTextColor={placeholderTextColor || "#5e5e5e"}
     />
   )
 }

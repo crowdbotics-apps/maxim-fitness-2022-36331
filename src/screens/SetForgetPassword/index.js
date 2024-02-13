@@ -119,6 +119,7 @@ const SetForgetPassword = props => {
                         onChangeText={value => setToken(value)}
                         style={[styles.inputStyle, { marginTop: 9 }]}
                         placeholder="Token"
+                        placeholderTextColor="#525252"
                       />
                     </View>
                     <View style={[fullWidth]}>
@@ -128,6 +129,7 @@ const SetForgetPassword = props => {
                         onChangeText={value => setPassword(value)}
                         style={[styles.inputStyle, { marginTop: 18 }]}
                         placeholder="Enter new Password"
+                        placeholderTextColor="#525252"
                       />
                     </View>
                     <>
@@ -213,7 +215,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   sendEmailButton: {
     height: 53,

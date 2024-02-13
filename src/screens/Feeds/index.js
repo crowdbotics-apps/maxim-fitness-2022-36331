@@ -18,6 +18,7 @@ import Video from "react-native-video"
 import { connect } from "react-redux"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
+import { useFocusEffect } from "@react-navigation/native"
 
 //actions
 import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
@@ -265,6 +266,7 @@ const Feeds = props => {
               onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
+              placeholderTextColor="#525252"
             />
 
             <View style={styles.btnStyles}>
@@ -272,7 +274,7 @@ const Feeds = props => {
                 style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
                 onPress={callback}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "#626262" }}>Cancel</Text>
               </TouchableOpacity>
 
               <View style={{ paddingHorizontal: 5 }} />
@@ -330,14 +332,16 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 18,
     marginVertical: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "black"
   },
   inputStyle: {
     height: 53,
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   btnStyles: {
     flexDirection: "row",

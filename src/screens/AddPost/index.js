@@ -44,16 +44,6 @@ const AddPost = props => {
     }
   }, [isFocused])
 
-  // useEffect(() => {
-  //   if (imageData.length) {
-  //     createThumbnail({
-  //       url:  imageData[0].path,
-  //     })
-  //       .then(response => [setVideoThumbNail(response), console.log('response---', response)])
-  //       .catch(err => console.log({err}));
-  //   }
-  // }, [imageData]);
-
   const aa = () => {
     let formData = new FormData()
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"]
@@ -173,6 +163,8 @@ const AddPost = props => {
               paddingHorizontal: 30,
               paddingVertical: 10
             }}
+            placeholder="Enter post title"
+            placeholderTextColor="#525252"
           />
         ) : (
           <TouchableOpacity

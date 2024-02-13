@@ -127,7 +127,14 @@ const ThingsToKnow = props => {
       </TouchableOpacity>
 
       <View style={{ marginHorizontal: 20 }}>
-        <Text style={{ fontSize: 24, lineHeight: 24, fontWeight: "700" }}>
+        <Text
+          style={{
+            fontSize: 24,
+            lineHeight: 24,
+            fontWeight: "700",
+            color: "#626262"
+          }}
+        >
           Three Things You Should Know
         </Text>
       </View>
@@ -175,10 +182,14 @@ const ThingsToKnow = props => {
                     {item.number}
                   </Text>
                 </View>
-                <Text style={{ fontWeight: "700" }}>{item.heading} </Text>
+                <Text style={{ fontWeight: "700", color: "#626262" }}>
+                  {item.heading}{" "}
+                </Text>
               </View>
 
-              <Text style={{ marginHorizontal: 10, marginTop: 8 }}>
+              <Text
+                style={{ marginHorizontal: 10, marginTop: 8, color: "#626262" }}
+              >
                 {item.description}
               </Text>
             </View>

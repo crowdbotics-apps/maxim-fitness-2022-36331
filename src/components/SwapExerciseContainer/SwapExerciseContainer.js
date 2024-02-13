@@ -85,7 +85,9 @@ const SwapExerciseContainer = props => {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{ textAlign: "center" }}>{item.name}</Text>
+          <Text style={{ textAlign: "center", color: "#626262" }}>
+            {item.name}
+          </Text>
         </View>
       </TouchableOpacity>
     )

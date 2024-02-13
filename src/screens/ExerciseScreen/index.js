@@ -490,7 +490,7 @@ const ExerciseScreen = props => {
                         alignItems: "center"
                       }}
                     >
-                      <Text bold style={{ fontSize: 20 }}>
+                      <Text bold style={{ fontSize: 20, color: "#626262" }}>
                         {"No video found"}
                       </Text>
                     </View>
@@ -520,12 +520,13 @@ const ExerciseScreen = props => {
                         text={route?.params?.item?.cardio_length}
                         largeTitle
                         bold
+                        style={{ color: "#626262" }}
                       />
                       <Text
                         text="minutes"
                         medium
                         bold
-                        style={{ lineHeight: 34 }}
+                        style={{ lineHeight: 34, color: "#626262" }}
                       />
                     </View>
                   )
@@ -711,9 +712,12 @@ const ExerciseScreen = props => {
               ?.description ? (
               sortDataByDoneStatus(selectedSession)
                 ?.[active]?.exercise?.description?.split("/n")
-                .map(item => <Text text={item} />)
+                .map(item => <Text text={item} style={{ color: "#626262" }} />)
             ) : (
-              <Text text={"No Description is available!"} />
+              <Text
+                text={"No Description is available!"}
+                style={{ color: "#626262" }}
+              />
             )}
           </View>
         </KeyboardAvoidingView>

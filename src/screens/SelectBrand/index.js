@@ -167,6 +167,7 @@ const SelectBrand = props => {
             onChangeText={setSearchString}
             placeholder="Search Foods and Products"
             autoCapitalize="none"
+            placeholderTextColor="#525252"
           />
         </View>
         <TouchableOpacity

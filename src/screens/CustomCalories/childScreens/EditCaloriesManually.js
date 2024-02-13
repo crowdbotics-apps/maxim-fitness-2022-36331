@@ -44,7 +44,8 @@ const EditCaloriesManually = props => {
   const fontSize15TextCenter = {
     fontSize: 14,
     textAlign: "center",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    color: "#626262"
   }
 
   return (
@@ -82,7 +83,12 @@ const EditCaloriesManually = props => {
             ]}
           >
             <View style={[row, justifyContentStart, alignItemsStart]}>
-              <Text color="commonCol" text="Calories" bold smallTitle />
+              <Text
+                style={{ color: "#626262" }}
+                text="Calories"
+                bold
+                smallTitle
+              />
               <Text
                 text={"Specific"}
                 style={[fontSize15TextCenter, Gutters.smallLMargin]}
@@ -99,14 +105,22 @@ const EditCaloriesManually = props => {
               />
               <Text
                 text={"Calories per day"}
-                style={[Gutters.regularHMargin, { fontSize: 18 }]}
+                style={[
+                  Gutters.regularHMargin,
+                  { fontSize: 18, color: "#626262" }
+                ]}
               />
             </View>
           </View>
           <View style={[styles.cardStyle, regularVPadding]}>
             <View style={regularHMargin}>
               <View style={[row, justifyContentStart, alignItemsStart]}>
-                <Text color="commonCol" text="Macronutrient" bold smallTitle />
+                <Text
+                  style={{ color: "#626262" }}
+                  text="Macronutrient"
+                  bold
+                  smallTitle
+                />
                 <Text
                   text={"Specific"}
                   style={[fontSize15TextCenter, Gutters.smallLMargin]}
@@ -130,7 +144,7 @@ const EditCaloriesManually = props => {
                 Global.borderAlto
               ]}
             >
-              <Text text="Protein" bold />
+              <Text text="Protein" bold style={{ color: "#626262" }} />
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
@@ -178,7 +192,7 @@ const EditCaloriesManually = props => {
                 Global.borderAlto
               ]}
             >
-              <Text text="Carbs" bold />
+              <Text text="Carbs" bold style={{ color: "#626262" }} />
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text
@@ -224,7 +238,7 @@ const EditCaloriesManually = props => {
                 smallTMargin
               ]}
             >
-              <Text text="Fats" bold />
+              <Text text="Fats" bold style={{ color: "#626262" }} />
               <View style={[row, regularHMargin]}>
                 <View style={[row, justifyContentStart, alignItemsStart]}>
                   <Text

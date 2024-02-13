@@ -353,7 +353,8 @@ const FatLoseProgram = props => {
                             fontSize: 15,
                             lineHeight: 18,
                             fontWeight: "bold",
-                            opacity: 0.7
+                            opacity: 0.7,
+                            color: "black"
                           }}
                         />
                         <View
@@ -483,7 +484,8 @@ const FatLoseProgram = props => {
                         style={{
                           fontSize: 15,
                           lineHeight: 20,
-                          fontWeight: "bold"
+                          fontWeight: "bold",
+                          color: "#626262"
                         }}
                       />
                       <Text
@@ -492,7 +494,8 @@ const FatLoseProgram = props => {
                           fontSize: 12,
                           lineHeight: 12,
                           fontWeight: "400",
-                          marginTop: 10
+                          marginTop: 10,
+                          color: "#626262"
                         }}
                       />
                     </View>
@@ -510,7 +513,8 @@ const FatLoseProgram = props => {
                         style={{
                           fontSize: 12,
                           lineHeight: 12,
-                          fontWeight: "400"
+                          fontWeight: "400",
+                          color: "#626262"
                           // opacity: 0.7
                         }}
                       />
@@ -520,7 +524,8 @@ const FatLoseProgram = props => {
                           fontSize: 15,
                           lineHeight: 18,
                           fontWeight: "bold",
-                          marginLeft: 30
+                          marginLeft: 30,
+                          color: "#626262"
                         }}
                       />
                     </View>
@@ -786,7 +791,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 40,
     marginTop: 10,
-    opacity: 0.8
+    // opacity: 0.8,
+    color: "#626262"
   },
   smallText: { fontSize: 15, lineHeight: 18 },
   IconStyle: { color: Colors.primary, fontSize: 15, marginLeft: 3 },

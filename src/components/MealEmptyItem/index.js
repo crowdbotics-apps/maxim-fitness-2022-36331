@@ -172,6 +172,7 @@ const MealEmptyItem = ({
                           text={item.food.name ? item.food.name : "name"}
                           bold
                           numberOfLines={1}
+                          style={{ color: "#626262" }}
                         />
                       </View>
                       <View style={[fill, row, justifyContentEnd]}>
@@ -179,6 +180,7 @@ const MealEmptyItem = ({
                           text={item.unit && item.unit.name}
                           bold
                           numberOfLines={1}
+                          style={{ color: "#626262" }}
                         />
                       </View>
                     </View>
@@ -232,7 +234,8 @@ const styles = StyleSheet.create({
     color: "black"
   },
   textWrapper: {
-    width: 70
+    width: 70,
+    color: "#525252"
   },
   imageWrapper: {
     width: 45,
