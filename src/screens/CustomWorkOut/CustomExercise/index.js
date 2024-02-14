@@ -398,7 +398,7 @@ const CustomExercise = props => {
             {cRequesting ? (
               <ActivityIndicator color={"black"} size={"small"} />
             ) : (
-              <Text text="Done" bold />
+              <Text text="Done" bold style={{ color: "#626262" }} />
             )}
           </TouchableOpacity>
         </View>
@@ -783,7 +783,8 @@ const CustomExercise = props => {
                         marginTop: 14,
                         paddingBottom: -10,
                         borderBottomWidth: 1,
-                        borderBottomColor: "#bababa"
+                        borderBottomColor: "#bababa",
+                        color: "#626262"
                       }}
                       keyboardType="number-pad"
                       onChangeText={val => setMinutes(val)}
@@ -822,7 +823,8 @@ const CustomExercise = props => {
                         height: 30,
                         borderBottomWidth: 1,
                         paddingBottom: -10,
-                        marginTop: 14
+                        marginTop: 14,
+                        color: "#626262"
                       }}
                       keyboardType="number-pad"
                       maxLength={3}
@@ -1104,7 +1106,7 @@ const CustomExercise = props => {
                     style={{
                       fontSize: 24,
                       fontWeight: "700",
-                      color: "#5e5e5e",
+                      color: "#626262",
                       marginTop: 5,
                       borderBottomWidth: 1,
                       maxWidth: 70,
@@ -1178,7 +1180,8 @@ const CustomExercise = props => {
                           height: 30,
                           width: 30,
                           borderBottomWidth: 1,
-                          paddingBottom: -10
+                          paddingBottom: -10,
+                          color: "#626262"
                         }}
                         onChangeText={val => {
                           updateMintsSets(val)
@@ -1213,7 +1216,8 @@ const CustomExercise = props => {
                           height: 30,
                           borderBottomWidth: 1,
                           paddingBottom: -10,
-                          marginTop: 14
+                          marginTop: 14,
+                          color: "#626262"
                         }}
                         maxLength={3}
                         value={seconds}

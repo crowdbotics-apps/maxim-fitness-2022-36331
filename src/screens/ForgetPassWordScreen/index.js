@@ -98,6 +98,7 @@ const ForgetPassWordScreen = props => {
                       onChangeText={value => setEmail(value)}
                       style={[styles.inputStyle, { marginTop: 9 }]}
                       placeholder={"Enter your email"}
+                      placeholderTextColor={"#626262"}
                     />
                   </View>
                 </TouchableWithoutFeedback>
@@ -174,7 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   sendEmailText: { fontSize: 16, color: "white", fontWeight: "700" }
 })

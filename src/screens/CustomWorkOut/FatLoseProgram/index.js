@@ -76,9 +76,18 @@ const FatLoseProgram = props => {
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
+      let dots = []
+      if (d.cardio && d.strength) {
+        dots = [vacation, massage]
+      } else if (d.cardio) {
+        dots = [vacation]
+      } else if (d.strength) {
+        dots = [massage]
+      }
+
       setData(prevState => ({
         ...prevState,
-        [d.date_time]: { dots: [vacation, massage] }
+        [d.date_time]: { ...prevState[d.date_time], dots: dots }
       }))
     })
   }, [getAllSessions])
@@ -199,6 +208,8 @@ const FatLoseProgram = props => {
 
     return formattedResult
   }
+  const d = new Date()
+  const day = d.getDay()
 
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
@@ -219,32 +230,76 @@ const FatLoseProgram = props => {
                     Gutters.small2xTMargin
                   ]}
                 >
-                  <TouchableOpacity
-                    style={row}
-                    onPress={
-                      activeIndex === 1 ? nextExercise : previousExercise
-                    }
-                  >
-                    {activeIndex === 2 ? (
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      style={[
+                        row,
+                        {
+                          marginRight: 10,
+                          opacity:
+                            getWeekSessions?.prev_week_number === 0 ||
+                            getWeekSessions?.prev_week_number === null
+                              ? 0.5
+                              : 1
+                        }
+                      ]}
+                      onPress={previousExercise}
+                      disabled={
+                        getWeekSessions?.prev_week_number === 0 ||
+                        getWeekSessions?.prev_week_number === null
+                      }
+                    >
                       <Icon
                         type="FontAwesome5"
                         name={"chevron-left"}
                         style={styles.IconStyle}
                       />
-                    ) : null}
-                    <Text
-                      color="primary"
-                      text={`Week ${activeIndex === 1 ? 2 : 1}`}
-                      style={[tinyLMargin, styles.smallText]}
-                    />
-                    {activeIndex === 1 ? (
+                      <Text
+                        color="primary"
+                        text={`Week ${
+                          getWeekSessions?.prev_week_number === null
+                            ? 1
+                            : getWeekSessions?.prev_week_number
+                        }`}
+                        style={[tinyLMargin, styles.smallText]}
+                      />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        row,
+                        {
+                          opacity:
+                            getWeekSessions?.next_week_number === 0 ||
+                            getWeekSessions?.next_week_number === null
+                              ? 0.5
+                              : 1
+                        }
+                      ]}
+                      onPress={nextExercise}
+                      disabled={
+                        getWeekSessions?.next_week_number === 0 ||
+                        getWeekSessions?.next_week_number === null
+                      }
+                    >
+                      <Text
+                        color="primary"
+                        text={`Week ${
+                          getWeekSessions?.date_in_week_number === 4
+                            ? 4
+                            : getWeekSessions?.date_in_week_number
+                            ? getWeekSessions?.date_in_week_number + 1
+                            : 4
+                        }`}
+                        style={[tinyLMargin, styles.smallText]}
+                      />
                       <Icon
                         type="FontAwesome5"
                         name={"chevron-right"}
                         style={styles.IconStyle}
                       />
-                    ) : null}
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
 
                   <TouchableOpacity style={row} onPress={openModal}>
                     <Text
@@ -298,7 +353,8 @@ const FatLoseProgram = props => {
                             fontSize: 15,
                             lineHeight: 18,
                             fontWeight: "bold",
-                            opacity: 0.7
+                            opacity: 0.7,
+                            color: "black"
                           }}
                         />
                         <View
@@ -379,7 +435,7 @@ const FatLoseProgram = props => {
               <View style={styles.cardView}>
                 <View style={[row, justifyContentBetween]}>
                   <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
                     color="primary"
                     style={styles.dayText}
                   />
@@ -428,7 +484,8 @@ const FatLoseProgram = props => {
                         style={{
                           fontSize: 15,
                           lineHeight: 20,
-                          fontWeight: "bold"
+                          fontWeight: "bold",
+                          color: "#626262"
                         }}
                       />
                       <Text
@@ -437,7 +494,8 @@ const FatLoseProgram = props => {
                           fontSize: 12,
                           lineHeight: 12,
                           fontWeight: "400",
-                          marginTop: 10
+                          marginTop: 10,
+                          color: "#626262"
                         }}
                       />
                     </View>
@@ -455,7 +513,8 @@ const FatLoseProgram = props => {
                         style={{
                           fontSize: 12,
                           lineHeight: 12,
-                          fontWeight: "400"
+                          fontWeight: "400",
+                          color: "#626262"
                           // opacity: 0.7
                         }}
                       />
@@ -465,7 +524,8 @@ const FatLoseProgram = props => {
                           fontSize: 15,
                           lineHeight: 18,
                           fontWeight: "bold",
-                          marginLeft: 30
+                          marginLeft: 30,
+                          color: "#626262"
                         }}
                       />
                     </View>
@@ -505,7 +565,7 @@ const FatLoseProgram = props => {
               <View style={styles.cardView}>
                 <View style={[row, justifyContentBetween]}>
                   <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay}`}
+                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
                     color="primary"
                     style={styles.dayText}
                   />
@@ -731,7 +791,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 40,
     marginTop: 10,
-    opacity: 0.8
+    // opacity: 0.8,
+    color: "#626262"
   },
   smallText: { fontSize: 15, lineHeight: 18 },
   IconStyle: { color: Colors.primary, fontSize: 15, marginLeft: 3 },

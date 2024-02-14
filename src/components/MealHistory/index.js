@@ -252,14 +252,18 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
                                           >
                                             <Text
                                               text={c.food && c.food.name}
-                                              style={[fill]}
+                                              style={[
+                                                fill,
+                                                { color: "#626262" }
+                                              ]}
                                               bold
                                             />
                                             <Text
                                               style={[
                                                 c.unit &&
                                                   c.unit.name.length > 20 &&
-                                                  fill
+                                                  fill,
+                                                { color: "#626262" }
                                               ]}
                                               text={c.unit && c.unit.name}
                                               bold
@@ -334,7 +338,8 @@ const styles = StyleSheet.create({
     color: "black"
   },
   textWrapper: {
-    width: 70
+    width: 70,
+    color: "#626262"
   },
   imageWrapper: {
     width: 45,

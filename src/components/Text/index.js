@@ -1,9 +1,9 @@
-import React from 'react'
-import { Text as NBText } from 'react-native'
+import React from "react"
+import { Text as NBText } from "react-native"
 
 // styles
-import styles from './styles'
-import { Fonts } from 'src/theme'
+import styles from "./styles"
+import { Fonts } from "src/theme"
 
 const Text = ({
   text,
@@ -23,7 +23,7 @@ const Text = ({
   large,
   smallTitle,
   regularTitle,
-  largeTitle,
+  largeTitle
 }) => {
   const {
     textCenter,
@@ -36,8 +36,8 @@ const Text = ({
     titleLarge,
     titleSmall,
     titleRegular,
-    textUnderline,
-  } = Fonts;
+    textUnderline
+  } = Fonts
 
   return (
     <NBText
@@ -56,13 +56,13 @@ const Text = ({
         smallTitle && titleSmall,
         regularTitle && titleRegular,
         largeTitle && titleLarge,
-        style,
+        style
       ]}
       numberOfLines={numberOfLines && numberOfLines}
     >
       {text ? text : children}
     </NBText>
-  );
-};
+  )
+}
 
-export default Text;
+export default Text

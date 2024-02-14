@@ -16,9 +16,9 @@ import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
 import Video from "react-native-video"
 import { connect } from "react-redux"
-import ImagePicker from "react-native-image-crop-picker"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
+import { useFocusEffect } from "@react-navigation/native"
 
 //actions
 import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
@@ -27,7 +27,9 @@ import { postReportRequest } from "../../ScreenRedux/feedRedux"
 let deviceHeight = Dimensions.get("window").height
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile, loadingReport } = props
+  const { feeds, requesting, navigation, profile, loadingReport, route } = props
+  const flatListRef = useRef(null)
+
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1)
   const [visible, setIsVisible] = useState(false)
@@ -91,6 +93,10 @@ const Feeds = props => {
     // }, 500)
   }
 
+  const scrollToIndex = index => {
+    flatListRef?.current?.scrollToIndex({ animated: true, index: index })
+  }
+
   const renderItem = ({ item, index }) => {
     return (
       // <TouchableOpacity>
@@ -109,6 +115,7 @@ const Feeds = props => {
         setImageIndex={setImageIndex}
         setModalVisible={setModalVisible}
         setItemData={setItemData}
+        scrollToIndex={scrollToIndex}
       />
       // </TouchableOpacity>
     )
@@ -141,12 +148,12 @@ const Feeds = props => {
         </View>
       ) : feedsState.length > 0 ? (
         <FlatList
-          // ref={flatList}
+          ref={flatListRef}
           onRefresh={onPullToRefresh}
           data={feedsState}
           refreshing={refresh}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => index.toString()}
           extraData={feedsState}
           onEndReached={onEnd}
           windowSize={250}
@@ -210,8 +217,8 @@ const Feeds = props => {
                 }}
                 muted={false}
                 repeat={true}
-                resizeMode="stretch"
-                style={{ height: "100%", width: "100%" }}
+                resizeMode="contain"
+                style={styles.videoStyle}
                 rate={1}
                 posterResizeMode="stretch"
                 playInBackground={true}
@@ -259,6 +266,7 @@ const Feeds = props => {
               onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
+              placeholderTextColor="#525252"
             />
 
             <View style={styles.btnStyles}>
@@ -266,7 +274,7 @@ const Feeds = props => {
                 style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
                 onPress={callback}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "#626262" }}>Cancel</Text>
               </TouchableOpacity>
 
               <View style={{ paddingHorizontal: 5 }} />
@@ -324,14 +332,16 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 18,
     marginVertical: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "black"
   },
   inputStyle: {
     height: 53,
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   btnStyles: {
     flexDirection: "row",
@@ -347,6 +357,11 @@ const styles = StyleSheet.create({
   reportStyle: {
     paddingHorizontal: 20,
     paddingVertical: 10
+  },
+  videoStyle: {
+    height: "100%",
+    resizeMode: "contain",
+    width: "100%"
   }
 })
 

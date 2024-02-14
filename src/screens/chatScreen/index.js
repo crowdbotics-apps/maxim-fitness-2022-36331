@@ -60,22 +60,21 @@ const ChatScreen = props => {
   }
 
   const handleBack = () => {
-    navigation.goBack()
     if (messages?.length) {
-      pubnub.objects
-        .setMemberships({
-          channels: [
-            {
-              id: item?.id,
-              custom: {
-                lastReadTimetoken: parseInt(
-                  messages?.[messages?.length - 1]?.timetoken
-                )
+      pubnub.time()?.then(res =>
+        pubnub.objects
+          .setMemberships({
+            channels: [
+              {
+                id: item?.id,
+                custom: {
+                  lastReadTimetoken: res?.timetoken
+                }
               }
-            }
-          ]
-        })
-        .then(res => {})
+            ]
+          })
+          .then(res => {})
+      )
     }
   }
 
@@ -135,12 +134,7 @@ const ChatScreen = props => {
 
   const handleMessage = event => {
     const message = event
-
-    if (messages) {
-      setMessages(messages => [...messages, message])
-    } else {
-      setMessages([message])
-    }
+    setMessages(messagesData => [...messagesData, message])
   }
 
   useEffect(() => {
@@ -305,7 +299,12 @@ const ChatScreen = props => {
           >
             <TouchableOpacity
               style={{ justifyContent: "center", flex: 1 }}
-              onPress={() => handleBack()}
+              onPress={() => {
+                handleBack()
+                setTimeout(() => {
+                  navigation.goBack()
+                }, 300)
+              }}
             >
               <Image source={backImage} style={{ height: 20, width: 30 }} />
             </TouchableOpacity>
@@ -345,7 +344,7 @@ const ChatScreen = props => {
                     : item?.custom?.ownerName
                 }
                 bold
-                style={{ fontSize: 20 }}
+                style={{ fontSize: 20, color: "#626262" }}
               />
 
               <Text
@@ -354,7 +353,12 @@ const ChatScreen = props => {
                     userProfile?.id === item.custom.owner ? 1 : 0
                   ]
                 }
-                style={{ fontSize: 16, opacity: 0.5, marginTop: 5 }}
+                style={{
+                  fontSize: 16,
+                  opacity: 0.5,
+                  marginTop: 5,
+                  color: "#626262"
+                }}
               />
               {/* <Text text={timeSince(item?.timeToken)} style={{ color: "#D3D3D3", fontSize: 12 }} /> */}
               {item?.updated && (
@@ -401,7 +405,11 @@ const ChatScreen = props => {
                                       items?.timetoken
                                     )}`}
                                     bold
-                                    style={{ fontSize: 12, opacity: 0.6 }}
+                                    style={{
+                                      fontSize: 12,
+                                      opacity: 0.6,
+                                      color: "#626262"
+                                    }}
                                   />
                                 </View>
                               </>
@@ -414,14 +422,18 @@ const ChatScreen = props => {
                                 <Text
                                   text={items?.message?.message}
                                   bold
-                                  style={{ fontSize: 14 }}
+                                  style={{ fontSize: 14, color: "#626262" }}
                                 />
                                 <Text
                                   text={`${messageTimeTokene(
                                     items?.timetoken
                                   )}`}
                                   bold
-                                  style={{ fontSize: 12, opacity: 0.6 }}
+                                  style={{
+                                    fontSize: 12,
+                                    opacity: 0.6,
+                                    color: "#626262"
+                                  }}
                                 />
                               </View>
                             )}
@@ -461,7 +473,11 @@ const ChatScreen = props => {
                               <Text
                                 text={`${messageTimeTokene(items?.timetoken)}`}
                                 bold
-                                style={{ fontSize: 12, opacity: 0.6 }}
+                                style={{
+                                  fontSize: 12,
+                                  opacity: 0.6,
+                                  color: "#626262"
+                                }}
                               />
                             </>
                           ) : (
@@ -469,12 +485,16 @@ const ChatScreen = props => {
                               <Text
                                 text={items?.message?.message}
                                 bold
-                                style={{ fontSize: 14 }}
+                                style={{ fontSize: 14, color: "#626262" }}
                               />
                               <Text
                                 text={`${messageTimeTokene(items?.timetoken)}`}
                                 bold
-                                style={{ fontSize: 12, opacity: 0.6 }}
+                                style={{
+                                  fontSize: 12,
+                                  opacity: 0.6,
+                                  color: "#626262"
+                                }}
                               />
                             </View>
                           )}
@@ -501,10 +521,12 @@ const ChatScreen = props => {
                 width: "74%",
                 borderRadius: 20,
                 borderColor: "gray",
-                paddingLeft: 30,
-                height: 40
+                paddingHorizontal: 20,
+                height: 40,
+                color: "black"
               }}
               placeholder="Write Message"
+              placeholderTextColor="#525252"
               onChangeText={val => setTextInput(val)}
               value={textInput}
             />

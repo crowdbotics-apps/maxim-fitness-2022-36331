@@ -57,7 +57,7 @@ const ExerciseCard = ({ route }) => {
                     <View style={[fill2x, smallLMargin]}>
                       <Text
                         text={item.exercise.name}
-                        style={regularHPadding}
+                        style={[regularHPadding, { color: "#626262" }]}
                         large
                         bold
                       />
@@ -140,7 +140,7 @@ const ExerciseCard = ({ route }) => {
                   <View style={[fill2x, smallLMargin]}>
                     <Text
                       text={item.exercise.name}
-                      style={regularHPadding}
+                      style={[regularHPadding, { color: "#626262" }]}
                       large
                       bold
                     />

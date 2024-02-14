@@ -42,7 +42,6 @@ import { connect } from "react-redux"
 const ExerciseScreen = props => {
   const { navigation, route, repsWeightState, exerciseObj, selectedSession } =
     props
-
   let refDescription = useRef("")
   let refWeight = useRef("")
   let refReps = useRef("")
@@ -151,7 +150,7 @@ const ExerciseScreen = props => {
     const unsubscribe = navigation.addListener("focus", () => {
       // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
       // if (findFirstNotDoneSet !== undefined) {
-      const setId = selectedSession[0]?.sets[0]?.id
+      const setId = sortDataByDoneStatus(selectedSession)[0]?.sets[0]?.id
       props.repsWeightRequest(setId, null, null)
       // }
     })
@@ -287,7 +286,7 @@ const ExerciseScreen = props => {
         const data = {
           activeSet,
           active,
-          selectedSession,
+          selectedSession: sortDataByDoneStatus(selectedSession),
           setTimmer
         }
         props.setDoneRequest(findSetId.id, data)
@@ -338,10 +337,10 @@ const ExerciseScreen = props => {
   }
 
   const swipeFunc = () => {
-    props.allSwapExercise(selectedSession?.[active]?.id)
+    props.allSwapExercise(sortDataByDoneStatus(selectedSession)?.[active]?.id)
     navigation.navigate("SwapExerciseScreen", {
       ScreenData: {
-        data: selectedSession?.[active],
+        data: sortDataByDoneStatus(selectedSession)?.[active],
         date_time: params?.item?.date_time
       }
     })
@@ -358,6 +357,18 @@ const ExerciseScreen = props => {
   const checkDoneExcercise = () => {
     const allDone = selectedSession?.every(item => item.done === true)
     return allDone
+  }
+
+  const sortDataByDoneStatus = data => {
+    return data.sort((a, b) => {
+      if (a.done === b.done) {
+        return 0
+      }
+      if (a.done) {
+        return 1
+      }
+      return -1
+    })
   }
 
   return (
@@ -404,7 +415,7 @@ const ExerciseScreen = props => {
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
             {selectedSession &&
-              selectedSession?.map((item, i) => {
+              sortDataByDoneStatus(selectedSession)?.map((item, i) => {
                 return (
                   <TouchableOpacity
                     // disabled={timmer}
@@ -457,7 +468,7 @@ const ExerciseScreen = props => {
         </ScrollView>
       </View>
       {selectedSession &&
-        selectedSession?.map((item, index) => {
+        sortDataByDoneStatus(selectedSession)?.map((item, index) => {
           if (active === index) {
             return (
               <View style={[fill]}>
@@ -479,7 +490,7 @@ const ExerciseScreen = props => {
                         alignItems: "center"
                       }}
                     >
-                      <Text bold style={{ fontSize: 20 }}>
+                      <Text bold style={{ fontSize: 20, color: "#626262" }}>
                         {"No video found"}
                       </Text>
                     </View>
@@ -509,12 +520,13 @@ const ExerciseScreen = props => {
                         text={route?.params?.item?.cardio_length}
                         largeTitle
                         bold
+                        style={{ color: "#626262" }}
                       />
                       <Text
                         text="minutes"
                         medium
                         bold
-                        style={{ lineHeight: 34 }}
+                        style={{ lineHeight: 34, color: "#626262" }}
                       />
                     </View>
                   )
@@ -679,7 +691,6 @@ const ExerciseScreen = props => {
                         setTimmer(false)
                         setStartTimer(false)
                       }}
-                      isDisable={timmer}
                     />
                   </ScrollView>
                 </View>
@@ -697,12 +708,16 @@ const ExerciseScreen = props => {
           style={[fill, { width: "100%", marginTop: 20 }]}
         >
           <View style={[regularHMargin]}>
-            {selectedSession?.[active]?.exercise?.description ? (
-              selectedSession?.[active]?.exercise?.description
-                ?.split("/n")
-                .map(item => <Text text={item} />)
+            {sortDataByDoneStatus(selectedSession)?.[active]?.exercise
+              ?.description ? (
+              sortDataByDoneStatus(selectedSession)
+                ?.[active]?.exercise?.description?.split("/n")
+                .map(item => <Text text={item} style={{ color: "#626262" }} />)
             ) : (
-              <Text text={"No Description is available!"} />
+              <Text
+                text={"No Description is available!"}
+                style={{ color: "#626262" }}
+              />
             )}
           </View>
         </KeyboardAvoidingView>
@@ -822,7 +837,7 @@ const ExerciseScreen = props => {
       </BottomSheet>
       {/*===============================================*/}
       <BottomSheet reff={refModal} h={deviceHeight - 100}>
-        <View style={[justifyContentStart, alignItemsCenter, fill4x]}>
+        <View style={[justifyContentStart, fill]}>
           <View style={[row, center, { marginTop: 20 }]}>
             {checkModalType(modal)}
           </View>
@@ -915,14 +930,24 @@ const ExerciseScreen = props => {
             ) : null}
           </>
 
-          <ScrollView style={fillGrow} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            contentContainerStyle={[fillGrow]}
+            showsVerticalScrollIndicator={true}
+          >
             {modal === "ss" || modal === "gs" ? (
               <>
                 {repsWeightState?.exercises?.length > 0 ? (
                   repsWeightState?.exercises?.map((exercise, index) => {
                     return (
-                      <View key={index} style={justifyContentCenter}>
-                        <View style={[row, fill, regularVMargin]}>
+                      <View key={index} style={[justifyContentCenter]}>
+                        <View
+                          style={[
+                            row,
+                            fill,
+                            regularVMargin,
+                            justifyContentCenter
+                          ]}
+                        >
                           <Text
                             regularTitle
                             color="quinary"
@@ -947,18 +972,21 @@ const ExerciseScreen = props => {
                   })
                 ) : (
                   <>
-                    <View style={[row, fill, regularVMargin]}>
+                    <View style={[row, fill, center, regularVMargin]}>
                       <Text
                         regularTitle
                         color="quinary"
-                        text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                        text={`1. ${
+                          sortDataByDoneStatus(selectedSession)?.[active]
+                            ?.exercise?.name
+                        }`}
                       />
                     </View>
                     <View style={center}>
                       <Image
                         source={{
-                          uri: selectedSession?.[active]?.exercise
-                            ?.video_thumbnail
+                          uri: sortDataByDoneStatus(selectedSession)?.[active]
+                            ?.exercise?.video_thumbnail
                         }}
                         style={styles.modalImageStyle}
                       />
@@ -968,18 +996,22 @@ const ExerciseScreen = props => {
               </>
             ) : (
               <>
-                <View style={[row, fill, regularVMargin]}>
+                <View style={[row, fill, center, regularVMargin]}>
                   <Text
                     regularTitle
                     color="quinary"
-                    text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                    text={`1. ${
+                      sortDataByDoneStatus(selectedSession)?.[active]?.exercise
+                        ?.name
+                    }`}
                   />
                 </View>
 
                 <View style={center}>
                   <Image
                     source={{
-                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
+                      uri: sortDataByDoneStatus(selectedSession)?.[active]
+                        ?.exercise?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />

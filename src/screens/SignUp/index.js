@@ -215,6 +215,7 @@ const SignUp = props => {
               style={[styles.inputStyle, { marginTop: 9 }]}
               onChangeText={value => handleOnChange("firstName", value)}
               placeholder="First Name"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.firstName.error}</Text>
             <TextInput
@@ -225,6 +226,7 @@ const SignUp = props => {
               ]}
               onChangeText={value => handleOnChange("lastName", value)}
               placeholder="Last Name"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.lastName.error}</Text>
             <TextInput
@@ -235,6 +237,7 @@ const SignUp = props => {
               ]}
               onChangeText={value => handleOnChange("email", value)}
               placeholder="Email"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.email.error}</Text>
             <TextInput
@@ -245,6 +248,7 @@ const SignUp = props => {
               ]}
               onChangeText={value => handleOnChange("password", value)}
               placeholder="Password"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.password.error}</Text>
             <View
@@ -361,7 +365,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   logInButton: {
     height: 53,

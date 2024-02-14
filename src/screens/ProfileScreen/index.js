@@ -684,11 +684,11 @@ const ProfileScreen = props => {
                 source={{
                   uri: videoUri
                 }}
-                style={{ height: "100%", width: "100%" }}
+                resizeMode="contain"
+                style={styles.videoStyle}
                 muted={false}
                 repeat={true}
                 // onEnd={() => setStart(false)}
-                resizeMode="stretch"
                 rate={1}
                 posterResizeMode="stretch"
                 playInBackground={true}
@@ -759,6 +759,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: 10,
     marginTop: Platform.OS === "android" ? 0 : 30
+  },
+  videoStyle: {
+    height: "100%",
+    resizeMode: "contain",
+    width: "100%"
   }
 })
 

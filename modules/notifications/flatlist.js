@@ -164,7 +164,9 @@ const Notifications = props => {
           }
           ListEmptyComponent={() => (
             <View style={styles.loaderStyle}>
-              <Text style={{ fontSize: 18 }}>No record found</Text>
+              <Text style={{ fontSize: 18, color: "#626262" }}>
+                No record found
+              </Text>
             </View>
           )}
         />

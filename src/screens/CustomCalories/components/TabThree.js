@@ -39,7 +39,11 @@ const TabThree = ({
     mediumBMargin,
     mediumTMargin
   } = Gutters
-  const fontSize15TextCenter = { fontSize: 15, textAlign: "center" }
+  const fontSize15TextCenter = {
+    fontSize: 15,
+    textAlign: "center",
+    color: "#626262"
+  }
 
   const calculateCalories = conCal => {
     const value = conCal[0]?.calories
@@ -242,7 +246,7 @@ const TabThree = ({
         <View>
           <Text
             text="Diet Type"
-            style={[{ fontSize: 20, opacity: 0.7 }]}
+            style={[{ fontSize: 20, opacity: 0.5, color: "black" }]}
             bold
           />
           <View style={styles.changeBtn}>

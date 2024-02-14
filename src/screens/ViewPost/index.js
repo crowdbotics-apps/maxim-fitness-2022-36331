@@ -40,7 +40,8 @@ import {
   postLikeRequest,
   postCommentReportRequest,
   postCommentDelete,
-  addComment
+  addComment,
+  getFeedsSuccess
 } from "../../ScreenRedux/feedRedux"
 import Share from "react-native-share"
 
@@ -71,10 +72,9 @@ const ViewPost = props => {
   const [reportType, setReportType] = useState(false)
 
   const inputRef = useRef()
-
   useEffect(() => {
     if (route?.params) {
-      props.getPost(route?.params?.id ? route?.params?.id : route?.params)
+      props.getPost(route?.params?.id ? route?.params?.id : route?.params?.id)
     }
   }, [route?.params])
 
@@ -88,18 +88,18 @@ const ViewPost = props => {
     if (postData && postData?.comments?.length > 0) {
       let data = [
         postData &&
-        postData?.comments?.length &&
-        postData.comments.map(item => ({
-          image: item?.user?.profile_picture,
-          text: item.content,
-          userName: item.user.username,
-          id: item.id,
-          userId: item.user.id,
-          liked: item.liked,
-          likes: item.likes,
-          created_at: item.created,
-          subComment: item.sub_comment.length ? item.sub_comment : []
-        }))
+          postData?.comments?.length &&
+          postData.comments.map(item => ({
+            image: item?.user?.profile_picture,
+            text: item.content,
+            userName: item.user.username,
+            id: item.id,
+            userId: item.user.id,
+            liked: item.liked,
+            likes: item.likes,
+            created_at: item.created,
+            subComment: item.sub_comment.length ? item.sub_comment : []
+          }))
       ]
       setPostComments(data[0])
     } else {
@@ -107,9 +107,12 @@ const ViewPost = props => {
     }
   }, [postData?.comments])
 
-  const callBackFun = status => {
+  const callBackFun = (status, response) => {
     if (status) {
       setCommentData(false)
+    }
+    if (response) {
+      commentsFilter(true, response)
     }
   }
 
@@ -223,15 +226,9 @@ const ViewPost = props => {
       }
     })
     await Share.open(options)
-      .then(res => { })
-      .catch(err => { })
+      .then(res => {})
+      .catch(err => {})
   }
-
-
-
-
-
-
 
   const likeSubComment = item => {
     let apiData = {
@@ -245,7 +242,7 @@ const ViewPost = props => {
   const addLikeAction = () => {
     let feedId = param?.id
     likeFilter(feedId)
-    const callBack = status => { }
+    const callBack = status => {}
 
     const data = { feedId, callBack }
     props.postLikeRequest(data)
@@ -258,12 +255,39 @@ const ViewPost = props => {
     if (param.liked) {
       param.liked = !param.liked
       param.likes = param.likes - 1
+
+      objToUpdate.liked = !objToUpdate.liked
+      objToUpdate.likes = objToUpdate.likes - 1
     } else {
       param.liked = !param.liked
       param.likes = param.likes + 1
+
+      objToUpdate.liked = !objToUpdate.liked
+      objToUpdate.likes = objToUpdate.likes + 1
     }
     updatedFeeds[index] = objToUpdate || param
+    feeds["results"] = updatedFeeds
     setFeedsState(updatedFeeds)
+    props.getFeedsSuccess(feeds)
+  }
+
+  const commentsFilter = (status, response) => {
+    let postId = param?.id
+    const updatedFeeds = [...feeds?.results]
+    const index = updatedFeeds.findIndex(item => item.id === postId)
+    const objToUpdate = updatedFeeds[index]
+    if (status) {
+      objToUpdate["comments"] = [...objToUpdate.comments, response]
+    } else {
+      objToUpdate["comments"] = objToUpdate?.comments?.filter(
+        item => item?.id !== response?.id
+      )
+    }
+
+    updatedFeeds[index] = objToUpdate
+    feeds["results"] = updatedFeeds
+
+    props.getFeedsSuccess(feeds)
   }
 
   const action = (item, type, isReply) => {
@@ -275,6 +299,7 @@ const ViewPost = props => {
         post_id: param?.id
       }
       props.postCommentDelete(isReply ? item.id : data, getComments, isReply)
+      !isReply && commentsFilter(false, data)
     } else {
       setModalVisible(true)
     }
@@ -317,7 +342,7 @@ const ViewPost = props => {
           <>
             <ScrollView
               contentContainerStyle={styles.mainContainer}
-            // keyboardShouldPersistTaps="handled"
+              // keyboardShouldPersistTaps="handled"
             >
               <TouchableOpacity
                 style={styles.leftArrow}
@@ -342,17 +367,17 @@ const ViewPost = props => {
                 <SliderBox
                   images={
                     param &&
-                      (param?.post_image?.length && param?.post_video?.length) > 0
+                    (param?.post_image?.length && param?.post_video?.length) > 0
                       ? [...param.post_image, ...param.post_video].map(item =>
-                        item?.image ? item?.image : item?.video_thumbnail
-                      )
+                          item?.image ? item?.image : item?.video_thumbnail
+                        )
                       : param?.post_image?.length > 0 &&
                         param?.post_video?.length === 0
-                        ? param?.post_image?.map(item => item?.image)
-                        : param?.post_video?.length > 0 &&
-                          param?.post_image?.length === 0
-                          ? param?.post_video.map(item => item?.video_thumbnail)
-                          : []
+                      ? param?.post_image?.map(item => item?.image)
+                      : param?.post_video?.length > 0 &&
+                        param?.post_image?.length === 0
+                      ? param?.post_video.map(item => item?.video_thumbnail)
+                      : []
                   }
                   style={styles.foodImageStyle}
                   sliderBoxHeight={260}
@@ -455,7 +480,8 @@ const ViewPost = props => {
                                       <Text
                                         style={{
                                           paddingVertical: 6,
-                                          textAlign: "center"
+                                          textAlign: "center",
+                                          color: "#626262"
                                         }}
                                       >
                                         Report comment
@@ -516,9 +542,9 @@ const ViewPost = props => {
                                 source={
                                   subComment?.user_detail?.profile_picture
                                     ? {
-                                      uri: subComment?.user_detail
-                                        ?.profile_picture
-                                    }
+                                        uri: subComment?.user_detail
+                                          ?.profile_picture
+                                      }
                                     : Images.profile
                                 }
                                 style={styles.profileImg}
@@ -572,7 +598,8 @@ const ViewPost = props => {
                                             <Text
                                               style={{
                                                 paddingVertical: 6,
-                                                textAlign: "center"
+                                                textAlign: "center",
+                                                color: "#626262"
                                               }}
                                             >
                                               Report reply
@@ -679,10 +706,12 @@ const ViewPost = props => {
                 }}
                 onPress={() => setCancelOption(false)}
               >
-                <Text style={{ fontWeight: "700" }}>
+                <Text style={{ fontWeight: "700", color: "#626262" }}>
                   reply to {focusreply && focusreply.name}
                 </Text>
-                <Text style={{ fontWeight: "700" }}>Cancel</Text>
+                <Text style={{ fontWeight: "700", color: "#626262" }}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             )}
             <View
@@ -695,9 +724,10 @@ const ViewPost = props => {
             >
               <TextInput
                 placeholder="Write a comment"
+                placeholderTextColor="#525252"
                 value={commentData}
                 onChangeText={value => setCommentData(value)}
-                style={{ paddingHorizontal: 10, flex: 1 }}
+                style={{ paddingHorizontal: 10, flex: 1, color: "black" }}
                 ref={inputRef}
               />
               <TouchableOpacity
@@ -735,6 +765,7 @@ const ViewPost = props => {
               onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
+              placeholderTextColor="#525252"
             />
 
             <View style={styles.btnStyles}>
@@ -742,7 +773,7 @@ const ViewPost = props => {
                 style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
                 onPress={callback}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "#626262" }}>Cancel</Text>
               </TouchableOpacity>
               <View style={{ paddingHorizontal: 5 }} />
               <TouchableOpacity
@@ -796,13 +827,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 10,
     lineHeight: 14,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   timeText: {
     fontSize: 10,
     marginLeft: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   pageText: {
     fontSize: 12,
@@ -855,7 +888,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 13,
     lineHeight: 15,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    color: "#626262"
   },
   commentSection: {
     flex: 1,
@@ -892,19 +926,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginLeft: 15,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comText1: {
     fontSize: 10,
     marginHorizontal: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comText2: {
     fontSize: 10,
     marginRight: 10,
     lineHeight: 12,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   comImage: {
     width: 22,
@@ -937,14 +974,16 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 18,
     marginVertical: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "#626262"
   },
   inputStyle: {
     height: 53,
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   btnStyles: {
     flexDirection: "row",
@@ -983,6 +1022,7 @@ const mapDispatchToProps = dispatch => ({
   postCommentReportRequest: (data, callback, isReply) =>
     dispatch(postCommentReportRequest(data, callback, isReply)),
   postCommentDelete: (data, callBack, isReply) =>
-    dispatch(postCommentDelete(data, callBack, isReply))
+    dispatch(postCommentDelete(data, callBack, isReply)),
+  getFeedsSuccess: data => dispatch(getFeedsSuccess(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(ViewPost)

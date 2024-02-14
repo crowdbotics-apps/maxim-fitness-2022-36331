@@ -21,7 +21,7 @@ import { Images } from "src/theme"
 import { connect } from "react-redux"
 
 //action
-import { AddPostData } from "../../ScreenRedux/addPostRequest"
+import { AddPostData, reset } from "../../ScreenRedux/addPostRequest"
 import { useIsFocused } from "@react-navigation/native"
 
 const { closeIcon, colorAddIcon, circleClose } = Images
@@ -43,16 +43,6 @@ const AddPost = props => {
       setContent(false)
     }
   }, [isFocused])
-
-  // useEffect(() => {
-  //   if (imageData.length) {
-  //     createThumbnail({
-  //       url:  imageData[0].path,
-  //     })
-  //       .then(response => [setVideoThumbNail(response), console.log('response---', response)])
-  //       .catch(err => console.log({err}));
-  //   }
-  // }, [imageData]);
 
   const aa = () => {
     let formData = new FormData()
@@ -101,7 +91,8 @@ const AddPost = props => {
         // width: 300,
         // height: 400,
         mediaType: "any",
-        multiple: true
+        multiple: true,
+        compressVideoPreset: "Passthrough"
       }).then(image => {
         image.length &&
           image?.slice(0, 5 - imageData?.length).forEach(item => {
@@ -144,7 +135,12 @@ const AddPost = props => {
             paddingHorizontal: 20
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              props.reset()
+              navigation.goBack()
+            }}
+          >
             <Image source={closeIcon} style={{ height: 14, width: 14 }} />
           </TouchableOpacity>
           <Text
@@ -167,6 +163,8 @@ const AddPost = props => {
               paddingHorizontal: 30,
               paddingVertical: 10
             }}
+            placeholder="Enter post title"
+            placeholderTextColor="#525252"
           />
         ) : (
           <TouchableOpacity
@@ -284,6 +282,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  AddPostData: data => dispatch(AddPostData(data))
+  AddPostData: data => dispatch(AddPostData(data)),
+  reset: () => dispatch(reset())
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddPost)

@@ -11,7 +11,8 @@
     "test": "jest",
     "lint": "eslint .",
     "web": "react-app-rewired start",
-    "web-build": "react-app-rewired build && mkdir -p backend/web_build && cp -R build/* backend/web_build"
+    "web-build": "react-app-rewired build && mkdir -p backend/web_build && cp -R build/* backend/web_build",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
@@ -32,6 +33,7 @@
     "lottie-react-native": "^5.1.4",
     "moment": "^2.29.4",
     "native-base": "^3.4.28",
+    "patch-package": "^8.0.0",
     "pubnub": "^7.4.5",
     "pubnub-react": "^3.0.2",
     "react": "18.2.0",
@@ -39,7 +41,7 @@
     "react-native": "0.71.7",
     "react-native-calendars": "^1.1302.0",
     "react-native-countdown-component": "^2.7.1",
-    "react-native-create-thumbnail": "^2.0.0",
+    "react-native-create-thumbnail": "^1.6.4",
     "react-native-credit-card-display": "^0.3.6",
     "react-native-date-picker": "^4.3.3",
     "react-native-device-info": "^10.12.0",

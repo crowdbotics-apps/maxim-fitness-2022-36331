@@ -37,7 +37,8 @@ const EditCustomCal = props => {
     fontSize: 14,
     lineHeight: 16,
     textAlign: "center",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    color: "#626262"
   }
   const data = consumeCalories[0]?.goals_values?.protein / 100
 
@@ -128,7 +129,8 @@ const EditCustomCal = props => {
                   style={{
                     paddingHorizontal: 30,
                     paddingVertical: 8,
-                    backgroundColor: Colors.alto
+                    backgroundColor: Colors.alto,
+                    color: "#626262"
                   }}
                   bold
                 />
@@ -140,12 +142,18 @@ const EditCustomCal = props => {
               style={{
                 alignSelf: "flex-start",
                 fontSize: 16,
-                marginVertical: 10
+                marginVertical: 10,
+                color: "#626262"
               }}
             />
           </View>
           <View style={[regularHMargin, regularVMargin]}>
-            <Text color="commonCol" text="Calories" bold smallTitle />
+            <Text
+              style={{ color: "#626262" }}
+              text="Calories"
+              bold
+              smallTitle
+            />
             <View
               style={[
                 row,
@@ -162,7 +170,8 @@ const EditCustomCal = props => {
                     fontSize: 20,
                     lineHeight: 25,
                     fontWeight: "600",
-                    paddingVertical: 5
+                    paddingVertical: 5,
+                    color: "#626262"
                     // margin: 0
                   }}
                 >
@@ -196,7 +205,7 @@ const EditCustomCal = props => {
             style={[row, regularHMargin, justifyContentBetween, smallVPadding]}
           >
             <View>
-              <Text text="Protein" bold />
+              <Text text="Protein" bold style={{ color: "#626262" }} />
               <View
                 style={[
                   row,
@@ -275,7 +284,7 @@ const EditCustomCal = props => {
             style={[row, regularHMargin, justifyContentBetween, smallVPadding]}
           >
             <View>
-              <Text text="Carbs" bold />
+              <Text text="Carbs" bold style={{ color: "#626262" }} />
               <View
                 style={[
                   row,
@@ -354,7 +363,7 @@ const EditCustomCal = props => {
             style={[row, regularHMargin, justifyContentBetween, smallVPadding]}
           >
             <View>
-              <Text text="Fats" bold />
+              <Text text="Fats" bold style={{ color: "#626262" }} />
               <View
                 style={[
                   row,

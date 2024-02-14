@@ -827,7 +827,7 @@ const CustomCalories = props => {
             onPress={() => setShowModalHistory(!showModalHistory)}
             style={smallBMargin}
           >
-            <Icon type="FontAwesome5" name="times" size={25} />
+            <Icon type="FontAwesome5" name="times" color="#626262" size={25} />
           </TouchableOpacity>
         </View>
         <MealHistory mealsByDate={meals} />

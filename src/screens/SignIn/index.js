@@ -307,6 +307,7 @@ const SignIn = props => {
               onChangeText={value => handleOnChange("email", value)}
               style={[styles.inputStyle, { marginTop: 9 }]}
               placeholder="Email"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.email.error}</Text>
             <TextInput
@@ -315,6 +316,7 @@ const SignIn = props => {
               onChangeText={value => handleOnChange("password", value)}
               style={[styles.inputStyle, { marginTop: 18 }]}
               placeholder="Password"
+              placeholderTextColor="#525252"
             />
             <Text style={{ color: "red" }}>{state.password.error}</Text>
             <View
@@ -364,9 +366,11 @@ const SignIn = props => {
                 justifyContent: "center"
               }}
             >
-              <Text>Don’t have an account? </Text>
+              <Text style={{ color: "#525252" }}>Don’t have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                <Text style={{ fontWeight: "700" }}>Sign Up </Text>
+                <Text style={{ fontWeight: "700", color: "black" }}>
+                  Sign Up{" "}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -412,7 +416,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   logInButton: {
     height: 53,

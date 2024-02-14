@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { navigate } from "../navigation/NavigationService"
 import { getFeedsRequest } from "./feedRedux"
+import { showMessage } from "react-native-flash-message"
 
 // config
 import { API_URL } from "../config/app"
@@ -67,9 +68,11 @@ function* AddPost({ data }) {
   try {
     const response = yield call(addPostAPI, data)
     navigate("Feeds")
+    yield put(reset())
     // yield put((getFeedsRequest(1)))
   } catch (e) {
     const { response } = e
+    showMessage({ message: "Something went wrong", type: "danger" })
   } finally {
     yield put(reset())
   }
