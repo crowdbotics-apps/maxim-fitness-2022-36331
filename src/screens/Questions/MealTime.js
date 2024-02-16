@@ -208,6 +208,7 @@ const MealTime = props => {
                 const timee = moment(val, ["h:mm A"]).format("HH:mm")
                 onSelectMeal(selectedMeal, timee, val)
               }}
+              textColor="black"
               androidVariant="iosClone"
               style={Global.secondaryBg}
             />
