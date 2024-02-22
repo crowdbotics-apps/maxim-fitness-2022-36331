@@ -1468,7 +1468,16 @@ class ConsumeCaloriesViewSet(ModelViewSet):
                             )
 
         else:
-            return Response([{"goals_values":{"id": req_calories.id} }])
+            queryset = self.get_queryset()
+            if queryset:
+                serializer = self.get_serializer(queryset, many=True)
+                return Response(serializer.data)
+            else:
+                ConsumeCalories.objects.create(calories=0, protein=0, carbs=0, fat=0, user=self.request.user,
+                                               goals_values=req_calories)
+                queryset = self.get_queryset().last()
+                serializer = self.get_serializer(queryset, many=True)
+                return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
