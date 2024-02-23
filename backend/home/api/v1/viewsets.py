@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Prefetch, Q, Exists, OuterRef
 from django.utils import timezone
+import boto3
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from fcm_django.models import FCMDevice
@@ -1260,18 +1261,18 @@ class PostViewSet(ModelViewSet):
                 headers = self.get_success_headers(serializer.data)
                 if image:
                     for i in image:
-                        data = {'post': serializer.data.get("id"), 'image': i}
-                        post_image.append(data)
-                    post_image_serializer = PostImageSerializer(data=post_image, many=True)
-                    if post_image_serializer.is_valid(raise_exception=True):
-                        post_image_serializer.save()
+                        image_data = {'post': serializer.data.get("id"), 'image': i}
+                        # post_image.append(data)
+                        post_image_serializer = PostImageSerializer(data=image_data)
+                        if post_image_serializer.is_valid(raise_exception=True):
+                            post_image_serializer.save()
                 if video:
                     for v in video:
-                        data = {'post': serializer.data.get("id"), "video": v}
-                        post_video.append(data)
-                    post_video_serializer = PostVideoSerializer(data=post_video, many=True)
-                    if post_video_serializer.is_valid(raise_exception=True):
-                        post_video_serializer.save()
+                        v_data = {'post': serializer.data.get("id"), "video": v}
+                        # post_video.append(data)
+                        post_video_serializer = PostVideoSerializer(data=v_data)
+                        if post_video_serializer.is_valid(raise_exception=True):
+                            post_video_serializer.save()
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1467,7 +1468,16 @@ class ConsumeCaloriesViewSet(ModelViewSet):
                             )
 
         else:
-            return Response([{"goals_values":{"id": req_calories.id} }])
+            queryset = self.get_queryset()
+            if queryset:
+                serializer = self.get_serializer(queryset, many=True)
+                return Response(serializer.data)
+            else:
+                ConsumeCalories.objects.create(calories=0, protein=0, carbs=0, fat=0, user=self.request.user,
+                                               goals_values=req_calories)
+                queryset = self.get_queryset().last()
+                serializer = self.get_serializer(queryset, many=True)
+                return Response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
