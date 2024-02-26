@@ -21,6 +21,7 @@ import { Text, BottomSheet } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
+import { addCustomExercise } from "../../../ScreenRedux/addExerciseRedux"
 import {
   getDaySessionRequest,
   getAllSessionRequest,
@@ -630,7 +631,10 @@ const FatLoseProgram = props => {
               </View>
               <View style={[fill, center, Gutters.regularVMargin]}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("AddExercise")}
+                  onPress={() => {
+                    props.addCustomExercise([])
+                    navigation.navigate("AddExercise")
+                  }}
                   // disabled={
                   //   todayRequest ||
                   //   todaySessions?.length === 0 ||
@@ -875,6 +879,7 @@ const mapDispatchToProps = dispatch => ({
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
-    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout))
+    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
+  addCustomExercise: () => dispatch(addCustomExercise([]))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FatLoseProgram)

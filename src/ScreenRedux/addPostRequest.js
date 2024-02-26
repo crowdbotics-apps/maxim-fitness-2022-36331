@@ -49,7 +49,6 @@ export const addPostReducer = (state = initialState, action) => {
 
 //Saga
 async function addPostAPI(data) {
-  console.log("ddddddddddddddd", data)
   const URL = `${API_URL}/post/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {

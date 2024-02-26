@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 // components
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native"
-import { Content, Icon } from "native-base"
+import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
 import Card1 from "./component/Card1"
@@ -16,6 +16,7 @@ import {
 
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
+import { ScrollView } from "react-native-gesture-handler"
 
 const SubscriptionScreen = props => {
   const { navigation, getPlans, userDetail, subscriptionData } = props
@@ -29,19 +30,19 @@ const SubscriptionScreen = props => {
   }, [])
 
   const card = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[0]?.id
-    let product = getPlans?.length > 0 && getPlans && getPlans[0]?.product
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
+    let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     navigation.navigate("CreditCard", { plan_id, product })
   }
   const card1 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[1]?.id
-    let product = getPlans?.length > 0 && getPlans && getPlans[1]?.product
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[1]?.id
+    let product = getPlans?.length > 0 && getPlans && getPlans?.[1]?.product
     navigation.navigate("CreditCard", { plan_id, product })
   }
 
   const card2 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans[2]?.id
-    let product = getPlans?.length > 0 && getPlans[2]?.product
+    let plan_id = getPlans?.length > 0 && getPlans?.[2]?.id
+    let product = getPlans?.length > 0 && getPlans?.[2]?.product
     navigation.navigate("CreditCard", { plan_id, product })
   }
 
@@ -100,7 +101,7 @@ const SubscriptionScreen = props => {
           />
         </TouchableOpacity>
       </View>
-      <Content>
+      <ScrollView>
         {curentTab === 0 && (
           <Card
             onPress={card}
@@ -128,7 +129,7 @@ const SubscriptionScreen = props => {
             subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
-      </Content>
+      </ScrollView>
       <Modal
         isVisible={isVisible}
         animationOutTiming={1}
