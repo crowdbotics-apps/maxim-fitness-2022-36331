@@ -14,6 +14,8 @@ const GET_EXERCISE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_SUCCESS"
 const GET_EXERCISE_TYPE_REQUEST = "AddExerciseScreen/GET_EXERCISE_TYPE_REQUEST"
 const GET_EXERCISE_TYPE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_TYPE_SUCCESS"
 
+const ADD_CUSTOM_EXERCISE = "AddExerciseScreen/ADD_CUSTOM_EXERCISE"
+
 const POST_CUSTOM_EXERCISE_REQUEST =
   "AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST"
 const POST_CUSTOM_EXERCISE_SUCCESS =
@@ -32,6 +34,11 @@ export const getExerciseTypeRequest = (data, search) => ({
   type: GET_EXERCISE_TYPE_REQUEST,
   data,
   search
+})
+
+export const addCustomExercise = data => ({
+  type: ADD_CUSTOM_EXERCISE,
+  data
 })
 
 export const getExerciseTypeSuccess = data => ({
@@ -57,7 +64,8 @@ const initialState = {
   getExerciseType: false,
 
   cRequesting: false,
-  getCustomExState: false
+  getCustomExState: false,
+  custom: []
 }
 
 export const addExerciseReducer = (state = initialState, action) => {
@@ -68,6 +76,11 @@ export const addExerciseReducer = (state = initialState, action) => {
         requesting: true
       }
 
+    case ADD_CUSTOM_EXERCISE:
+      return {
+        ...state,
+        custom: action.data
+      }
     case GET_EXERCISE_SUCCESS:
       return {
         ...state,
@@ -169,6 +182,7 @@ function* postCustomEx({ data }) {
     const response = yield call(postCustomExAPI, data)
     yield put(postCustomExSuccess(response.data))
     navigate("FatLoseProgram")
+    yield put(addCustomExercise([]))
   } catch (e) {
     yield put(postCustomExSuccess(false))
   }

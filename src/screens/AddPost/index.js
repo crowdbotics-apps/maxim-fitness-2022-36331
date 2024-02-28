@@ -33,7 +33,6 @@ const AddPost = props => {
   const [showPost, setShowPost] = useState(false)
   const [imageData, setImageData] = useState([])
   const [content, setContent] = useState(false)
-  const [videoThumbnail, setVideoThumbNail] = useState(false)
   const isFocused = useIsFocused()
 
   useEffect(() => {
@@ -46,6 +45,7 @@ const AddPost = props => {
 
   const aa = () => {
     let formData = new FormData()
+    formData.append("content", content)
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"]
     // formData.append('video_thumbnail', {
     //   uri: videoThumbnail.path,

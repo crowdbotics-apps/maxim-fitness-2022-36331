@@ -106,6 +106,7 @@ const Birthday = props => {
               const dob = moment(val).format("YYYY-MM-DD")
               setNavState(dob)
             }}
+            textColor="black"
             androidVariant="iosClone"
             style={Global.secondaryBg}
             // maximumDate={new Date()}
