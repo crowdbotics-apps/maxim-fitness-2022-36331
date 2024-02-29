@@ -8,7 +8,7 @@ import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
 
-const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
+const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
   const {
     regularHMargin,
     regularVPadding,
@@ -48,7 +48,7 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
           <View style={[row, alignItemsCenter]}>
             <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5 }} />
             <Text
-              text={"User will recieve a nutrition plan"}
+              text={"User will recieve a nutrition plan."}
               color="secondary"
               style={{ fontSize: 16 }}
             />
@@ -56,7 +56,7 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
           <View style={[row, alignItemsCenter]}>
             <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5 }} />
             <Text
-              text={"User will have option to custom the Nutrition plan"}
+              text={"User will have option to custom the Nutrition plan."}
               color="secondary"
               style={{ fontSize: 16 }}
             />
@@ -75,15 +75,10 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
           </View> */}
         </View>
         <View style={[row, center, fill, mediumTMargin]}>
-          <Text
-            text={`$ ${getPlans?.length > 0 ? getPlans?.[2].amount : ""}`}
-            regularTitle
-            color="secondary"
-            bold
-          />
+          <Text text={`$ ${amount}`} regularTitle color="secondary" bold />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {getPlans?.[2]?.id === subsucriptionId ? (
+        {getPlans?.[0]?.id === subsucriptionId ? (
           <TouchableOpacity style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
@@ -128,7 +123,7 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
         <Button
           color="secondary"
           text={
-            getPlans?.[2]?.id === subsucriptionId ? "Already Bought" : "Buy Now"
+            getPlans?.[0]?.id === subsucriptionId ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -136,7 +131,7 @@ const Card2s = ({ onPress, getPlans, subsucriptionId }) => {
             regularHPadding,
             { height: 40, borderRadius: 30 }
           ]}
-          onPress={getPlans?.[2]?.id !== subsucriptionId ? onPress : null}
+          onPress={getPlans?.[0]?.id !== subsucriptionId ? onPress : null}
         />
       </View>
     </>
@@ -176,4 +171,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Card2s
+export default PremiumCard
