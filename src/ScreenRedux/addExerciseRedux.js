@@ -165,7 +165,7 @@ function* getExerciseType({ data, search }) {
 
 async function postCustomExAPI(data) {
   const token = await AsyncStorage.getItem("authToken")
-  const URL = `${API_URL}/session/create_custom_workout/`
+  const URL = `${API_URL}/new_custom_workout/`
   const options = {
     headers: {
       "Content-Type": "application/json",

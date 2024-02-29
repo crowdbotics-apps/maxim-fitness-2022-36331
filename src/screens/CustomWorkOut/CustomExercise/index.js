@@ -26,13 +26,23 @@ import ImagePicker from "react-native-image-crop-picker"
 
 //Themes
 import { Global, Gutters, Layout, Colors, Images, Fonts } from "../../../theme"
-import { postCustomExRequest } from "../../../ScreenRedux/addExerciseRedux"
+import {
+  postCustomExRequest,
+  addCustomExercise
+} from "../../../ScreenRedux/addExerciseRedux"
+import { transformData } from "../../../utils/utils"
 
 const CustomExercise = props => {
   const { redBin, circleClose, radioBlue, doneImg, greyNext, duplicateIcon } =
     Images
-  const { navigation, route, cRequesting, getCustomExState, todaySessions } =
-    props
+  const {
+    navigation,
+    route,
+    cRequesting,
+    getCustomExState,
+    todaySessions,
+    profile
+  } = props
   const { width, height } = Dimensions.get("window")
 
   const [reps, setReps] = useState("")
@@ -55,43 +65,65 @@ const CustomExercise = props => {
 
   const [temporaryReps, setTemporaryReps] = useState(false)
   const [selectIndex, setSelectIndex] = useState(0)
+  const [exerciseIndex, setExerciseIndex] = useState(0)
+
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
   })
 
-  const numberOfExercise = route?.params?.exercises?.length
-  const activeSet = route?.params?.activeSet
+  // const numberOfExercise = route?.params?.exercises?.length
+  // const activeSet = route?.params?.activeSet
 
   useEffect(() => {
     if (todaySessions?.id && todaySessions?.name !== "Rest") {
-      setTitle(todaySessions?.name)
+      setTitle("")
     }
   }, [])
 
-  const duplicateSet = () => {
-    if (numberOfExercise === 1) {
-      const newArray = [...sets, sets[currentIndex]]
-      setSets(newArray)
-    } else {
-      const newArray = [...dualSets, dualSets[currentIndex]]
-      setDualSets(newArray)
+  const findingData = () => {
+    const checkData = props?.customExercise[exerciseIndex]
+    return {
+      activeSet: checkData?.activeSet,
+      exercises: checkData?.exercises?.type,
+      currentData: checkData
     }
   }
 
-  const deleteSet = () => {
-    setCurrentIndex(false)
-    if (numberOfExercise === 1) {
-      const newArray = [...sets]
-      newArray.splice(currentIndex, 1)
-      setSets(newArray)
-      setDeleteModal(false)
+  const updateReducer = (type, updatedData) => {
+    const data = [...props.customExercise]
+    const updatedObject = { ...data[exerciseIndex] }
+
+    // Perform the deep update
+    if (updatedObject.hasOwnProperty(type)) {
+      updatedObject[type] = [...updatedObject[type], updatedData]
     } else {
-      const newArray = [...dualSets]
-      newArray.splice(currentIndex, 1)
-      setDualSets(newArray)
-      setDeleteModal(false)
+      updatedObject[type] = [updatedData]
     }
+    data[exerciseIndex] = updatedObject
+
+    // Update the state or props
+    props.addCustomExercise(data)
+    setCurrentIndex(false)
+  }
+
+  const setType = ["Super Set", "Giant Set"]
+
+  const duplicateSet = item => {
+    const newData = [...props?.customExercise]
+    newData.push(item)
+    props.addCustomExercise(newData)
+    setCurrentIndex(false)
+  }
+
+  const deleteSet = () => {
+    const data = [...props?.customExercise]
+    data.splice(exerciseIndex, 1)
+    props.addCustomExercise(data)
+    setSets(data)
+    setDeleteModal(false)
+    setCurrentIndex(false)
+    setExerciseIndex(false)
   }
 
   const resetValues = () => {
@@ -117,8 +149,11 @@ const CustomExercise = props => {
   }
 
   const remaingSameDualKeep = () => {
-    if (numberOfExercise === 1) {
-      if (activeSet?.item === "Drop Set") {
+    const data = [...props?.customExercise]
+    const checkData = data?.[exerciseIndex]
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
         if (selectIndex + 1 === 1) {
           setDroupSets({
             ...droupSet,
@@ -153,7 +188,7 @@ const CustomExercise = props => {
         }
       }
     } else {
-      if (activeSet?.value === 4) {
+      if (findingData()?.activeSet?.value === 4) {
         if (dualSetState === 1) {
           setDualReps({
             ...dualReps,
@@ -191,8 +226,11 @@ const CustomExercise = props => {
   }
 
   const remaingRestSameDualKeep = () => {
-    if (numberOfExercise === 1) {
-      if (activeSet?.item === "Drop Set") {
+    const data = [...props?.customExercise]
+    const checkData = data?.[exerciseIndex]
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
         if (selectIndex + 1 === 1) {
           setTimeData(prevState => ({
             ...prevState,
@@ -237,7 +275,7 @@ const CustomExercise = props => {
         }
       }
     } else {
-      if (activeSet?.value === 4) {
+      if (findingData()?.activeSet?.value === 4) {
         if (dualSetState === 1) {
           setTimeData(prevState => ({
             ...prevState,
@@ -287,7 +325,10 @@ const CustomExercise = props => {
   }
 
   const renderInputValue = key => {
-    if (numberOfExercise === 1) {
+    const data = [...props?.customExercise]
+    const checkData = data?.[exerciseIndex]
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
       const val = droupSet[`state${key + 1}`]
       val ? setReps(val) : setReps("")
     } else {
@@ -344,18 +385,33 @@ const CustomExercise = props => {
       showMessage({ message: "Title should not be Rest", type: "danger" })
     } else {
       const payload = {
-        title: title ? title : "title",
-        session_date: todaySessions?.date_time,
-        exercise_ids: route?.params?.exercises?.map((ex, i) => ex.id),
-        set: numberOfExercise === 1 ? sets : resultArray(),
-        adding_exercise_in_workout: true,
-        session_id: todaySessions?.id
+        name: title ? title : "title",
+        user: profile?.id,
+        custom_exercises: transformData(props.customExercise)
+        // adding_exercise_in_workout: true
       }
+
       props.postCustomExRequest(payload)
     }
   }
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
+  const checkSets = () => {
+    const jsonData = transformData(props.customExercise)
+
+    for (const entry of jsonData) {
+      if (entry.custom_sets.length === 0) {
+        return false
+      }
+      for (const set of entry.custom_sets) {
+        if (!set.reps) {
+          return false
+        }
+      }
+    }
+
+    return true
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -378,20 +434,13 @@ const CustomExercise = props => {
               style={{ width: 30, height: 25, resizeMode: "contain" }}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            disabled={
-              cRequesting ||
-              title === "" ||
-              (dualSets?.length === 0 && sets?.length === 0)
-            }
+          {/* <TouchableOpacity
+            disabled={cRequesting || title === "" || !checkSets()}
             onPress={addDataCustomEx}
             style={[
               styles.doneStyle,
               {
-                opacity:
-                  title === "" || (dualSets?.length === 0 && sets?.length === 0)
-                    ? 0.5
-                    : 1
+                opacity: title === "" || !checkSets() ? 0.5 : 1
               }
             ]}
           >
@@ -400,7 +449,7 @@ const CustomExercise = props => {
             ) : (
               <Text text="Done" bold style={{ color: "#626262" }} />
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View
@@ -423,221 +472,305 @@ const CustomExercise = props => {
           />
         </View>
 
-        <View
-          style={[
-            styles.tableView,
-            Gutters.regularHMargin,
-            Gutters.regularVMargin,
-            Gutters.regularBPadding
-          ]}
-        >
-          {
-            //numberOfExercise === 1 ? (
-            //<View style={[Layout.row, Gutters.smallHMargin, Gutters.smallVMargin]}>
-            //<Image source={Images.profileBackGround} style={styles.exerciseImage} />
-            //<Text text="Barbell bench press" style={styles.exerciseName} />
-            //</View>
-            // ) :
+        {props?.customExercise.length !== 0 ? (
+          props?.customExercise.map((item, index) => (
+            <View
+              style={[
+                styles.tableView,
+                Gutters.regularHMargin,
+                Gutters.regularVMargin,
+                Gutters.regularBPadding
+              ]}
+            >
+              {
+                //numberOfExercise === 1 ? (
+                //<View style={[Layout.row, Gutters.smallHMargin, Gutters.smallVMargin]}>
+                //<Image source={Images.profileBackGround} style={styles.exerciseImage} />
+                //<Text text="Barbell bench press" style={styles.exerciseName} />
+                //</View>
+                // ) :
 
-            route?.params?.exercises?.map((exe, i) => {
-              return (
-                <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
-                  <View style={Layout.row}>
-                    <Image
-                      source={
-                        exe?.video_thumbnail
-                          ? { uri: exe?.video_thumbnail }
-                          : Images.profileBackGround
-                      }
-                      style={styles.exerciseImage1}
-                    />
-                    <Text
-                      style={styles.exerciseName1}
-                      text={
-                        route?.params?.exercises?.length === 1
-                          ? `${exe.name}`
-                          : `${list[i]}. ${exe.name}`
-                      }
-                    />
-                  </View>
+                item?.exercises?.type?.map((exe, i) => {
+                  return (
+                    <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
+                      <View style={Layout.row}>
+                        <Image
+                          source={
+                            exe?.video_thumbnail
+                              ? { uri: exe?.video_thumbnail }
+                              : Images.profileBackGround
+                          }
+                          style={styles.exerciseImage1}
+                        />
+                        <Text
+                          style={styles.exerciseName1}
+                          text={
+                            item?.exercises?.type?.length === 1
+                              ? `${exe.name}`
+                              : `${list[i]}. ${exe.name}`
+                          }
+                        />
+                      </View>
 
-                  {/* <View style={[Layout.row, Gutters.smallTMargin]}>
+                      {/* <View style={[Layout.row, Gutters.smallTMargin]}>
                     <Image source={Images.profileBackGround} style={styles.exerciseImage1} />
                     <Text style={styles.exerciseName1} text={`a. ${ex2}`} />
                   </View> */}
-                </View>
-              )
-            })
-          }
-
-          <View
-            style={[
-              Layout.row,
-              Gutters.smallHMargin,
-              Gutters.smallTMargin,
-              Layout.justifyContentAround
-            ]}
-          >
-            <Text style={styles.setStyle} text="Set" />
-            <Text style={styles.setStyle} text="Reps" />
-            <Text style={styles.setStyle} text="Rest" />
-          </View>
-          <View style={Gutters.smallTMargin}>
-            {numberOfExercise === 1 &&
-              sets?.map((item, i) => (
-                <TouchableOpacity
-                  onPress={() => setCurrentIndex(i)}
-                  style={[
-                    Layout.row,
-                    Global.height35,
-                    Gutters.tinyTMargin,
-                    Gutters.largeHMargin,
-                    Layout.alignItemsCenter,
-                    Layout.justifyContentAround,
-                    {
-                      borderRadius: 6,
-                      backgroundColor:
-                        currentIndex === i ? "#9cdaff" : "#f3f1f4"
-                    }
-                  ]}
-                >
-                  <Text style={styles.setTextStyle} text={i + 1} />
-                  <Text
-                    style={[styles.setTextStyle, Gutters.mediumHMargin]}
-                    text={item.reps}
-                  />
-                  <Text
-                    style={styles.setTextStyle}
-                    text={!item.rest ? "-" : item.rest}
-                  />
-                </TouchableOpacity>
-              ))}
-            {numberOfExercise > 1 &&
-              dualSets?.map((item, i) => (
-                <TouchableOpacity
-                  style={[
-                    Global.borderR10,
-                    Gutters.largeHMargin,
-                    Gutters.smallBMargin,
-                    Gutters.regularBPadding,
-                    {
-                      backgroundColor:
-                        i === currentIndex ? "#74ccff" : "#f1f1f1"
-                    }
-                  ]}
-                  onPress={() => setCurrentIndex(i)}
-                >
-                  <Text style={styles.dualSetsStyle} text={i + 1} />
-                  <View style={styles.dualSetsSecondView}>
-                    <Text
-                      style={styles.dualSetsName}
-                      text={"a. " + route?.params?.exercises[0]?.name}
-                    />
-                    <Text
-                      style={styles.dualSetRepsStyle}
-                      text={item?.exerciseA?.reps}
-                    />
-                    <Text
-                      style={styles.dualSetRestStyle}
-                      text={
-                        item?.exerciseA?.rest === 0
-                          ? "-"
-                          : item?.exerciseA?.rest
-                      }
-                    />
-                  </View>
-                  <View
-                    style={[
-                      styles.dualSetsSecondView1,
-                      activeSet?.value === 4 && styles.borderStyle
-                    ]}
-                  >
-                    <Text
-                      style={styles.dualSecondEx}
-                      text={"b. " + route?.params?.exercises[1]?.name}
-                    />
-                    <Text
-                      style={styles.dualSecondReps}
-                      text={item.exerciseB.reps}
-                    />
-                    <Text
-                      style={styles.dualSecondRest}
-                      text={
-                        item?.exerciseB?.rest === 0
-                          ? "-"
-                          : item?.exerciseB?.rest
-                      }
-                    />
-                  </View>
-                  {activeSet?.value === 4 && (
-                    <View style={styles.dualSetsSecondView1}>
-                      <Text
-                        style={styles.dualSecondEx}
-                        text={"c. " + route?.params?.exercises[2]?.name}
-                      />
-                      <Text
-                        style={styles.dualSecondReps}
-                        text={item.exerciseC.reps}
-                      />
-                      <Text
-                        style={styles.dualSecondRest}
-                        text={
-                          item?.exerciseC?.rest === 0
-                            ? "-"
-                            : item?.exerciseC?.rest
-                        }
-                      />
                     </View>
-                  )}
-                </TouchableOpacity>
-              ))}
-          </View>
+                  )
+                })
+              }
 
-          <View style={Gutters.largeHMargin}>
-            <TouchableOpacity
-              onPress={() => {
-                resetValues()
-                if (numberOfExercise === 1) {
-                  refRBSheet.current.open()
-                } else {
-                  refRBSheetDual.current.open()
-                }
-              }}
-              style={styles.addSetsButton}
-            >
-              <Text style={styles.addSetsText} text="Add Set" />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={[
-              Layout.row,
-              Gutters.smallHMargin,
-              Gutters.small2xTMargin,
-              Layout.justifyContentBetween
-            ]}
-          >
-            <TouchableOpacity
-              style={Layout.row}
-              onPress={() => duplicateSet()}
-              disabled={currentIndex || currentIndex === 0 ? false : true}
-            >
-              <Image source={duplicateIcon} style={{ height: 22, width: 20 }} />
-              <Text
-                style={{ fontWeight: "500", color: "#7e7e7e", marginLeft: 10 }}
+              <View
+                style={[
+                  Layout.row,
+                  Gutters.smallHMargin,
+                  Gutters.smallTMargin,
+                  Layout.justifyContentAround
+                ]}
               >
-                Duplicate
-              </Text>
-            </TouchableOpacity>
+                <Text style={styles.setStyle} text="Set" />
+                <Text style={styles.setStyle} text="Reps" />
+                <Text style={styles.setStyle} text="Rest" />
+              </View>
+              <View style={Gutters.smallTMargin}>
+                {item?.exercises?.type?.length === 1 &&
+                  item?.single?.map((items, i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        const data = {
+                          index: i,
+                          exerciseIndex: index
+                        }
+                        setExerciseIndex(index)
+                        setCurrentIndex(data)
+                      }}
+                      style={[
+                        Layout.row,
+                        Global.height35,
+                        Gutters.tinyTMargin,
+                        Gutters.largeHMargin,
+                        Layout.alignItemsCenter,
+                        Layout.justifyContentAround,
+                        {
+                          borderRadius: 6,
+                          backgroundColor:
+                            currentIndex?.index === i &&
+                            currentIndex?.exerciseIndex === index
+                              ? "#9cdaff"
+                              : "#f3f1f4"
+                        }
+                      ]}
+                    >
+                      <Text style={styles.setTextStyle} text={i + 1} />
+                      <Text
+                        style={[styles.setTextStyle, Gutters.mediumHMargin]}
+                        text={items.reps}
+                      />
+                      <Text
+                        style={styles.setTextStyle}
+                        text={!items.rest ? "-" : items.rest}
+                      />
+                    </TouchableOpacity>
+                  ))}
 
-            <TouchableOpacity
-              onPress={() => setDeleteModal(true)}
-              disabled={currentIndex || currentIndex === 0 ? false : true}
-            >
-              <Image source={redBin} style={{ height: 22, width: 20 }} />
-            </TouchableOpacity>
+                {item?.exercises?.type?.length > 1 &&
+                  item?.dualSets?.map((items, i) => (
+                    <TouchableOpacity
+                      style={[
+                        Global.borderR10,
+                        Gutters.largeHMargin,
+                        Gutters.smallBMargin,
+                        Gutters.regularBPadding,
+                        {
+                          backgroundColor:
+                            currentIndex?.index === i &&
+                            currentIndex?.exerciseIndex === index
+                              ? "#74ccff"
+                              : "#f1f1f1"
+                        }
+                      ]}
+                      onPress={() => {
+                        setExerciseIndex(index)
+                        const data = {
+                          index: i,
+                          exerciseIndex: index
+                        }
+                        setCurrentIndex(data)
+                      }}
+                    >
+                      <Text style={styles.dualSetsStyle} text={i + 1} />
+                      <View style={styles.dualSetsSecondView}>
+                        <Text
+                          style={styles.dualSetsName}
+                          text={"a. " + item?.exercises?.type?.[0]?.name}
+                        />
+                        <Text
+                          style={styles.dualSetRepsStyle}
+                          text={items?.exerciseA?.reps}
+                        />
+                        <Text
+                          style={styles.dualSetRestStyle}
+                          text={
+                            items?.exerciseA?.rest === 0
+                              ? "-"
+                              : items?.exerciseA?.rest
+                          }
+                        />
+                      </View>
+                      <View
+                        style={[
+                          styles.dualSetsSecondView1,
+                          findingData()?.activeSet?.value === 4 &&
+                            styles.borderStyle
+                        ]}
+                      >
+                        <Text
+                          style={styles.dualSecondEx}
+                          text={"b. " + item?.exercises?.type?.[1]?.name}
+                        />
+                        <Text
+                          style={styles.dualSecondReps}
+                          text={items.exerciseB.reps}
+                        />
+                        <Text
+                          style={styles.dualSecondRest}
+                          text={
+                            items?.exerciseB?.rest === 0
+                              ? "-"
+                              : items?.exerciseB?.rest
+                          }
+                        />
+                      </View>
+                      {findingData()?.activeSet?.value === 4 && (
+                        <View style={styles.dualSetsSecondView1}>
+                          <Text
+                            style={styles.dualSecondEx}
+                            text={"c. " + item?.exercises?.type?.[2]?.name}
+                          />
+                          <Text
+                            style={styles.dualSecondReps}
+                            text={items.exerciseC.reps}
+                          />
+                          <Text
+                            style={styles.dualSecondRest}
+                            text={
+                              items?.exerciseC?.rest === 0
+                                ? "-"
+                                : items?.exerciseC?.rest
+                            }
+                          />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+
+              <View style={Gutters.largeHMargin}>
+                <TouchableOpacity
+                  onPress={() => {
+                    resetValues()
+                    setExerciseIndex(index)
+                    if (item?.exercises?.type?.length === 1) {
+                      refRBSheet.current.open()
+                    } else {
+                      refRBSheetDual.current.open()
+                    }
+                  }}
+                  style={styles.addSetsButton}
+                >
+                  <Text style={styles.addSetsText} text="Add Set" />
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={[
+                  Layout.row,
+                  Gutters.smallHMargin,
+                  Gutters.small2xTMargin,
+                  Layout.justifyContentBetween
+                ]}
+              >
+                <TouchableOpacity
+                  style={Layout.row}
+                  onPress={() => {
+                    duplicateSet(item)
+                  }}
+                  // disabled={
+                  //   currentIndex?.exerciseIndex === index &&
+                  //   (currentIndex || currentIndex === 0)
+                  //     ? false
+                  //     : true
+                  // }
+                >
+                  <Image
+                    source={duplicateIcon}
+                    style={{ height: 22, width: 20 }}
+                  />
+                  <Text
+                    style={{
+                      fontWeight: "500",
+                      color: "#7e7e7e",
+                      marginLeft: 10
+                    }}
+                  >
+                    Duplicate
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    setExerciseIndex(index)
+                    setDeleteModal(true)
+                  }}
+                  // disabled={
+                  //   currentIndex?.exerciseIndex === index &&
+                  //   (currentIndex || currentIndex === 0)
+                  //     ? false
+                  //     : true
+                  // }
+                >
+                  <Image source={redBin} style={{ height: 22, width: 20 }} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center"
+            }}
+          >
+            <Text style={styles.exerciseFound} text={"No exercise found"} />
           </View>
-        </View>
+        )}
+        {props?.customExercise?.length !== 0 ? (
+          <View style={{ marginHorizontal: 15 }}>
+            <Button
+              text={"Add Exercie"}
+              textStyle={[{ color: "white" }]}
+              style={[
+                styles.btn,
+                {
+                  opacity: title === "" || !checkSets() ? 0.5 : 1
+                }
+              ]}
+              disabled={cRequesting || title === "" || !checkSets()}
+              onPress={addDataCustomEx}
+              loading={cRequesting}
+
+              // disabled={
+              //   activeSet?.id === 1
+              //     ? selectedItem?.length < 2
+              //     : activeSet?.value === 4
+              //     ? selectedItem?.length < 3
+              //     : selectedItem?.length < 1
+              // }
+              // onPress={makeDataParams}
+            />
+          </View>
+        ) : null}
       </KeyboardAwareScrollView>
 
       <RBSheet
@@ -712,9 +845,9 @@ const CustomExercise = props => {
                     maxWidth: 70,
                     minWidth: 40,
                     marginTop:
-                      activeSet &&
-                      (activeSet?.item === "Drop Set" ||
-                        activeSet?.item === "Triple Set")
+                      findingData()?.activeSet &&
+                      (findingData()?.activeSet?.item === "Drop Set" ||
+                        findingData()?.activeSet?.item === "Triple Set")
                         ? 0
                         : 5
                   }}
@@ -725,8 +858,8 @@ const CustomExercise = props => {
                   keyboardType="number-pad"
                   value={`${reps}`}
                 />
-                {(activeSet?.item === "Drop Set" ||
-                  activeSet?.item === "Triple Set") && (
+                {(findingData()?.activeSet?.item === "Drop Set" ||
+                  findingData()?.activeSet?.item === "Triple Set") && (
                   <View
                     style={{
                       flexDirection: "row",
@@ -734,7 +867,7 @@ const CustomExercise = props => {
                       bottom: 8
                     }}
                   >
-                    {Array(activeSet?.value)
+                    {Array(findingData()?.activeSet?.value)
                       .fill()
                       .map((item, index) => (
                         <Pressable
@@ -761,9 +894,9 @@ const CustomExercise = props => {
                   {
                     width: 120,
                     opacity:
-                      activeSet?.item === "Drop Set" ||
-                      activeSet?.item === "Triple Set"
-                        ? activeSet?.value !== selectIndex + 1
+                      findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set"
+                        ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
                         : 1
@@ -789,11 +922,12 @@ const CustomExercise = props => {
                       keyboardType="number-pad"
                       onChangeText={val => setMinutes(val)}
                       editable={
-                        activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set"
                           ? true
-                          : (activeSet?.item === "Drop Set" ||
-                              activeSet?.item === "Triple Set") &&
-                            (activeSet?.value === selectIndex + 1
+                          : (findingData()?.activeSet?.item === "Drop Set" ||
+                              findingData()?.activeSet?.item ===
+                                "Triple Set") &&
+                            (findingData()?.activeSet?.value === selectIndex + 1
                               ? true
                               : false)
                       }
@@ -830,11 +964,12 @@ const CustomExercise = props => {
                       maxLength={3}
                       onChangeText={val => setSeconds(val)}
                       editable={
-                        activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set"
                           ? true
-                          : (activeSet?.item === "Drop Set" ||
-                              activeSet?.item === "Triple Set") &&
-                            (activeSet?.value === selectIndex + 1
+                          : (findingData()?.activeSet?.item === "Drop Set" ||
+                              findingData()?.activeSet?.item ===
+                                "Triple Set") &&
+                            (findingData()?.activeSet?.value === selectIndex + 1
                               ? true
                               : false)
                       }
@@ -930,20 +1065,35 @@ const CustomExercise = props => {
                 }}
                 onPress={() => {
                   if (
-                    activeSet?.item === "Drop Set" ||
-                    activeSet?.item === "Triple Set"
+                    findingData()?.activeSet?.item === "Drop Set" ||
+                    findingData()?.activeSet?.item === "Triple Set"
                   ) {
                     setSelectIndex(selectIndex + 1)
                     if (
-                      activeSet?.item === "Drop Set"
+                      findingData()?.activeSet?.item === "Drop Set"
                         ? selectIndex + 1 === 2
                         : selectIndex + 1 === 3
                     ) {
                       setSelectIndex(0)
+                      const myData = {
+                        // ex_id: findingData()?.exercises?.[0]?.id,
+                        set_no: 1,
+                        reps:
+                          droupSet &&
+                          droupSet?.state1 +
+                            "/" +
+                            droupSet?.state2 +
+                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                        weight: "",
+                        set_type: selectIndex + 1 === 3 ? "tds" : "ds",
+                        rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
+                        timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
+                      }
+
                       setSets(prevValues => [
                         ...prevValues,
                         {
-                          ex_id: route?.params?.exercises?.[0]?.id,
+                          // ex_id: findingData()?.exercises?.[0]?.id,
                           set_no: 1,
                           reps:
                             droupSet &&
@@ -959,24 +1109,25 @@ const CustomExercise = props => {
                             minutes * 60 + parseFloat(seconds ? seconds : 0)
                         }
                       ])
+                      updateReducer("single", myData)
+
                       refRBSheet.current.close()
                       resetValues()
                     }
                     renderInputValue(selectIndex + 1)
                     renderRestInputValue(selectIndex + 1)
                   } else {
-                    setSets(prevValues => [
-                      ...prevValues,
-                      {
-                        ex_id: route?.params?.exercises?.map(e => e.id),
-                        set_no: 1,
-                        reps: reps,
-                        weight: "",
-                        set_type: "r",
-                        rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
-                        timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
-                      }
-                    ])
+                    const myData = {
+                      // ex_id: findingData()?.exercises?.[0]?.id,
+                      set_no: 1,
+                      reps: reps,
+                      weight: "",
+                      set_type: "r",
+                      rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
+                      timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
+                    }
+
+                    updateReducer("single", myData)
                     refRBSheet.current.close()
                     resetValues()
                   }
@@ -984,10 +1135,10 @@ const CustomExercise = props => {
                 disabled={reps !== "" ? false : true}
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
-                  {activeSet &&
-                  (activeSet?.item === "Drop Set" ||
-                    activeSet?.item === "Triple Set") &&
-                  selectIndex + 1 < activeSet?.value
+                  {findingData()?.activeSet &&
+                  (findingData()?.activeSet?.item === "Drop Set" ||
+                    findingData()?.activeSet?.item === "Triple Set") &&
+                  selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
                 </Text>
@@ -1036,7 +1187,7 @@ const CustomExercise = props => {
                   }}
                 >
                   {/* {dualSetState === 1 ? ex1 : ex2} */}
-                  {route?.params?.exercises[dualSetState - 1]?.name}
+                  {findingData()?.exercises?.[dualSetState - 1]?.name}
                 </Text>
                 <TouchableOpacity
                   onPress={() => refRBSheetDual.current.close()}
@@ -1048,7 +1199,7 @@ const CustomExercise = props => {
                 </TouchableOpacity>
               </View>
               <View style={styles.dualDotsStyle}>
-                {Array(activeSet?.value === 4 ? 3 : 2)
+                {Array(findingData()?.activeSet?.value === 4 ? 3 : 2)
                   .fill()
                   .map((item, index) => (
                     <TouchableOpacity
@@ -1283,7 +1434,10 @@ const CustomExercise = props => {
                   }
                 ]}
                 onPress={() => {
-                  if (dualSetState < (activeSet?.value === 4 ? 3 : 2)) {
+                  if (
+                    dualSetState <
+                    (findingData()?.activeSet?.value === 4 ? 3 : 2)
+                  ) {
                     setDualSetState(dualSetState + 1)
                     renderInputValue(dualSetState + 1)
                     renderRestInputValue(dualSetState + 1)
@@ -1294,7 +1448,7 @@ const CustomExercise = props => {
                     setDualSetState(1)
                     setReps("")
 
-                    if (activeSet?.value === 4) {
+                    if (findingData()?.activeSet?.value === 4) {
                       setDualSets(prevValues => [
                         ...prevValues,
                         {
@@ -1310,7 +1464,7 @@ const CustomExercise = props => {
                                   ? timeData?.seconds?.sec1
                                   : 0
                               ),
-                            ex_id: route?.params?.exercises[0]?.id,
+                            // ex_id: findingData()?.exercises?.[0]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
                             set_type: "gs",
@@ -1337,7 +1491,7 @@ const CustomExercise = props => {
                                   ? timeData?.seconds?.sec2
                                   : 0
                               ),
-                            ex_id: route?.params?.exercises[1]?.id,
+                            // ex_id: findingData()?.exercises?.[1]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
                             set_type: "gs",
@@ -1364,7 +1518,7 @@ const CustomExercise = props => {
                                   ? timeData?.seconds?.sec3
                                   : 0
                               ),
-                            ex_id: route?.params?.exercises[2]?.id,
+                            // ex_id: findingData()?.exercises?.[2]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
                             set_type: "gs",
@@ -1381,6 +1535,91 @@ const CustomExercise = props => {
                           }
                         }
                       ])
+                      const newData = {
+                        exerciseA: {
+                          reps: dualReps.state1,
+                          rest:
+                            (timeData?.mints?.mint1
+                              ? timeData?.mints?.mint1
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec1
+                                ? timeData?.seconds?.sec1
+                                : 0
+                            ),
+                          // ex_id: findingData()?.exercises?.[0]?.id,
+                          set_no: dualSets?.length + 1,
+                          weight: "",
+                          set_type: "gs",
+                          timer:
+                            (timeData?.mints?.mint1
+                              ? timeData?.mints?.mint1
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec1
+                                ? timeData?.seconds?.sec1
+                                : 0
+                            )
+                        },
+                        exerciseB: {
+                          reps: dualReps.state2,
+                          rest:
+                            (timeData?.mints?.mint2
+                              ? timeData?.mints?.mint2
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec2
+                                ? timeData?.seconds?.sec2
+                                : 0
+                            ),
+                          // ex_id: findingData()?.exercises?.[1]?.id,
+                          set_no: dualSets?.length + 1,
+                          weight: "",
+                          set_type: "gs",
+                          timer:
+                            (timeData?.mints?.mint2
+                              ? timeData?.mints?.mint2
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec2
+                                ? timeData?.seconds?.sec2
+                                : 0
+                            )
+                        },
+                        exerciseC: {
+                          reps: dualReps.state3,
+                          rest:
+                            (timeData?.mints?.mint3
+                              ? timeData?.mints?.mint3
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec3
+                                ? timeData?.seconds?.sec3
+                                : 0
+                            ),
+                          // ex_id: findingData()?.exercises?.[2]?.id,
+                          set_no: dualSets?.length + 1,
+                          weight: "",
+                          set_type: "gs",
+                          timer:
+                            (timeData?.mints?.mint3
+                              ? timeData?.mints?.mint3
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec3
+                                ? timeData?.seconds?.sec3
+                                : 0
+                            )
+                        }
+                      }
+
+                      updateReducer("dualSets", newData)
                     } else {
                       setDualSets(prevValues => [
                         ...prevValues,
@@ -1397,7 +1636,7 @@ const CustomExercise = props => {
                                   ? timeData?.seconds?.sec1
                                   : 0
                               ),
-                            ex_id: route?.params?.exercises[0]?.id,
+                            // ex_id: findingData()?.exercises?.[0]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
                             set_type: "ss",
@@ -1424,7 +1663,7 @@ const CustomExercise = props => {
                                   ? timeData?.seconds?.sec2
                                   : 0
                               ),
-                            ex_id: route?.params?.exercises[1].id,
+                            // ex_id: findingData()?.exercises?.[1].id,
                             set_no: dualSets?.length + 1,
                             weight: "",
                             set_type: "ss",
@@ -1441,6 +1680,63 @@ const CustomExercise = props => {
                           }
                         }
                       ])
+                      const newData = {
+                        exerciseA: {
+                          reps: dualReps.state1,
+                          rest:
+                            (timeData?.mints?.mint1
+                              ? timeData?.mints?.mint1
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec1
+                                ? timeData?.seconds?.sec1
+                                : 0
+                            ),
+                          // ex_id: findingData()?.exercises?.[0]?.id,
+                          set_no: dualSets?.length + 1,
+                          weight: "",
+                          set_type: "ss",
+                          timer:
+                            (timeData?.mints?.mint1
+                              ? timeData?.mints?.mint1
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec1
+                                ? timeData?.seconds?.sec1
+                                : 0
+                            )
+                        },
+                        exerciseB: {
+                          reps: dualReps.state2,
+                          rest:
+                            (timeData?.mints?.mint2
+                              ? timeData?.mints?.mint2
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec2
+                                ? timeData?.seconds?.sec2
+                                : 0
+                            ),
+                          // ex_id: findingData()?.exercises?.[1].id,
+                          set_no: dualSets?.length + 1,
+                          weight: "",
+                          set_type: "ss",
+                          timer:
+                            (timeData?.mints?.mint2
+                              ? timeData?.mints?.mint2
+                              : 0) *
+                              60 +
+                            parseFloat(
+                              timeData?.seconds?.sec2
+                                ? timeData?.seconds?.sec2
+                                : 0
+                            )
+                        }
+                      }
+                      updateReducer("dualSets", newData)
                     }
 
                     resetValues()
@@ -1449,7 +1745,8 @@ const CustomExercise = props => {
                 disabled={temporaryReps === "" ? true : false}
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
-                  {activeSet && dualSetState < (activeSet?.value === 4 ? 3 : 2)
+                  {findingData()?.activeSet &&
+                  dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
                     ? "Next"
                     : "Done"}
                 </Text>
@@ -1491,7 +1788,7 @@ const CustomExercise = props => {
         >
           <Text
             style={styles.deleteText}
-            text="Are you sure you want to delete this set?"
+            text="Are you sure you want to delete this exercise?"
           />
 
           <View style={[Layout.row, Gutters.small2xTMargin]}>
@@ -1504,7 +1801,7 @@ const CustomExercise = props => {
             <View style={Gutters.small2xHMargin} />
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: "#f3f1f4" }]}
-              disabled={currentIndex === false ? true : false}
+              disabled={currentIndex?.index === false ? true : false}
               onPress={() => setDeleteModal(false)}
             >
               <Text style={styles.yesNoButton} text="No" />
@@ -1540,6 +1837,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     alignSelf: "center",
     flex: 1
+  },
+  exerciseFound: {
+    marginLeft: 20,
+    color: "#636363",
+    fontSize: 20,
+    fontWeight: "700",
+    alignSelf: "center"
+    // flex: 1
   },
   setStyle: { color: "#00a1ff", fontWeight: "700" },
   setTextStyle: { color: "#5e5e5e", fontWeight: "700" },
@@ -1715,16 +2020,25 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     width: 140
+  },
+  btn: {
+    backgroundColor: "#00a1ff",
+    marginBottom: 10,
+    textAlign: "center",
+    height: 40
   }
 })
 
 const mapStateToProps = state => ({
   cRequesting: state.addExerciseReducer.cRequesting,
   getCustomExState: state.addExerciseReducer.getCustomExState,
-  todaySessions: state.programReducer.todaySessions
+  todaySessions: state.programReducer.todaySessions,
+  customExercise: state.addExerciseReducer.custom,
+  profile: state.login.userDetail
 })
 
 const mapDispatchToProps = dispatch => ({
-  postCustomExRequest: data => dispatch(postCustomExRequest(data))
+  postCustomExRequest: data => dispatch(postCustomExRequest(data)),
+  addCustomExercise: data => dispatch(addCustomExercise(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)
