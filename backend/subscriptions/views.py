@@ -81,8 +81,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        premium_user = request.data.get("premium_user")
+        user = request.user
 
-        return Response(subscription)
+        if premium_user:
+            user.is_premium_user = True
+            user.save()
+        return Response({"subscription": subscription, "is_premium_user": user.is_premium_user})
 
     @swagger_auto_schema(
         method='POST',
@@ -132,7 +137,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
                     "number": data.get("card_number"),
                     "exp_month": data.get("card_exp_month"),
                     "exp_year": data.get("card_exp_year"),
-                    "cvc": data.get("card_cvv")
+                    "cvc": data.get("card_cvc")
                 },
             )
             internal_customer = InternalCustomer.objects.filter(user=request.user).first()

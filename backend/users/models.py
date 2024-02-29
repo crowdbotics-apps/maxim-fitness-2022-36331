@@ -43,6 +43,7 @@ class User(AbstractUser):
     background_picture = models.ImageField(upload_to='background_picture', null=True, blank=True)
 
     stripe_customer_id = models.CharField(max_length=50, null=True, blank=True)
+    is_premium_user = models.BooleanField(default=False)
     valid_till = models.DateField(null=True, blank=True)
     trial = models.BooleanField(default=False)
     last_update = models.DateField(null=True, blank=True)

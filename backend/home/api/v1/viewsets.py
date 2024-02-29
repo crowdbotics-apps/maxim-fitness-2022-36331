@@ -59,7 +59,7 @@ from home.api.v1.serializers import (
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
     ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer,
-    ReportCommentReplySerializer, MealTimeSerializer, MealHistorySerializer
+    ReportCommentReplySerializer, MealTimeSerializer, MealHistorySerializer, CustomWorkoutSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -67,7 +67,8 @@ from .permissions import (
 from home.models import Product, ProductUnit, Meal, FoodItem, Category, Recipe, Post, Form, ConsumeCalories, Following \
     , Comment, ReportAPost, BlockUser
 from home.nutritionix import Nutritionix
-from program.models import Exercise, Session, Workout, Set, Report, ProgramExercise, ExerciseType
+from program.models import Exercise, Session, Workout, Set, Report, ProgramExercise, ExerciseType, CustomWorkout, \
+    CustomExercise, CustomSet
 from users.models import AnswerProgram
 from notification.models import Notification
 
@@ -156,14 +157,14 @@ class ProfileViewSet(ModelViewSet):
         if consume_cal.exists():
             ConsumeCalories.objects.update(goals_values=object)
         else:
-            ConsumeCalories.objects.create(goals_values=object, user=self.request.user, carbs=0, fat=0, protein=0, calories=0)
-
+            ConsumeCalories.objects.create(goals_values=object, user=self.request.user, carbs=0, fat=0, protein=0,
+                                           calories=0)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             queryset = self.get_queryset()
             request_from = self.request.data.get('request_type', None)
-            height = self.request.data.get('height',None)
+            height = self.request.data.get('height', None)
             weight = self.request.data.get('weight', None)
             male, female, rma, calories, age, fitness_goal, gender, activity_level = 0, 0, 0, 0, 0, 0, 0, 0
             u = ''
@@ -659,9 +660,10 @@ class MealViewSet(ModelViewSet):
         meal_id = Meal.objects.filter(user=user).last().id
         current_datetime = timezone.now()
         data = []
-        #.annotate(
-            # food_items_count=Count('food_items_times')).filter(food_items_count__gt=0)
-        user_meal_times_ids = MealTime.objects.filter(meal__user=user).order_by("-date_time__date").values_list("id", flat=True)
+        # .annotate(
+        # food_items_count=Count('food_items_times')).filter(food_items_count__gt=0)
+        user_meal_times_ids = MealTime.objects.filter(meal__user=user).order_by("-date_time__date").values_list("id",
+                                                                                                                flat=True)
         unique_dates = FoodItem.objects.filter(meal_time_id__in=user_meal_times_ids).order_by(
             "-created__date").distinct("created__date").values_list("created__date", flat=True)
         # serializer = MealTimeSerializer(all_meal_times, many=True, context={'current_date': current_datetime})
@@ -674,15 +676,15 @@ class MealViewSet(ModelViewSet):
             if date == current_datetime.date():
                 for meal_time in user_meal_times_ids:
                     food_item_meals = FoodItem.objects.filter(
-                                created__date=current_datetime.date(), meal_time_id=meal_time,
-                                created__lte=current_datetime).order_by("meal_time__date_time")
+                        created__date=current_datetime.date(), meal_time_id=meal_time,
+                        created__lte=current_datetime).order_by("meal_time__date_time")
                     if not food_item_meals.exists():
                         pass
                     else:
                         serializer = FoodItemSerializer(food_item_meals, many=True)
                         new_data.append({"id": food_item_meals.first().meal_time.id,
                                          "date_time": food_item_meals.first().meal_time.date_time,
-                                             "food_items": serializer.data})
+                                         "food_items": serializer.data})
                 data.append({str(date): new_data})
             else:
                 for meal_time in user_meal_times_ids:
@@ -746,7 +748,6 @@ class MealViewSet(ModelViewSet):
                     FoodItem.objects.create(meal=meal, food=food, portion=food_item['portion'], unit=unit)
                 return Response('Food added to the meal.')
         return Response({'error': "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
-
 
     @action(detail=False, methods=['post'])
     def delete_food(self, request):
@@ -1429,7 +1430,8 @@ class CaloriesRequiredViewSet(ModelViewSet):
         if a.exists():
             a.update(goals_values=req_calories)
         else:
-            ConsumeCalories.objects.create(calories=0, protein=0, carbs=0, fat=0, user=self.request.user, goals_values=req_calories)
+            ConsumeCalories.objects.create(calories=0, protein=0, carbs=0, fat=0, user=self.request.user,
+                                           goals_values=req_calories)
         return Response(serializer.data)
 
 
@@ -1613,7 +1615,8 @@ class ReportACommentViewSet(ModelViewSet):
         comment = Comment.objects.filter(id=comment_id).first()
         send_notification(sender=self.request.user, receiver=comment.user, title="Report Comment",
                           message=f"Your comment is reported by {self.request.user.username}", post_id=None,
-                          extra={"post_id": comment.post.id, "sender": request.user.id, "receiver": comment.user.id, "comment_id": comment.id}
+                          extra={"post_id": comment.post.id, "sender": request.user.id, "receiver": comment.user.id,
+                                 "comment_id": comment.id}
                           )
         return Response({"data": "Comment Reported successfully"}, status=status.HTTP_201_CREATED)
 
@@ -1742,3 +1745,38 @@ class ReportCommentReplyViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response({"data": "Reported successfully"}, status=status.HTTP_201_CREATED)
+
+
+class CustomWorkoutViewSet(ModelViewSet):
+    queryset = CustomWorkout.objects.all()
+    serializer_class = CustomWorkoutSerializer
+
+    def get_queryset(self):
+        return CustomWorkout.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        custom_workout_serializer = self.get_serializer(data=data)
+        custom_workout_serializer.is_valid(raise_exception=True)
+        custom_workout = custom_workout_serializer.save()
+
+        custom_exercises_data = data.get('custom_exercises', [])
+        for custom_exercise_data in custom_exercises_data:
+            if len(custom_exercise_data['exercises']) == 2:
+                name = "Superset"
+            elif len(custom_exercise_data['exercises']) == 3:
+                name = "Giantset"
+            else:
+                name = None
+
+            custom_exercise_data['name'] = name
+            custom_sets_data = custom_exercise_data.pop('custom_sets', [])
+            custom_exercise = CustomExercise.objects.create(custom_workout=custom_workout, name=name)
+            custom_exercise.exercises.set(custom_exercise_data['exercises'])
+
+            # Create custom sets
+            for custom_set_data in custom_sets_data:
+                del custom_set_data['rest']
+                custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
+
+        return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
