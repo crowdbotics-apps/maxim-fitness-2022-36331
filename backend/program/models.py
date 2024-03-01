@@ -38,7 +38,7 @@ class Session(models.Model):
     carb = models.FloatField(null=True, blank=True)
     carb_casual = models.FloatField(null=True, blank=True)
     done = models.BooleanField(default=False)
-    is_active=models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.user}_{self.date_time}{self.id}"
@@ -156,13 +156,19 @@ class Program(models.Model):
                 )
                 order = 1
                 for exercise in day.day_exercises.all():
-                    workout = Workout.objects.create(
-                        session=session,
-                        exercise=exercise.exercise,
-                        order=order
-                    )
-                    order += 1
+                    # workout = Workout.objects.create(
+                    #     session=session,
+                    #     exercise=exercise.exercise,
+                    #     order=order
+                    # )
+                    # order += 1
                     for set in exercise.program_exercie_sets.all():
+                        workout = Workout.objects.create(
+                            session=session,
+                            exercise=exercise.exercise,
+                            order=order
+                        )
+                        order += 1
                         print('set', set.set_type)
                         s_ = Set.objects.create(
                             workout=workout,
@@ -173,6 +179,8 @@ class Program(models.Model):
                             set_type=set.set_type,
                         )
                         s_.exercises.set(set.exercises.all())
+
+                        workout.exercises.set(set.exercises.all())
                         print(s_, 'created', s_.set_type)
                 days_gap += 1
                 print(*[s.set_type for s in session.get_sets()])
@@ -252,11 +260,12 @@ class ProgramSet(models.Model):
 
 class Workout(models.Model):
     session = models.ForeignKey('Session', related_name='workouts', on_delete=models.CASCADE)
-    exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)
+    exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=500, null=True)
     order = models.PositiveIntegerField(default=1)
     timer = models.FloatField(default=90.0)
     done = models.BooleanField(default=False)
+    exercises = models.ManyToManyField('Exercise', blank=True, related_name="multiple_exercises")
 
     def mark_done(self):
         sets = self.sets.filter(done=False)
@@ -273,6 +282,56 @@ class Workout(models.Model):
         self.save()
         for set in self.sets.all():
             set.reset()
+
+
+class CustomWorkout(models.Model):
+    session = models.ForeignKey('Session', related_name='custom_workouts', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='custom_workouts_users', on_delete=models.CASCADE)
+    name = models.CharField(max_length=500, null=True)
+    done = models.BooleanField(default=False)
+    created_date = models.DateField(auto_now_add=True, editable=True)
+
+
+class CustomExercise(models.Model):
+    exercises = models.ManyToManyField('Exercise', blank=True, related_name='custom_workout_exercises')
+    custom_workout = models.ForeignKey('CustomWorkout', related_name='custom_exercises_workouts',
+                                       on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=500, null=True, blank=True)
+
+
+class CustomSet(models.Model):
+    REGULAR = 'r'
+    SUPERSET = 'ss'
+    GIANTSET = 'gs'
+    DROPSET = 'ds'
+    TRIPLE_DROPSET = 'td'
+    CIRCUIT_TRAINING = 'ct'
+    CARDIO = 'cr'
+    TYPE = [
+        (SUPERSET, 'Superset'),
+        (GIANTSET, 'Giantset'),
+        (DROPSET, 'Dropset'),
+        (TRIPLE_DROPSET, 'Triple Dropset'),
+        (CIRCUIT_TRAINING, 'Circuit Training'),
+        (REGULAR, 'Regular'),
+        (CARDIO, 'Cardio'),
+    ]
+    custom_exercise = models.ForeignKey('CustomExercise', related_name='custom_set_exercises', on_delete=models.CASCADE)
+    set_no = models.PositiveIntegerField(default=1)
+
+    reps = models.CharField(default="1", max_length=150)
+    weight = models.CharField(max_length=250, default="1")
+    timer = models.FloatField(default=90.0)
+
+    set_type = models.CharField(
+        max_length=10,
+        choices=TYPE,
+        default=REGULAR
+    )
+
+    exercises = models.ManyToManyField('Exercise', blank=True, related_name='custom_sets_exercises')
+
+    done = models.BooleanField(default=False)
 
 
 class Set(models.Model):
@@ -305,7 +364,7 @@ class Set(models.Model):
         default=REGULAR
     )
 
-    exercises = models.ManyToManyField('Exercise', blank=True)
+    exercises = models.ManyToManyField('Exercise', blank=True, related_name='sets_exercises')
 
     done = models.BooleanField(default=False)
 
@@ -316,3 +375,5 @@ class Set(models.Model):
     def reset(self):
         self.done = False
         self.save()
+
+

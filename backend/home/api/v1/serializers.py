@@ -26,7 +26,8 @@ from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem
     PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply, AltMeasure, MealTime, \
     MealHistory
 
-from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report
+from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report, CustomWorkout, \
+    CustomExercise, CustomSet
 from users.models import Settings, UserPhoto, UserVideo
 
 User = get_user_model()
@@ -219,7 +220,7 @@ class UserSerializer(serializers.ModelSerializer):
                   "exercise_level", "activity_level",
                   "understanding_level", "number_of_meal", "number_of_training_days",
                   "fitness_goal", "settings", 'stripe_customer_id', "is_survey", "is_superuser", 'request_user',
-                  'block_user'
+                  'block_user', 'is_premium_user'
                   ]
 
     def _get_request(self):
@@ -660,4 +661,24 @@ class ReportCommentReplySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportCommentReply
+        fields = "__all__"
+class CustomExercisesSetsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomSet
+        fields = "__all__"
+
+
+class CustomExercisesSerializer(serializers.ModelSerializer):
+    custom_sets = CustomExercisesSetsSerializer(many=True,  source="custom_set_exercises")
+    exercises = ExerciseSerializer(many=True)
+    class Meta:
+        model = CustomExercise
+        fields = "__all__"
+
+class CustomWorkoutSerializer(serializers.ModelSerializer):
+    custom_exercise = CustomExercisesSerializer(many=True, source="custom_exercises_workouts", read_only=True)
+
+    class Meta:
+        model = CustomWorkout
         fields = "__all__"
