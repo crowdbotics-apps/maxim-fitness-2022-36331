@@ -26,6 +26,8 @@ const POST_SUBSCRIPTION_SUCCESS =
   "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_SUCCESS"
 const POST_SUBSCRIPTION_FAILURE =
   "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_FAILURE"
+const PAYMENT_SUBSCRIPTION_REQUEST =
+  "SUBSCRIPTION_SCREEN/PAYMENT_SUBSCRIPTION_REQUEST"
 
 const initialState = {
   requesting: false,
@@ -39,7 +41,8 @@ const initialState = {
   SRequesting: false,
   getSubscription: false,
   getSubscriptionError: false,
-  subscriptionData: false
+  subscriptionData: false,
+  subRequesting: false
 }
 
 //Actions
@@ -93,6 +96,11 @@ export const newSubScription = data => ({
   data
 })
 
+export const paymentSubscriptionRequest = data => ({
+  type: PAYMENT_SUBSCRIPTION_REQUEST,
+  data
+})
+
 export const reset = () => ({
   type: RESET
 })
@@ -103,20 +111,20 @@ export const subscriptionReducer = (state = initialState, action) => {
     case GET_PLAN_REQUEST:
       return {
         ...state,
-        requesting: true
+        subRequesting: true
       }
 
     case GET_PLAN_SUCCESS:
       return {
         ...state,
         getPlanSuccess: action.data,
-        requesting: false
+        subRequesting: false
       }
     case GET_PLAN_FAILURE:
       return {
         ...state,
         getPlanFailure: action.error,
-        requesting: false
+        subRequesting: false
       }
 
     case GET_CUSTOMERID_REQUEST:
@@ -176,7 +184,7 @@ export const subscriptionReducer = (state = initialState, action) => {
 
 //Saga
 async function getPlanAPI() {
-  const URL = `${API_URL}/payment/get_plans/`
+  const URL = `${API_URL}/subscription/plans/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "GET",
@@ -191,12 +199,15 @@ async function getPlanAPI() {
 function* getFeeds() {
   try {
     const response = yield call(getPlanAPI)
-    yield put(getPlanSuccess(response.data.data))
+    const activeFilteredData = response.data.filter(
+      data => data.product_details.active
+    )
+    yield put(getPlanSuccess(activeFilteredData))
   } catch (e) {
     const { response } = e
     yield put(getPlanFailure(e))
   } finally {
-    yield put(reset())
+    yield put(getPlanFailure())
   }
 }
 
@@ -227,8 +238,9 @@ function* getCustomerId() {
 }
 
 //Saga
-async function postSubscriptionAPI(data) {
-  const URL = `${API_URL}/payment/create_subscription/`
+
+async function addSubscriptionCardAPI(data) {
+  const URL = `${API_URL}/subscription/create_card/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "POST",
@@ -240,18 +252,40 @@ async function postSubscriptionAPI(data) {
   }
   return XHR(URL, options)
 }
-
-function* postSubscription({ data }) {
+function* addSubscriptionCard({ data }) {
   try {
-    const response = yield call(postSubscriptionAPI, data)
-    const token = AsyncStorage.getItem("authToken")
-    yield put(setAccessToken(token))
-
-    yield put(newSubScription(response.data))
-    navigate("Feeds")
+    const response = yield call(addSubscriptionCardAPI, data)
+    yield put(paymentSubscriptionRequest(data))
   } catch (e) {
     const { response } = e
     // yield put(postSubscriptionFailure(e))
+  } finally {
+    yield put(reset())
+  }
+}
+//api call function
+async function paymentSubscriptionAPI(payload) {
+  const data = { price_id: payload.plan_id, premium_user: payload.premium_user }
+  const URL = `${API_URL}/subscription/create_subscription3/`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token  ${token}`
+    },
+    data
+  }
+  return XHR(URL, options)
+}
+//generator function
+function* paymentSubscription({ data }) {
+  try {
+    const response = yield call(paymentSubscriptionAPI, data)
+    navigate("Feeds")
+    yield put(newSubScription(response.data))
+  } catch (e) {
+    const { response } = e
   } finally {
     yield put(reset())
   }
@@ -260,5 +294,6 @@ function* postSubscription({ data }) {
 export default all([
   takeLatest(GET_PLAN_REQUEST, getFeeds),
   takeLatest(GET_CUSTOMERID_REQUEST, getCustomerId),
-  takeLatest(POST_SUBSCRIPTION_REQUEST, postSubscription)
+  takeLatest(POST_SUBSCRIPTION_REQUEST, addSubscriptionCard),
+  takeLatest(PAYMENT_SUBSCRIPTION_REQUEST, paymentSubscription)
 ])

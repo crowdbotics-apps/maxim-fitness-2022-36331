@@ -22,7 +22,7 @@ const CreditCard = props => {
   const {
     navigation,
     route: {
-      params: { plan_id, product }
+      params: { plan_id, product, is_premium }
     }
   } = props
   const [data, setData] = useState([])
@@ -41,14 +41,16 @@ const CreditCard = props => {
   const getDataFromCard = () => {
     const month = data.values.expiry.slice(0, 2)
     const year = data.values.expiry.slice(3, 5)
-    props.postSubscriptionRequest({
+    const newData = {
+      card_holder_name: data.values.name,
       card_number: data.values.number,
       card_exp_month: month,
       card_exp_year: year,
-      card_cvv: data.values.cvc,
+      card_cvc: data.values.cvc,
       plan_id: plan_id,
-      product: product
-    })
+      premium_user: is_premium
+    }
+    props.postSubscriptionRequest(newData)
     // navigation.navigate('SurveyScreen');
   }
   const saveData = () => {
