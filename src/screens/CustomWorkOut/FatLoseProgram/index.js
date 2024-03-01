@@ -615,64 +615,63 @@ const FatLoseProgram = props => {
               </View>
             </View>
           )}
-          {!todayRequest && getWeekSessions?.query?.length > 0 && (
-            <View style={[center, styles.cardView2]}>
+
+          <View style={[center, styles.cardView2]}>
+            <Text
+              text={"Create the a Custom Workout"}
+              style={styles.heading3}
+            />
+            <View style={{ marginHorizontal: 10, marginTop: 10 }}>
               <Text
-                text={"Create the a Custom Workout"}
-                style={styles.heading3}
+                text={
+                  "Design your own strength workout or choose an outdoor run, hike, walk, or bike ride using our GPS tracker and guided workouts."
+                }
+                style={styles.praText}
               />
-              <View style={{ marginHorizontal: 10, marginTop: 10 }}>
-                <Text
-                  text={
-                    "Design your own strength workout or choose an outdoor run, hike, walk, or bike ride using our GPS tracker and guided workouts."
-                  }
-                  style={styles.praText}
-                />
-              </View>
-              <View style={[fill, center, Gutters.regularVMargin]}>
-                <TouchableOpacity
-                  onPress={() => {
-                    props.addCustomExercise([])
-                    navigation.navigate("AddExercise")
-                  }}
-                  // disabled={
-                  //   todayRequest ||
-                  //   todaySessions?.length === 0 ||
-                  //   todaySessions?.name === "Rest"
-                  // }
-                >
-                  <LinearGradient
-                    start={start}
-                    end={end}
-                    colors={
-                      // todayRequest ||
-                      // todaySessions?.length === 0 ||
-                      // todaySessions?.name === "Rest"
-                      //   ? ["#dddddd", "#dddddd"]
-                      //   :
-                      ["#00a2ff", "#00a2ff"]
-                    }
-                    style={[
-                      fill,
-                      Gutters.small2xHPadding,
-                      Gutters.regularVPadding,
-                      styles.gradientWrapper
-                    ]}
-                  >
-                    <Text
-                      text="Create Workout"
-                      style={{
-                        fontSize: 16,
-                        lineHeight: 18,
-                        fontWeight: "bold",
-                        color: "#fff"
-                      }}
-                    />
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
             </View>
-          )}
+            <View style={[fill, center, Gutters.regularVMargin]}>
+              <TouchableOpacity
+                onPress={() => {
+                  props.addCustomExercise([])
+                  navigation.navigate("AddExercise")
+                }}
+                // disabled={
+                //   todayRequest ||
+                //   todaySessions?.length === 0 ||
+                //   todaySessions?.name === "Rest"
+                // }
+              >
+                <LinearGradient
+                  start={start}
+                  end={end}
+                  colors={
+                    // todayRequest ||
+                    // todaySessions?.length === 0 ||
+                    // todaySessions?.name === "Rest"
+                    //   ? ["#dddddd", "#dddddd"]
+                    //   :
+                    ["#00a2ff", "#00a2ff"]
+                  }
+                  style={[
+                    fill,
+                    Gutters.small2xHPadding,
+                    Gutters.regularVPadding,
+                    styles.gradientWrapper
+                  ]}
+                >
+                  <Text
+                    text="Create Workout"
+                    style={{
+                      fontSize: 16,
+                      lineHeight: 18,
+                      fontWeight: "bold",
+                      color: "#fff"
+                    }}
+                  />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
 

@@ -320,11 +320,13 @@ function* getAllSessions({ data }) {
   try {
     if (data && data !== "all") {
       const response = yield call(getWeekSessionAPI, data)
-      const query = sortSessionBySets(response?.data?.query)
+      // const query = sortSessionBySets(response?.data?.query)
+      const query = response?.data?.query
       yield put(getWeekSessionSuccess({ ...response?.data, query }))
     } else {
       const response = yield call(getAllSessionAPI, data)
-      const query = sortSessionBySets(response?.data?.query)
+      // const query = sortSessionBySets(response?.data?.query)
+      const query = response?.data?.query
       yield put(getAllSessionSuccess({ ...response?.data, query }))
     }
   } catch (e) {

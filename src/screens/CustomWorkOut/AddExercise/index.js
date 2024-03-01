@@ -23,6 +23,7 @@ import { connect } from "react-redux"
 
 import { TextInput } from "react-native-gesture-handler"
 import {
+  addCustomExercise,
   getExerciseRequest,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
@@ -98,7 +99,15 @@ const AddExercies = props => {
     const data = activeSet?.item
       ? activeSet
       : { id: 0, value: 0, item: "Single Set" }
+
     navigation.navigate("CustomExercise", { exercises, activeSet: data })
+    let newObj = {}
+    newObj[`type`] = exercises
+    const newData = [
+      ...props.customExercise,
+      { exercises: newObj, activeSet: data }
+    ]
+    props.addCustomExercise(newData)
   }
 
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
@@ -110,6 +119,7 @@ const AddExercies = props => {
       value
     )
   }
+
   const onHandlePress = (i, item) => {
     setSelectedItem([])
     setSelectMuscle(i)
@@ -687,12 +697,14 @@ const mapStateToProps = state => ({
   requesting: state.addExerciseReducer.requesting,
   request: state.addExerciseReducer.request,
   getExerciseState: state.addExerciseReducer.getExerciseState,
-  getExerciseType: state.addExerciseReducer.getExerciseType
+  getExerciseType: state.addExerciseReducer.getExerciseType,
+  customExercise: state.addExerciseReducer.custom
 })
 
 const mapDispatchToProps = dispatch => ({
   getExerciseRequest: () => dispatch(getExerciseRequest()),
   getExerciseTypeRequest: (data, search) =>
-    dispatch(getExerciseTypeRequest(data, search))
+    dispatch(getExerciseTypeRequest(data, search)),
+  addCustomExercise: data => dispatch(addCustomExercise(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddExercies)
