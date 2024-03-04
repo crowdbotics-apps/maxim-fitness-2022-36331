@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { API_URL } from "../config/app"
 import { setAccessToken } from "./loginRedux"
 import { navigate } from "../navigation/NavigationService"
+import { showMessage } from "react-native-flash-message"
 
 // utils
 import XHR from "src/utils/XHR"
@@ -257,6 +258,10 @@ function* addSubscriptionCard({ data }) {
     const response = yield call(addSubscriptionCardAPI, data)
     yield put(paymentSubscriptionRequest(data))
   } catch (e) {
+    showMessage({
+      message: "something went wrong",
+      type: "error"
+    })
     const { response } = e
     // yield put(postSubscriptionFailure(e))
   } finally {

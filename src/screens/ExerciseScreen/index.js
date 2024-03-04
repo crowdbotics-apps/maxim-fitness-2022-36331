@@ -487,7 +487,7 @@ const ExerciseScreen = props => {
           </View>
         </ScrollView>
       </View>
-      {selectedExercise.length !== 0 &&
+      {selectedExercise?.length !== 0 &&
         (selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "ss" ||
           selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "gs") && (
           <View style={[row, center, secondaryBg]}>

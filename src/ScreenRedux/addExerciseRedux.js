@@ -22,15 +22,18 @@ const POST_CUSTOM_EXERCISE_REQUEST =
   "AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST"
 const POST_CUSTOM_EXERCISE_SUCCESS =
   "AddExerciseScreen/POST_CUSTOM_EXERCISE_SUCCESS"
+const GET_CUSTOM_EXERCISE_SUCCESS =
+  "AddExerciseScreen/GET_CUSTOM_EXERCISE_SUCCESS"
 
 export const getExerciseRequest = () => ({
   type: GET_EXERCISE_REQUEST
 })
-export const getCustomExerciseRequest = () => ({
-  type: GET_CUSTOM_EXERCISE_REQUEST
-})
-export const getCustomExerciseRequestSuccess = data => ({
+export const getCustomExerciseRequest = date => ({
   type: GET_CUSTOM_EXERCISE_REQUEST,
+  date
+})
+export const getCustomExerciseSuccess = data => ({
+  type: GET_CUSTOM_EXERCISE_SUCCESS,
   data
 })
 
@@ -75,7 +78,7 @@ const initialState = {
   cRequesting: false,
   getCustomExState: false,
   custom: [],
-  getCustomExerciseState: false
+  getCustomExerciseState: []
 }
 
 export const addExerciseReducer = (state = initialState, action) => {
@@ -83,12 +86,6 @@ export const addExerciseReducer = (state = initialState, action) => {
     case GET_EXERCISE_REQUEST:
       return {
         ...state,
-        requesting: true
-      }
-    case GET_CUSTOM_EXERCISE_REQUEST:
-      return {
-        ...state,
-        getCustomExerciseState: action.data,
         requesting: true
       }
 
@@ -129,7 +126,17 @@ export const addExerciseReducer = (state = initialState, action) => {
         getCustomExState: action.data,
         cRequesting: false
       }
-
+    case GET_CUSTOM_EXERCISE_SUCCESS:
+      return {
+        ...state,
+        getCustomExerciseState: action.data,
+        cRequesting: false
+      }
+    case GET_CUSTOM_EXERCISE_REQUEST:
+      return {
+        ...state,
+        requesting: true
+      }
     default:
       return state
   }
@@ -206,7 +213,7 @@ function* postCustomEx({ data }) {
 
 async function getCustomExerciseAPI(data) {
   const token = await AsyncStorage.getItem("authToken")
-  const URL = `${API_URL}/new_custom_workout/?day=${data}`
+  const URL = `${API_URL}/new_custom_workout/?date=${data.date}`
   const options = {
     headers: {
       "Content-Type": "application/json",
@@ -220,12 +227,11 @@ async function getCustomExerciseAPI(data) {
 function* getCustomExercise(data) {
   try {
     const response = yield call(getCustomExerciseAPI, data)
-    yield put(getCustomExerciseRequestSuccess(response.data))
+    yield put(getCustomExerciseSuccess(response.data))
   } catch (e) {
-    yield put(getCustomExerciseRequestSuccess(false))
+    yield put(getCustomExerciseSuccess(false))
   }
 }
-
 export default all([
   takeLatest(POST_CUSTOM_EXERCISE_REQUEST, postCustomEx),
   takeLatest(GET_EXERCISE_TYPE_REQUEST, getExerciseType),
