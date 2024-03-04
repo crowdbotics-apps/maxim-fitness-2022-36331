@@ -227,6 +227,7 @@ const Feeds = props => {
                 disableFocus={true}
                 mixWithOthers={"mix"}
                 controls={true}
+                poster={videoUri?.video_thumbnail}
                 onLoadStart={() => setLoading(true)}
                 onLoad={() => setLoading(false)}
               />
@@ -256,7 +257,7 @@ const Feeds = props => {
         isVisible={isModalVisible}
         animationIn="zoomIn"
         animationOut={"zoomOut"}
-        // onBackdropPress={() => toggleModal(false)}
+      // onBackdropPress={() => toggleModal(false)}
       >
         <View style={styles.modalStyle}>
           <View style={styles.reportStyle}>
