@@ -2,7 +2,7 @@ import React from "react"
 
 // components
 import { View, StyleSheet, TouchableOpacity } from "react-native"
-import { Text } from "../../../components"
+import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
@@ -62,9 +62,10 @@ const Card = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
+        <Loader isLoading={amount != 0 || amount < 0} />
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
-            text={`$ ${amount || "0"}`}
+            text={`$ ${amount || 0}`}
             regularTitle
             color="secondary"
             bold

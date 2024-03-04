@@ -1,14 +1,21 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Dimensions, StyleSheet } from 'react-native';
-import { Images } from '../../theme';
+import React, { useRef, useEffect, useState } from "react"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  StyleSheet
+} from "react-native"
+import { Images } from "../../theme"
 
-const width = Dimensions.get('screen').width / 3.1;
+const width = Dimensions.get("screen").width / 3.1
 
 const ExcerciseTabHeaderItem = ({
   goToPage,
   activeTab,
   index,
-  item,
+  item
   // setElemetForParent,
   // pickSessionAction,
   // selectedSession,
@@ -16,7 +23,7 @@ const ExcerciseTabHeaderItem = ({
   // setStartRest,
   // setShowBar,
 }) => {
-  const viewRef = useRef(null);
+  const viewRef = useRef(null)
   // const [element, setElement] = useState(null);
 
   // useEffect(() => {
@@ -46,10 +53,10 @@ const ExcerciseTabHeaderItem = ({
       ref={viewRef}
       // onLayout={onLayoutHelper}
       style={{
-        backgroundColor: 'white',
+        backgroundColor: "white",
         marginTop: activeTab !== index ? 5 : 0,
         borderTopLeftRadius: activeTab === index ? 7 : 0,
-        borderTopRightRadius: activeTab === index ? 7 : 0,
+        borderTopRightRadius: activeTab === index ? 7 : 0
       }}
     >
       <TouchableOpacity
@@ -64,8 +71,9 @@ const ExcerciseTabHeaderItem = ({
           {
             marginTop: activeTab !== index ? 5 : 0,
             height: activeTab === index ? 70 : 60,
-            backgroundColor: activeTab === index ? 'white' : 'rgb(242, 242, 242)',
-          },
+            backgroundColor:
+              activeTab === index ? "white" : "rgb(242, 242, 242)"
+          }
         ]}
       >
         <View style={styles.buttonContainer}>
@@ -77,18 +85,18 @@ const ExcerciseTabHeaderItem = ({
           <View
             style={{
               flex: item?.done ? 2 : 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
               paddingLeft: item?.done ? 0 : 10,
-              paddingRight: 10,
+              paddingRight: 10
             }}
           >
             <Text
               style={{
-                color: 'black',
+                color: "black",
                 fontSize: 15,
-                textAlign: 'center',
+                textAlign: "center"
               }}
               ellipsizeMode="tail"
               numberOfLines={3}
@@ -99,33 +107,33 @@ const ExcerciseTabHeaderItem = ({
         </View>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   touchButtonContainer: {
     marginBottom: -10,
     width,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 8,
-    marginHorizontal: 2.5,
+    marginHorizontal: 2.5
   },
   buttonContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     height: 60,
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   doneWrapper: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center"
   },
   imageWrapper: {
     width: 20,
-    height: 20,
-  },
-});
+    height: 20
+  }
+})
 
-export default ExcerciseTabHeaderItem;
+export default ExcerciseTabHeaderItem

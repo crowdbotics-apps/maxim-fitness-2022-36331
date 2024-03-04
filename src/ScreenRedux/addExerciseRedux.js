@@ -9,13 +9,15 @@ import XHR from "src/utils/XHR"
 import { navigate } from "../navigation/NavigationService"
 
 const GET_EXERCISE_REQUEST = "AddExerciseScreen/GET_EXERCISE_REQUEST"
+
 const GET_EXERCISE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_SUCCESS"
 
 const GET_EXERCISE_TYPE_REQUEST = "AddExerciseScreen/GET_EXERCISE_TYPE_REQUEST"
 const GET_EXERCISE_TYPE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_TYPE_SUCCESS"
 
 const ADD_CUSTOM_EXERCISE = "AddExerciseScreen/ADD_CUSTOM_EXERCISE"
-
+const GET_CUSTOM_EXERCISE_REQUEST =
+  "AddExerciseScreen/GET_CUSTOM_EXERCISE_REQUEST"
 const POST_CUSTOM_EXERCISE_REQUEST =
   "AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST"
 const POST_CUSTOM_EXERCISE_SUCCESS =
@@ -23,6 +25,13 @@ const POST_CUSTOM_EXERCISE_SUCCESS =
 
 export const getExerciseRequest = () => ({
   type: GET_EXERCISE_REQUEST
+})
+export const getCustomExerciseRequest = () => ({
+  type: GET_CUSTOM_EXERCISE_REQUEST
+})
+export const getCustomExerciseRequestSuccess = data => ({
+  type: GET_CUSTOM_EXERCISE_REQUEST,
+  data
 })
 
 export const getExerciseSuccess = data => ({
@@ -65,7 +74,8 @@ const initialState = {
 
   cRequesting: false,
   getCustomExState: false,
-  custom: []
+  custom: [],
+  getCustomExerciseState: false
 }
 
 export const addExerciseReducer = (state = initialState, action) => {
@@ -73,6 +83,12 @@ export const addExerciseReducer = (state = initialState, action) => {
     case GET_EXERCISE_REQUEST:
       return {
         ...state,
+        requesting: true
+      }
+    case GET_CUSTOM_EXERCISE_REQUEST:
+      return {
+        ...state,
+        getCustomExerciseState: action.data,
         requesting: true
       }
 
@@ -188,8 +204,31 @@ function* postCustomEx({ data }) {
   }
 }
 
+async function getCustomExerciseAPI(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/new_custom_workout/?day=${data}`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(URL, options)
+}
+
+function* getCustomExercise(data) {
+  try {
+    const response = yield call(getCustomExerciseAPI, data)
+    yield put(getCustomExerciseRequestSuccess(response.data))
+  } catch (e) {
+    yield put(getCustomExerciseRequestSuccess(false))
+  }
+}
+
 export default all([
   takeLatest(POST_CUSTOM_EXERCISE_REQUEST, postCustomEx),
   takeLatest(GET_EXERCISE_TYPE_REQUEST, getExerciseType),
-  takeLatest(GET_EXERCISE_REQUEST, getExercise)
+  takeLatest(GET_EXERCISE_REQUEST, getExercise),
+  takeLatest(GET_CUSTOM_EXERCISE_REQUEST, getCustomExercise)
 ])

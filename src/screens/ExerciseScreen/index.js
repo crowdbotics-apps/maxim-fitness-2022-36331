@@ -48,6 +48,7 @@ const ExerciseScreen = props => {
   let refModal = useRef("")
 
   const [videoLoader, setVideoLoader] = useState(false)
+  const [mainActive, setMainActive] = useState(0)
   const [active, setActive] = useState(0)
   const [params, setParms] = useState({})
   const [startTimer, setStartTimer] = useState(false)
@@ -64,6 +65,7 @@ const ExerciseScreen = props => {
   const [weightThree, setWeightThree] = useState("")
   const [showModalWeightTwo, setShowModalWeightTwo] = useState(false)
   const [showModalWeightThree, setShowModalWeightThree] = useState(false)
+  const [selectedExercise, setSelectedExercise] = useState([])
 
   // change color state
   const [repsColor, setRepsColor] = useState(false)
@@ -150,7 +152,8 @@ const ExerciseScreen = props => {
     const unsubscribe = navigation.addListener("focus", () => {
       // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
       // if (findFirstNotDoneSet !== undefined) {
-      const setId = sortDataByDoneStatus(selectedSession)[0]?.sets[0]?.id
+      const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
+
       props.repsWeightRequest(setId, null, null)
       // }
     })
@@ -160,6 +163,8 @@ const ExerciseScreen = props => {
   useEffect(() => {
     if (route) {
       setParms(route.params)
+
+      selectedSession && setSelectedExercise(selectedSession?.[0])
     }
   }, [route])
 
@@ -286,7 +291,7 @@ const ExerciseScreen = props => {
         const data = {
           activeSet,
           active,
-          selectedSession: sortDataByDoneStatus(selectedSession),
+          selectedSession: selectedSession,
           setTimmer
         }
         props.setDoneRequest(findSetId.id, data)
@@ -337,10 +342,10 @@ const ExerciseScreen = props => {
   }
 
   const swipeFunc = () => {
-    props.allSwapExercise(sortDataByDoneStatus(selectedSession)?.[active]?.id)
+    props.allSwapExercise(selectedSession?.[active]?.id)
     navigation.navigate("SwapExerciseScreen", {
       ScreenData: {
-        data: sortDataByDoneStatus(selectedSession)?.[active],
+        data: selectedSession?.[active],
         date_time: params?.item?.date_time
       }
     })
@@ -400,6 +405,7 @@ const ExerciseScreen = props => {
             setHours={setHours}
           />
         </View>
+
         <View />
       </View>
       <View style={[row, center, secondaryBg]}>
@@ -415,20 +421,34 @@ const ExerciseScreen = props => {
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
             {selectedSession &&
-              sortDataByDoneStatus(selectedSession)?.map((item, i) => {
+              selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
                     // disabled={timmer}
-                    onPress={() => selectExercise(item, i)}
+                    onPress={() => {
+                      setSelectedExercise(item)
+                      setMainActive(i)
+
+                      if (
+                        item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
+                        item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
+                      ) {
+                        selectExercise(item?.exercises?.[i], 0)
+                      } else {
+                        selectExercise(item?.exercises?.[0], 0)
+                      }
+
+                      //
+                    }}
                     style={[
                       row,
                       center,
                       smallHPadding,
                       {
-                        minHeight: active === i ? 80 : 60,
-                        borderRadius: active === i ? 8 : 10,
-                        marginHorizontal: active === i ? 0 : 2,
-                        backgroundColor: active === i ? "white" : "#F2F2F2"
+                        minHeight: mainActive === i ? 80 : 60,
+                        borderRadius: mainActive === i ? 8 : 10,
+                        marginHorizontal: mainActive === i ? 0 : 2,
+                        backgroundColor: mainActive === i ? "white" : "#F2F2F2"
                       }
                     ]}
                   >
@@ -458,7 +478,7 @@ const ExerciseScreen = props => {
                         ellipsizeMode="tail"
                         numberOfLines={3}
                       >
-                        {`${i + 1}. ${item?.exercise?.name}`}
+                        {`${i + 1}. ${item?.name}`}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -467,19 +487,89 @@ const ExerciseScreen = props => {
           </View>
         </ScrollView>
       </View>
-      {selectedSession &&
-        sortDataByDoneStatus(selectedSession)?.map((item, index) => {
+      {selectedExercise.length !== 0 &&
+        (selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "ss" ||
+          selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "gs") && (
+          <View style={[row, center, secondaryBg]}>
+            <ScrollView
+              horizontal
+              contentContainerStyle={[
+                fillGrow,
+                alignItemsEnd,
+                { height: 80, backgroundColor: "#F2F2F2" }
+              ]}
+              showsHorizontalScrollIndicator={false}
+              automaticallyAdjustContentInsets={false}
+            >
+              <View
+                style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}
+              >
+                {selectedExercise?.length !== 0
+                  ? selectedExercise?.exercises?.map((list, i) => (
+                      <TouchableOpacity
+                        // disabled={timmer}
+                        onPress={() => selectExercise(list, i)}
+                        style={[
+                          row,
+                          center,
+                          smallHPadding,
+                          {
+                            minHeight: active === i ? 80 : 60,
+                            borderRadius: active === i ? 8 : 10,
+                            marginHorizontal: active === i ? 0 : 2,
+                            backgroundColor: active === i ? "white" : "#F2F2F2"
+                          }
+                        ]}
+                      >
+                        {list?.done ? (
+                          <View style={styles.doneWrapper}>
+                            <Image
+                              source={Images.iconDoneProgram}
+                              style={styles.imageWrapper}
+                            />
+                          </View>
+                        ) : null}
+                        <View
+                          style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            width: 100
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "black",
+                              fontSize: 15,
+                              textAlign: "center"
+                            }}
+                            ellipsizeMode="tail"
+                            numberOfLines={3}
+                          >
+                            {`${i + 1}. ${list?.name}`}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  : null}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+      {selectedExercise?.length !== 0 &&
+        selectedExercise?.exercises?.map((item, index) => {
           if (active === index) {
             return (
               <View style={[fill]}>
                 <View style={[{ backgroundColor: "#F2F2F2" }]}>
-                  {item?.exercise?.video ? (
+                  {item?.video ? (
                     <VideoPlayer
                       video={{
-                        uri: item?.exercise?.video
+                        uri: item?.video
                       }}
                       resizeMode="stretch"
-                      thumbnail={{ uri: item?.exercise?.video_thumbnail }}
+                      thumbnail={{ uri: item?.video_thumbnail }}
                       disableFullscreen={false}
                     />
                   ) : (
@@ -708,10 +798,10 @@ const ExerciseScreen = props => {
           style={[fill, { width: "100%", marginTop: 20 }]}
         >
           <View style={[regularHMargin]}>
-            {sortDataByDoneStatus(selectedSession)?.[active]?.exercise
-              ?.description ? (
-              sortDataByDoneStatus(selectedSession)
-                ?.[active]?.exercise?.description?.split("/n")
+            {selectedExercise?.length !== 0 &&
+            selectedExercise?.exercises?.[active]?.description ? (
+              selectedExercise?.exercises?.[active]?.description
+                ?.split("/n")
                 .map(item => <Text text={item} style={{ color: "#626262" }} />)
             ) : (
               <Text
@@ -976,17 +1066,14 @@ const ExerciseScreen = props => {
                       <Text
                         regularTitle
                         color="quinary"
-                        text={`1. ${
-                          sortDataByDoneStatus(selectedSession)?.[active]
-                            ?.exercise?.name
-                        }`}
+                        text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                       />
                     </View>
                     <View style={center}>
                       <Image
                         source={{
-                          uri: sortDataByDoneStatus(selectedSession)?.[active]
-                            ?.exercise?.video_thumbnail
+                          uri: selectedSession?.[active]?.exercise
+                            ?.video_thumbnail
                         }}
                         style={styles.modalImageStyle}
                       />
@@ -1000,18 +1087,14 @@ const ExerciseScreen = props => {
                   <Text
                     regularTitle
                     color="quinary"
-                    text={`1. ${
-                      sortDataByDoneStatus(selectedSession)?.[active]?.exercise
-                        ?.name
-                    }`}
+                    text={`1. ${selectedSession?.[active]?.exercise?.name}`}
                   />
                 </View>
 
                 <View style={center}>
                   <Image
                     source={{
-                      uri: sortDataByDoneStatus(selectedSession)?.[active]
-                        ?.exercise?.video_thumbnail
+                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />

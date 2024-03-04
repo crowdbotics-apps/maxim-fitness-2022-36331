@@ -21,7 +21,10 @@ import { Text, BottomSheet } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
-import { addCustomExercise } from "../../../ScreenRedux/addExerciseRedux"
+import {
+  addCustomExercise,
+  getCustomExerciseRequest
+} from "../../../ScreenRedux/addExerciseRedux"
 import {
   getDaySessionRequest,
   getAllSessionRequest,
@@ -32,20 +35,21 @@ const FatLoseProgram = props => {
   const {
     navigation,
     todayRequest,
+    requesting,
     todaySessions,
     getAllSessions,
     getWeekSessions,
-    profile
+    profile,
+    getCustomExerciseState
   } = props
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
   const [index, setIndex] = useState(false)
   const [isModal, setIsModal] = useState(false)
   const [data, setData] = useState({})
-
+  console.log(getCustomExerciseState, "getCustomExerciseState")
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
-
   useEffect(() => {
     getWeekSessions?.query?.map((p, i) => {
       if (p.date_time === moment(new Date()).format("YYYY-MM-DD")) {
@@ -96,6 +100,7 @@ const FatLoseProgram = props => {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       const newDate = moment(new Date()).format("YYYY-MM-DD")
+      props.getCustomExerciseRequest(newDate)
       props.getAllSessionRequest(newDate)
       props.getDaySessionRequest(newDate)
       setIndex(false)
@@ -420,146 +425,323 @@ const FatLoseProgram = props => {
             <View style={[Layout.center, { height: 200 }]}>
               <Text text={"No workout found!"} style={styles.headind2} />
             </View>
-          ) : todaySessions?.name && todaySessions?.name !== "Rest" ? (
-            <View>
-              <Text
-                text={
-                  todaySessions.date_time ===
-                  moment(new Date()).format("YYYY-MM-DD")
-                    ? "Today's Workout"
-                    : `${moment(todaySessions.date_time).format(
-                        "dddd"
-                      )}'s Workout`
-                }
-                style={styles.headind2}
-              />
-              <View style={styles.cardView}>
-                <View style={[row, justifyContentBetween]}>
+          ) : getCustomExerciseState?.length ||
+            (todaySessions?.name && todaySessions?.name !== "Rest") ? (
+            <>
+              {todaySessions?.name !== "Rest" && (
+                <View>
                   <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
-                    color="primary"
-                    style={styles.dayText}
+                    text={
+                      todaySessions.date_time ===
+                      moment(new Date()).format("YYYY-MM-DD")
+                        ? "Today's Workout"
+                        : `${moment(todaySessions.date_time).format(
+                            "dddd"
+                          )}'s Workout`
+                    }
+                    style={styles.headind2}
                   />
-                  <TouchableOpacity
-                    onPress={() => refDescription.current.open()}
-                  >
-                    <Image source={etc} style={styles.imgStyle} />
-                  </TouchableOpacity>
+                  <View style={styles.cardView}>
+                    <View style={[row, justifyContentBetween]}>
+                      <Text
+                        text={`Day ${
+                          weekDay === 0 ? 7 : weekDay ? weekDay : day
+                        }`}
+                        color="primary"
+                        style={styles.dayText}
+                      />
+                      <TouchableOpacity
+                        onPress={() => refDescription.current.open()}
+                      >
+                        <Image source={etc} style={styles.imgStyle} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[row, { flex: 1 }]}>
+                      <View
+                        style={[
+                          row,
+                          {
+                            width: "36%",
+                            marginTop: 5,
+                            flexWrap: "wrap"
+                          }
+                        ]}
+                      >
+                        {todaySessions?.workouts &&
+                          todaySessions?.workouts?.map((item, i) => (
+                            <Image
+                              source={{
+                                uri: item?.exercise.exercise_type?.image
+                              }}
+                              style={{
+                                width: 50,
+                                height: 50,
+                                marginLeft: 5,
+                                marginTop: i > 1 ? 5 : 0
+                              }}
+                            />
+                          ))}
+                      </View>
+
+                      <View
+                        style={{
+                          flex: 1,
+                          width: "85%",
+                          marginHorizontal: 10,
+                          fllex: 1
+                        }}
+                      >
+                        <View>
+                          <Text
+                            text={todaySessions?.name}
+                            style={{
+                              fontSize: 15,
+                              lineHeight: 20,
+                              fontWeight: "bold",
+                              color: "#626262"
+                            }}
+                          />
+                          <Text
+                            text={`${todaySessions?.workouts?.length} exercies`}
+                            style={{
+                              fontSize: 12,
+                              lineHeight: 12,
+                              fontWeight: "400",
+                              marginTop: 10,
+                              color: "#626262"
+                            }}
+                          />
+                        </View>
+
+                        <View
+                          style={[
+                            row,
+                            fill,
+                            alignItemsCenter,
+                            {
+                              marginVertical: 20,
+                              justifyContent: "space-between"
+                            }
+                          ]}
+                        >
+                          <Text
+                            text={`${todaySessions?.cardio_length} minutes`}
+                            style={{
+                              fontSize: 12,
+                              lineHeight: 12,
+                              fontWeight: "400",
+                              color: "#626262"
+                              // opacity: 0.7
+                            }}
+                          />
+                          <Text
+                            text="Steady State"
+                            style={{
+                              fontSize: 15,
+                              lineHeight: 18,
+                              fontWeight: "bold",
+                              marginLeft: 30,
+                              color: "#626262"
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={[row]}></View>
+                    <View style={[fill, center, Gutters.regularVMargin]}>
+                      <TouchableOpacity onPress={selectExerciseObj}>
+                        <LinearGradient
+                          start={start}
+                          end={end}
+                          colors={["#00e200", "#00e268"]}
+                          style={[
+                            fill,
+                            Gutters.small2xHPadding,
+                            Gutters.regularVPadding,
+                            styles.gradientWrapper
+                          ]}
+                        >
+                          <Text
+                            text="Start Workout"
+                            style={{
+                              fontSize: 16,
+                              lineHeight: 18,
+                              fontWeight: "bold",
+                              color: "#545454"
+                            }}
+                          />
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-                <View style={[row, { flex: 1 }]}>
-                  <View
-                    style={[
-                      row,
-                      {
-                        width: "36%",
-                        marginTop: 5,
-                        flexWrap: "wrap"
+              )}
+              {getCustomExerciseState.length && (
+                <View>
+                  {!todaySessions?.name && !todaySessions?.name !== "Rest" && (
+                    <Text
+                      text={
+                        todaySessions.date_time ===
+                        moment(new Date()).format("YYYY-MM-DD")
+                          ? "Today's Workout"
+                          : `${moment(todaySessions.date_time).format(
+                              "dddd"
+                            )}'s Workout`
                       }
-                    ]}
-                  >
-                    {todaySessions?.workouts &&
-                      todaySessions?.workouts?.map((item, i) => (
-                        <Image
-                          source={{ uri: item?.exercise.exercise_type?.image }}
-                          style={{
-                            width: 50,
-                            height: 50,
-                            marginLeft: 5,
-                            marginTop: i > 1 ? 5 : 0
-                          }}
-                        />
-                      ))}
-                  </View>
-
-                  <View
-                    style={{
-                      flex: 1,
-                      width: "85%",
-                      marginHorizontal: 10,
-                      fllex: 1
-                    }}
-                  >
-                    <View>
+                      style={styles.headind2}
+                    />
+                  )}
+                  {getCustomExerciseState.length && (
+                    <Text
+                      text={
+                        getCustomExerciseState[0].created_date ===
+                        moment(new Date()).format("YYYY-MM-DD")
+                          ? "Today's Custom Workout"
+                          : `${moment(
+                              getCustomExerciseState[0].created_date
+                            ).format("dddd")}'s Custom Workout`
+                      }
+                      style={styles.headind2}
+                    />
+                  )}
+                  <View style={styles.cardView}>
+                    <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={todaySessions?.name}
-                        style={{
-                          fontSize: 15,
-                          lineHeight: 20,
-                          fontWeight: "bold",
-                          color: "#626262"
-                        }}
+                        text={`Day ${
+                          weekDay === 0 ? 7 : weekDay ? weekDay : day
+                        }`}
+                        color="primary"
+                        style={styles.dayText}
                       />
-                      <Text
-                        text={`${todaySessions?.workouts?.length} exercies`}
-                        style={{
-                          fontSize: 12,
-                          lineHeight: 12,
-                          fontWeight: "400",
-                          marginTop: 10,
-                          color: "#626262"
-                        }}
-                      />
+                      <TouchableOpacity
+                        onPress={() => refDescription.current.open()}
+                      >
+                        <Image source={etc} style={styles.imgStyle} />
+                      </TouchableOpacity>
                     </View>
+                    <View style={[row, { flex: 1 }]}>
+                      <View
+                        style={[
+                          row,
+                          {
+                            width: "36%",
+                            marginTop: 5,
+                            flexWrap: "wrap"
+                          }
+                        ]}
+                      >
+                        {getCustomExerciseState?.custom_exercise &&
+                          getCustomExerciseState?.custom_exercise?.map(
+                            (item, i) => (
+                              <Image
+                                source={{
+                                  uri: item?.exercise_type?.image
+                                }}
+                                style={{
+                                  width: 50,
+                                  height: 50,
+                                  marginLeft: 5,
+                                  marginTop: i > 1 ? 5 : 0
+                                }}
+                              />
+                            )
+                          )}
+                      </View>
 
-                    <View
-                      style={[
-                        row,
-                        fill,
-                        alignItemsCenter,
-                        { marginVertical: 20, justifyContent: "space-between" }
-                      ]}
-                    >
-                      <Text
-                        text={`${todaySessions?.cardio_length} minutes`}
+                      <View
                         style={{
-                          fontSize: 12,
-                          lineHeight: 12,
-                          fontWeight: "400",
-                          color: "#626262"
-                          // opacity: 0.7
+                          flex: 1,
+                          width: "85%",
+                          marginHorizontal: 10,
+                          fllex: 1
                         }}
-                      />
-                      <Text
-                        text="Steady State"
-                        style={{
-                          fontSize: 15,
-                          lineHeight: 18,
-                          fontWeight: "bold",
-                          marginLeft: 30,
-                          color: "#626262"
-                        }}
-                      />
+                      >
+                        <View>
+                          <Text
+                            text={getCustomExerciseState[0]?.name}
+                            style={{
+                              fontSize: 15,
+                              lineHeight: 20,
+                              fontWeight: "bold",
+                              color: "#626262"
+                            }}
+                          />
+                          <Text
+                            text={`${getCustomExerciseState?.custom_excercise?.length} exercies`}
+                            style={{
+                              fontSize: 12,
+                              lineHeight: 12,
+                              fontWeight: "400",
+                              marginTop: 10,
+                              color: "#626262"
+                            }}
+                          />
+                        </View>
+
+                        <View
+                          style={[
+                            row,
+                            fill,
+                            alignItemsCenter,
+                            {
+                              marginVertical: 20,
+                              justifyContent: "space-between"
+                            }
+                          ]}
+                        >
+                          <Text
+                            text={`${getCustomExerciseState?.cardio_length} minutes`}
+                            style={{
+                              fontSize: 12,
+                              lineHeight: 12,
+                              fontWeight: "400",
+                              color: "#626262"
+                              // opacity: 0.7
+                            }}
+                          />
+                          <Text
+                            text="Steady State"
+                            style={{
+                              fontSize: 15,
+                              lineHeight: 18,
+                              fontWeight: "bold",
+                              marginLeft: 30,
+                              color: "#626262"
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={[row]}></View>
+                    <View style={[fill, center, Gutters.regularVMargin]}>
+                      <TouchableOpacity onPress={selectExerciseObj}>
+                        <LinearGradient
+                          start={start}
+                          end={end}
+                          colors={["#00e200", "#00e268"]}
+                          style={[
+                            fill,
+                            Gutters.small2xHPadding,
+                            Gutters.regularVPadding,
+                            styles.gradientWrapper
+                          ]}
+                        >
+                          <Text
+                            text="Start Workout"
+                            style={{
+                              fontSize: 16,
+                              lineHeight: 18,
+                              fontWeight: "bold",
+                              color: "#545454"
+                            }}
+                          />
+                        </LinearGradient>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
-                <View style={[row]}></View>
-                <View style={[fill, center, Gutters.regularVMargin]}>
-                  <TouchableOpacity onPress={selectExerciseObj}>
-                    <LinearGradient
-                      start={start}
-                      end={end}
-                      colors={["#00e200", "#00e268"]}
-                      style={[
-                        fill,
-                        Gutters.small2xHPadding,
-                        Gutters.regularVPadding,
-                        styles.gradientWrapper
-                      ]}
-                    >
-                      <Text
-                        text="Start Workout"
-                        style={{
-                          fontSize: 16,
-                          lineHeight: 18,
-                          fontWeight: "bold",
-                          color: "#545454"
-                        }}
-                      />
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
+              )}
+            </>
           ) : (
             <View>
               <Text text={"Rest day"} style={styles.headind2} />
@@ -871,10 +1053,13 @@ const mapStateToProps = state => ({
   requesting: state.programReducer.requesting,
   getAllSessions: state.programReducer.getAllSessions,
   getWeekSessions: state.programReducer.getWeekSessions,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
+  requesting: state.addExerciseReducer.requesting,
+  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState
 })
 
 const mapDispatchToProps = dispatch => ({
+  getCustomExerciseRequest: data => dispatch(getCustomExerciseRequest(data)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>

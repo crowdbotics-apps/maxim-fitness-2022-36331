@@ -97,7 +97,8 @@ const SubscriptionScreen = props => {
             navigation={navigation}
             getPlans={getPlans}
             amount={
-              getPlans?.length && getPlans[getPlans?.length - 1]?.unit_amount
+              getPlans?.length &&
+              getPlans[getPlans?.length - 1]?.unit_amount / 100
             }
             subsucriptionId={subscriptionData?.plan?.id}
           />
