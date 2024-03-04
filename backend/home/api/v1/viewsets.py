@@ -1752,7 +1752,10 @@ class CustomWorkoutViewSet(ModelViewSet):
     serializer_class = CustomWorkoutSerializer
 
     def get_queryset(self):
-        return CustomWorkout.objects.filter(user=self.request.user)
+        date = self.request.query_params.get('date', None)
+        if date:
+            return CustomWorkout.objects.filter(user=self.request.user, created_date=date).order_by('-created_date')
+        return CustomWorkout.objects.filter(user=self.request.user).order_by('-created_date')
 
     def create(self, request, *args, **kwargs):
         data = request.data
