@@ -164,21 +164,32 @@ const FatLoseProgram = props => {
   //     })
   //   }
   // }, [getWeekSessions])
-  console.log(getCustomExerciseState, "getCustomExerciseState")
-  const selectExerciseObj = () => {
-    getWeekSessions?.query?.map((item, index) => {
-      if (todaySessions?.id === item.id) {
-        const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
-          workoutItem => !workoutItem.done
-        )
-        props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
-        refDescription.current.close()
-        navigation.navigate("ExerciseScreen", {
-          workouts: item?.workouts,
-          item: item
-        })
-      }
-    })
+  const selectExerciseObj = (data, id) => {
+    if (id === 'custom') {
+      const [itemWorkoutUndone, nextWorkout] = data.workouts.filter(
+        workoutItem => !workoutItem.done
+      )
+      props.pickSession(itemWorkoutUndone, data.workouts, nextWorkout)
+      refDescription.current.close()
+      navigation.navigate("ExerciseScreen", {
+        workouts: data?.workouts,
+        item: data
+      })
+    } else {
+      getWeekSessions?.query?.map((item, index) => {
+        if (todaySessions?.id === item.id) {
+          const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
+            workoutItem => !workoutItem.done
+          )
+          props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
+          refDescription.current.close()
+          navigation.navigate("ExerciseScreen", {
+            workouts: item?.workouts,
+            item: item
+          })
+        }
+      })
+    }
   }
 
   const openModal = () => {
@@ -208,18 +219,34 @@ const FatLoseProgram = props => {
     // Format the result
     let formattedResult = `${minutes}`
     if (remainingSeconds > 0) {
-      formattedResult += `:${
-        remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds}`
+      formattedResult += `:${remainingSeconds < 10 ? "0" : ""
+        }${remainingSeconds}`
     }
 
     return formattedResult
   }
   const d = new Date()
   const day = d.getDay()
+  const getTotalExerciseCount = (workouts) => {
+    let total = 0;
+    workouts?.forEach(workout => {
+      total += workout?.exercises?.length || 0;
+    });
+    return total;
+  }
+  const getTotalTimeInMinutes = (workouts) => {
+    let total = 0;
+    workouts?.forEach(workout => {
+      workout?.sets?.forEach(set => {
+        total += (set?.timer || 0) / 60;
+      });
+    });
+    return Math.round(total);
+  }
+
   const renderCard = item => {
     return (
-      <View>
+      <View style={{ flex: 1, margin: 6 }}>
         <View style={styles.cardView}>
           <View style={[row, justifyContentBetween]}>
             <Text
@@ -236,7 +263,7 @@ const FatLoseProgram = props => {
               style={[
                 row,
                 {
-                  width: "36%",
+                  width: "38%",
                   marginTop: 5,
                   flexWrap: "wrap"
                 }
@@ -281,7 +308,7 @@ const FatLoseProgram = props => {
                   }}
                 />
                 <Text
-                  text={`${item?.workouts[0].exercises?.length} exercies`}
+                  text={`${getTotalExerciseCount(item.workouts)} exercies`}
                   style={{
                     fontSize: 12,
                     lineHeight: 12,
@@ -304,7 +331,7 @@ const FatLoseProgram = props => {
                 ]}
               >
                 <Text
-                  text={`${item?.cardio_length} minutes`}
+                  text={`${getTotalTimeInMinutes(item?.workouts)} minutes`}
                   style={{
                     fontSize: 12,
                     lineHeight: 12,
@@ -328,7 +355,7 @@ const FatLoseProgram = props => {
           </View>
           <View style={[row]}></View>
           <View style={[fill, center, Gutters.regularVMargin]}>
-            <TouchableOpacity onPress={selectExerciseObj}>
+            <TouchableOpacity onPress={() => selectExerciseObj(item, 'custom')}>
               <LinearGradient
                 start={start}
                 end={end}
@@ -383,7 +410,7 @@ const FatLoseProgram = props => {
                           marginRight: 10,
                           opacity:
                             getWeekSessions?.prev_week_number === 0 ||
-                            getWeekSessions?.prev_week_number === null
+                              getWeekSessions?.prev_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -401,11 +428,10 @@ const FatLoseProgram = props => {
                       />
                       <Text
                         color="primary"
-                        text={`Week ${
-                          getWeekSessions?.prev_week_number === null
-                            ? 1
-                            : getWeekSessions?.prev_week_number
-                        }`}
+                        text={`Week ${getWeekSessions?.prev_week_number === null
+                          ? 1
+                          : getWeekSessions?.prev_week_number
+                          }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                     </TouchableOpacity>
@@ -416,7 +442,7 @@ const FatLoseProgram = props => {
                         {
                           opacity:
                             getWeekSessions?.next_week_number === 0 ||
-                            getWeekSessions?.next_week_number === null
+                              getWeekSessions?.next_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -429,13 +455,12 @@ const FatLoseProgram = props => {
                     >
                       <Text
                         color="primary"
-                        text={`Week ${
-                          getWeekSessions?.date_in_week_number === 4
-                            ? 4
-                            : getWeekSessions?.date_in_week_number
+                        text={`Week ${getWeekSessions?.date_in_week_number === 4
+                          ? 4
+                          : getWeekSessions?.date_in_week_number
                             ? getWeekSessions?.date_in_week_number + 1
                             : 4
-                        }`}
+                          }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                       <Icon
@@ -572,20 +597,19 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Workout`
+                          "dddd"
+                        )}'s Workout`
                     }
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
                     <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={`Day ${
-                          weekDay === 0 ? 7 : weekDay ? weekDay : day
-                        }`}
+                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
+                          }`}
                         color="primary"
                         style={styles.dayText}
                       />
@@ -720,11 +744,11 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Custom Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Custom Workout`
+                          "dddd"
+                        )}'s Custom Workout`
                     }
                     style={[styles.headind2]}
                   />
@@ -814,11 +838,11 @@ const FatLoseProgram = props => {
                   props.addCustomExercise([])
                   navigation.navigate("AddExercise")
                 }}
-                // disabled={
-                //   todayRequest ||
-                //   todaySessions?.length === 0 ||
-                //   todaySessions?.name === "Rest"
-                // }
+              // disabled={
+              //   todayRequest ||
+              //   todaySessions?.length === 0 ||
+              //   todaySessions?.name === "Rest"
+              // }
               >
                 <LinearGradient
                   start={start}
