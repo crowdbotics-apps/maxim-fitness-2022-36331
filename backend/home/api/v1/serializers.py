@@ -670,14 +670,14 @@ class CustomExercisesSetsSerializer(serializers.ModelSerializer):
 
 
 class CustomExercisesSerializer(serializers.ModelSerializer):
-    custom_sets = CustomExercisesSetsSerializer(many=True,  source="custom_set_exercises")
+    sets = CustomExercisesSetsSerializer(many=True,  source="custom_set_exercises")
     exercises = ExerciseSerializer(many=True)
     class Meta:
         model = CustomExercise
         fields = "__all__"
 
 class CustomWorkoutSerializer(serializers.ModelSerializer):
-    custom_exercise = CustomExercisesSerializer(many=True, source="custom_exercises_workouts", read_only=True)
+    workouts = CustomExercisesSerializer(many=True, source="custom_exercises_workouts", read_only=True)
 
     class Meta:
         model = CustomWorkout
