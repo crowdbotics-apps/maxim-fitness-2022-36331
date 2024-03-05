@@ -216,7 +216,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', "profile_url", "profile_picture",
                   "background_picture", "description",
 
-                  "gender", 'dob', "height", "weight", "unit",
+                  "gender", 'dob', "height", "weight", "unit", "trial",
                   "exercise_level", "activity_level",
                   "understanding_level", "number_of_meal", "number_of_training_days",
                   "fitness_goal", "settings", 'stripe_customer_id', "is_survey", "is_superuser", 'request_user',
@@ -670,11 +670,25 @@ class CustomExercisesSetsSerializer(serializers.ModelSerializer):
 
 
 class CustomExercisesSerializer(serializers.ModelSerializer):
-    sets = CustomExercisesSetsSerializer(many=True,  source="custom_set_exercises")
+    # sets = CustomExercisesSetsSerializer(many=True,  source="custom_set_exercises")
+    # sets = serializers.SerializerMethodField()
     exercises = ExerciseSerializer(many=True)
     class Meta:
         model = CustomExercise
         fields = "__all__"
+
+    def to_representation(self, instance):
+        try:
+            representation = super().to_representation(instance)
+            all_exercises = representation['exercises']
+            for exercise in all_exercises:
+                custom_set = CustomSet.objects.filter(custom_exercise=instance, exercises__in=[exercise['id']])
+                exercise['sets'] = CustomExercisesSetsSerializer(custom_set, many=True).data
+            return representation
+        except Exercise as e:
+            pass
+
+
 
 class CustomWorkoutSerializer(serializers.ModelSerializer):
     workouts = CustomExercisesSerializer(many=True, source="custom_exercises_workouts", read_only=True)

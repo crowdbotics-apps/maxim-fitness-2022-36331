@@ -30,7 +30,7 @@ from home.api.v1.viewsets import (
     ReportAPostViewSet,
     BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
     ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet,
-    ReportACommentViewSet, ReportCommentReplyViewSet, CustomWorkoutViewSet,
+    ReportACommentViewSet, ReportCommentReplyViewSet, CustomWorkoutViewSet, CustomSetViewSet,
 )
 
 from rest_framework import permissions
@@ -81,6 +81,7 @@ router.register('report', ReportViewSet, basename='report')
 router.register('follow', FollowViewSet, basename='report')
 router.register('settings', SettingsViewSet, basename='settings')
 router.register('set', SetViewSet, basename='set')
+router.register('custom_set', CustomSetViewSet, basename='custom_set')
 router.register('calories-required', CaloriesRequiredViewSet, basename='calories_required')
 router.register('consume-calories', ConsumeCaloriesViewSet, basename='consume_calories')
 router.register('comment', CommentViewSet, basename='comment')
