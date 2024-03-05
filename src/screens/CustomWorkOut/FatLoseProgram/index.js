@@ -173,7 +173,8 @@ const FatLoseProgram = props => {
       refDescription.current.close()
       navigation.navigate("ExerciseScreen", {
         workouts: data?.workouts,
-        item: data
+        item: data,
+        custom: true
       })
     } else {
       getWeekSessions?.query?.map((item, index) => {
@@ -185,7 +186,9 @@ const FatLoseProgram = props => {
           refDescription.current.close()
           navigation.navigate("ExerciseScreen", {
             workouts: item?.workouts,
-            item: item
+            item: item,
+            custom: false
+
           })
         }
       })
@@ -236,24 +239,26 @@ const FatLoseProgram = props => {
   }
   const getTotalTimeInMinutes = (workouts) => {
     let total = 0;
+
     workouts?.forEach(workout => {
-      workout?.sets?.forEach(set => {
-        total += (set?.timer || 0) / 60;
+      workout?.exercises?.forEach(exercise => {
+        exercise?.sets?.forEach(set => {
+          total += (set?.timer || 0) / 60;
+        });
       });
     });
+
     return Math.round(total);
   }
 
-  const renderCard = item => {
+  const renderCard = (item) => {
+    const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
+
     return (
-      <View style={{ flex: 1, margin: 6 }}>
-        <View style={styles.cardView}>
+      <View style={{ flex: 1, margin: 6, padding: 2 }}>
+        <View style={[styles.cardView, { flexDirection: 'column' }]}>
           <View style={[row, justifyContentBetween]}>
-            <Text
-              text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
-              color="primary"
-              style={styles.dayText}
-            />
+            <Text text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`} color="primary" style={styles.dayText} />
             <TouchableOpacity onPress={() => refDescription.current.open()}>
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
@@ -263,40 +268,35 @@ const FatLoseProgram = props => {
               style={[
                 row,
                 {
-                  width: "38%",
+                  width: "32%",
                   marginTop: 5,
-                  flexWrap: "wrap"
+                  flexWrap: "wrap",
                 }
               ]}
             >
-              {item?.workouts &&
-                item?.workouts.map(workout => {
-                  return workout?.exercises?.map((data, i) => {
-                    return (
-                      <Image
-                        source={{
-                          uri: data?.exercise_type?.image
-                        }}
-                        style={{
-                          width: 50,
-                          height: 50,
-                          marginLeft: 5,
-                          marginTop: i > 1 ? 5 : 0
-                        }}
-                      />
-                    )
-                  })
-                })}
+              {hasImages ? (
+                item?.workouts.map((workout) =>
+                  workout?.exercises?.map((data, i) => (
+                    <Image
+                      key={i}
+                      source={{
+                        uri: data?.exercise_type?.image,
+                      }}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        marginLeft: 5,
+                        marginTop: i > 1 ? 5 : 0,
+                      }}
+                    />
+                  ))
+                )
+              ) : (
+                <Text style={{ color: '#626262', width: 50, height: 50, marginLeft: 5, marginTop: 5 }}>No Image</Text>
+              )}
             </View>
 
-            <View
-              style={{
-                flex: 1,
-                width: "85%",
-                marginHorizontal: 10,
-                fllex: 1
-              }}
-            >
+            <View style={{ flex: 1, width: "65%", marginHorizontal: 10 }}>
               <View>
                 <Text
                   text={item?.name}
@@ -304,17 +304,17 @@ const FatLoseProgram = props => {
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: "bold",
-                    color: "#626262"
+                    color: "#626262",
                   }}
                 />
                 <Text
-                  text={`${getTotalExerciseCount(item.workouts)} exercies`}
+                  text={`${getTotalExerciseCount(item.workouts)} exercises`}
                   style={{
                     fontSize: 12,
                     lineHeight: 12,
                     fontWeight: "400",
                     marginTop: 10,
-                    color: "#626262"
+                    color: "#626262",
                   }}
                 />
               </View>
@@ -326,8 +326,8 @@ const FatLoseProgram = props => {
                   alignItemsCenter,
                   {
                     marginVertical: 20,
-                    justifyContent: "space-between"
-                  }
+                    justifyContent: "space-between",
+                  },
                 ]}
               >
                 <Text
@@ -336,24 +336,27 @@ const FatLoseProgram = props => {
                     fontSize: 12,
                     lineHeight: 12,
                     fontWeight: "400",
-                    color: "#626262"
-                    // opacity: 0.7
+                    color: "#626262",
                   }}
                 />
+
                 <Text
                   text="Steady State"
                   style={{
                     fontSize: 15,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    marginLeft: 30,
-                    color: "#626262"
+                    marginLeft: 5,
+                    marginRight: -5,
+                    color: "#626262",
                   }}
                 />
               </View>
             </View>
           </View>
+
           <View style={[row]}></View>
+
           <View style={[fill, center, Gutters.regularVMargin]}>
             <TouchableOpacity onPress={() => selectExerciseObj(item, 'custom')}>
               <LinearGradient
@@ -364,7 +367,7 @@ const FatLoseProgram = props => {
                   fill,
                   Gutters.small2xHPadding,
                   Gutters.regularVPadding,
-                  styles.gradientWrapper
+                  styles.gradientWrapper,
                 ]}
               >
                 <Text
@@ -373,7 +376,7 @@ const FatLoseProgram = props => {
                     fontSize: 16,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    color: "#545454"
+                    color: "#545454",
                   }}
                 />
               </LinearGradient>
@@ -381,8 +384,12 @@ const FatLoseProgram = props => {
           </View>
         </View>
       </View>
-    )
-  }
+    );
+  };
+
+
+
+
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>

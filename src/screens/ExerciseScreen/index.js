@@ -33,6 +33,7 @@ import VideoPlayer from "../../components/VideoPlayer"
 import {
   getAllSessionRequest,
   repsWeightRequest,
+  repsCustomWeightRequest,
   setDoneRequest,
   sessionDone,
   allSwapExercise
@@ -152,10 +153,14 @@ const ExerciseScreen = props => {
     const unsubscribe = navigation.addListener("focus", () => {
       // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
       // if (findFirstNotDoneSet !== undefined) {
-      const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
+      if (route?.params?.custom) {
+        const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
+        props.repsCustomWeightRequest(setId, null, null)
 
-      props.repsWeightRequest(setId, null, null)
-      // }
+      } else {
+        const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
+        props.repsWeightRequest(setId, null, null)
+      }
     })
     return unsubscribe
   }, [navigation])
@@ -221,7 +226,7 @@ const ExerciseScreen = props => {
     const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${showModalRepsThree ? "/" : ""
       }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
     const dd = "reps"
-    props.repsWeightRequest(id, reps, dd)
+    route?.params?.custom ? props.repsCustomWeightRequest(id, reps, dd) : props.repsWeightRequest(id, reps, dd)
     setReps("")
     setRepsTwo("")
     setRepsThree("")
@@ -234,7 +239,7 @@ const ExerciseScreen = props => {
     const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${showModalWeightThree ? "/" : ""
       }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
     const dd = "weight"
-    props.repsWeightRequest(id, weight, dd)
+    route?.params?.custom ? props.repsCustomWeightRequest(id, weight, dd) : props.repsWeightRequest(id, weight, dd)
     setWeight("")
     setWeightTwo("")
     setWeightThree("")
@@ -270,7 +275,7 @@ const ExerciseScreen = props => {
     const id = set?.id
     const individual = null
     const dd = null
-    props.repsWeightRequest(id, individual, dd)
+    route?.params?.custom ? props.repsCustomWeightRequest(id, individual, dd) : props.repsWeightRequest(id, individual, dd)
     setRepsColor(false)
     setWeightColor(false)
   }
@@ -308,7 +313,7 @@ const ExerciseScreen = props => {
   const selectExercise = (item, i) => {
     setActive(i)
     setActiveSet(0)
-    props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    route?.params?.custom ? props.repsCustomWeightRequest(item?.sets?.[0]?.id, null, null, callBack) : props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
   }
 
   const callBack = item => {
@@ -417,7 +422,7 @@ const ExerciseScreen = props => {
           automaticallyAdjustContentInsets={false}
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
-            {selectedSession &&
+            {selectedSession?.length &&
               selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
@@ -475,7 +480,7 @@ const ExerciseScreen = props => {
                         ellipsizeMode="tail"
                         numberOfLines={3}
                       >
-                        {`${i + 1}. ${item?.name}`}
+                        {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name}`}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -554,6 +559,8 @@ const ExerciseScreen = props => {
             </ScrollView>
           </View>
         )}
+      {/*===============================================*/}
+
       {selectedExercise?.length !== 0 &&
         selectedExercise?.exercises?.map((item, index) => {
           if (active === index) {
@@ -786,6 +793,7 @@ const ExerciseScreen = props => {
           }
         })}
 
+      {/*===============================================*/}
       {/*===============================================*/}
 
       <BottomSheet reff={refDescription} h={400}>
@@ -1191,6 +1199,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
+  repsCustomWeightRequest: (id, data, dd, callBack) =>
+    dispatch(repsCustomWeightRequest(id, data, dd, callBack)),
   repsWeightRequest: (id, data, dd, callBack) =>
     dispatch(repsWeightRequest(id, data, dd, callBack)),
   setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),

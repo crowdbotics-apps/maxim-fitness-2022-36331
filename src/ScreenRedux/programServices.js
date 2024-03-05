@@ -21,6 +21,8 @@ const TODAY_SESSIONS_SUCCESS = "ProgramScreen/TODAY_SESSIONS_SUCCESS"
 
 const REPS_WEIGHT_REQUEST = "ProgramScreen/REPS_WEIGHT_REQUEST"
 const REPS_WEIGHT_SUCCESS = "ProgramScreen/REPS_WEIGHT_SUCCESS"
+const REPS_CUSTOM_WEIGHT_REQUEST = "ProgramScreen/REPS_CUSTOM_WEIGHT_REQUEST"
+
 
 const PICK_SESSION = "ProgramScreen/PICK_SESSION"
 
@@ -70,8 +72,16 @@ export const getDaySessionSuccess = data => ({
   data
 })
 
+
 export const repsWeightRequest = (id, data, dd, callBack) => ({
   type: REPS_WEIGHT_REQUEST,
+  id,
+  data,
+  dd,
+  callBack
+})
+export const repsCustomWeightRequest = (id, data, dd, callBack) => ({
+  type: REPS_CUSTOM_WEIGHT_REQUEST,
   id,
   data,
   dd,
@@ -83,6 +93,10 @@ export const repsWeightSuccess = data => ({
   data
 })
 
+export const repsCutsomWeightSuccess = data => ({
+  type: REPS_WEIGHT_SUCCESS,
+  data
+})
 export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   type: PICK_SESSION,
   exerciseObj,
@@ -226,7 +240,11 @@ export const programReducer = (state = initialState, action) => {
         ...state,
         loader: true
       }
-
+    case REPS_CUSTOM_WEIGHT_REQUEST:
+      return {
+        ...state,
+        loader: true
+      }
     case ALL_SWAP_EXERCISE: {
       return {
         ...state,
@@ -448,6 +466,51 @@ function* updateRepsWeight({ id, data, dd, callBack }) {
   }
 }
 
+// <==================================>
+async function updateCustomRepsAPI(id) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/custom_set/${id}/`
+
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "PATCH"
+  }
+  return XHR(URL, options)
+}
+
+function* updateCustomRepsWeight({ id, data, dd, callBack }) {
+  try {
+    if (dd === "reps") {
+      const response = yield call(updateRepsAPI, id, data)
+      yield put(repsWeightSuccess(response.data))
+    } else if (dd === "weight") {
+      const response = yield call(updateWeightAPI, id, data)
+
+      yield put(repsWeightSuccess(response.data))
+    } else if (dd === true) {
+      const response = yield call(updateSetDoneAPI, id, data)
+
+      yield put(repsWeightSuccess(response.data))
+      const newDate = moment(new Date()).format("YYYY-MM-DD")
+      yield put(getAllSessionRequest(newDate))
+    } else {
+      const response = yield call(updateCustomRepsAPI, id)
+      if (response?.data) {
+        yield put(repsCutsomWeightSuccess(response?.data))
+        if (callBack) {
+          callBack(response?.data)
+        }
+      }
+    }
+  } catch (e) {
+
+    yield put(repsCutsomWeightSuccess(false))
+  }
+}
+// <==================================>
 async function setDoneAPI(id) {
   const token = await AsyncStorage.getItem("authToken")
   const URL = `${API_URL}/session/mark_set_done/`
@@ -594,6 +657,7 @@ function* allSwapExerciseData({ exerciseId }) {
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
+  takeLatest(REPS_CUSTOM_WEIGHT_REQUEST, updateCustomRepsWeight),
   takeLatest(SETS_DONE_REQUEST, setDoneAction),
   takeLatest(TODAY_SESSIONS_REQUEST, getTodaySessions),
   takeLatest(WORKOUT_DONE_REQUEST, workoutDoneCompleted),

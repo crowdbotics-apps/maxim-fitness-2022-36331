@@ -123,7 +123,7 @@ const SwapExerciseContainer = props => {
         ) : (
           <>
             {allExerciseSwapped?.length > 0 &&
-            allExerciseSwapped !== "no exercise available" ? (
+              allExerciseSwapped !== "no exercise available" ? (
               <FlatList
                 data={allExerciseSwapped || []}
                 keyExtractor={index => index.toString()}

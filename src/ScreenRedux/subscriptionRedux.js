@@ -271,7 +271,7 @@ function* addSubscriptionCard({ data }) {
 //api call function
 async function paymentSubscriptionAPI(payload) {
   const data = { price_id: payload.plan_id, premium_user: payload.premium_user }
-  const URL = `${API_URL}/subscription/create_subscription3/`
+  const URL = `${API_URL}/subscription/create_subscription/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "POST",
