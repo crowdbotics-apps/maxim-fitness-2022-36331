@@ -304,7 +304,7 @@ const FatLoseProgram = props => {
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: "bold",
-                    color: "#626262",
+                    color: "#626262"
                   }}
                 />
                 <Text
@@ -314,7 +314,7 @@ const FatLoseProgram = props => {
                     lineHeight: 12,
                     fontWeight: "400",
                     marginTop: 10,
-                    color: "#626262",
+                    color: "#626262"
                   }}
                 />
               </View>
@@ -326,8 +326,8 @@ const FatLoseProgram = props => {
                   alignItemsCenter,
                   {
                     marginVertical: 20,
-                    justifyContent: "space-between",
-                  },
+                    justifyContent: "space-between"
+                  }
                 ]}
               >
                 <Text
@@ -336,27 +336,24 @@ const FatLoseProgram = props => {
                     fontSize: 12,
                     lineHeight: 12,
                     fontWeight: "400",
-                    color: "#626262",
+                    color: "#626262"
+                    // opacity: 0.7
                   }}
                 />
-
                 <Text
                   text="Steady State"
                   style={{
                     fontSize: 15,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    marginLeft: 5,
-                    marginRight: -5,
-                    color: "#626262",
+                    marginLeft: 30,
+                    color: "#626262"
                   }}
                 />
               </View>
             </View>
           </View>
-
           <View style={[row]}></View>
-
           <View style={[fill, center, Gutters.regularVMargin]}>
             <TouchableOpacity onPress={() => selectExerciseObj(item, 'custom')}>
               <LinearGradient
@@ -367,7 +364,7 @@ const FatLoseProgram = props => {
                   fill,
                   Gutters.small2xHPadding,
                   Gutters.regularVPadding,
-                  styles.gradientWrapper,
+                  styles.gradientWrapper
                 ]}
               >
                 <Text
@@ -376,7 +373,7 @@ const FatLoseProgram = props => {
                     fontSize: 16,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    color: "#545454",
+                    color: "#545454"
                   }}
                 />
               </LinearGradient>
@@ -384,12 +381,8 @@ const FatLoseProgram = props => {
           </View>
         </View>
       </View>
-    );
-  };
-
-
-
-
+    )
+  }
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>

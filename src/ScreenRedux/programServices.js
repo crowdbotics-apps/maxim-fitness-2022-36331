@@ -72,7 +72,6 @@ export const getDaySessionSuccess = data => ({
   data
 })
 
-
 export const repsWeightRequest = (id, data, dd, callBack) => ({
   type: REPS_WEIGHT_REQUEST,
   id,
