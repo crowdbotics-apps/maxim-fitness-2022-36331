@@ -59,7 +59,8 @@ from home.api.v1.serializers import (
     ProductUnitSerializer, RestSocialLoginSerializer, ReportAPostSerializer, BlockedUserSerializer, ChatSerializer,
     PostImageSerializer, CommentReplySerializer, CommentLikeSerializer, PostVideoSerializer, ReportAUserSerializer,
     ExerciseTypeSerializer, UserPhotoSerializer, UserVideoSerializer, ReportACommentSerializer,
-    ReportCommentReplySerializer, MealTimeSerializer, MealHistorySerializer, CustomWorkoutSerializer
+    ReportCommentReplySerializer, MealTimeSerializer, MealHistorySerializer, CustomWorkoutSerializer,
+    CustomExercisesSetsSerializer
 )
 from .permissions import (
     RecipePermission,
@@ -1770,7 +1771,10 @@ class CustomWorkoutViewSet(ModelViewSet):
             elif len(custom_exercise_data['exercises']) == 3:
                 name = "Giantset"
             else:
-                name = None
+                try:
+                    name = Exercise.objects.get(id=custom_exercise_data['exercises'][0]).name
+                except Exception as e:
+                    name = None
 
             custom_exercise_data['name'] = name
             custom_sets_data = custom_exercise_data.pop('custom_sets', [])
@@ -1778,8 +1782,19 @@ class CustomWorkoutViewSet(ModelViewSet):
             custom_exercise.exercises.set(custom_exercise_data['exercises'])
 
             # Create custom sets
-            for custom_set_data in custom_sets_data:
-                del custom_set_data['rest']
-                custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
-
+            for i in custom_exercise_data['exercises']:
+                for custom_set_data in custom_sets_data:
+                    try:
+                        del custom_set_data['rest']
+                    except:
+                        pass
+                    custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
+                    custom_set.exercises.set([i])
         return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CustomSetViewSet(ModelViewSet):
+    serializer_class = CustomExercisesSetsSerializer
+
+    def get_queryset(self):
+        return CustomSet.objects.all().order_by('-id')

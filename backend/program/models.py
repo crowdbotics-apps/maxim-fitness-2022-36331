@@ -156,19 +156,19 @@ class Program(models.Model):
                 )
                 order = 1
                 for exercise in day.day_exercises.all():
-                    # workout = Workout.objects.create(
-                    #     session=session,
-                    #     exercise=exercise.exercise,
-                    #     order=order
-                    # )
-                    # order += 1
+                    workout = Workout.objects.create(
+                        session=session,
+                        exercise=exercise.exercise,
+                        order=order
+                    )
+                    order += 1
                     for set in exercise.program_exercie_sets.all():
-                        workout = Workout.objects.create(
-                            session=session,
-                            exercise=exercise.exercise,
-                            order=order
-                        )
-                        order += 1
+                        # workout = Workout.objects.create(
+                        #     session=session,
+                        #     exercise=exercise.exercise,
+                        #     order=order
+                        # )
+                        # order += 1
                         print('set', set.set_type)
                         s_ = Set.objects.create(
                             workout=workout,
@@ -320,6 +320,7 @@ class CustomSet(models.Model):
     set_no = models.PositiveIntegerField(default=1)
 
     reps = models.CharField(default="1", max_length=150)
+    rest = models.CharField(default="1", max_length=150)
     weight = models.CharField(max_length=250, default="1")
     timer = models.FloatField(default=90.0)
 

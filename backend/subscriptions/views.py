@@ -87,6 +87,9 @@ class SubscriptionViewSet(viewsets.ViewSet):
         if premium_user:
             user.is_premium_user = True
             user.save()
+        else:
+            user.trial = True
+            user.save()
         return Response({"subscription": subscription, "is_premium_user": user.is_premium_user})
 
     @swagger_auto_schema(
