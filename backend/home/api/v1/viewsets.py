@@ -1793,6 +1793,29 @@ class CustomWorkoutViewSet(ModelViewSet):
         return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
 
 
+    @action(detail=False, methods=['post'])
+    def mark_workout_done(self, request):
+        id = request.data.get('id')  # workout  id
+        if id:
+            workout = CustomWorkout.objects.filter(id=id).first()
+            if workout:
+                workout.mark_done_completely()
+                return Response("Workout marked done")
+            return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def mark_set_done(self, request):
+        id = request.data.get('id')  # custom_set id
+        if id:
+            custom_set = CustomSet.objects.filter(id=id).first()
+            if custom_set:
+                custom_set.mark_done()
+                return Response("Set marked done")
+            return Response({'error': "Set not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CustomSetViewSet(ModelViewSet):
     serializer_class = CustomExercisesSetsSerializer
 

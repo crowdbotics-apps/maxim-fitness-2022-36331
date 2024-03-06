@@ -576,31 +576,31 @@ def program_assign_user_delete(sender, instance, **kwargs):
     Session.objects.filter(user=instance.user).delete()
 
 
-# @receiver(post_save, sender=PostVideo)
-# def save_video_thumbnail(sender, instance, created, **kwargs):
-#     if created:
-#         post_video = PostVideo.objects.get(id=instance.id)
-#         path_to_file = MEDIA_URL + post_video.video.name
-#         filename_sp = post_video.video.name.split("/")[-1].split(".")[0]
-#         destination_file_name = f"{filename_sp}.{post_video.video.name.split('.')[-1]}"
-#         thumbnail_file_name = f"{filename_sp}.png"
-#         try:
-#             wget.download(post_video.video.url, destination_file_name)
-#             options = {
-#                 'trim': False,
-#                 'height': 300,
-#                 'width': 300,
-#                 'quality': 85,
-#                 'type': 'thumbnail'
-#             }
-#             generate_thumbnail(destination_file_name, thumbnail_file_name, options)
-#             # TODO: upload thumbnail_file_name to post_video.thumbnail
-#             post_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
-#         except Exception as e:
-#             print(e)
-#         finally:
-#             os.remove(destination_file_name)
-#             os.remove(thumbnail_file_name)
+@receiver(post_save, sender=PostVideo)
+def save_video_thumbnail(sender, instance, created, **kwargs):
+    if created:
+        post_video = PostVideo.objects.get(id=instance.id)
+        path_to_file = MEDIA_URL + post_video.video.name
+        filename_sp = post_video.video.name.split("/")[-1].split(".")[0]
+        destination_file_name = f"{filename_sp}.{post_video.video.name.split('.')[-1]}"
+        thumbnail_file_name = f"{filename_sp}.png"
+        try:
+            wget.download(post_video.video.url, destination_file_name)
+            options = {
+                'trim': False,
+                'height': 300,
+                'width': 300,
+                'quality': 85,
+                'type': 'thumbnail'
+            }
+            generate_thumbnail(destination_file_name, thumbnail_file_name, options)
+            # TODO: upload thumbnail_file_name to post_video.thumbnail
+            post_video.video_thumbnail.save(thumbnail_file_name, File(open(thumbnail_file_name, 'rb')), save=True)
+        except Exception as e:
+            print(e)
+        finally:
+            os.remove(destination_file_name)
+            os.remove(thumbnail_file_name)
 
 
 class Following(FollowingManager):
