@@ -283,6 +283,16 @@ class Workout(models.Model):
         for set in self.sets.all():
             set.reset()
 
+# class WorkoutAssignedExercise(models.Model):
+#     """
+#     use for assigned program exercises according to set types
+#     for superset two exercises will be used, for giantset three exercises will be added and for others one exercise will be added
+#     """
+#     exercises = models.ManyToManyField('Exercise', blank=True, related_name='custom_workout_exercises')
+#     workout = models.ForeignKey('Workout', related_name='assigned_workout_exercises',
+#                                        on_delete=models.CASCADE, null=True, blank=True)
+#     name = models.CharField(max_length=500, null=True, blank=True)
+
 
 class CustomWorkout(models.Model):
     session = models.ForeignKey('Session', related_name='custom_workouts', on_delete=models.CASCADE, null=True, blank=True)
@@ -290,6 +300,11 @@ class CustomWorkout(models.Model):
     name = models.CharField(max_length=500, null=True)
     done = models.BooleanField(default=False)
     created_date = models.DateField(auto_now_add=True, editable=True)
+
+    def mark_done_completely(self):
+        self.done = True
+        self.save()
+
 
 
 class CustomExercise(models.Model):
@@ -333,6 +348,10 @@ class CustomSet(models.Model):
     exercises = models.ManyToManyField('Exercise', blank=True, related_name='custom_sets_exercises')
 
     done = models.BooleanField(default=False)
+
+    def mark_done(self):
+        self.done = True
+        self.save()
 
 
 class Set(models.Model):
