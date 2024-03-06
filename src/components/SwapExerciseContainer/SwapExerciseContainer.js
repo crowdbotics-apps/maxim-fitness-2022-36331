@@ -191,7 +191,8 @@ const styles = StyleSheet.create({
 const mapState = state => ({
   allExerciseSwapped:
     state.programReducer && state.programReducer.allExerciseSwapped,
-  requesting: state.programReducer && state.programReducer.loading
+  requesting: state.programReducer && state.programReducer.loading,
+
 })
 
 const mapDispatchToProps = dispatch => ({

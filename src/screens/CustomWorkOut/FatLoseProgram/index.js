@@ -29,19 +29,21 @@ import {
 import {
   getDaySessionRequest,
   getAllSessionRequest,
-  pickSession
+  pickSession,
+  setCustom
 } from "../../../ScreenRedux/programServices"
 
 const FatLoseProgram = props => {
   const {
     navigation,
     todayRequest,
+    cRequesting,
     requesting,
     todaySessions,
     getAllSessions,
     getWeekSessions,
     profile,
-    getCustomExerciseState
+    getCustomExerciseState,
   } = props
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
@@ -171,10 +173,11 @@ const FatLoseProgram = props => {
       )
       props.pickSession(itemWorkoutUndone, data.workouts, nextWorkout)
       refDescription.current.close()
+      props.setCustom(true)
       navigation.navigate("ExerciseScreen", {
         workouts: data?.workouts,
         item: data,
-        custom: true
+
       })
     } else {
       getWeekSessions?.query?.map((item, index) => {
@@ -184,11 +187,10 @@ const FatLoseProgram = props => {
           )
           props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
           refDescription.current.close()
+          props.setCustom(false)
           navigation.navigate("ExerciseScreen", {
             workouts: item?.workouts,
             item: item,
-            custom: false
-
           })
         }
       })
@@ -255,7 +257,7 @@ const FatLoseProgram = props => {
     const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
 
     return (
-      <View style={{ flex: 1, margin: 6, padding: 2 }}>
+      <View style={{ flex: 1, margin: 6, padding: 2, width: '100%' }}>
         <View style={[styles.cardView, { flexDirection: 'column' }]}>
           <View style={[row, justifyContentBetween]}>
             <Text text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`} color="primary" style={styles.dayText} />
@@ -346,7 +348,7 @@ const FatLoseProgram = props => {
                     fontSize: 15,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    marginLeft: 30,
+                    marginLeft: 5,
                     color: "#626262"
                   }}
                 />
@@ -383,6 +385,8 @@ const FatLoseProgram = props => {
       </View>
     )
   }
+  const showPromoCard = todaySessions?.name !== "Rest" || todaySessions?.length >= 1
+
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -573,7 +577,7 @@ const FatLoseProgram = props => {
                               />
                             )}
                           </View>
-                        ) : null}
+                        ) : <></>}
                       </TouchableOpacity>
                     )
                   })}
@@ -581,18 +585,18 @@ const FatLoseProgram = props => {
               </View>
             </>
           )}
-          {todayRequest ? (
+          {todayRequest || cRequesting ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
             </View>
-          ) : todaySessions?.length < 1 ? (
+          ) : todaySessions?.length < 1 && getCustomExerciseState?.length < 1 ? (
             <View style={[Layout.center, { height: 200 }]}>
               <Text text={"No workout found!"} style={styles.headind2} />
             </View>
           ) : (todaySessions?.name && todaySessions?.name !== "Rest") ||
             getCustomExerciseState?.length ? (
             <>
-              {todaySessions?.name !== "Rest" && (
+              {showPromoCard ? (
                 <View>
                   <Text
                     text={
@@ -634,7 +638,7 @@ const FatLoseProgram = props => {
                           todaySessions?.workouts?.map((item, i) => (
                             <Image
                               source={{
-                                uri: item?.exercise.exercise_type?.image
+                                uri: item?.exercise?.exercise_type?.image
                               }}
                               style={{
                                 width: 50,
@@ -738,7 +742,7 @@ const FatLoseProgram = props => {
                     </View>
                   </View>
                 </View>
-              )}
+              ) : <></>}
               {getCustomExerciseState?.length ? (
                 <>
                   <Text
@@ -757,11 +761,10 @@ const FatLoseProgram = props => {
                     data={getCustomExerciseState || []}
                     renderItem={data => renderCard(data.item)}
                     horizontal={true}
+
                   />
                 </>
-              ) : (
-                <></>
-              )}
+              ) : <></>}
             </>
           ) : (
             <View>
@@ -1076,13 +1079,15 @@ const mapStateToProps = state => ({
   getWeekSessions: state.programReducer.getWeekSessions,
   profile: state.login.userDetail,
   requesting: state.addExerciseReducer.requesting,
-  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState
+  cRequesting: state.addExerciseReducer.cRequesting,
+  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,
 })
 
 const mapDispatchToProps = dispatch => ({
   getCustomExerciseRequest: date => dispatch(getCustomExerciseRequest(date)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
+  setCustom: type => dispatch(setCustom(type)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
     dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   addCustomExercise: () => dispatch(addCustomExercise([]))

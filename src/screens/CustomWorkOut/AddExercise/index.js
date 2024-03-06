@@ -286,8 +286,8 @@ const AddExercies = props => {
                         item?.pictures[0]?.image
                           ? { uri: item?.pictures[0]?.image }
                           : item?.video_thumbnail
-                          ? { uri: item?.video_thumbnail }
-                          : foodImage
+                            ? { uri: item?.video_thumbnail }
+                            : foodImage
                       }
                       style={{ width: 80, height: 45 }}
                     />
@@ -326,8 +326,8 @@ const AddExercies = props => {
             activeSet?.id === 1
               ? selectedItem?.length < 2
               : activeSet?.value === 4
-              ? selectedItem?.length < 3
-              : selectedItem?.length < 1
+                ? selectedItem?.length < 3
+                : selectedItem?.length < 1
           }
           onPress={makeDataParams}
         />

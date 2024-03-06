@@ -35,13 +35,16 @@ import {
   repsWeightRequest,
   repsCustomWeightRequest,
   setDoneRequest,
+  customSetDoneRequest,
   sessionDone,
-  allSwapExercise
+  allSwapExercise,
+  customSessionDone
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
+import { useIsFocused } from "@react-navigation/native"
 
 const ExerciseScreen = props => {
-  const { navigation, route, repsWeightState, exerciseObj, selectedSession } =
+  const { navigation, route, repsWeightState, exerciseObj, selectedSession, isCustom } =
     props
   let refDescription = useRef("")
   let refWeight = useRef("")
@@ -149,29 +152,27 @@ const ExerciseScreen = props => {
         break
     }
   }
+  const onFocus = useIsFocused()
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
-      // if (findFirstNotDoneSet !== undefined) {
-      if (route?.params?.custom) {
-        const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
-        props.repsCustomWeightRequest(setId, null, null)
+    dataGet()
+  }, [onFocus])
+  const dataGet = () => {
+    if (isCustom) {
+      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      props.repsCustomWeightRequest(setId, null, null)
 
-      } else {
-        const setId = selectedSession?.[0]?.exercise?.[0]?.sets[0]?.id
-        props.repsWeightRequest(setId, null, null)
-      }
-    })
-    return unsubscribe
-  }, [navigation])
+    } else {
+      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      props.repsWeightRequest(setId, null, null)
+    }
 
-  useEffect(() => {
     if (route) {
       setParms(route.params)
 
       selectedSession && setSelectedExercise(selectedSession?.[0])
     }
-  }, [route])
+  }
+
 
   const {
     row,
@@ -226,7 +227,11 @@ const ExerciseScreen = props => {
     const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${showModalRepsThree ? "/" : ""
       }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
     const dd = "reps"
-    route?.params?.custom ? props.repsCustomWeightRequest(id, reps, dd) : props.repsWeightRequest(id, reps, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, reps, dd)
+    } else {
+      props.repsWeightRequest(id, reps, dd)
+    }
     setReps("")
     setRepsTwo("")
     setRepsThree("")
@@ -239,7 +244,11 @@ const ExerciseScreen = props => {
     const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${showModalWeightThree ? "/" : ""
       }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
     const dd = "weight"
-    route?.params?.custom ? props.repsCustomWeightRequest(id, weight, dd) : props.repsWeightRequest(id, weight, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, weight, dd)
+    } else {
+      props.repsWeightRequest(id, weight, dd)
+    }
     setWeight("")
     setWeightTwo("")
     setWeightThree("")
@@ -275,7 +284,11 @@ const ExerciseScreen = props => {
     const id = set?.id
     const individual = null
     const dd = null
-    route?.params?.custom ? props.repsCustomWeightRequest(id, individual, dd) : props.repsWeightRequest(id, individual, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, individual, dd)
+    } else {
+      props.repsWeightRequest(id, individual, dd)
+    }
     setRepsColor(false)
     setWeightColor(false)
   }
@@ -297,7 +310,11 @@ const ExerciseScreen = props => {
           selectedSession: selectedSession,
           setTimmer
         }
-        props.setDoneRequest(findSetId.id, data)
+        if (isCustom) {
+          props.customSetDoneRequest(findSetId.id, data)
+        } else {
+          props.setDoneRequest(findSetId.id, data)
+        }
       }
     }
 
@@ -313,7 +330,11 @@ const ExerciseScreen = props => {
   const selectExercise = (item, i) => {
     setActive(i)
     setActiveSet(0)
-    route?.params?.custom ? props.repsCustomWeightRequest(item?.sets?.[0]?.id, null, null, callBack) : props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    if (isCustom) {
+      props.repsCustomWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    } else {
+      props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    }
   }
 
   const callBack = item => {
@@ -523,6 +544,7 @@ const ExerciseScreen = props => {
                         }
                       ]}
                     >
+
                       {list?.done ? (
                         <View style={styles.doneWrapper}>
                           <Image
@@ -776,7 +798,7 @@ const ExerciseScreen = props => {
                       startRest={timmer}
                       activeSet={activeSet}
                       onPress={() => {
-                        props.sessionDone(params?.item?.id, screenNavigation)
+                        isCustom ? props.customSessionDone(params?.item?.id, screenNavigation) : props.sessionDone(params?.item?.id, screenNavigation)
                         setStartTimer(false)
                         setTimmer(false)
                       }}
@@ -1031,8 +1053,8 @@ const ExerciseScreen = props => {
           >
             {modal === "ss" || modal === "gs" ? (
               <>
-                {repsWeightState?.exercises?.length > 0 ? (
-                  repsWeightState?.exercises?.map((exercise, index) => {
+                {selectedExercise?.exercises?.length > 0 ? (
+                  selectedExercise?.exercises?.map((exercise, index) => {
                     return (
                       <View key={index} style={[justifyContentCenter]}>
                         <View
@@ -1070,13 +1092,13 @@ const ExerciseScreen = props => {
                       <Text
                         regularTitle
                         color="quinary"
-                        text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                        text={`1. ${selectedExercise?.exercises?.[active]?.name}`}
                       />
                     </View>
                     <View style={center}>
                       <Image
                         source={{
-                          uri: selectedSession?.[active]?.exercise
+                          uri: selectedExercise?.exercises?.[active]
                             ?.video_thumbnail
                         }}
                         style={styles.modalImageStyle}
@@ -1091,14 +1113,14 @@ const ExerciseScreen = props => {
                   <Text
                     regularTitle
                     color="quinary"
-                    text={`1. ${selectedSession?.[active]?.exercise?.name}`}
+                    text={`1. ${selectedExercise?.exercises?.[active]?.name}`}
                   />
                 </View>
 
                 <View style={center}>
                   <Image
                     source={{
-                      uri: selectedSession?.[active]?.exercise?.video_thumbnail
+                      uri: selectedExercise?.exercises?.[active]?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />
@@ -1193,8 +1215,8 @@ const mapStateToProps = state => ({
   exerciseObj: state.programReducer.exerciseObj,
   selectedSession: state.programReducer.selectedSession,
   nextWorkout: state.programReducer.nextWorkout,
-
-  setDone: state.programReducer.setDone
+  setDone: state.programReducer.setDone,
+  isCustom: state.programReducer.isCustom,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1204,8 +1226,10 @@ const mapDispatchToProps = dispatch => ({
   repsWeightRequest: (id, data, dd, callBack) =>
     dispatch(repsWeightRequest(id, data, dd, callBack)),
   setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
+  customSetDoneRequest: (id, data) => dispatch(customSetDoneRequest(id, data)),
   sessionDone: (id, screenNavigation) =>
     dispatch(sessionDone(id, screenNavigation)),
+  customSessionDone: (id, screenNavigation) => dispatch(customSessionDone(id, screenNavigation)),
   allSwapExercise: id => dispatch(allSwapExercise(id))
 })
 
