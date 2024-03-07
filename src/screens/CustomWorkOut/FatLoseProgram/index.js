@@ -49,6 +49,9 @@ const FatLoseProgram = props => {
   const [activeIndex, setActiveIndex] = useState(1)
   const [index, setIndex] = useState(false)
   const [isModal, setIsModal] = useState(false)
+  const [customWorkout, setCustomWorkout] = useState(false)
+  const [customWorkoutData, setCustomWorkoutData] = useState([])
+
   const [data, setData] = useState({})
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
@@ -167,7 +170,7 @@ const FatLoseProgram = props => {
   //   }
   // }, [getWeekSessions])
   const selectExerciseObj = (data, id) => {
-    if (id === 'custom') {
+    if (id) {
       const [itemWorkoutUndone, nextWorkout] = data.workouts.filter(
         workoutItem => !workoutItem.done
       )
@@ -257,11 +260,15 @@ const FatLoseProgram = props => {
     const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
 
     return (
-      <View style={{ flex: 1, margin: 6, padding: 2, width: '100%' }}>
-        <View style={[styles.cardView, { flexDirection: 'column' }]}>
-          <View style={[row, justifyContentBetween]}>
+      <View style={{ margin: 6, padding: 2, flex: 1 }}>
+        <View style={[styles.cardView, { flexDirection: 'column', }]}>
+          <View style={[row, justifyContentBetween,]}>
             <Text text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`} color="primary" style={styles.dayText} />
-            <TouchableOpacity onPress={() => refDescription.current.open()}>
+            <TouchableOpacity onPress={() => {
+              refDescription.current.open()
+              setCustomWorkoutData(item)
+              setCustomWorkout(true)
+            }}>
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
@@ -270,9 +277,9 @@ const FatLoseProgram = props => {
               style={[
                 row,
                 {
-                  width: "32%",
                   marginTop: 5,
                   flexWrap: "wrap",
+                  maxWidth: 200
                 }
               ]}
             >
@@ -348,7 +355,7 @@ const FatLoseProgram = props => {
                     fontSize: 15,
                     lineHeight: 18,
                     fontWeight: "bold",
-                    marginLeft: 5,
+                    marginLeft: 30,
                     color: "#626262"
                   }}
                 />
@@ -356,8 +363,8 @@ const FatLoseProgram = props => {
             </View>
           </View>
           <View style={[row]}></View>
-          <View style={[fill, center, Gutters.regularVMargin]}>
-            <TouchableOpacity onPress={() => selectExerciseObj(item, 'custom')}>
+          <View style={[fill, center, Gutters.regularVMargin,]}>
+            <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
               <LinearGradient
                 start={start}
                 end={end}
@@ -386,7 +393,7 @@ const FatLoseProgram = props => {
     )
   }
   const showPromoCard = todaySessions?.name !== "Rest" || todaySessions?.length >= 1
-
+  const hasCSVImages = todaySessions?.workouts && todaySessions.workouts.some((workout) => workout?.exercises?.length > 0);
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -623,31 +630,39 @@ const FatLoseProgram = props => {
                         <Image source={etc} style={styles.imgStyle} />
                       </TouchableOpacity>
                     </View>
-                    <View style={[row, { flex: 1 }]}>
+                    <View style={[row,]}>
                       <View
                         style={[
                           row,
                           {
-                            width: "36%",
+                            maxWidth: 200,
                             marginTop: 5,
                             flexWrap: "wrap"
                           }
                         ]}
                       >
-                        {todaySessions?.workouts &&
-                          todaySessions?.workouts?.map((item, i) => (
-                            <Image
-                              source={{
-                                uri: item?.exercise?.exercise_type?.image
-                              }}
-                              style={{
-                                width: 50,
-                                height: 50,
-                                marginLeft: 5,
-                                marginTop: i > 1 ? 5 : 0
-                              }}
-                            />
-                          ))}
+                        <View style={{ flexDirection: 'column' }}>
+                          {hasCSVImages ? (
+                            todaySessions?.workouts.slice(0, 1).map((workout) =>
+                              workout?.exercises?.map((data, i) => (
+                                <Image
+                                  key={i}
+                                  source={{
+                                    uri: data?.exercise_type?.image,
+                                  }}
+                                  style={{
+                                    width: 50,
+                                    height: 50,
+                                    marginLeft: 5,
+                                    marginTop: i > 1 ? 5 : 0,
+                                  }}
+                                />
+                              ))
+                            )
+                          ) : (
+                            <Text style={{ color: '#626262', width: 50, height: 50, marginLeft: 5, marginTop: 5 }}>No Image</Text>
+                          )}
+                        </View>
                       </View>
 
                       <View
@@ -669,7 +684,7 @@ const FatLoseProgram = props => {
                             }}
                           />
                           <Text
-                            text={`${todaySessions?.workouts?.length} exercies`}
+                            text={`${todaySessions?.workouts?.length} exercises`}
                             style={{
                               fontSize: 12,
                               lineHeight: 12,
@@ -761,7 +776,7 @@ const FatLoseProgram = props => {
                     data={getCustomExerciseState || []}
                     renderItem={data => renderCard(data.item)}
                     horizontal={true}
-
+                    contentContainerStyle={{ flexGrow: 1 }}
                   />
                 </>
               ) : <></>}
@@ -954,7 +969,7 @@ const FatLoseProgram = props => {
           <View style={[regularHMargin, {}]}>
             <TouchableOpacity
               style={[row, alignItemsCenter]}
-              onPress={selectExerciseObj}
+              onPress={() => selectExerciseObj(customWorkoutData, customWorkout)}
             >
               <Image source={threeLine} style={{ width: 50, height: 50 }} />
               <Text
@@ -972,7 +987,7 @@ const FatLoseProgram = props => {
             <View style={[row, alignItemsCenter, { marginTop: 20 }]}>
               <Image source={circle} style={{ width: 50, height: 50 }} />
               <Text
-                text={"Resechedule Workout"}
+                text={"Reschedule Workout"}
                 style={{
                   fontSize: 20,
                   lineHeight: 22,

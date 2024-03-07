@@ -38,14 +38,16 @@ import {
   customSetDoneRequest,
   sessionDone,
   allSwapExercise,
+  allSwapCustomExercise,
   customSessionDone
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
-import { useIsFocused } from "@react-navigation/native"
+import { useIsFocused, useRoute } from "@react-navigation/native"
 
 const ExerciseScreen = props => {
-  const { navigation, route, repsWeightState, exerciseObj, selectedSession, isCustom } =
+  const { navigation, repsWeightState, exerciseObj, selectedSession, isCustom } =
     props
+  const route = useRoute()
   let refDescription = useRef("")
   let refWeight = useRef("")
   let refReps = useRef("")
@@ -154,23 +156,23 @@ const ExerciseScreen = props => {
   }
   const onFocus = useIsFocused()
   useEffect(() => {
-    dataGet()
-  }, [onFocus])
-  const dataGet = () => {
+    getData()
+
+  }, [onFocus, route])
+  const getData = async () => {
+    if (route) {
+      selectedSession && setSelectedExercise(selectedSession?.[0])
+    }
+
     if (isCustom) {
       const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
-      props.repsCustomWeightRequest(setId, null, null)
+      await props.repsCustomWeightRequest(setId, null, null)
 
     } else {
       const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
-      props.repsWeightRequest(setId, null, null)
+      await props.repsWeightRequest(setId, null, null)
     }
 
-    if (route) {
-      setParms(route.params)
-
-      selectedSession && setSelectedExercise(selectedSession?.[0])
-    }
   }
 
 
@@ -366,13 +368,31 @@ const ExerciseScreen = props => {
   }
 
   const swipeFunc = () => {
-    props.allSwapExercise(selectedSession?.[active]?.id)
-    navigation.navigate("SwapExerciseScreen", {
-      ScreenData: {
-        data: selectedSession?.[active],
-        date_time: params?.item?.date_time
-      }
-    })
+    if (isCustom) {
+      const exerciseTypeId = selectedSession?.[mainActive]?.exercises?.[active]?.exercise_type?.id
+      props.allSwapCustomExercise(exerciseTypeId)
+      navigation.navigate("SwapExerciseScreen", {
+        ScreenData: {
+          data: selectedSession?.[mainActive]?.exercises?.[active],
+          date_time: params?.item?.date_time,
+          workout: params?.workouts?.[mainActive]?.id,
+          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
+          workout_id: params?.item?.id
+        }
+      })
+    } else {
+      props.allSwapExercise(selectedSession?.[active]?.id)
+      navigation.navigate("SwapExerciseScreen", {
+        ScreenData: {
+          data: selectedSession?.[mainActive]?.exercises?.[active],
+          date_time: params?.item?.date_time,
+          workout: params?.workouts?.[mainActive]?.id,
+          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
+          workout_id: params?.workout_id
+
+        }
+      })
+    }
   }
 
   const screenNavigation = () => {
@@ -1230,7 +1250,10 @@ const mapDispatchToProps = dispatch => ({
   sessionDone: (id, screenNavigation) =>
     dispatch(sessionDone(id, screenNavigation)),
   customSessionDone: (id, screenNavigation) => dispatch(customSessionDone(id, screenNavigation)),
-  allSwapExercise: id => dispatch(allSwapExercise(id))
+  allSwapExercise: id => dispatch(allSwapExercise(id)),
+  allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id))
+
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen)

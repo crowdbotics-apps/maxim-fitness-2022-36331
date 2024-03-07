@@ -11,6 +11,7 @@ import moment from "moment"
 
 import { sortSessionBySets } from "../utils/common"
 import { goBack } from "../navigation/NavigationService"
+import { showMessage } from "react-native-flash-message"
 
 const ALL_SESSIONS_REQUEST = "ProgramScreen/ALL_SESSIONS_REQUEST"
 const ALL_SESSIONS_SUCCESS = "ProgramScreen/ALL_SESSIONS_SUCCESS"
@@ -47,11 +48,18 @@ const EXERCISE_DONE_SUCCESS = "ProgramScreen/EXERCISE_DONE_SUCCESS"
 
 const SAVE_SWIPE_DATE = "ProgramScreen/SAVE_SWIPE_DATE"
 const SWAP_EXERCISE = "ProgramScreen/SWAP_EXERCISE"
+const SWAP_CUSTOM_EXERCISE = "ProgramScreen/SWAP_CUSTOM_EXERCISE"
 const SWAP_EXERCISE_ISTRUE = "ProgramScreen/SWAP_EXERCISE_ISTRUE"
 
 const ALL_SWAP_EXERCISE = "ProgramScreen/ALL_SWAP_EXERCISE"
 const ALL_SWAP_EXERCISE_SUCCESS = "ProgramScreen/ALL_SWAP_EXERCISE_SUCCESS"
 const ALL_SWAP_EXERCISE_ERROR = "ProgramScreen/ALL_SWAP_EXERCISE_ERROR"
+
+
+const ALL_SWAP_CUSTOM_EXERCISE = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE"
+const ALL_SWAP_CUSTOM_EXERCISE_SUCCESS = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE_SUCCESS"
+const ALL_SWAP_CUSTOM_EXERCISE_ERROR = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE_ERROR"
+
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -174,6 +182,11 @@ export const swapExercises = (data, date_time) => ({
   data,
   date_time
 })
+export const swapCustomExercises = (data, date_time) => ({
+  type: SWAP_CUSTOM_EXERCISE,
+  data,
+  date_time
+})
 
 export const swapExerciseisTrue = () => ({
   type: SWAP_EXERCISE_ISTRUE
@@ -181,6 +194,10 @@ export const swapExerciseisTrue = () => ({
 
 export const allSwapExercise = exerciseId => ({
   type: ALL_SWAP_EXERCISE,
+  exerciseId
+})
+export const allSwapCustomExercise = exerciseId => ({
+  type: ALL_SWAP_CUSTOM_EXERCISE,
   exerciseId
 })
 
@@ -270,11 +287,29 @@ export const programReducer = (state = initialState, action) => {
         loading: true
       }
     }
-
+    case ALL_SWAP_CUSTOM_EXERCISE: {
+      return {
+        ...state,
+        loading: true
+      }
+    }
+    case ALL_SWAP_CUSTOM_EXERCISE_SUCCESS: {
+      return {
+        ...state,
+        allExerciseSwapped: action.payload,
+        loading: false
+      }
+    }
     case ALL_SWAP_EXERCISE_SUCCESS: {
       return {
         ...state,
         allExerciseSwapped: action.payload,
+        loading: false
+      }
+    }
+    case ALL_SWAP_CUSTOM_EXERCISE_ERROR: {
+      return {
+        ...state,
         loading: false
       }
     }
@@ -747,7 +782,7 @@ function* customSessionDoneCompleted({ id, screenNavigation }) {
   }
 }
 
-// <============start===custom work out done================>
+// <============end===custom work out done================>
 
 
 
@@ -777,6 +812,52 @@ function* swapExercisesData({ data, date_time }) {
   }
 }
 
+// <============start===SwapCustomExerciseData   ===== custom workouts===========>
+async function swapCustomExercisesAPI(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/new_custom_workout/swap_exercise/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST",
+    data
+  }
+  return XHR(URL, options)
+}
+async function getCustomExerciseAPI(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/new_custom_workout/${data}/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(URL, options)
+}
+
+function* swapCustomExercisesData({ data }) {
+  try {
+    const response = yield call(swapCustomExercisesAPI, data)
+    yield put(swapExerciseisTrue())
+    const customData = yield getCustomExerciseAPI(data?.workout_id)
+    if (customData?.data?.workouts) {
+      navigate("ExerciseScreen", {
+        workouts: customData?.data?.workouts,
+        item: customData?.data,
+      });
+    }
+  } catch (e) {
+    showMessage({ message: "Something went wrong", type: "danger" })
+    yield put(swapExerciseisTrue())
+  }
+}
+
+// <============end===SwapCustomExerciseData   ===== custom workouts===========>
+
 async function allSwapExerciseAPI(exerciseId) {
   const token = await AsyncStorage.getItem("authToken")
   const URL = `${API_URL}/session/list_exercises/?id=${exerciseId}`
@@ -798,7 +879,30 @@ function* allSwapExerciseData({ exerciseId }) {
     yield put(allSwapExerciseError())
   }
 }
+// <============start===allSwapCustomExerciseData   ===== custom workouts===========>
 
+async function allSwapCustomExerciseAPI(exerciseId) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/new_custom_workout/list_exercises/?id=${exerciseId}`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(URL, options)
+}
+
+function* allSwapCustomExerciseData({ exerciseId }) {
+  try {
+    const response = yield call(allSwapCustomExerciseAPI, exerciseId)
+    yield put(allSwapExerciseSuccess(response.data))
+  } catch (e) {
+    yield put(allSwapExerciseError())
+  }
+}
+// <============end===allSwapCustomExerciseData   ===== custom workouts===========>
 
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
@@ -811,5 +915,8 @@ export default all([
   takeLatest(SESSION_DONE_REQUEST, sessionDoneCompleted),
   takeLatest(CUSTOM_SESSION_DONE_REQUEST, customSessionDoneCompleted),
   takeLatest(SWAP_EXERCISE, swapExercisesData),
-  takeLatest(ALL_SWAP_EXERCISE, allSwapExerciseData)
+  takeLatest(SWAP_CUSTOM_EXERCISE, swapCustomExercisesData),
+  takeLatest(ALL_SWAP_EXERCISE, allSwapExerciseData),
+  takeLatest(ALL_SWAP_CUSTOM_EXERCISE, allSwapCustomExerciseData)
+
 ])
