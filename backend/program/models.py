@@ -156,32 +156,44 @@ class Program(models.Model):
                 )
                 order = 1
                 for exercise in day.day_exercises.all():
-                    workout = Workout.objects.create(
-                        session=session,
-                        exercise=exercise.exercise,
-                        order=order
-                    )
+                    if exercise.exercise:
+                        workout = Workout.objects.create(
+                            session=session,
+                            exercise=exercise.exercise,
+                            order=order,
+                            name=exercise.exercise.name
+                        )
+                    else:
+                        workout = Workout.objects.create(
+                            session=session,
+                            exercise=exercise.exercises.first(),
+                            order=order,
+                            name=exercise.name
+                        )
+                    workout.exercises.set(exercise.exercises.all())
                     order += 1
                     for set in exercise.program_exercie_sets.all():
-                        # workout = Workout.objects.create(
-                        #     session=session,
-                        #     exercise=exercise.exercise,
-                        #     order=order
-                        # )
-                        # order += 1
-                        print('set', set.set_type)
-                        s_ = Set.objects.create(
-                            workout=workout,
-                            set_no=set.set_no,
-                            reps=set.reps,
-                            weight=set.weight,
-                            timer=set.timer,
-                            set_type=set.set_type,
-                        )
-                        s_.exercises.set(set.exercises.all())
+                        for i in range(len(set.exercises.all())):
 
-                        workout.exercises.set(set.exercises.all())
-                        print(s_, 'created', s_.set_type)
+                            # workout = Workout.objects.create(
+                            #     session=session,
+                            #     exercise=exercise.exercise,
+                            #     order=order
+                            # )
+                            # order += 1
+                            print('set', set.set_type)
+                            s_ = Set.objects.create(
+                                workout=workout,
+                                set_no=set.set_no,
+                                reps=set.reps,
+                                weight=set.weight,
+                                timer=set.timer,
+                                set_type=set.set_type,
+                            )
+                            s_.exercises.set(set.exercises.all())
+
+                            # workout.exercises.set(set.exercises.all())
+                            print(s_, 'created', s_.set_type)
                 days_gap += 1
                 print(*[s.set_type for s in session.get_sets()])
 
@@ -214,10 +226,12 @@ class Day(models.Model):
 
 class ProgramExercise(models.Model):
     day = models.ForeignKey("Day", on_delete=models.CASCADE, null=True, related_name="day_exercises")
-    exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE)
+    exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE, null=True, blank=True)
+    exercises = models.ManyToManyField("Exercise", related_name="program_exercises", null=True, blank=True)
+    name = models.CharField(max_length=25, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.exercise} >> day: {self.day}"
+        return f"{self.exercise} >> day: {self.day} >> {self.name}"
 
 
 class ProgramExerciseReplacement(models.Model):
@@ -288,7 +302,7 @@ class Workout(models.Model):
 #     use for assigned program exercises according to set types
 #     for superset two exercises will be used, for giantset three exercises will be added and for others one exercise will be added
 #     """
-#     exercises = models.ManyToManyField('Exercise', blank=True, related_name='custom_workout_exercises')
+#     exercises = models.ManyToManyField('Exercise', blank=True, related_name='assigned_workout_exercises')
 #     workout = models.ForeignKey('Workout', related_name='assigned_workout_exercises',
 #                                        on_delete=models.CASCADE, null=True, blank=True)
 #     name = models.CharField(max_length=500, null=True, blank=True)

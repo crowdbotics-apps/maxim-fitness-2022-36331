@@ -1756,7 +1756,7 @@ class CustomWorkoutViewSet(ModelViewSet):
         date = self.request.query_params.get('date', None)
         if date:
             return CustomWorkout.objects.filter(user=self.request.user, created_date=date).order_by('-created_date')
-        return CustomWorkout.objects.filter(user=self.request.user).order_by('-created_date')
+        return CustomWorkout.objects.filter(user=self.request.user).order_by('-id', '-created_date')
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -1814,6 +1814,41 @@ class CustomWorkoutViewSet(ModelViewSet):
                 return Response("Set marked done")
             return Response({'error': "Set not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def list_exercises(self, request):
+        exercise_type_id = request.GET.get('id')
+        if exercise_type_id:
+            exercises = Exercise.objects.filter(exercise_type_id=exercise_type_id)
+            serializer = ExerciseSerializer(exercises, many=True, context={'request': request})
+            return Response(serializer.data)
+        return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def swap_exercise(self, request):
+        workout_id = request.data.get('workout_id')
+        exercise_id = request.data.get('exercise_id')
+        rest_of_program = request.data.get('rest_of_program')
+        custom_workouts_exercise_id = request.data.get('custom_workouts_exercise_id')
+
+        if workout_id and exercise_id:
+            custom_workout = CustomWorkout.objects.filter(id=workout_id).first()
+            exercise = Exercise.objects.filter(id=exercise_id).first()
+            if custom_workout and exercise:
+                if rest_of_program:
+                    workouts = CustomExercise.objects.filter(id=custom_workouts_exercise_id,
+                        custom_workout=custom_workout, exercises__id__in=[exercise.id])
+                    for workout in workouts:
+                        rest = Exercise.objects.filter(id=rest_of_program).first()
+                        workout.exercises.remove(exercise)  # Remove the matched exercise
+                        workout.exercises.add(rest)
+                        workout.save()
+                        for custom_set in CustomSet.objects.filter(custom_exercise=workout, exercises__id__in=[exercise.id]):
+                            custom_set.exercises.remove(exercise)
+                            custom_set.exercises.add(rest)
+                return Response("Exercise swapped")
+            return Response({'error': "Workout/Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'workout_id and exercise_id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomSetViewSet(ModelViewSet):
