@@ -417,13 +417,36 @@ class SetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExercisesSerializer(serializers.ModelSerializer):
+    exercise_type = ExerciseTypeSerializer()
+    pictures = ExerciseImagesSerializer(many=True)
+
+    class Meta:
+        model = Exercise
+        fields = '__all__'
+
 class WorkoutSerializer(serializers.ModelSerializer):
-    exercise = ExerciseSerializer()
-    sets = SetSerializer(many=True)
+    exercises = ExercisesSerializer(many=True)
+    # sets = SetSerializer(many=True)
 
     class Meta:
         model = Workout
         fields = '__all__'
+
+    def to_representation(self, instance):
+        try:
+            representation = super().to_representation(instance)
+            all_exercises = representation['exercises']
+            for exercise in all_exercises:
+                custom_set = Set.objects.filter(workout=instance)
+                exercise['sets'] = SetSerializer(custom_set, many=True).data
+            #     all_sets_done = all(set['done'] for set in exercise['sets'])
+            #     exercise['done'] = all_sets_done
+            # all_exercise_done = all(ex['done'] for ex in representation['exercises'])
+            # representation['done'] = all_exercise_done
+            return representation
+        except Exercise as e:
+            pass
 
 
 class SessionSerializer(serializers.ModelSerializer):
