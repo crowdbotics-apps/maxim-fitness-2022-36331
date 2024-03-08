@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 import RBSheet from "react-native-raw-bottom-sheet"
-const BottomSheet = ({ children, reff, h, Iconbg, bg, isDrage }) => {
+const BottomSheet = ({ children, reff, h, Iconbg, bg, isDrage, onClose }) => {
   return (
     <RBSheet
       ref={reff}
@@ -19,6 +19,7 @@ const BottomSheet = ({ children, reff, h, Iconbg, bg, isDrage }) => {
       }}
       height={h ? h : 250}
       openDuration={250}
+      onClose={onClose}
     >
       {children}
     </RBSheet>

@@ -37,7 +37,7 @@ const data = [
   { id: 4, value: 3, item: "Triple Set" }
 ]
 const AddExercies = props => {
-  const { navigation, getExerciseState, requesting, getExerciseType } = props
+  const { navigation, getExerciseState, route, requesting, getExerciseType } = props
   let refDescription = useRef("")
   let isFocused = useIsFocused()
   const [activeSet, setActiveSet] = useState(false)
@@ -99,8 +99,8 @@ const AddExercies = props => {
     const data = activeSet?.item
       ? activeSet
       : { id: 0, value: 0, item: "Single Set" }
-
-    navigation.navigate("CustomExercise", { exercises, activeSet: data })
+    // route.params.date
+    navigation.navigate("CustomExercise", { exercises, activeSet: data, date: route?.params?.date })
     let newObj = {}
     newObj[`type`] = exercises
     const newData = [

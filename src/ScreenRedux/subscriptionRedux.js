@@ -283,11 +283,25 @@ async function paymentSubscriptionAPI(payload) {
   }
   return XHR(URL, options)
 }
+//assign CSV programs
+async function submitQuestionAPI() {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/form/set_program/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST"
+  }
+  return XHR(URL, options)
+}
 //generator function
 function* paymentSubscription({ data }) {
   try {
     const response = yield call(paymentSubscriptionAPI, data)
     navigate("Feeds")
+    yield submitQuestionAPI()
     yield put(newSubScription(response.data))
   } catch (e) {
     const { response } = e

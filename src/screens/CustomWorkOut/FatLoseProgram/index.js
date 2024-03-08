@@ -22,9 +22,12 @@ import { Text, BottomSheet } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
+import DatePicker from "react-native-date-picker"
+
 import {
   addCustomExercise,
-  getCustomExerciseRequest
+  getCustomExerciseRequest,
+  customWorkoutRescheduleRequest
 } from "../../../ScreenRedux/addExerciseRedux"
 import {
   getDaySessionRequest,
@@ -51,6 +54,7 @@ const FatLoseProgram = props => {
   const [isModal, setIsModal] = useState(false)
   const [customWorkout, setCustomWorkout] = useState(false)
   const [customWorkoutData, setCustomWorkoutData] = useState([])
+  const [openDatePicker, setOpenDatePicker] = useState(false)
 
   const [data, setData] = useState({})
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
@@ -139,7 +143,6 @@ const FatLoseProgram = props => {
       props.getDaySessionRequest(date)
     }
   }
-
   const selectDay = (item, i) => {
     const newDate = moment(item.date_time).format("YYYY-MM-DD")
     setIndex(newDate)
@@ -169,12 +172,25 @@ const FatLoseProgram = props => {
   //     })
   //   }
   // }, [getWeekSessions])
+
+  const reScheduleWorkout = (date) => {
+    const resetDate = moment(date).format("YYYY-MM-DD")
+    if (customWorkout) {
+      props.customWorkoutRescheduleRequest(customWorkoutData?.id, resetDate)
+    } else {
+      getWeekSessions?.query?.map((item, index) => {
+        if (todaySessions?.id === item.id) {
+          // props.workoutRescheduleRequest(item.id, resetDate) //make new action in reducer
+        }
+      })
+    }
+  }
   const selectExerciseObj = (data, id) => {
     if (id) {
       const [itemWorkoutUndone, nextWorkout] = data.workouts.filter(
         workoutItem => !workoutItem.done
       )
-      props.pickSession(itemWorkoutUndone, data.workouts, nextWorkout)
+      props.pickSession(itemWorkoutUndone, data?.workouts, nextWorkout)
       refDescription.current.close()
       props.setCustom(true)
       navigation.navigate("ExerciseScreen", {
@@ -188,7 +204,7 @@ const FatLoseProgram = props => {
           const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
             workoutItem => !workoutItem.done
           )
-          props.pickSession(itemWorkoutUndone, item.workouts, nextWorkout)
+          props.pickSession(itemWorkoutUndone, item?.workouts, nextWorkout)
           refDescription.current.close()
           props.setCustom(false)
           navigation.navigate("ExerciseScreen", {
@@ -201,6 +217,7 @@ const FatLoseProgram = props => {
   }
 
   const openModal = () => {
+
     setIsModal(true)
     props.getAllSessionRequest("")
   }
@@ -260,10 +277,16 @@ const FatLoseProgram = props => {
     const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
 
     return (
-      <View style={{ margin: 6, padding: 2, flex: 1 }}>
-        <View style={[styles.cardView, { flexDirection: 'column', }]}>
-          <View style={[row, justifyContentBetween,]}>
-            <Text text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`} color="primary" style={styles.dayText} />
+      <View style={{ margin: 10, padding: 2, flex: 1, }}>
+        <View style={[styles.cardView, { width: '100%' }]}>
+          <View style={[row, justifyContentBetween]}>
+
+            <Text
+              text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
+                }`}
+              color="primary"
+              style={styles.dayText}
+            />
             <TouchableOpacity onPress={() => {
               refDescription.current.open()
               setCustomWorkoutData(item)
@@ -272,44 +295,38 @@ const FatLoseProgram = props => {
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
-          <View style={[row, { flex: 1 }]}>
-            <View
-              style={[
-                row,
-                {
-                  marginTop: 5,
-                  flexWrap: "wrap",
-                  maxWidth: 200
-                }
-              ]}
-            >
+          <View style={[row,]}>
+
+            <ScrollView horizontal nestedScrollEnabled contentContainerStyle={{ height: 100, width: 100 }}>
               {hasImages ? (
-                item?.workouts.map((workout) =>
-                  workout?.exercises?.map((data, i) => (
-                    <Image
-                      key={i}
-                      source={{
-                        uri: data?.exercise_type?.image,
-                      }}
-                      style={{
-                        width: 50,
-                        height: 50,
-                        marginLeft: 5,
-                        marginTop: i > 1 ? 5 : 0,
-                      }}
-                    />
-                  ))
-                )
+                item?.workouts.map((workout, index) => (
+                  <View key={index} style={{ flexDirection: 'column' }}>
+                    {workout?.exercises?.map((data, i) => (
+                      <Image
+                        key={i}
+                        source={{
+                          uri: data?.exercise_type?.image,
+                        }}
+                        style={{
+                          width: 50,
+                          height: 50,
+                          marginTop: 5,
+                        }}
+                      />
+                    ))}
+                  </View>
+                ))
               ) : (
                 <Text style={{ color: '#626262', width: 50, height: 50, marginLeft: 5, marginTop: 5 }}>No Image</Text>
               )}
-            </View>
+            </ScrollView>
 
             <View style={{ flex: 1, width: "65%", marginHorizontal: 10 }}>
               <View>
                 <Text
                   text={item?.name}
                   style={{
+                    flex: 1,
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: "bold",
@@ -389,10 +406,10 @@ const FatLoseProgram = props => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </View >
     )
   }
-  const showPromoCard = todaySessions?.name !== "Rest" || todaySessions?.length >= 1
+  const showPromoCard = (todaySessions?.name !== "Rest" || todaySessions?.length >= 1) && profile.is_premium_user
   const hasCSVImages = todaySessions?.workouts && todaySessions.workouts.some((workout) => workout?.exercises?.length > 0);
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
@@ -776,7 +793,7 @@ const FatLoseProgram = props => {
                     data={getCustomExerciseState || []}
                     renderItem={data => renderCard(data.item)}
                     horizontal={true}
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={{ paddingRight: 10 }}
                   />
                 </>
               ) : <></>}
@@ -854,7 +871,10 @@ const FatLoseProgram = props => {
               <TouchableOpacity
                 onPress={() => {
                   props.addCustomExercise([])
-                  navigation.navigate("AddExercise")
+                  navigation.navigate("AddExercise",
+                    {
+                      date: index
+                    })
                 }}
               // disabled={
               //   todayRequest ||
@@ -953,6 +973,7 @@ const FatLoseProgram = props => {
             backgroundColor: "red"
           }
         }}
+        onClose={() => setCustomWorkout(false)}
       >
         <KeyboardAvoidingView
           enabled
@@ -983,8 +1004,10 @@ const FatLoseProgram = props => {
                   marginLeft: 30
                 }}
               />
-            </TouchableOpacity>
-            <View style={[row, alignItemsCenter, { marginTop: 20 }]}>
+            </TouchableOpacity >
+            <TouchableOpacity style={[row, alignItemsCenter, { marginTop: 20 }]}
+              onPress={() => setOpenDatePicker(true)}
+            >
               <Image source={circle} style={{ width: 50, height: 50 }} />
               <Text
                 text={"Reschedule Workout"}
@@ -998,10 +1021,29 @@ const FatLoseProgram = props => {
                   // flex: 1
                 }}
               />
-            </View>
+            </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </BottomSheet>
+      <DatePicker
+        modal
+        mode="date"
+        open={openDatePicker}
+        // date={customWorkout?.length ? new Date(customWorkoutData?.created_date) : new Date(todaySessions?.date_time) }
+        date={new Date()}
+        onConfirm={(date) => {
+          refDescription.current.close()
+          setOpenDatePicker(false)
+          reScheduleWorkout(date)
+        }}
+        onCancel={() => {
+          refDescription.current.close()
+          setOpenDatePicker(false)
+        }}
+        minimumDate={getAllSessions ? new Date(getAllSessions?.query?.[0]?.date_time) : new Date()}
+        maximumDate={getAllSessions ? new Date(getAllSessions?.query?.[getAllSessions?.query?.length - 1]?.date_time) : null}
+      />
+
     </SafeAreaView>
   )
 }
@@ -1105,6 +1147,7 @@ const mapDispatchToProps = dispatch => ({
   setCustom: type => dispatch(setCustom(type)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
     dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
-  addCustomExercise: () => dispatch(addCustomExercise([]))
+  addCustomExercise: () => dispatch(addCustomExercise([])),
+  customWorkoutRescheduleRequest: (id, date) => dispatch(customWorkoutRescheduleRequest(id, date)),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FatLoseProgram)

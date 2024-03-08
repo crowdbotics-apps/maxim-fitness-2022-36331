@@ -1,5 +1,6 @@
 import { all, call, put, takeLatest } from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { showMessage } from "react-native-flash-message"
 
 // config
 import { API_URL } from "../config/app"
@@ -18,6 +19,9 @@ const GET_EXERCISE_TYPE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_TYPE_SUCCESS"
 const ADD_CUSTOM_EXERCISE = "AddExerciseScreen/ADD_CUSTOM_EXERCISE"
 const GET_CUSTOM_EXERCISE_REQUEST =
   "AddExerciseScreen/GET_CUSTOM_EXERCISE_REQUEST"
+const CUSTOM_WORKOUT_RESCHEDULE_REQUEST =
+  "AddExerciseScreen/CUSTOM_WORKOUT_RESCHEDULE_REQUEST"
+
 const POST_CUSTOM_EXERCISE_REQUEST =
   "AddExerciseScreen/POST_CUSTOM_EXERCISE_REQUEST"
 const POST_CUSTOM_EXERCISE_SUCCESS =
@@ -32,6 +36,12 @@ export const getCustomExerciseRequest = date => ({
   type: GET_CUSTOM_EXERCISE_REQUEST,
   date
 })
+export const customWorkoutRescheduleRequest = (id, date) => ({
+  type: CUSTOM_WORKOUT_RESCHEDULE_REQUEST,
+  id,
+  date
+})
+
 export const getCustomExerciseSuccess = data => ({
   type: GET_CUSTOM_EXERCISE_SUCCESS,
   data
@@ -137,6 +147,11 @@ export const addExerciseReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
+    case CUSTOM_WORKOUT_RESCHEDULE_REQUEST:
+      return {
+        ...state,
+        requesting: true
+      }
     default:
       return state
   }
@@ -232,9 +247,42 @@ function* getCustomExercise(data) {
     yield put(getCustomExerciseSuccess(false))
   }
 }
+// <===================================> Reschedule Custom  start Workout <===================================>
+async function rescheduleCustomWorkoutAPI(id, date) {
+  const data = { "workout_id": id, "schedule_date": date }
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/new_custom_workout/reschedule_workout/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST",
+    data
+  }
+  return XHR(URL, options)
+}
+
+function* rescheduleCustomWorkoutRequest({ id, date }) {
+  try {
+    const response = yield call(rescheduleCustomWorkoutAPI, id, date)
+    showMessage({ message: response?.data?.success, type: "success" })
+    yield put(getCustomExerciseRequest(date))
+  } catch (e) {
+    showMessage({ message: "Something went wrong", type: "danger" })
+
+  }
+}
+// <===================================> Reschedule Custom  end Workout <===================================>
+
+
+
 export default all([
   takeLatest(POST_CUSTOM_EXERCISE_REQUEST, postCustomEx),
   takeLatest(GET_EXERCISE_TYPE_REQUEST, getExerciseType),
   takeLatest(GET_EXERCISE_REQUEST, getExercise),
-  takeLatest(GET_CUSTOM_EXERCISE_REQUEST, getCustomExercise)
+  takeLatest(GET_CUSTOM_EXERCISE_REQUEST, getCustomExercise),
+  takeLatest(CUSTOM_WORKOUT_RESCHEDULE_REQUEST, rescheduleCustomWorkoutRequest)
+
+
 ])

@@ -463,7 +463,7 @@ const ExerciseScreen = props => {
           automaticallyAdjustContentInsets={false}
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
-            {selectedSession?.length &&
+            {selectedSession?.length ?
               selectedSession?.map((item, i) => {
                 return (
                   <TouchableOpacity
@@ -481,7 +481,6 @@ const ExerciseScreen = props => {
                         selectExercise(item?.exercises?.[0], 0)
                       }
 
-                      //
                     }}
                     style={[
                       row,
@@ -502,7 +501,7 @@ const ExerciseScreen = props => {
                           style={styles.imageWrapper}
                         />
                       </View>
-                    ) : null}
+                    ) : <></>}
                     <View
                       style={{
                         justifyContent: "center",
@@ -526,7 +525,7 @@ const ExerciseScreen = props => {
                     </View>
                   </TouchableOpacity>
                 )
-              })}
+              }) : <></>}
           </View>
         </ScrollView>
       </View>
@@ -603,7 +602,7 @@ const ExerciseScreen = props => {
         )}
       {/*===============================================*/}
 
-      {selectedExercise?.length !== 0 &&
+      {selectedExercise?.length != 0 ?
         selectedExercise?.exercises?.map((item, index) => {
           if (active === index) {
             return (
@@ -833,7 +832,7 @@ const ExerciseScreen = props => {
               </View>
             )
           }
-        })}
+        }) : <></>}
 
       {/*===============================================*/}
       {/*===============================================*/}
