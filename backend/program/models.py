@@ -8,6 +8,7 @@ from django.core.files import File
 
 from datetime import datetime, timedelta
 
+from django.utils import timezone
 from thumbnail import generate_thumbnail
 
 User = get_user_model()
@@ -141,10 +142,10 @@ class Program(models.Model):
                 date_time = self.get_date_time(days_gap)
                 session = Session.objects.create(
                     user=user,
-                    strength=day.strength,
+                    strength=day.strength if user.is_premium_user else False,
                     date_time=date_time,
                     program=self,
-                    cardio=day.cardio,
+                    cardio=day.cardio if user.is_premium_user else False,
                     cardio_length=day.cardio_length,
                     cardio_frequency=day.cardio_frequency,
                     heart_rate=day.heart_rate,
@@ -155,47 +156,48 @@ class Program(models.Model):
                     name=day.name,
                 )
                 order = 1
-                for exercise in day.day_exercises.all():
-                    if exercise.exercise:
-                        workout = Workout.objects.create(
-                            session=session,
-                            exercise=exercise.exercise,
-                            order=order,
-                            name=exercise.exercise.name
-                        )
-                    else:
-                        workout = Workout.objects.create(
-                            session=session,
-                            exercise=exercise.exercises.first(),
-                            order=order,
-                            name=exercise.name
-                        )
-                    workout.exercises.set(exercise.exercises.all())
-                    order += 1
-                    for set in exercise.program_exercie_sets.all():
-                        for i in range(len(set.exercises.all())):
-
-                            # workout = Workout.objects.create(
-                            #     session=session,
-                            #     exercise=exercise.exercise,
-                            #     order=order
-                            # )
-                            # order += 1
-                            print('set', set.set_type)
-                            s_ = Set.objects.create(
-                                workout=workout,
-                                set_no=set.set_no,
-                                reps=set.reps,
-                                weight=set.weight,
-                                timer=set.timer,
-                                set_type=set.set_type,
-                            )
-                            s_.exercises.set(set.exercises.all())
-
-                            # workout.exercises.set(set.exercises.all())
-                            print(s_, 'created', s_.set_type)
                 days_gap += 1
-                print(*[s.set_type for s in session.get_sets()])
+                if user.is_premium_user:
+                    for exercise in day.day_exercises.all():
+                        if exercise.exercise:
+                            workout = Workout.objects.create(
+                                session=session,
+                                exercise=exercise.exercise,
+                                order=order,
+                                name=exercise.exercise.name
+                            )
+                        else:
+                            workout = Workout.objects.create(
+                                session=session,
+                                exercise=exercise.exercises.first(),
+                                order=order,
+                                name=exercise.name
+                            )
+                        workout.exercises.set(exercise.exercises.all())
+                        order += 1
+                        for set in exercise.program_exercie_sets.all():
+                            for i in range(len(set.exercises.all())):
+
+                                # workout = Workout.objects.create(
+                                #     session=session,
+                                #     exercise=exercise.exercise,
+                                #     order=order
+                                # )
+                                # order += 1
+                                print('set', set.set_type)
+                                s_ = Set.objects.create(
+                                    workout=workout,
+                                    set_no=set.set_no,
+                                    reps=set.reps,
+                                    weight=set.weight,
+                                    timer=set.timer,
+                                    set_type=set.set_type,
+                                )
+                                s_.exercises.set(set.exercises.all())
+
+                                # workout.exercises.set(set.exercises.all())
+                                print(s_, 'created', s_.set_type)
+                    print(*[s.set_type for s in session.get_sets()])
 
 
 class Week(models.Model):
@@ -313,7 +315,7 @@ class CustomWorkout(models.Model):
     user = models.ForeignKey(User, related_name='custom_workouts_users', on_delete=models.CASCADE)
     name = models.CharField(max_length=500, null=True)
     done = models.BooleanField(default=False)
-    created_date = models.DateField(auto_now_add=True, editable=True)
+    created_date = models.DateField(null=True, blank=True, default=timezone.now)
 
     def mark_done_completely(self):
         self.done = True
