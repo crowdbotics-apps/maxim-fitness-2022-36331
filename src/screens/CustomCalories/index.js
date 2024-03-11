@@ -48,7 +48,8 @@ import { useIsFocused } from "@react-navigation/native"
 import { getNotificationCount } from "../../ScreenRedux/nutritionRedux"
 import {
   getAllSessionRequest,
-  getDaySessionRequest
+  getDaySessionRequest,
+  swapCustomExercises
 } from "../../ScreenRedux/programServices"
 import {
   GoogleSignin,
@@ -69,8 +70,10 @@ const CustomCalories = props => {
     navigation,
     requesting,
     updateLoader,
-    loader
+    loader,
+    getAllCustomSessions
   } = props
+
   let refWeight = useRef("")
   let refTrainingDay = useRef("")
   const pubnub = usePubNub()
@@ -88,7 +91,7 @@ const CustomCalories = props => {
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
-
+props.swapCustomExercises('',true)
       props.getMealsHistoryRequest()
     })
     return unsubscribe
@@ -206,6 +209,29 @@ const CustomCalories = props => {
     props.updateAnswers(tempData)
     navigation.navigate("MealPreference", { isHome: true })
   }
+  
+
+
+  //<==================custom Workouts list==============start==========>
+  const sortedCustomData = () => {
+    const data = getAllCustomSessions?.sort(
+      (a, b) => new Date(b.created_date) - new Date(a.created_date)
+    );
+    return data || [];
+  };
+  
+  const checkCustomValue = () => {
+    const data = getAllCustomSessions?.workouts?.map((item, index) => {
+      if (item?.workouts?.some(item => item?.done)) {
+        return true
+      } else {
+        return true
+      }
+    })
+    const isData = data && data?.find(item => item?.done)
+    return isData
+  }
+  //<==================custom Workouts list==============end==========>
 
   const sortedData = () => {
     const data = getAllSessions?.query?.sort(
@@ -215,7 +241,6 @@ const CustomCalories = props => {
   }
   const checkValue = () => {
     const data = getAllSessions?.query?.map((item, index) => {
-      console.log(item, 'getAllSessions item');
       if (item?.workouts?.some(item => item?.done)) {
         return true
       } else {
@@ -443,18 +468,18 @@ const CustomCalories = props => {
             >
               <Text style={styles.comingSoonWork} text="Workouts" />
             </View>
-            {requesting ? (
+            {/* {requesting ? (
               <View style={styles.loaderContainer}>
                 <ActivityIndicator color="#000" size={"large"} />
               </View>
-            ) : checkValue() && sortedData()?.length ? (
-              sortedData()?.map((item, index) => {
+            ) : checkValue() && sortedData()?.length||checkCustomValue&&sortedCustomData()?.length ? (
+              {checkValue() && sortedData()?.length?
+             ( sortedData()?.map((item, index) => {
                 const todayDayString = moment(item.date_time).format(
                   "MM/DD/YYYY"
                 )
 
                 if (item?.workouts?.some(item => item?.done)) {
-                  console.log(item, 'item');
                   return (
                     <TouchableOpacity
                       key={index}
@@ -473,15 +498,116 @@ const CustomCalories = props => {
                     </TouchableOpacity>
                   )
                 }
-              })
-            ) : (
+              })):(<></>)}
+              {checkCustomValue&&sortedCustomData()?.length?
+                sortedData()?.map((item, index) => {
+                  const todayDayString = moment(item.date_time).format(
+                    "MM/DD/YYYY"
+                  )
+    
+                  if (item?.workouts?.some(item => item?.done)) {
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() =>
+                          navigation.navigate("WorkoutCard", {
+                            summary: item.workouts,
+                            uppercard: item
+                          })
+                        }
+                      >
+                        <RuningWorkout
+                          item={item}
+                          index={index}
+                          todayDayStr={todayDayString}
+                        />
+                      </TouchableOpacity>
+                    )
+                  }
+                })
+              :<></> }
+             
+            ) :(
               <View style={[fill, center]}>
                 <Text
                   text="No workout available."
                   style={{ color: "black", fontSize: 22 }}
                 />
               </View>
-            )}
+            )} */}
+            {requesting ? (
+  <View style={styles.loaderContainer}>
+    <ActivityIndicator color="#000" size={"large"} />
+  </View>
+) : (
+  (checkValue() && sortedData()?.length) || (checkCustomValue() && sortedCustomData()?.length) ? (
+    <>
+      {checkValue() && sortedData()?.length ? (
+        sortedData()?.map((item, index) => {
+          const todayDayString = moment(item.date_time).format("MM/DD/YYYY")
+
+          if (item?.workouts?.some(item => item?.done)) {
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() =>
+                  navigation.navigate("WorkoutCard", {
+                    summary: item.workouts,
+                    uppercard: item
+                  })
+                }
+              >
+                <RuningWorkout
+                  item={item}
+                  index={index}
+                  todayDayStr={todayDayString}
+                />
+              </TouchableOpacity>
+            )
+          } else {
+            return null;
+          }
+        })
+      ) : null}
+
+      {checkCustomValue() && sortedCustomData()?.length ? (
+        sortedCustomData()?.map((item, index) => {
+          const todayDayString = moment(item.date_time).format("MM/DD/YYYY")
+
+          if (item?.workouts?.some(item => item)) {
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() =>
+                  navigation.navigate("WorkoutCard", {
+                    summary: item.workouts,
+                    uppercard: item
+                  })
+                }
+              >
+                <RuningWorkout
+                  item={item}
+                  index={index}
+                  todayDayStr={todayDayString}
+                />
+              </TouchableOpacity>
+            )
+          } else {
+            return null;
+          }
+        })
+      ) : null}
+    </>
+  ) : (
+    <View style={[fill, center]}>
+      <Text
+        text="No workout available."
+        style={{ color: "black", fontSize: 22 }}
+      />
+    </View>
+  )
+)}
+
           </Content>
         )}
         {tab === 2 && (
@@ -1014,6 +1140,7 @@ const mapStateToProps = state => ({
   unreadCount: state.nutritionReducer.unreadCount,
   todaySessions: state.programReducer.todaySessions,
   getAllSessions: state.programReducer.getAllSessions,
+  getAllCustomSessions: state.programReducer.getAllCustomSessions,
   requesting: state.programReducer.requesting,
   loader: state.profileReducer.request,
   updateLoader: state.questionReducer.requesting,
@@ -1021,6 +1148,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  swapCustomExercises:(data,all)=>dispatch(swapCustomExercises(data,all)),
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsHistoryRequest: () => dispatch(getMealsHistoryRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),

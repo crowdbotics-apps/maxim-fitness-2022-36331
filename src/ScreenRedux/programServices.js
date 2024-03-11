@@ -15,6 +15,8 @@ import { showMessage } from "react-native-flash-message"
 
 const ALL_SESSIONS_REQUEST = "ProgramScreen/ALL_SESSIONS_REQUEST"
 const ALL_SESSIONS_SUCCESS = "ProgramScreen/ALL_SESSIONS_SUCCESS"
+const ALL_CUSTOM_SESSIONS_SUCCESS = "ProgramScreen/ALL_CUSTOM_SESSIONS_SUCCESS"
+
 const WEEK_SESSIONS_SUCCESS = "ProgramScreen/WEEK_SESSIONS_SUCCESS"
 
 const TODAY_SESSIONS_REQUEST = "ProgramScreen/TODAY_SESSIONS_REQUEST"
@@ -70,6 +72,11 @@ export const getAllSessionSuccess = data => ({
   type: ALL_SESSIONS_SUCCESS,
   data
 })
+export const getAllCustomSessionSuccess = data => ({
+  type: ALL_CUSTOM_SESSIONS_SUCCESS,
+  data
+})
+
 
 export const getWeekSessionSuccess = data => ({
   type: WEEK_SESSIONS_SUCCESS,
@@ -182,10 +189,10 @@ export const swapExercises = (data, date_time) => ({
   data,
   date_time
 })
-export const swapCustomExercises = (data, date_time) => ({
+export const swapCustomExercises = (data, all) => ({
   type: SWAP_CUSTOM_EXERCISE,
   data,
-  date_time
+  all
 })
 
 export const swapExerciseisTrue = () => ({
@@ -213,7 +220,9 @@ export const allSwapExerciseError = () => ({
 const initialState = {
   requesting: false,
   getAllSessions: false,
+  getAllCustomSessions:false,
   getAllSessionsRequesting: false,
+  getAllCustomSessionsRequesting:false,
   getWeekSessions: false,
 
   loader: false,
@@ -251,6 +260,13 @@ export const programReducer = (state = initialState, action) => {
         getAllSessions: action.data,
         getAllSessionsRequesting: false
       }
+      case ALL_CUSTOM_SESSIONS_SUCCESS:
+        return {
+          ...state,
+          getAllCustomSessions: action.data,
+          getAllCustomSessionsRequesting: false
+        }
+      
 
     case WEEK_SESSIONS_SUCCESS:
       return {
@@ -788,6 +804,7 @@ function* customSessionDoneCompleted({ id, screenNavigation }) {
 
 
 async function swapExercisesAPI(data) {
+  console.log(data,'daatatatata');
   const token = await AsyncStorage.getItem("authToken")
   const URL = `${API_URL}/session/swap_exercise/`
   const options = {
@@ -805,10 +822,10 @@ function* swapExercisesData({ data, date_time }) {
   try {
     const response = yield call(swapExercisesAPI, data)
     yield put(swapExerciseisTrue())
-
     const newDate = moment(date_time).format("YYYY-MM-DD")
     yield put(getDaySessionRequest(newDate, true))
   } catch (e) {
+    console.log(e,'errro');
     yield put(swapExerciseisTrue())
   }
 }
@@ -839,9 +856,27 @@ async function getCustomExerciseAPI(data) {
   }
   return XHR(URL, options)
 }
+async function getallCustomExerciseAPI() {
+  const token = await AsyncStorage.getItem("authToken")
+  
+  const URL = `${API_URL}/new_custom_workout/?all=true`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(URL, options)
+}
 
-function* swapCustomExercisesData({ data }) {
+function* swapCustomExercisesData({ data,all }) {
   try {
+    if(all){
+      const response = yield call(getallCustomExerciseAPI)
+      yield put(getAllCustomSessionSuccess(response?.data ))
+    }
+    else{
     const response = yield call(swapCustomExercisesAPI, data)
     yield put(swapExerciseisTrue())
     const customData = yield getCustomExerciseAPI(data?.workout_id)
@@ -851,7 +886,7 @@ function* swapCustomExercisesData({ data }) {
         workouts: customData?.data?.workouts,
         item: customData?.data,
       });
-    }
+    }}
   } catch (e) {
     showMessage({ message: "Something went wrong", type: "danger" })
     yield put(swapExerciseisTrue())

@@ -9,7 +9,6 @@ import { showMessage } from "react-native-flash-message"
 
 // utils
 import XHR from "src/utils/XHR"
-import { profileData } from "./profileRedux"
 
 //Types
 const GET_PLAN_REQUEST = "SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST"
@@ -257,7 +256,6 @@ async function addSubscriptionCardAPI(data) {
 function* addSubscriptionCard({ data }) {
   try {
     const response = yield call(addSubscriptionCardAPI, data)
-    yield call(profileData())
     yield put(paymentSubscriptionRequest(data))
   } catch (e) {
     showMessage({

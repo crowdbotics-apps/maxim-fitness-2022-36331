@@ -383,6 +383,7 @@ const ExerciseScreen = props => {
         }
       })
     } else {
+      console.log(params?.item?.id,'params?.item?.workout_id');
       props.allSwapExercise(selectedSession?.[active]?.id)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
@@ -390,7 +391,7 @@ const ExerciseScreen = props => {
           date_time: params?.item?.date_time,
           workout: params?.workouts?.[mainActive]?.id,
           custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
-          workout_id: params?.workout_id
+          workout_id:params?.item?.id
 
         }
       })
