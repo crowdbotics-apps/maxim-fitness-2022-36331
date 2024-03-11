@@ -804,7 +804,6 @@ function* customSessionDoneCompleted({ id, screenNavigation }) {
 
 
 async function swapExercisesAPI(data) {
-  console.log(data,'daatatatata');
   const token = await AsyncStorage.getItem("authToken")
   const URL = `${API_URL}/session/swap_exercise/`
   const options = {
@@ -825,7 +824,6 @@ function* swapExercisesData({ data, date_time }) {
     const newDate = moment(date_time).format("YYYY-MM-DD")
     yield put(getDaySessionRequest(newDate, true))
   } catch (e) {
-    console.log(e,'errro');
     yield put(swapExerciseisTrue())
   }
 }
