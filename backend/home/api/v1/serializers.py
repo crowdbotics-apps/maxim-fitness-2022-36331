@@ -438,7 +438,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
             representation = super().to_representation(instance)
             all_exercises = representation['exercises']
             for exercise in all_exercises:
-                custom_set = Set.objects.filter(workout=instance)
+                custom_set = Set.objects.filter(workout=instance, exercises__in=[exercise['id']])
                 exercise['sets'] = SetSerializer(custom_set, many=True).data
             #     all_sets_done = all(set['done'] for set in exercise['sets'])
             #     exercise['done'] = all_sets_done

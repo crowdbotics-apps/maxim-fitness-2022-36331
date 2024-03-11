@@ -175,15 +175,8 @@ class Program(models.Model):
                             )
                         workout.exercises.set(exercise.exercises.all())
                         order += 1
-                        for set in exercise.program_exercie_sets.all():
-                            for i in range(len(set.exercises.all())):
-
-                                # workout = Workout.objects.create(
-                                #     session=session,
-                                #     exercise=exercise.exercise,
-                                #     order=order
-                                # )
-                                # order += 1
+                        for ex in exercise.exercises.all():
+                            for set in exercise.program_exercie_sets.all():
                                 print('set', set.set_type)
                                 s_ = Set.objects.create(
                                     workout=workout,
@@ -193,7 +186,7 @@ class Program(models.Model):
                                     timer=set.timer,
                                     set_type=set.set_type,
                                 )
-                                s_.exercises.set(set.exercises.all())
+                                s_.exercises.add(ex)
 
                                 # workout.exercises.set(set.exercises.all())
                                 print(s_, 'created', s_.set_type)
