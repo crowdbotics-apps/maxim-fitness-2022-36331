@@ -159,7 +159,7 @@ class Program(models.Model):
                 days_gap += 1
                 if user.is_premium_user:
                     for exercise in day.day_exercises.all():
-                        if exercise.exercise:
+                        if not exercise.name:
                             workout = Workout.objects.create(
                                 session=session,
                                 exercise=exercise.exercise,
