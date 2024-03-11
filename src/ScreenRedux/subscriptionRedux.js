@@ -301,6 +301,10 @@ function* paymentSubscription({ data }) {
   try {
     const response = yield call(paymentSubscriptionAPI, data)
     navigate("Feeds")
+    showMessage({
+      message: "Card added successfully",
+      type: "success"
+    })
     yield submitQuestionAPI()
     yield put(newSubScription(response.data))
   } catch (e) {

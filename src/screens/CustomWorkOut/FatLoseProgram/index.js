@@ -196,7 +196,6 @@ const FatLoseProgram = props => {
       navigation.navigate("ExerciseScreen", {
         workouts: data?.workouts,
         item: data,
-
       })
     } else {
       getWeekSessions?.query?.map((item, index) => {
@@ -930,7 +929,7 @@ const FatLoseProgram = props => {
           }
         ]}
       >
-        {props.requesting ? (
+        {props.getAllSessionsRequesting ? (
           <View
             style={[
               Layout.fill,
@@ -1135,6 +1134,7 @@ const mapStateToProps = state => ({
   getAllSessions: state.programReducer.getAllSessions,
   getWeekSessions: state.programReducer.getWeekSessions,
   profile: state.login.userDetail,
+  getAllSessionsRequesting: state.addExerciseReducer.getAllSessionsRequesting,
   requesting: state.addExerciseReducer.requesting,
   cRequesting: state.addExerciseReducer.cRequesting,
   getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,

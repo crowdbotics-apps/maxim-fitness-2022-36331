@@ -213,6 +213,7 @@ export const allSwapExerciseError = () => ({
 const initialState = {
   requesting: false,
   getAllSessions: false,
+  getAllSessionsRequesting: false,
   getWeekSessions: false,
 
   loader: false,
@@ -241,14 +242,14 @@ export const programReducer = (state = initialState, action) => {
     case ALL_SESSIONS_REQUEST:
       return {
         ...state,
-        requesting: true
+        getAllSessionsRequesting: true
       }
 
     case ALL_SESSIONS_SUCCESS:
       return {
         ...state,
         getAllSessions: action.data,
-        requesting: false
+        getAllSessionsRequesting: false
       }
 
     case WEEK_SESSIONS_SUCCESS:
@@ -844,6 +845,7 @@ function* swapCustomExercisesData({ data }) {
     const response = yield call(swapCustomExercisesAPI, data)
     yield put(swapExerciseisTrue())
     const customData = yield getCustomExerciseAPI(data?.workout_id)
+    yield put(pickSession(null, customData?.data?.workouts, null))
     if (customData?.data?.workouts) {
       navigate("ExerciseScreen", {
         workouts: customData?.data?.workouts,

@@ -156,6 +156,7 @@ const ExerciseScreen = props => {
   }
   const onFocus = useIsFocused()
   useEffect(() => {
+    setParms(route?.params)
     getData()
 
   }, [onFocus, route])
@@ -337,33 +338,34 @@ const ExerciseScreen = props => {
     } else {
       props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
     }
+
   }
 
   const callBack = item => {
     setTimmer(false)
     if (item?.set_type?.toLowerCase() === "ss") {
       setModal("ss")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "gs") {
       setModal("gs")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "ds") {
       setModal("ds")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "tds") {
       setModal("tds")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "ct") {
       setModal("ct")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "r") {
       setModal("r")
-      refModal.current.open()
+      // refModal.current.open()
     }
   }
 
@@ -466,64 +468,67 @@ const ExerciseScreen = props => {
             {selectedSession?.length ?
               selectedSession?.map((item, i) => {
                 return (
-                  <TouchableOpacity
-                    // disabled={timmer}
-                    onPress={() => {
-                      setSelectedExercise(item)
-                      setMainActive(i)
-
-                      if (
-                        item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
-                        item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
-                      ) {
-                        selectExercise(item?.exercises?.[i], 0)
-                      } else {
-                        selectExercise(item?.exercises?.[0], 0)
-                      }
-
-                    }}
-                    style={[
-                      row,
-                      center,
-                      smallHPadding,
-                      {
-                        minHeight: mainActive === i ? 80 : 60,
-                        borderRadius: mainActive === i ? 8 : 10,
-                        marginHorizontal: mainActive === i ? 0 : 2,
-                        backgroundColor: mainActive === i ? "white" : "#F2F2F2"
-                      }
-                    ]}
-                  >
-                    {item?.done ? (
-                      <View style={styles.doneWrapper}>
-                        <Image
-                          source={Images.iconDoneProgram}
-                          style={styles.imageWrapper}
-                        />
-                      </View>
-                    ) : <></>}
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        width: 100
+                  <View>
+                    <TouchableOpacity
+                      // disabled={timmer}
+                      onPress={() => {
+                        setSelectedExercise(item)
+                        setMainActive(i)
+                        if (
+                          item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
+                          item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
+                        ) {
+                          selectExercise(item?.exercises?.[i], 0)
+                        } else {
+                          selectExercise(item?.exercises?.[0], 0)
+                        }
+                        setTimeout(() => {
+                          refModal.current.open()
+                        }, 800);
                       }}
+                      style={[
+                        row,
+                        center,
+                        smallHPadding,
+                        {
+                          minHeight: mainActive === i ? 80 : 60,
+                          borderRadius: mainActive === i ? 8 : 10,
+                          marginHorizontal: mainActive === i ? 0 : 2,
+                          backgroundColor: mainActive === i ? "white" : "#F2F2F2"
+                        }
+                      ]}
                     >
-                      <Text
+                      {item?.done ? (
+                        <View style={styles.doneWrapper}>
+                          <Image
+                            source={Images.iconDoneProgram}
+                            style={styles.imageWrapper}
+                          />
+                        </View>
+                      ) : <></>}
+                      <View
                         style={{
-                          color: "black",
-                          fontSize: 15,
-                          textAlign: "center"
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          width: 100
                         }}
-                        ellipsizeMode="tail"
-                        numberOfLines={3}
                       >
-                        {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name}`}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                        <Text
+                          style={{
+                            color: "black",
+                            fontSize: 15,
+                            textAlign: "center"
+                          }}
+                          ellipsizeMode="tail"
+                          numberOfLines={3}
+                        >
+                          {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name}`}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 )
               }) : <></>}
           </View>
@@ -631,6 +636,7 @@ const ExerciseScreen = props => {
                     </View>
                   )}
                 </View>
+
                 {repsWeightState?.set_type?.toLowerCase() === "cr" ? (
                   props.loader ? (
                     <View
@@ -697,6 +703,7 @@ const ExerciseScreen = props => {
                         { height: 60, paddingHorizontal: 10 }
                       ]}
                     >
+                      {/* <====================sets=====start======================> */}
                       <ScrollView
                         horizontal
                         contentContainerStyle={fillGrow}
@@ -723,6 +730,7 @@ const ExerciseScreen = props => {
                     </View>
                   </>
                 )}
+                {/* <====================sets===========end================> */}
                 <View style={[fill, secondaryBg]}>
                   <ScrollView contentContainerStyle={[fillGrow]}>
                     {repsWeightState?.set_type?.toLowerCase() ===
