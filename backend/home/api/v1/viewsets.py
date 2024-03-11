@@ -1754,8 +1754,11 @@ class CustomWorkoutViewSet(ModelViewSet):
 
     def get_queryset(self):
         date = self.request.query_params.get('date', None)
+        all = self.request.query_params.get('all', None)
         if date:
             return CustomWorkout.objects.filter(user=self.request.user, created_date=date).order_by('-created_date')
+        if all:
+            return CustomWorkout.objects.filter(user=self.request.user).order_by('-id', '-created_date')
         return CustomWorkout.objects.filter(user=self.request.user).order_by('-id', '-created_date')
 
     def create(self, request, *args, **kwargs):
