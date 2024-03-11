@@ -35,6 +35,7 @@ import {
   pickSession,
   setCustom
 } from "../../../ScreenRedux/programServices"
+import { profileData } from "../../../ScreenRedux/profileRedux"
 
 const FatLoseProgram = props => {
   const {
@@ -47,6 +48,7 @@ const FatLoseProgram = props => {
     getWeekSessions,
     profile,
     getCustomExerciseState,
+    profileData
   } = props
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
@@ -109,6 +111,7 @@ const FatLoseProgram = props => {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       const newDate = moment(new Date()).format("YYYY-MM-DD")
+      profileData()
       props.getAllSessionRequest(newDate)
       props.getDaySessionRequest(newDate)
       props.getCustomExerciseRequest(newDate)
@@ -276,7 +279,7 @@ const FatLoseProgram = props => {
     const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
 
     return (
-      <View style={{ margin: 10, padding: 2, flex: 1, }}>
+      <View style={{ margin: 5, flex: 1, }}>
         <View style={[styles.cardView, { width: '100%' }]}>
           <View style={[row, justifyContentBetween]}>
 
@@ -1141,6 +1144,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
   getCustomExerciseRequest: date => dispatch(getCustomExerciseRequest(date)),
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),

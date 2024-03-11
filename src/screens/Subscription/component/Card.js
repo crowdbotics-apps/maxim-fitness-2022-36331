@@ -62,7 +62,7 @@ const Card = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
-        <Loader isLoading={amount != 0 || amount < 0} />
+        <Loader isLoading={amount} />
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
             text={`$ ${amount || 0}`}

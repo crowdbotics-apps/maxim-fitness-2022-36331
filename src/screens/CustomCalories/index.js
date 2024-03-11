@@ -71,7 +71,6 @@ const CustomCalories = props => {
     updateLoader,
     loader
   } = props
-
   let refWeight = useRef("")
   let refTrainingDay = useRef("")
   const pubnub = usePubNub()
@@ -214,9 +213,9 @@ const CustomCalories = props => {
     )
     return data || []
   }
-
   const checkValue = () => {
     const data = getAllSessions?.query?.map((item, index) => {
+      console.log(item, 'getAllSessions item');
       if (item?.workouts?.some(item => item?.done)) {
         return true
       } else {
@@ -226,7 +225,6 @@ const CustomCalories = props => {
     const isData = data && data?.find(item => item)
     return isData
   }
-
   const logOut = async () => {
     if (await GoogleSignin.isSignedIn()) {
       try {
@@ -456,6 +454,7 @@ const CustomCalories = props => {
                 )
 
                 if (item?.workouts?.some(item => item?.done)) {
+                  console.log(item, 'item');
                   return (
                     <TouchableOpacity
                       key={index}
@@ -612,33 +611,33 @@ const CustomCalories = props => {
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                    return (
-                      <TouchableOpacity
-                        key={i}
-                        // onPress={() => {
-                        //   if (item.message === 'Comment Post' || 'Like Post') {
-                        //     navigation.navigate('PostDetail', { item: item });
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        //   if (item.message === 'Started following you') {
-                        //     navigation.navigate('ProfileView', item);
-                        //   }
-                        //   if (item.message === 'Message') {
-                        //     navigation.navigate('ChatRoom');
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        // }}
-                      >
-                        <RuningCard
-                          item={item}
-                          Notification={item.message}
-                          Time={calculatePostTime(item)}
-                        />
-                      </TouchableOpacity>
-                    )
-                  })
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                    // onPress={() => {
+                    //   if (item.message === 'Comment Post' || 'Like Post') {
+                    //     navigation.navigate('PostDetail', { item: item });
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    //   if (item.message === 'Started following you') {
+                    //     navigation.navigate('ProfileView', item);
+                    //   }
+                    //   if (item.message === 'Message') {
+                    //     navigation.navigate('ChatRoom');
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    // }}
+                    >
+                      <RuningCard
+                        item={item}
+                        Notification={item.message}
+                        Time={calculatePostTime(item)}
+                      />
+                    </TouchableOpacity>
+                  )
+                })
                 : null}
             </View>
           </ScrollView>

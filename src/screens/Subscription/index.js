@@ -19,6 +19,8 @@ import { ScrollView } from "react-native-gesture-handler"
 
 const SubscriptionScreen = props => {
   const { navigation, getPlans, userDetail, subscriptionData } = props
+
+
   const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
@@ -98,7 +100,7 @@ const SubscriptionScreen = props => {
             getPlans={getPlans}
             amount={
               getPlans?.length &&
-              getPlans[getPlans?.length - 1]?.unit_amount / 100
+              getPlans[getPlans?.length - 1]?.unit_amount
             }
             subsucriptionId={subscriptionData?.plan?.id}
           />
@@ -203,6 +205,7 @@ const SubscriptionScreen = props => {
       </Modal>
     </>
   )
+
 }
 const styles = StyleSheet.create({
   leftArrow: {
