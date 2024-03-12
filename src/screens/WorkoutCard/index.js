@@ -46,7 +46,7 @@ const WorkoutCard = ({ navigation, route }) => {
   }, [])
 
   const countMints = () => {
-    const data = route?.params?.uppercard.workouts.reduce(
+    const data = route?.params?.uppercard?.workouts.reduce(
       (total, workout) => total + workout.timer,
       0
     )
@@ -99,6 +99,7 @@ const WorkoutCard = ({ navigation, route }) => {
             marginTop: 10
           }}
         />
+        {route?.params?.uppercard?.cardio_length?
         <View style={{ paddingHorizontal: 15 }}>
           <View style={styles.UpperCardMainStyle}>
             {/* <View style={styles.UpperCardStyle}>
@@ -183,7 +184,7 @@ const WorkoutCard = ({ navigation, route }) => {
               <Text style={{ color: "black" }}>Minutes</Text>
             </View>
           </View>
-        </View>
+        </View>:<></>}
         <>
           <ScrollView showsHorizontalScrollIndicator={false}>
             <View style={fill}>

@@ -211,26 +211,28 @@ props.swapCustomExercises('',true)
   }
   
 
-
   //<==================custom Workouts list==============start==========>
   const sortedCustomData = () => {
     const data = getAllCustomSessions?.sort(
       (a, b) => new Date(b.created_date) - new Date(a.created_date)
-    );
-    return data || [];
-  };
+      );
+      return data || [];
+    };
   
-  const checkCustomValue = () => {
-    const data = getAllCustomSessions?.workouts?.map((item, index) => {
-      if (item?.workouts?.some(item => item?.done)) {
-        return true
-      } else {
-        return true
-      }
-    })
-    const isData = data && data?.find(item => item?.done)
-    return isData
-  }
+    const checkCustomValue = () => {
+      const data = getAllCustomSessions?.length&&getAllCustomSessions?.map((item, index) => {
+        if (item?.done) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    
+      const isData = data && data?.find(item => item);
+    
+      return isData;
+    };
+    
   //<==================custom Workouts list==============end==========>
 
   const sortedData = () => {
@@ -572,15 +574,15 @@ props.swapCustomExercises('',true)
 
       {checkCustomValue() && sortedCustomData()?.length ? (
         sortedCustomData()?.map((item, index) => {
-          const todayDayString = moment(item.date_time).format("MM/DD/YYYY")
+          const todayDayString = moment(item.created_date).format("MM/DD/YYYY")
 
-          if (item?.workouts?.some(item => item)) {
+          if (item?.workouts?.some(item => item?.done)) {
             return (
               <TouchableOpacity
                 key={index}
                 onPress={() =>
                   navigation.navigate("WorkoutCard", {
-                    summary: item.workouts,
+                    summary: item?.workouts,
                     uppercard: item
                   })
                 }

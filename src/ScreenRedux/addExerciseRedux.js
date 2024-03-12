@@ -8,7 +8,8 @@ import { API_URL } from "../config/app"
 // utils
 import XHR from "src/utils/XHR"
 import { navigate } from "../navigation/NavigationService"
-
+//actions
+import { pickSession } from "./programServices";
 const GET_EXERCISE_REQUEST = "AddExerciseScreen/GET_EXERCISE_REQUEST"
 
 const GET_EXERCISE_SUCCESS = "AddExerciseScreen/GET_EXERCISE_SUCCESS"
@@ -68,9 +69,10 @@ export const getExerciseTypeSuccess = data => ({
   data
 })
 
-export const postCustomExRequest = data => ({
+export const postCustomExRequest = (data,start) => ({
   type: POST_CUSTOM_EXERCISE_REQUEST,
-  data
+  data,
+  start
 })
 
 export const postCustomExSuccess = data => ({
@@ -215,12 +217,25 @@ async function postCustomExAPI(data) {
   return XHR(URL, options)
 }
 
-function* postCustomEx({ data }) {
+function* postCustomEx({ data,start }) {
+  console.warn(data,start,'data,start')
   try {
+    if(start){
+      const response = yield call(postCustomExAPI, data)
+      yield put(postCustomExSuccess(response.data))
+    yield put(pickSession(null, response?.data?.workouts, null))
+    if (response?.data?.workouts) {
+      navigate("ExerciseScreen", {
+        workouts: response?.data?.workouts,
+        item: response?.data,
+      });
+    }
+      yield put(addCustomExercise([]))
+    }else{ 
     const response = yield call(postCustomExAPI, data)
     yield put(postCustomExSuccess(response.data))
     navigate("FatLoseProgram")
-    yield put(addCustomExercise([]))
+    yield put(addCustomExercise([]))}
   } catch (e) {
     yield put(postCustomExSuccess(false))
   }

@@ -222,7 +222,7 @@ const initialState = {
   getAllSessions: false,
   getAllCustomSessions:false,
   getAllSessionsRequesting: false,
-  getAllCustomSessionsRequesting:false,
+  getAllCustomSessionsRequesting:[],
   getWeekSessions: false,
 
   loader: false,

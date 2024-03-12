@@ -39,9 +39,9 @@ const data = [
 const AddExercies = props => {
   const { navigation, getExerciseState, route, requesting, getExerciseType } = props
   let refDescription = useRef("")
-  let isFocused = useIsFocused()
   const [activeSet, setActiveSet] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
+
   const [desription, setDesription] = useState(false)
   const [selectMuscle, setSelectMuscle] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -256,7 +256,7 @@ const AddExercies = props => {
           </View>
           <View style={{ marginTop: 25 }}>
             <Text
-              text="Poupular Exercies"
+              text="Popular Exercises"
               style={[styles.heading, { color: "#626262" }]}
             />
           </View>
@@ -319,7 +319,7 @@ const AddExercies = props => {
       </ScrollView>
       <View style={{ alignSelf: "center" }}>
         <Button
-          text={"Add Exercies"}
+          text={"Add Exercise"}
           textStyle={[{ color: "white" }]}
           style={styles.btn}
           disabled={

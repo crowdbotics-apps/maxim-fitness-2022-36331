@@ -28,7 +28,9 @@ import ImagePicker from "react-native-image-crop-picker"
 import { Global, Gutters, Layout, Colors, Images, Fonts } from "../../../theme"
 import {
   postCustomExRequest,
-  addCustomExercise
+  addCustomExercise,
+  getExerciseTypeRequest
+
 } from "../../../ScreenRedux/addExerciseRedux"
 import { transformData } from "../../../utils/utils"
 
@@ -39,22 +41,24 @@ const CustomExercise = props => {
     navigation,
     route,
     cRequesting,
+    requesting,
     getCustomExState,
     todaySessions,
-    profile
+    profile,
+    getExerciseType,
+    custom
   } = props
   const { width, height } = Dimensions.get("window")
-
+const {exercises, activeSetData=activeSet, date}=route?.params
   const [reps, setReps] = useState("")
   const [title, setTitle] = useState("")
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [deleteModal, setDeleteModal] = useState(false)
-
   //BottomSheetRefs
   const refRBSheet = useRef()
   const refRBSheetDual = useRef()
-
+let replaceExercise=useRef("")
   const [sets, setSets] = useState([])
   const [dualSets, setDualSets] = useState([])
   const [dualSetState, setDualSetState] = useState(1)
@@ -66,11 +70,14 @@ const CustomExercise = props => {
   const [temporaryReps, setTemporaryReps] = useState(false)
   const [selectIndex, setSelectIndex] = useState(0)
   const [exerciseIndex, setExerciseIndex] = useState(0)
-
+  const [selectedItem, setSelectedItem] = useState([])
+  const [activeSet, setActiveSet] = useState(activeSetData)
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
   })
+  const {alignItemsEnd, row, fill, center, alignItemsCenter,justifyContentCenter, justifyContentBetween,fillGrow,justifyContentAround } = Layout
+  const { foodImage, iconI } = Images
 
   // const numberOfExercise = route?.params?.exercises?.length
   // const activeSet = route?.params?.activeSet
@@ -379,6 +386,22 @@ const CustomExercise = props => {
     return flattenedArray
   }
 
+  
+  const startCutomWorkout = () => {
+    if (title === "Rest" || title === "rest") {
+      showMessage({ message: "Title should not be Rest", type: "danger" })
+    } else {
+      const payload = {
+        name: title ? title : "title",
+        user: profile?.id,
+        created_date: route?.params?.date,
+        custom_exercises: transformData(props.customExercise)
+        // adding_exercise_in_workout: true
+      }
+
+      props.postCustomExRequest(payload,true)
+    }
+  }
   // Flatten the array
   const addDataCustomEx = () => {
     if (title === "Rest" || title === "rest") {
@@ -392,7 +415,7 @@ const CustomExercise = props => {
         // adding_exercise_in_workout: true
       }
 
-      props.postCustomExRequest(payload)
+      props.postCustomExRequest(payload,false)
     }
   }
 
@@ -414,19 +437,68 @@ const CustomExercise = props => {
     return true
   }
 
+  const onSelectItem = i => {
+    let array = [...selectedItem]
+    if (array.includes(i)) {
+      array = array.filter(index => index !== i)
+      setSelectedItem(array)
+    } else {
+      if (activeSet?.id === 1) {
+        if (selectedItem.length < 2) {
+          array[i]=i
+          setSelectedItem(array)
+        }
+      } else if (activeSet?.value === 4) {
+        if (selectedItem.length < 3) {
+          array[i]=i
+          setSelectedItem(array)
+        }
+      } else {
+        setSelectedItem([i])
+      }
+    }
+  } 
+
+  // }
+  const makeDataParams = () => {
+    const exercises = [props.customExercise];
+  
+    getExerciseType.forEach((item, ind) => {
+      if (selectedItem.includes(ind)) {
+        exercises.push(item);
+      }
+    });
+  
+    const newObj = { type: exercises };
+  
+    const newData = props.customExercise.map((existingData) => {
+      if (existingData.activeSet.id === activeSet.id) {
+        return { exercises: newObj, activeSet: activeSet };
+      } else if (existingData?.dualSets) {
+        return { exercises: newObj, activeSet: existingData?.dualSets };
+      } else {
+        return existingData;
+      }
+    });
+  
+    props.addCustomExercise(newData);
+    replaceExercise.current.close();
+  };
+  
+  
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
-        contentContainerStyle={Layout.fillGrow}
+        contentContainerStyle={fillGrow}
         keyboardShouldPersistTaps={"handled"}
       >
         <View
           style={[
-            Layout.row,
+            row,
             Gutters.regularVMargin,
             Gutters.regularHMargin,
-            Layout.alignItemsCenter,
-            Layout.justifyContentBetween
+            alignItemsCenter,
+            justifyContentBetween
           ]}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -455,17 +527,17 @@ const CustomExercise = props => {
 
         <View
           style={[
-            Layout.row,
+            row,
             Global.borderB,
             Global.height60,
             Global.borderAlto,
-            Layout.alignItemsCenter,
+            alignItemsCenter,
             Gutters.regularHMargin,
-            Layout.justifyContentBetween
+            justifyContentBetween
           ]}
         >
           <InputField
-            inputStyle={[Fonts.titleRegular, Layout.fill]}
+            inputStyle={[Fonts.titleRegular, fill]}
             value={title}
             onChangeText={val => setTitle(val)}
             placeholder="Workout Title"
@@ -485,7 +557,7 @@ const CustomExercise = props => {
             >
               {
                 //numberOfExercise === 1 ? (
-                //<View style={[Layout.row, Gutters.smallHMargin, Gutters.smallVMargin]}>
+                //<View style={[row, Gutters.smallHMargin, Gutters.smallVMargin]}>
                 //<Image source={Images.profileBackGround} style={styles.exerciseImage} />
                 //<Text text="Barbell bench press" style={styles.exerciseName} />
                 //</View>
@@ -494,7 +566,16 @@ const CustomExercise = props => {
                 item?.exercises?.type?.map((exe, i) => {
                   return (
                     <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
-                      <View style={Layout.row}>
+                      <TouchableOpacity 
+                      onPress={()=>{
+                        props.getExerciseTypeRequest(
+                          exe?.exercise_type.id,
+                          ""
+                        )
+                        setActiveSet(item?.activeSet)
+                      replaceExercise.current.open()
+                        }}
+                      style={row}>
                         <Image
                           source={
                             exe?.video_thumbnail
@@ -511,9 +592,9 @@ const CustomExercise = props => {
                               : `${list[i]}. ${exe.name}`
                           }
                         />
-                      </View>
+                      </TouchableOpacity>
 
-                      {/* <View style={[Layout.row, Gutters.smallTMargin]}>
+                      {/* <View style={[row, Gutters.smallTMargin]}>
                     <Image source={Images.profileBackGround} style={styles.exerciseImage1} />
                     <Text style={styles.exerciseName1} text={`a. ${ex2}`} />
                   </View> */}
@@ -524,10 +605,10 @@ const CustomExercise = props => {
 
               <View
                 style={[
-                  Layout.row,
+                  row,
                   Gutters.smallHMargin,
                   Gutters.smallTMargin,
-                  Layout.justifyContentAround
+                  justifyContentAround
                 ]}
               >
                 <Text style={styles.setStyle} text="Set" />
@@ -547,12 +628,12 @@ const CustomExercise = props => {
                         setCurrentIndex(data)
                       }}
                       style={[
-                        Layout.row,
+                        row,
                         Global.height35,
                         Gutters.tinyTMargin,
                         Gutters.largeHMargin,
-                        Layout.alignItemsCenter,
-                        Layout.justifyContentAround,
+                        alignItemsCenter,
+                        justifyContentAround,
                         {
                           borderRadius: 6,
                           backgroundColor:
@@ -686,14 +767,14 @@ const CustomExercise = props => {
 
               <View
                 style={[
-                  Layout.row,
+                  row,
                   Gutters.smallHMargin,
                   Gutters.small2xTMargin,
-                  Layout.justifyContentBetween
+                  justifyContentBetween
                 ]}
               >
                 <TouchableOpacity
-                  style={Layout.row}
+                  style={row}
                   onPress={() => {
                     duplicateSet(item)
                   }}
@@ -749,7 +830,7 @@ const CustomExercise = props => {
         {props?.customExercise?.length !== 0 ? (
           <View style={{ marginHorizontal: 15 }}>
             <Button
-              text={"Add Exercie"}
+              text={"Add Exercise"}
               textStyle={[{ color: "white" }]}
               style={[
                 styles.btn,
@@ -772,6 +853,33 @@ const CustomExercise = props => {
             />
           </View>
         ) : null}
+        {props?.customExercise?.length !== 0 ? (
+         <View style={{ marginHorizontal: 15 }}>
+            <Button
+              text={"Start Workout"}
+              textStyle={[{ color: "white" }]}
+              style={[
+                styles.btn,
+                {
+                  flex:1,
+                  backgroundColor:'green',
+                  opacity: title === "" || !checkSets() ? 0.5 : 1
+                }
+              ]}
+              disabled={cRequesting || title === "" || !checkSets()}
+              onPress={startCutomWorkout}
+              loading={cRequesting}
+
+            // disabled={
+            //   activeSet?.id === 1
+            //     ? selectedItem?.length < 2
+            //     : activeSet?.value === 4
+            //     ? selectedItem?.length < 3
+            //     : selectedItem?.length < 1
+            // }
+            // onPress={makeDataParams}
+            />
+          </View>):<></>}
       </KeyboardAwareScrollView>
 
       <RBSheet
@@ -795,22 +903,22 @@ const CustomExercise = props => {
           <ScrollView keyboardShouldPersistTaps={"handled"}>
             <View
               style={[
-                Layout.row,
-                Layout.fill,
+                row,
+                fill,
                 Gutters.small2xHMargin,
-                Layout.justifyContentBetween
+                justifyContentBetween
               ]}
             >
-              <View style={Layout.fill} />
-              <View style={[Layout.fill, Layout.center]}>
+              <View style={fill} />
+              <View style={[fill, center]}>
                 <Text style={styles.setOneTextStyle} text="Set 1" />
               </View>
               <TouchableOpacity
                 onPress={() => refRBSheet.current.close()}
                 style={[
-                  Layout.fill,
-                  Layout.alignItemsEnd,
-                  Layout.justifyContentCenter
+                  fill,
+                  alignItemsEnd,
+                  justifyContentCenter,
                 ]}
               >
                 <Image source={circleClose} style={{ height: 25, width: 25 }} />
@@ -819,10 +927,10 @@ const CustomExercise = props => {
 
             <View
               style={[
-                Layout.row,
+                row,
                 Gutters.largeHMargin,
                 Gutters.small2xTMargin,
-                Layout.justifyContentBetween
+                justifyContentBetween
               ]}
             >
               <View style={styles.secondaryBoxes}>
@@ -908,7 +1016,7 @@ const CustomExercise = props => {
                   style={{ color: "#00a1ff", fontWeight: "700" }}
                   text="Enter Rest"
                 />
-                <View style={[Layout.row, Layout.alignItemsCenter]}>
+                <View style={[row, alignItemsCenter]}>
                   <View>
                     <TextInput
                       style={{
@@ -987,17 +1095,17 @@ const CustomExercise = props => {
             </View>
             <View
               style={[
-                Layout.row,
+              row,
                 Gutters.largeHMargin,
                 Gutters.small2xTMargin,
-                Layout.justifyContentBetween
+                justifyContentBetween
               ]}
             >
               <View
                 style={[
-                  Layout.row,
+                  row,
                   Gutters.smallTMargin,
-                  Layout.alignItemsCenter
+                  alignItemsCenter
                 ]}
               >
                 <TouchableOpacity
@@ -1022,9 +1130,9 @@ const CustomExercise = props => {
               </View>
               <View
                 style={[
-                  Layout.row,
+                row,
                   Gutters.smallTMargin,
-                  Layout.alignItemsCenter
+                 alignItemsCenter
                 ]}
               >
                 <TouchableOpacity
@@ -1050,7 +1158,7 @@ const CustomExercise = props => {
 
             <View
               style={[
-                Layout.center,
+                center,
                 Gutters.smallVMargin,
                 Gutters.regularBPadding
               ]}
@@ -1769,6 +1877,85 @@ const CustomExercise = props => {
           </ScrollView>
         </View>
       </RBSheet>
+      <BottomSheet
+        reff={replaceExercise}
+        isDrage={true}
+        h={700}
+        Iconbg={Colors.athensgray}
+        bg={Colors.athensgray}
+        customStyles={{
+          draggableIcon: {
+            backgroundColor: "red"
+          }
+        }}
+      >
+ <View style={[row,justifyContentBetween,{ marginTop: 25,marginHorizontal: 25  }]}>
+            <Text
+              text="Popular Exercises"
+              style={[styles.heading, { color: "#626262" }]}
+            />
+            <TouchableOpacity 
+             disabled={
+              activeSet?.id === 1
+                ? selectedItem?.length < 2
+                : activeSet?.value === 4
+                  ? selectedItem?.length < 3
+                  : selectedItem?.length < 1
+            }
+            onPress={makeDataParams}
+            style={[styles.addSetsButton]}>
+              <Text>
+                Done
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView>
+          <View style={{ marginBottom: 20 }}>
+          {getExerciseType === false && !requesting && props.request ? (
+            <ActivityIndicator size={"large"} color="green" />
+          ) : getExerciseType && getExerciseType?.length ? (
+            getExerciseType.map((item, i) => (
+              <TouchableOpacity
+                style={[
+                  styles.cardView,
+                  {
+                    backgroundColor: selectedItem.includes(i)
+                      ? "#74ccff"
+                      : "#e5e5e5"
+                  }
+                ]}
+                onPress={() => onSelectItem(i)}
+              >
+                <View
+                  style={[row, justifyContentBetween, { position: "relative" }]}
+                >
+                  <View style={[center, styles.cardImg]}>
+                    <Image
+                      source={
+                        item?.pictures[0]?.image
+                          ? { uri: item?.pictures[0]?.image }
+                          : item?.video_thumbnail
+                            ? { uri: item?.video_thumbnail }
+                            : foodImage
+                      }
+                      style={{ width: 80, height: 45 }}
+                    />
+                  </View>
+                  <View style={[center, { marginRight: 50, flex: 1 }]}>
+                    <Text text={item.name} style={styles.heading1} />
+                  </View>
+                  
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.notFound}>
+              <Text bold>No exercise found</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+      </BottomSheet>
 
       <Modal
         isVisible={deleteModal}
@@ -1781,7 +1968,7 @@ const CustomExercise = props => {
             Gutters.small2xHMargin,
             Global.secondaryBg,
             Global.borderR10,
-            Layout.center,
+            center,
             {
               height: 250
             }
@@ -1792,7 +1979,7 @@ const CustomExercise = props => {
             text="Are you sure you want to delete this exercise?"
           />
 
-          <View style={[Layout.row, Gutters.small2xTMargin]}>
+          <View style={[row, Gutters.small2xTMargin]}>
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: "#74ccff" }]}
               onPress={() => deleteSet()}
@@ -2027,7 +2214,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
     height: 40
-  }
+  },
+  heading: {
+    textAlign:'center',
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  cardView: {
+    padding: 13,
+    marginTop: 15,
+    borderRadius: 10,
+    backgroundColor: Colors.brightturquoise,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 5,
+    marginHorizontal: 8
+  },
+  cardImg: {
+    backgroundColor: "white",
+    width: 90,
+    height: 60,
+    borderRadius: 10
+  },
 })
 
 const mapStateToProps = state => ({
@@ -2035,11 +2249,14 @@ const mapStateToProps = state => ({
   getCustomExState: state.addExerciseReducer.getCustomExState,
   todaySessions: state.programReducer.todaySessions,
   customExercise: state.addExerciseReducer.custom,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
+  getExerciseType: state.addExerciseReducer.getExerciseType,
+  requesting: state.addExerciseReducer.requesting,
 })
 
 const mapDispatchToProps = dispatch => ({
-  postCustomExRequest: data => dispatch(postCustomExRequest(data)),
-  addCustomExercise: data => dispatch(addCustomExercise(data))
+  postCustomExRequest: (data,start) => dispatch(postCustomExRequest(data,start)),
+  addCustomExercise: data => dispatch(addCustomExercise(data)),
+  getExerciseTypeRequest: (data, search) =>dispatch(getExerciseTypeRequest(data, search)),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)
