@@ -462,17 +462,17 @@ let replaceExercise=useRef("")
   // }
   const makeDataParams = () => {
     const exercises = [props.customExercise];
-  
-    getExerciseType.forEach((item, ind) => {
+    {getExerciseType&&
+    getExerciseType?.forEach((item, ind) => {
       if (selectedItem.includes(ind)) {
         exercises.push(item);
       }
-    });
+    });}
   
     const newObj = { type: exercises };
   
     const newData = props.customExercise.map((existingData) => {
-      if (existingData.activeSet.id === activeSet.id) {
+      if (existingData.activeSet.id === activeSet?.id) {
         return { exercises: newObj, activeSet: activeSet };
       } else if (existingData?.dualSets) {
         return { exercises: newObj, activeSet: existingData?.dualSets };
@@ -569,7 +569,7 @@ let replaceExercise=useRef("")
                       <TouchableOpacity 
                       onPress={()=>{
                         props.getExerciseTypeRequest(
-                          exe?.exercise_type.id,
+                          exe?.exercise_type?.id,
                           ""
                         )
                         setActiveSet(item?.activeSet)
