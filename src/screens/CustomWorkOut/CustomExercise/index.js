@@ -30,7 +30,6 @@ import {
   postCustomExRequest,
   addCustomExercise,
   getExerciseTypeRequest
-
 } from "../../../ScreenRedux/addExerciseRedux"
 import { transformData } from "../../../utils/utils"
 
@@ -46,10 +45,10 @@ const CustomExercise = props => {
     todaySessions,
     profile,
     getExerciseType,
-    custom
+    pickedDate
   } = props
   const { width, height } = Dimensions.get("window")
-const {exercises, activeSetData=activeSet, date}=route?.params
+  const { exercises,activeSet, } = route?.params
   const [reps, setReps] = useState("")
   const [title, setTitle] = useState("")
   const [minutes, setMinutes] = useState(0)
@@ -58,7 +57,7 @@ const {exercises, activeSetData=activeSet, date}=route?.params
   //BottomSheetRefs
   const refRBSheet = useRef()
   const refRBSheetDual = useRef()
-let replaceExercise=useRef("")
+  let replaceExercise = useRef("")
   const [sets, setSets] = useState([])
   const [dualSets, setDualSets] = useState([])
   const [dualSetState, setDualSetState] = useState(1)
@@ -71,12 +70,22 @@ let replaceExercise=useRef("")
   const [selectIndex, setSelectIndex] = useState(0)
   const [exerciseIndex, setExerciseIndex] = useState(0)
   const [selectedItem, setSelectedItem] = useState([])
-  const [activeSet, setActiveSet] = useState(activeSetData)
+  const [activeCard, setActiveCard] = useState({item:{},index:0})
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
   })
-  const {alignItemsEnd, row, fill, center, alignItemsCenter,justifyContentCenter, justifyContentBetween,fillGrow,justifyContentAround } = Layout
+  const {
+    alignItemsEnd,
+    row,
+    fill,
+    center,
+    alignItemsCenter,
+    justifyContentCenter,
+    justifyContentBetween,
+    fillGrow,
+    justifyContentAround
+  } = Layout
   const { foodImage, iconI } = Images
 
   // const numberOfExercise = route?.params?.exercises?.length
@@ -385,8 +394,6 @@ let replaceExercise=useRef("")
     const flattenedArray = arrayList.flat()
     return flattenedArray
   }
-
-  
   const startCutomWorkout = () => {
     if (title === "Rest" || title === "rest") {
       showMessage({ message: "Title should not be Rest", type: "danger" })
@@ -394,30 +401,30 @@ let replaceExercise=useRef("")
       const payload = {
         name: title ? title : "title",
         user: profile?.id,
-        created_date: route?.params?.date,
+        created_date: pickedDate,
         custom_exercises: transformData(props.customExercise)
         // adding_exercise_in_workout: true
       }
 
-      props.postCustomExRequest(payload,true)
+      props.postCustomExRequest(payload, true)
     }
   }
   // Flatten the array
-  const addDataCustomEx = () => {
-    if (title === "Rest" || title === "rest") {
-      showMessage({ message: "Title should not be Rest", type: "danger" })
-    } else {
-      const payload = {
-        name: title ? title : "title",
-        user: profile?.id,
-        created_date: route?.params?.date,
-        custom_exercises: transformData(props.customExercise)
-        // adding_exercise_in_workout: true
-      }
+  // const addDataCustomEx = () => {
+  //   if (title === "Rest" || title === "rest") {
+  //     showMessage({ message: "Title should not be Rest", type: "danger" })
+  //   } else {
+  //     const payload = {
+  //       name: title ? title : "title",
+  //       user: profile?.id,
+  //       created_date: route?.params?.date,
+  //       custom_exercises: transformData(props.customExercise)
+  //       // adding_exercise_in_workout: true
+  //     }
 
-      props.postCustomExRequest(payload,false)
-    }
-  }
+  //     props.postCustomExRequest(payload, false)
+  //   }
+  // }
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
   const checkSets = () => {
@@ -437,55 +444,51 @@ let replaceExercise=useRef("")
     return true
   }
 
-  const onSelectItem = i => {
-    let array = [...selectedItem]
+  const onSelectItem = ( i) => {
+    let array = [...selectedItem];
     if (array.includes(i)) {
-      array = array.filter(index => index !== i)
-      setSelectedItem(array)
+        array = array.filter(index => index !== i);
     } else {
-      if (activeSet?.id === 1) {
-        if (selectedItem.length < 2) {
-          array[i]=i
-          setSelectedItem(array)
+        if (activeSet?.id === 1) {
+            if (selectedItem.length < 2) {
+                array.push(i);
+            }
+        } else if (activeSet?.value === 4) {
+            if (selectedItem.length < 3) {
+                array.push(i);
+            }
+        } else {
+            array = [i];
         }
-      } else if (activeSet?.value === 4) {
-        if (selectedItem.length < 3) {
-          array[i]=i
-          setSelectedItem(array)
-        }
-      } else {
-        setSelectedItem([i])
-      }
     }
-  } 
+    setSelectedItem(array);
+};
 
-  // }
-  const makeDataParams = () => {
-    const exercises = [props.customExercise];
-    {getExerciseType&&
-    getExerciseType?.forEach((item, ind) => {
+const updateDataParams = () => {
+  const exercises = [];
+  getExerciseType && getExerciseType.forEach((item, ind) => {
       if (selectedItem.includes(ind)) {
-        exercises.push(item);
+          exercises.push(item);
       }
-    });}
-  
-    const newObj = { type: exercises };
-  
-    const newData = props.customExercise.map((existingData) => {
-      if (existingData.activeSet.id === activeSet?.id) {
-        return { exercises: newObj, activeSet: activeSet };
-      } else if (existingData?.dualSets) {
-        return { exercises: newObj, activeSet: existingData?.dualSets };
+  });
+
+  const newObj = { type: exercises };
+
+  const newData = props.customExercise.map((existingData, idx) => {
+      if (idx === activeCard.index) {
+          return { ...existingData, exercises: newObj };
       } else {
-        return existingData;
+          return existingData;
       }
-    });
-  
-    props.addCustomExercise(newData);
-    replaceExercise.current.close();
-  };
-  
-  
+  });
+
+
+
+  props.addCustomExercise(newData);
+  replaceExercise.current.close();
+  setActiveCard({ item: {}, index: 0 });
+};
+ 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
@@ -566,16 +569,18 @@ let replaceExercise=useRef("")
                 item?.exercises?.type?.map((exe, i) => {
                   return (
                     <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
-                      <TouchableOpacity 
-                      onPress={()=>{
-                        props.getExerciseTypeRequest(
-                          exe?.exercise_type?.id,
-                          ""
-                        )
-                        setActiveSet(item?.activeSet)
-                      replaceExercise.current.open()
+                      <TouchableOpacity
+                        onPress={() => {
+                          props.getExerciseTypeRequest(
+                            exe?.exercise_type?.id,
+                            ""
+                          )
+                          
+                          setActiveCard({item:item,index:index})
+                          replaceExercise.current.open()
                         }}
-                      style={row}>
+                        style={row}
+                      >
                         <Image
                           source={
                             exe?.video_thumbnail
@@ -638,7 +643,7 @@ let replaceExercise=useRef("")
                           borderRadius: 6,
                           backgroundColor:
                             currentIndex?.index === i &&
-                              currentIndex?.exerciseIndex === index
+                            currentIndex?.exerciseIndex === index
                               ? "#9cdaff"
                               : "#f3f1f4"
                         }
@@ -667,7 +672,7 @@ let replaceExercise=useRef("")
                         {
                           backgroundColor:
                             currentIndex?.index === i &&
-                              currentIndex?.exerciseIndex === index
+                            currentIndex?.exerciseIndex === index
                               ? "#74ccff"
                               : "#f1f1f1"
                         }
@@ -704,7 +709,7 @@ let replaceExercise=useRef("")
                         style={[
                           styles.dualSetsSecondView1,
                           findingData()?.activeSet?.value === 4 &&
-                          styles.borderStyle
+                            styles.borderStyle
                         ]}
                       >
                         <Text
@@ -732,7 +737,7 @@ let replaceExercise=useRef("")
                           />
                           <Text
                             style={styles.dualSecondReps}
-                            text={items.exerciseC.reps}
+                            text={items.exerciseC?.reps}
                           />
                           <Text
                             style={styles.dualSecondRest}
@@ -778,12 +783,12 @@ let replaceExercise=useRef("")
                   onPress={() => {
                     duplicateSet(item)
                   }}
-                // disabled={
-                //   currentIndex?.exerciseIndex === index &&
-                //   (currentIndex || currentIndex === 0)
-                //     ? false
-                //     : true
-                // }
+                  // disabled={
+                  //   currentIndex?.exerciseIndex === index &&
+                  //   (currentIndex || currentIndex === 0)
+                  //     ? false
+                  //     : true
+                  // }
                 >
                   <Image
                     source={duplicateIcon}
@@ -805,12 +810,12 @@ let replaceExercise=useRef("")
                     setExerciseIndex(index)
                     setDeleteModal(true)
                   }}
-                // disabled={
-                //   currentIndex?.exerciseIndex === index &&
-                //   (currentIndex || currentIndex === 0)
-                //     ? false
-                //     : true
-                // }
+                  // disabled={
+                  //   currentIndex?.exerciseIndex === index &&
+                  //   (currentIndex || currentIndex === 0)
+                  //     ? false
+                  //     : true
+                  // }
                 >
                   <Image source={redBin} style={{ height: 22, width: 20 }} />
                 </TouchableOpacity>
@@ -834,35 +839,32 @@ let replaceExercise=useRef("")
               textStyle={[{ color: "white" }]}
               style={[
                 styles.btn,
-                {
-                  opacity: title === "" || !checkSets() ? 0.5 : 1
-                }
+               
               ]}
-              disabled={cRequesting || title === "" || !checkSets()}
-              onPress={addDataCustomEx}
-              loading={cRequesting}
+              // disabled={cRequesting || title === "" || !checkSets()}
+              onPress={() => navigation.goBack()}
 
-            // disabled={
-            //   activeSet?.id === 1
-            //     ? selectedItem?.length < 2
-            //     : activeSet?.value === 4
-            //     ? selectedItem?.length < 3
-            //     : selectedItem?.length < 1
-            // }
-            // onPress={makeDataParams}
+              // disabled={
+              //   activeSet?.id === 1
+              //     ? selectedItem?.length < 2
+              //     : activeSet?.value === 4
+              //     ? selectedItem?.length < 3
+              //     : selectedItem?.length < 1
+              // }
+              // onPress={makeDataParams}
             />
           </View>
         ) : null}
         {props?.customExercise?.length !== 0 ? (
-         <View style={{ marginHorizontal: 15 }}>
+          <View style={{ marginHorizontal: 15 }}>
             <Button
               text={"Start Workout"}
               textStyle={[{ color: "white" }]}
               style={[
                 styles.btn,
                 {
-                  flex:1,
-                  backgroundColor:'green',
+                  flex: 1,
+                  backgroundColor: "green",
                   opacity: title === "" || !checkSets() ? 0.5 : 1
                 }
               ]}
@@ -870,16 +872,19 @@ let replaceExercise=useRef("")
               onPress={startCutomWorkout}
               loading={cRequesting}
 
-            // disabled={
-            //   activeSet?.id === 1
-            //     ? selectedItem?.length < 2
-            //     : activeSet?.value === 4
-            //     ? selectedItem?.length < 3
-            //     : selectedItem?.length < 1
-            // }
-            // onPress={makeDataParams}
+              // disabled={
+              //   activeSet?.id === 1
+              //     ? selectedItem?.length < 2
+              //     : activeSet?.value === 4
+              //     ? selectedItem?.length < 3
+              //     : selectedItem?.length < 1
+              // }
+              // onPress={makeDataParams}
             />
-          </View>):<></>}
+          </View>
+        ) : (
+          <></>
+        )}
       </KeyboardAwareScrollView>
 
       <RBSheet
@@ -902,12 +907,7 @@ let replaceExercise=useRef("")
         <View style={styles.secondView}>
           <ScrollView keyboardShouldPersistTaps={"handled"}>
             <View
-              style={[
-                row,
-                fill,
-                Gutters.small2xHMargin,
-                justifyContentBetween
-              ]}
+              style={[row, fill, Gutters.small2xHMargin, justifyContentBetween]}
             >
               <View style={fill} />
               <View style={[fill, center]}>
@@ -915,11 +915,7 @@ let replaceExercise=useRef("")
               </View>
               <TouchableOpacity
                 onPress={() => refRBSheet.current.close()}
-                style={[
-                  fill,
-                  alignItemsEnd,
-                  justifyContentCenter,
-                ]}
+                style={[fill, alignItemsEnd, justifyContentCenter]}
               >
                 <Image source={circleClose} style={{ height: 25, width: 25 }} />
               </TouchableOpacity>
@@ -955,8 +951,8 @@ let replaceExercise=useRef("")
                     minWidth: 40,
                     marginTop:
                       findingData()?.activeSet &&
-                        (findingData()?.activeSet?.item === "Drop Set" ||
-                          findingData()?.activeSet?.item === "Triple Set")
+                      (findingData()?.activeSet?.item === "Drop Set" ||
+                        findingData()?.activeSet?.item === "Triple Set")
                         ? 0
                         : 5
                   }}
@@ -969,32 +965,32 @@ let replaceExercise=useRef("")
                 />
                 {(findingData()?.activeSet?.item === "Drop Set" ||
                   findingData()?.activeSet?.item === "Triple Set") && (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        position: "absolute",
-                        bottom: 8
-                      }}
-                    >
-                      {Array(findingData()?.activeSet?.value)
-                        .fill()
-                        .map((item, index) => (
-                          <Pressable
-                            // onPress={() => {
-                            //   droupSet?.state2 && setReps(droupSet?.state2)
-                            // }}
-                            style={{
-                              height: 5,
-                              width: 5,
-                              borderRadius: 50,
-                              backgroundColor: "black",
-                              marginRight: 5,
-                              opacity: index === selectIndex ? 1 : 0.5
-                            }}
-                          />
-                        ))}
-                    </View>
-                  )}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      position: "absolute",
+                      bottom: 8
+                    }}
+                  >
+                    {Array(findingData()?.activeSet?.value)
+                      .fill()
+                      .map((item, index) => (
+                        <Pressable
+                          // onPress={() => {
+                          //   droupSet?.state2 && setReps(droupSet?.state2)
+                          // }}
+                          style={{
+                            height: 5,
+                            width: 5,
+                            borderRadius: 50,
+                            backgroundColor: "black",
+                            marginRight: 5,
+                            opacity: index === selectIndex ? 1 : 0.5
+                          }}
+                        />
+                      ))}
+                  </View>
+                )}
               </View>
 
               <View
@@ -1004,7 +1000,7 @@ let replaceExercise=useRef("")
                     width: 120,
                     opacity:
                       findingData()?.activeSet?.item === "Drop Set" ||
-                        findingData()?.activeSet?.item === "Triple Set"
+                      findingData()?.activeSet?.item === "Triple Set"
                         ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
@@ -1034,11 +1030,11 @@ let replaceExercise=useRef("")
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                            findingData()?.activeSet?.item ===
-                            "Triple Set") &&
-                          (findingData()?.activeSet?.value === selectIndex + 1
-                            ? true
-                            : false)
+                              findingData()?.activeSet?.item ===
+                                "Triple Set") &&
+                            (findingData()?.activeSet?.value === selectIndex + 1
+                              ? true
+                              : false)
                       }
                       maxLength={2}
                       value={`${minutes}`}
@@ -1076,11 +1072,11 @@ let replaceExercise=useRef("")
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                            findingData()?.activeSet?.item ===
-                            "Triple Set") &&
-                          (findingData()?.activeSet?.value === selectIndex + 1
-                            ? true
-                            : false)
+                              findingData()?.activeSet?.item ===
+                                "Triple Set") &&
+                            (findingData()?.activeSet?.value === selectIndex + 1
+                              ? true
+                              : false)
                       }
                       value={`${seconds}`}
                     />
@@ -1095,19 +1091,13 @@ let replaceExercise=useRef("")
             </View>
             <View
               style={[
-              row,
+                row,
                 Gutters.largeHMargin,
                 Gutters.small2xTMargin,
                 justifyContentBetween
               ]}
             >
-              <View
-                style={[
-                  row,
-                  Gutters.smallTMargin,
-                  alignItemsCenter
-                ]}
-              >
+              <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
                     if (reps !== "") {
@@ -1128,13 +1118,7 @@ let replaceExercise=useRef("")
                   Keep reps the{"\n"} same for {"\n"} remaining sets
                 </Text>
               </View>
-              <View
-                style={[
-                row,
-                  Gutters.smallTMargin,
-                 alignItemsCenter
-                ]}
-              >
+              <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
                     if (seconds !== "" || minutes !== "") {
@@ -1157,11 +1141,7 @@ let replaceExercise=useRef("")
             </View>
 
             <View
-              style={[
-                center,
-                Gutters.smallVMargin,
-                Gutters.regularBPadding
-              ]}
+              style={[center, Gutters.smallVMargin, Gutters.regularBPadding]}
             >
               <TouchableOpacity
                 style={{
@@ -1190,9 +1170,9 @@ let replaceExercise=useRef("")
                         reps:
                           droupSet &&
                           droupSet?.state1 +
-                          "/" +
-                          droupSet?.state2 +
-                          (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                            "/" +
+                            droupSet?.state2 +
+                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                         weight: "",
                         set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                         rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
@@ -1207,9 +1187,9 @@ let replaceExercise=useRef("")
                           reps:
                             droupSet &&
                             droupSet?.state1 +
-                            "/" +
-                            droupSet?.state2 +
-                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                              "/" +
+                              droupSet?.state2 +
+                              (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                           weight: "",
                           set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                           rest:
@@ -1245,9 +1225,9 @@ let replaceExercise=useRef("")
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                    (findingData()?.activeSet?.item === "Drop Set" ||
-                      findingData()?.activeSet?.item === "Triple Set") &&
-                    selectIndex + 1 < findingData()?.activeSet?.value
+                  (findingData()?.activeSet?.item === "Drop Set" ||
+                    findingData()?.activeSet?.item === "Triple Set") &&
+                  selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
                 </Text>
@@ -1567,7 +1547,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1581,7 +1561,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1594,7 +1574,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1608,7 +1588,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1621,7 +1601,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1635,7 +1615,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1651,7 +1631,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1665,7 +1645,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1678,7 +1658,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1692,7 +1672,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1705,7 +1685,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1719,7 +1699,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1739,7 +1719,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1753,7 +1733,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1766,7 +1746,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1780,7 +1760,7 @@ let replaceExercise=useRef("")
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                              60 +
+                                60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1796,7 +1776,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1810,7 +1790,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1823,7 +1803,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1837,7 +1817,7 @@ let replaceExercise=useRef("")
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                            60 +
+                              60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1855,7 +1835,7 @@ let replaceExercise=useRef("")
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                    dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
+                  dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
                     ? "Next"
                     : "Done"}
                 </Text>
@@ -1888,73 +1868,82 @@ let replaceExercise=useRef("")
             backgroundColor: "red"
           }
         }}
+        onClose={()=>setActiveCard({item:{},index:0})}
       >
- <View style={[row,justifyContentBetween,{ marginTop: 25,marginHorizontal: 25  }]}>
-            <Text
-              text="Popular Exercises"
-              style={[styles.heading, { color: "#626262" }]}
-            />
-            <TouchableOpacity 
-             disabled={
+        <View
+          style={[
+            row,
+            justifyContentBetween,
+            { marginTop: 25, marginHorizontal: 25 }
+          ]}
+        >
+          <Text
+            text="Popular Exercises"
+            style={[styles.heading, { color: "#626262" }]}
+          />
+          <TouchableOpacity
+            disabled={
               activeSet?.id === 1
                 ? selectedItem?.length < 2
                 : activeSet?.value === 4
-                  ? selectedItem?.length < 3
-                  : selectedItem?.length < 1
+                ? selectedItem?.length < 3
+                : selectedItem?.length < 1
             }
-            onPress={makeDataParams}
-            style={[styles.addSetsButton]}>
-              <Text>
-                Done
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView>
+            onPress={updateDataParams}
+            style={[styles.addSetsButton]}
+          >
+            <Text>Done</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView>
           <View style={{ marginBottom: 20 }}>
-          {getExerciseType === false && !requesting && props.request ? (
-            <ActivityIndicator size={"large"} color="green" />
-          ) : getExerciseType && getExerciseType?.length ? (
-            getExerciseType.map((item, i) => (
-              <TouchableOpacity
-                style={[
-                  styles.cardView,
-                  {
-                    backgroundColor: selectedItem.includes(i)
-                      ? "#74ccff"
-                      : "#e5e5e5"
-                  }
-                ]}
-                onPress={() => onSelectItem(i)}
-              >
-                <View
-                  style={[row, justifyContentBetween, { position: "relative" }]}
+            {getExerciseType === false && !requesting && props.request ? (
+              <ActivityIndicator size={"large"} color="green" />
+            ) : getExerciseType && getExerciseType?.length ? (
+              getExerciseType.map((item, i) => (
+                <TouchableOpacity
+                  style={[
+                    styles.cardView,
+                    {
+                      backgroundColor: selectedItem.includes(i)
+                        ? "#74ccff"
+                        : "#e5e5e5"
+                    }
+                  ]}
+                  onPress={() => onSelectItem(i)}
                 >
-                  <View style={[center, styles.cardImg]}>
-                    <Image
-                      source={
-                        item?.pictures[0]?.image
-                          ? { uri: item?.pictures[0]?.image }
-                          : item?.video_thumbnail
+                  <View
+                    style={[
+                      row,
+                      justifyContentBetween,
+                      { position: "relative" }
+                    ]}
+                  >
+                    <View style={[center, styles.cardImg]}>
+                      <Image
+                        source={
+                          item?.pictures[0]?.image
+                            ? { uri: item?.pictures[0]?.image }
+                            : item?.video_thumbnail
                             ? { uri: item?.video_thumbnail }
                             : foodImage
-                      }
-                      style={{ width: 80, height: 45 }}
-                    />
+                        }
+                        style={{ width: 80, height: 45 }}
+                      />
+                    </View>
+                    <View style={[center, { marginRight: 50, flex: 1 }]}>
+                      <Text text={item.name} style={styles.heading1} />
+                    </View>
                   </View>
-                  <View style={[center, { marginRight: 50, flex: 1 }]}>
-                    <Text text={item.name} style={styles.heading1} />
-                  </View>
-                  
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <View style={styles.notFound}>
-              <Text bold>No exercise found</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={styles.notFound}>
+                <Text bold>No exercise found</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </BottomSheet>
 
       <Modal
@@ -2216,9 +2205,9 @@ const styles = StyleSheet.create({
     height: 40
   },
   heading: {
-    textAlign:'center',
+    textAlign: "center",
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   cardView: {
     padding: 13,
@@ -2241,7 +2230,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 60,
     borderRadius: 10
-  },
+  }
 })
 
 const mapStateToProps = state => ({
@@ -2252,11 +2241,14 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   getExerciseType: state.addExerciseReducer.getExerciseType,
   requesting: state.addExerciseReducer.requesting,
+  pickedDate:state.programReducer.pickedDate
 })
 
 const mapDispatchToProps = dispatch => ({
-  postCustomExRequest: (data,start) => dispatch(postCustomExRequest(data,start)),
+  postCustomExRequest: (data, start) =>
+    dispatch(postCustomExRequest(data, start)),
   addCustomExercise: data => dispatch(addCustomExercise(data)),
-  getExerciseTypeRequest: (data, search) =>dispatch(getExerciseTypeRequest(data, search)),
+  getExerciseTypeRequest: (data, search) =>
+    dispatch(getExerciseTypeRequest(data, search))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

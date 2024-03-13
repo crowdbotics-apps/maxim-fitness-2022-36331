@@ -523,7 +523,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.orumtraining;
+				PRODUCT_BUNDLE_IDENTIFIER = "maxim-fitness-2022-36331";
 				PRODUCT_NAME = maxim_fitness_2022_36331;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -557,7 +557,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.orumtraining;
+				PRODUCT_BUNDLE_IDENTIFIER = "maxim-fitness-2022-36331";
 				PRODUCT_NAME = maxim_fitness_2022_36331;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;

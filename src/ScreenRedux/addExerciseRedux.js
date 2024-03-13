@@ -218,7 +218,6 @@ async function postCustomExAPI(data) {
 }
 
 function* postCustomEx({ data,start }) {
-  console.warn(data,start,'data,start')
   try {
     if(start){
       const response = yield call(postCustomExAPI, data)

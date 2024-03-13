@@ -29,6 +29,8 @@ const REPS_CUSTOM_WEIGHT_REQUEST = "ProgramScreen/REPS_CUSTOM_WEIGHT_REQUEST"
 
 const PICK_SESSION = "ProgramScreen/PICK_SESSION"
 const CUSTOM_SESSION = "ProgramScreen/CUSTOM_SESSION"
+const PICKED_DATE = "ProgramScreen/PICKED_DATE"
+
 
 
 
@@ -121,9 +123,13 @@ export const pickSession = (exerciseObj, selectedSession, nextWorkout) => ({
   selectedSession,
   nextWorkout
 })
-export const setCustom = (data) => ({
+export const setCustom = data => ({
   type: CUSTOM_SESSION,
-  data
+  data,
+})
+export const setPickedDate = date => ({
+  type: PICKED_DATE,
+  date
 })
 
 export const customSetDoneRequest = (id, data) => ({
@@ -234,7 +240,7 @@ const initialState = {
   selectedSession: false,
   nextWorkout: false,
   isCustom: false,
-
+  pickedDate:new Date(),
   setLoading: false,
   setDone: false,
   exeLoading: false,
@@ -347,7 +353,14 @@ export const programReducer = (state = initialState, action) => {
     case CUSTOM_SESSION: {
       return {
         ...state,
-        isCustom: action.data
+        isCustom: action.data,
+      }
+    }
+    case PICKED_DATE: {
+      return {
+        ...state,
+        pickedDate:action.date
+
       }
     }
     case PICK_SESSION: {

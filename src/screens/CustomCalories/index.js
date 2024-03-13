@@ -91,7 +91,7 @@ const CustomCalories = props => {
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
-props.swapCustomExercises('',true)
+      props.swapCustomExercises("", true)
       props.getMealsHistoryRequest()
     })
     return unsubscribe
@@ -209,30 +209,31 @@ props.swapCustomExercises('',true)
     props.updateAnswers(tempData)
     navigation.navigate("MealPreference", { isHome: true })
   }
-  
 
   //<==================custom Workouts list==============start==========>
   const sortedCustomData = () => {
     const data = getAllCustomSessions?.sort(
       (a, b) => new Date(b.created_date) - new Date(a.created_date)
-      );
-      return data || [];
-    };
-  
-    const checkCustomValue = () => {
-      const data = getAllCustomSessions?.length&&getAllCustomSessions?.map((item, index) => {
+    )
+    return data || []
+  }
+
+  const checkCustomValue = () => {
+    const data =
+      getAllCustomSessions?.length &&
+      getAllCustomSessions?.map((item, index) => {
         if (item?.done) {
-          return true;
+          return true
         } else {
-          return false;
+          return false
         }
-      });
-    
-      const isData = data && data?.find(item => item);
-    
-      return isData;
-    };
-    
+      })
+
+    const isData = data && data?.find(item => item)
+
+    return isData
+  }
+
   //<==================custom Workouts list==============end==========>
 
   const sortedData = () => {
@@ -459,157 +460,112 @@ props.swapCustomExercises('',true)
           // </View>
 
           <Content contentContainerStyle={fillGrow}>
-            <View
-              style={[
-                row,
-                justifyContentBetween,
-                alignItemsCenter,
-                small2xHMargin,
-                smallVPadding
-              ]}
-            >
-              <Text style={styles.comingSoonWork} text="Workouts" />
-            </View>
-            {/* {requesting ? (
+            {requesting ? (
               <View style={styles.loaderContainer}>
                 <ActivityIndicator color="#000" size={"large"} />
               </View>
-            ) : checkValue() && sortedData()?.length||checkCustomValue&&sortedCustomData()?.length ? (
-              {checkValue() && sortedData()?.length?
-             ( sortedData()?.map((item, index) => {
-                const todayDayString = moment(item.date_time).format(
-                  "MM/DD/YYYY"
-                )
+            ) : (checkValue() && sortedData()?.length) ||
+              (checkCustomValue() && sortedCustomData()?.length) ? (
+              <>
+                {checkValue() && sortedData()?.length && (
+                  <View
+                    style={[
+                      row,
+                      justifyContentBetween,
+                      alignItemsCenter,
+                      small2xHMargin,
+                      smallVPadding
+                    ]}
+                  >
+                    <Text style={styles.comingSoonWork} text="Workouts" />
+                  </View>
+                )}
+                {checkValue() && sortedData()?.length
+                  ? sortedData()?.map((item, index) => {
+                      const todayDayString = moment(item.date_time).format(
+                        "MM/DD/YYYY"
+                      )
 
-                if (item?.workouts?.some(item => item?.done)) {
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() =>
-                        navigation.navigate("WorkoutCard", {
-                          summary: item.workouts,
-                          uppercard: item
-                        })
+                      if (item?.workouts?.some(item => item?.done)) {
+                        return (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() =>
+                              navigation.navigate("WorkoutCard", {
+                                summary: item.workouts,
+                                uppercard: item
+                              })
+                            }
+                          >
+                            <RuningWorkout
+                              item={item}
+                              index={index}
+                              todayDayStr={todayDayString}
+                            />
+                          </TouchableOpacity>
+                        )
+                      } else {
+                        return null
                       }
+                    })
+                  : null}
+
+                {checkCustomValue() && sortedCustomData()?.length ? (
+                  <>
+                    <View
+                      style={[
+                        row,
+                        justifyContentBetween,
+                        alignItemsCenter,
+                        small2xHMargin,
+                        smallVPadding
+                      ]}
                     >
-                      <RuningWorkout
-                        item={item}
-                        index={index}
-                        todayDayStr={todayDayString}
+                      <Text
+                        style={styles.comingSoonWork}
+                        text="Custom Workouts"
                       />
-                    </TouchableOpacity>
-                  )
-                }
-              })):(<></>)}
-              {checkCustomValue&&sortedCustomData()?.length?
-                sortedData()?.map((item, index) => {
-                  const todayDayString = moment(item.date_time).format(
-                    "MM/DD/YYYY"
-                  )
-    
-                  if (item?.workouts?.some(item => item?.done)) {
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() =>
-                          navigation.navigate("WorkoutCard", {
-                            summary: item.workouts,
-                            uppercard: item
-                          })
-                        }
-                      >
-                        <RuningWorkout
-                          item={item}
-                          index={index}
-                          todayDayStr={todayDayString}
-                        />
-                      </TouchableOpacity>
-                    )
-                  }
-                })
-              :<></> }
-             
-            ) :(
+                    </View>
+                    {sortedCustomData()?.map((item, index) => {
+                      const todayDayString = moment(item.created_date).format(
+                        "MM/DD/YYYY"
+                      )
+
+                      if (item?.workouts?.some(item => item?.done)) {
+                        return (
+                          <>
+                            <TouchableOpacity
+                              key={index}
+                              onPress={() =>
+                                navigation.navigate("WorkoutCard", {
+                                  summary: item?.workouts,
+                                  uppercard: item
+                                })
+                              }
+                            >
+                              <RuningWorkout
+                                item={item}
+                                index={index}
+                                todayDayStr={todayDayString}
+                              />
+                            </TouchableOpacity>
+                          </>
+                        )
+                      } else {
+                        return null
+                      }
+                    })}
+                  </>
+                ) : null}
+              </>
+            ) : (
               <View style={[fill, center]}>
                 <Text
                   text="No workout available."
                   style={{ color: "black", fontSize: 22 }}
                 />
               </View>
-            )} */}
-            {requesting ? (
-  <View style={styles.loaderContainer}>
-    <ActivityIndicator color="#000" size={"large"} />
-  </View>
-) : (
-  (checkValue() && sortedData()?.length) || (checkCustomValue() && sortedCustomData()?.length) ? (
-    <>
-      {checkValue() && sortedData()?.length ? (
-        sortedData()?.map((item, index) => {
-          const todayDayString = moment(item.date_time).format("MM/DD/YYYY")
-
-          if (item?.workouts?.some(item => item?.done)) {
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() =>
-                  navigation.navigate("WorkoutCard", {
-                    summary: item.workouts,
-                    uppercard: item
-                  })
-                }
-              >
-                <RuningWorkout
-                  item={item}
-                  index={index}
-                  todayDayStr={todayDayString}
-                />
-              </TouchableOpacity>
-            )
-          } else {
-            return null;
-          }
-        })
-      ) : null}
-
-      {checkCustomValue() && sortedCustomData()?.length ? (
-        sortedCustomData()?.map((item, index) => {
-          const todayDayString = moment(item.created_date).format("MM/DD/YYYY")
-
-          if (item?.workouts?.some(item => item?.done)) {
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() =>
-                  navigation.navigate("WorkoutCard", {
-                    summary: item?.workouts,
-                    uppercard: item
-                  })
-                }
-              >
-                <RuningWorkout
-                  item={item}
-                  index={index}
-                  todayDayStr={todayDayString}
-                />
-              </TouchableOpacity>
-            )
-          } else {
-            return null;
-          }
-        })
-      ) : null}
-    </>
-  ) : (
-    <View style={[fill, center]}>
-      <Text
-        text="No workout available."
-        style={{ color: "black", fontSize: 22 }}
-      />
-    </View>
-  )
-)}
-
+            )}
           </Content>
         )}
         {tab === 2 && (
@@ -739,33 +695,33 @@ props.swapCustomExercises('',true)
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                    // onPress={() => {
-                    //   if (item.message === 'Comment Post' || 'Like Post') {
-                    //     navigation.navigate('PostDetail', { item: item });
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    //   if (item.message === 'Started following you') {
-                    //     navigation.navigate('ProfileView', item);
-                    //   }
-                    //   if (item.message === 'Message') {
-                    //     navigation.navigate('ChatRoom');
-                    //     setIsVisible(!isVisible);
-                    //     countNotification(item);
-                    //   }
-                    // }}
-                    >
-                      <RuningCard
-                        item={item}
-                        Notification={item.message}
-                        Time={calculatePostTime(item)}
-                      />
-                    </TouchableOpacity>
-                  )
-                })
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        // onPress={() => {
+                        //   if (item.message === 'Comment Post' || 'Like Post') {
+                        //     navigation.navigate('PostDetail', { item: item });
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        //   if (item.message === 'Started following you') {
+                        //     navigation.navigate('ProfileView', item);
+                        //   }
+                        //   if (item.message === 'Message') {
+                        //     navigation.navigate('ChatRoom');
+                        //     setIsVisible(!isVisible);
+                        //     countNotification(item);
+                        //   }
+                        // }}
+                      >
+                        <RuningCard
+                          item={item}
+                          Notification={item.message}
+                          Time={calculatePostTime(item)}
+                        />
+                      </TouchableOpacity>
+                    )
+                  })
                 : null}
             </View>
           </ScrollView>
@@ -1150,7 +1106,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  swapCustomExercises:(data,all)=>dispatch(swapCustomExercises(data,all)),
+  swapCustomExercises: (data, all) => dispatch(swapCustomExercises(data, all)),
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsHistoryRequest: () => dispatch(getMealsHistoryRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),

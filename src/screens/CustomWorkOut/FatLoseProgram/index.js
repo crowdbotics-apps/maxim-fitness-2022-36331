@@ -33,7 +33,8 @@ import {
   getDaySessionRequest,
   getAllSessionRequest,
   pickSession,
-  setCustom
+  setCustom,
+  setPickedDate
 } from "../../../ScreenRedux/programServices"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 
@@ -42,7 +43,6 @@ const FatLoseProgram = props => {
     navigation,
     todayRequest,
     cRequesting,
-    requesting,
     todaySessions,
     getAllSessions,
     getWeekSessions,
@@ -57,7 +57,6 @@ const FatLoseProgram = props => {
   const [customWorkout, setCustomWorkout] = useState(false)
   const [customWorkoutData, setCustomWorkoutData] = useState([])
   const [openDatePicker, setOpenDatePicker] = useState(false)
-
   const [data, setData] = useState({})
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
@@ -703,7 +702,7 @@ const FatLoseProgram = props => {
                             }}
                           />
                           <Text
-                            text={`${todaySessions?.workouts?.length} exercises`}
+                            text={`${getTotalExerciseCount(todaySessions?.workouts)} exercises`}
                             style={{
                               fontSize: 12,
                               lineHeight: 12,
@@ -726,7 +725,7 @@ const FatLoseProgram = props => {
                           ]}
                         >
                           <Text
-                            text={`${todaySessions?.cardio_length} minutes`}
+                            text={`${getTotalTimeInMinutes(todaySessions?.workouts)} minutes`}
                             style={{
                               fontSize: 12,
                               lineHeight: 12,
@@ -872,11 +871,10 @@ const FatLoseProgram = props => {
             <View style={[fill, center, Gutters.regularVMargin]}>
               <TouchableOpacity
                 onPress={() => {
+                  
                   props.addCustomExercise([])
-                  navigation.navigate("AddExercise",
-                    {
-                      date: index
-                    })
+                  props.setPickedDate(index)
+                  navigation.navigate("AddExercise")
                 }}
               // disabled={
               //   todayRequest ||
@@ -1138,7 +1136,6 @@ const mapStateToProps = state => ({
   getWeekSessions: state.programReducer.getWeekSessions,
   profile: state.login.userDetail,
   getAllSessionsRequesting: state.addExerciseReducer.getAllSessionsRequesting,
-  requesting: state.addExerciseReducer.requesting,
   cRequesting: state.addExerciseReducer.cRequesting,
   getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,
 })
@@ -1149,6 +1146,7 @@ const mapDispatchToProps = dispatch => ({
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   setCustom: type => dispatch(setCustom(type)),
+  setPickedDate:date => dispatch(setPickedDate(date)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
     dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   addCustomExercise: () => dispatch(addCustomExercise([])),
