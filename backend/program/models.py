@@ -137,6 +137,7 @@ class Program(models.Model):
         print('weeks', weeks)
         days_gap = 0
         for week in weeks:
+            day_no = 1
             days = week.days.all().order_by("id")
             print('total_days', days)
             # days_gap = 0
@@ -157,10 +158,11 @@ class Program(models.Model):
                     carb_casual=day.carb_casual,
                     name=day.name,
                     week_number=week.week,
-                    day_number=days_gap + 1, # for handling current_date as 0 + 1
+                    day_number=day_no,
                 )
                 order = 1
                 days_gap += 1
+                day_no += 1
                 if user.is_premium_user:
                     for exercise in day.day_exercises.all():
                         if not exercise.name:
