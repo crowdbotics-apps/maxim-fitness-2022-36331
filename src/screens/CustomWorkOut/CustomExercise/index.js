@@ -22,7 +22,6 @@ import { Text, InputField, BottomSheet, Button } from "../../../components"
 //Libraries
 import Modal from "react-native-modal"
 import RBSheet from "react-native-raw-bottom-sheet"
-import ImagePicker from "react-native-image-crop-picker"
 
 //Themes
 import { Global, Gutters, Layout, Colors, Images, Fonts } from "../../../theme"
@@ -31,24 +30,30 @@ import {
   addCustomExercise,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
+import { setCustom } from "../../../ScreenRedux/programServices"
 import { transformData } from "../../../utils/utils"
+import { useNavigation, useRoute } from "@react-navigation/native"
 
 const CustomExercise = props => {
   const { redBin, circleClose, radioBlue, doneImg, greyNext, duplicateIcon } =
     Images
   const {
-    navigation,
-    route,
     cRequesting,
     requesting,
     getCustomExState,
     todaySessions,
     profile,
     getExerciseType,
-    pickedDate
+    pickedDate,
+    setCustom,
+    postCustomExRequest,
+    customExercise,
+    addCustomExercise    
   } = props
+  const navigation = useNavigation()
+  const route = useRoute()
   const { width, height } = Dimensions.get("window")
-  const { exercises,activeSet, } = route?.params
+  const { exercises, activeSet } = route?.params
   const [reps, setReps] = useState("")
   const [title, setTitle] = useState("")
   const [minutes, setMinutes] = useState(0)
@@ -70,7 +75,7 @@ const CustomExercise = props => {
   const [selectIndex, setSelectIndex] = useState(0)
   const [exerciseIndex, setExerciseIndex] = useState(0)
   const [selectedItem, setSelectedItem] = useState([])
-  const [activeCard, setActiveCard] = useState({item:{},index:0})
+  const [activeCard, setActiveCard] = useState({ item: {}, index: 0 })
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
@@ -98,7 +103,7 @@ const CustomExercise = props => {
   }, [])
 
   const findingData = () => {
-    const checkData = props?.customExercise[exerciseIndex]
+    const checkData = customExercise[exerciseIndex]
     return {
       activeSet: checkData?.activeSet,
       exercises: checkData?.exercises?.type,
@@ -107,7 +112,7 @@ const CustomExercise = props => {
   }
 
   const updateReducer = (type, updatedData) => {
-    const data = [...props.customExercise]
+    const data = [...customExercise]
     const updatedObject = { ...data[exerciseIndex] }
 
     // Perform the deep update
@@ -119,7 +124,7 @@ const CustomExercise = props => {
     data[exerciseIndex] = updatedObject
 
     // Update the state or props
-    props.addCustomExercise(data)
+    addCustomExercise(data)
     setCurrentIndex(false)
   }
 
@@ -128,14 +133,14 @@ const CustomExercise = props => {
   const duplicateSet = item => {
     const newData = [...props?.customExercise]
     newData.push(item)
-    props.addCustomExercise(newData)
+    addCustomExercise(newData)
     setCurrentIndex(false)
   }
 
   const deleteSet = () => {
     const data = [...props?.customExercise]
     data.splice(exerciseIndex, 1)
-    props.addCustomExercise(data)
+    addCustomExercise(data)
     setSets(data)
     setDeleteModal(false)
     setCurrentIndex(false)
@@ -402,11 +407,12 @@ const CustomExercise = props => {
         name: title ? title : "title",
         user: profile?.id,
         created_date: pickedDate,
-        custom_exercises: transformData(props.customExercise)
+        custom_exercises: transformData(customExercise)
         // adding_exercise_in_workout: true
       }
-
-      props.postCustomExRequest(payload, true)
+      setCustom(true)
+      postCustomExRequest(payload, true)
+      navigation.pop(2);
     }
   }
   // Flatten the array
@@ -428,7 +434,7 @@ const CustomExercise = props => {
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
   const checkSets = () => {
-    const jsonData = transformData(props.customExercise)
+    const jsonData = transformData(customExercise)
 
     for (const entry of jsonData) {
       if (entry.custom_sets.length === 0) {
@@ -444,51 +450,50 @@ const CustomExercise = props => {
     return true
   }
 
-  const onSelectItem = ( i) => {
-    let array = [...selectedItem];
+  const onSelectItem = i => {
+    let array = [...selectedItem]
     if (array.includes(i)) {
-        array = array.filter(index => index !== i);
+      array = array.filter(index => index !== i)
     } else {
-        if (activeSet?.id === 1) {
-            if (selectedItem.length < 2) {
-                array.push(i);
-            }
-        } else if (activeSet?.value === 4) {
-            if (selectedItem.length < 3) {
-                array.push(i);
-            }
-        } else {
-            array = [i];
+      if (activeSet?.id === 1) {
+        if (selectedItem.length < 2) {
+          array.push(i)
         }
-    }
-    setSelectedItem(array);
-};
-
-const updateDataParams = () => {
-  const exercises = [];
-  getExerciseType && getExerciseType.forEach((item, ind) => {
-      if (selectedItem.includes(ind)) {
-          exercises.push(item);
-      }
-  });
-
-  const newObj = { type: exercises };
-
-  const newData = props.customExercise.map((existingData, idx) => {
-      if (idx === activeCard.index) {
-          return { ...existingData, exercises: newObj };
+      } else if (activeSet?.value === 4) {
+        if (selectedItem.length < 3) {
+          array.push(i)
+        }
       } else {
-          return existingData;
+        array = [i]
       }
-  });
+    }
+    setSelectedItem(array)
+  }
 
+  const updateDataParams = () => {
+    const exercises = []
+    getExerciseType &&
+      getExerciseType.forEach((item, ind) => {
+        if (selectedItem.includes(ind)) {
+          exercises.push(item)
+        }
+      })
 
+    const newObj = { type: exercises }
 
-  props.addCustomExercise(newData);
-  replaceExercise.current.close();
-  setActiveCard({ item: {}, index: 0 });
-};
- 
+    const newData = customExercise.map((existingData, idx) => {
+      if (idx === activeCard.index) {
+        return { ...existingData, exercises: newObj }
+      } else {
+        return existingData
+      }
+    })
+
+    addCustomExercise(newData)
+    replaceExercise.current.close()
+    setActiveCard({ item: {}, index: 0 })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
@@ -571,12 +576,12 @@ const updateDataParams = () => {
                     <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
                       <TouchableOpacity
                         onPress={() => {
-                          props.getExerciseTypeRequest(
+                          getExerciseTypeRequest(
                             exe?.exercise_type?.id,
                             ""
                           )
-                          
-                          setActiveCard({item:item,index:index})
+
+                          setActiveCard({ item: item, index: index })
                           replaceExercise.current.open()
                         }}
                         style={row}
@@ -837,10 +842,7 @@ const updateDataParams = () => {
             <Button
               text={"Add Exercise"}
               textStyle={[{ color: "white" }]}
-              style={[
-                styles.btn,
-               
-              ]}
+              style={[styles.btn]}
               // disabled={cRequesting || title === "" || !checkSets()}
               onPress={() => navigation.goBack()}
 
@@ -1868,7 +1870,7 @@ const updateDataParams = () => {
             backgroundColor: "red"
           }
         }}
-        onClose={()=>setActiveCard({item:{},index:0})}
+        onClose={() => setActiveCard({ item: {}, index: 0 })}
       >
         <View
           style={[
@@ -1897,7 +1899,7 @@ const updateDataParams = () => {
         </View>
         <ScrollView>
           <View style={{ marginBottom: 20 }}>
-            {getExerciseType === false && !requesting && props.request ? (
+            {getExerciseType === false && !requesting && requesting ? (
               <ActivityIndicator size={"large"} color="green" />
             ) : getExerciseType && getExerciseType?.length ? (
               getExerciseType.map((item, i) => (
@@ -2241,7 +2243,7 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   getExerciseType: state.addExerciseReducer.getExerciseType,
   requesting: state.addExerciseReducer.requesting,
-  pickedDate:state.programReducer.pickedDate
+  pickedDate: state.programReducer.pickedDate
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -2249,6 +2251,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(postCustomExRequest(data, start)),
   addCustomExercise: data => dispatch(addCustomExercise(data)),
   getExerciseTypeRequest: (data, search) =>
-    dispatch(getExerciseTypeRequest(data, search))
+    dispatch(getExerciseTypeRequest(data, search)),
+  setCustom: type => dispatch(setCustom(type))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

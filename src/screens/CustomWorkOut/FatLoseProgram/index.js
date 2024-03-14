@@ -17,13 +17,13 @@ import { connect } from "react-redux"
 import Modal from "react-native-modal"
 import { CalendarList } from "react-native-calendars"
 import LinearGradient from "react-native-linear-gradient"
-
-import { Text, BottomSheet } from "../../../components"
+import DatePicker from "react-native-date-picker"
+//utils imports
+import { Text, BottomSheet, SubscriptionCard } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
-import DatePicker from "react-native-date-picker"
-
+//redux imports
 import {
   addCustomExercise,
   getCustomExerciseRequest,
@@ -175,7 +175,7 @@ const FatLoseProgram = props => {
   //   }
   // }, [getWeekSessions])
 
-  const reScheduleWorkout = (date) => {
+  const reScheduleWorkout = date => {
     const resetDate = moment(date).format("YYYY-MM-DD")
     if (customWorkout) {
       props.customWorkoutRescheduleRequest(customWorkoutData?.id, resetDate)
@@ -197,7 +197,7 @@ const FatLoseProgram = props => {
       props.setCustom(true)
       navigation.navigate("ExerciseScreen", {
         workouts: data?.workouts,
-        item: data,
+        item: data
       })
     } else {
       getWeekSessions?.query?.map((item, index) => {
@@ -210,7 +210,7 @@ const FatLoseProgram = props => {
           props.setCustom(false)
           navigation.navigate("ExerciseScreen", {
             workouts: item?.workouts,
-            item: item,
+            item: item
           })
         }
       })
@@ -218,7 +218,6 @@ const FatLoseProgram = props => {
   }
 
   const openModal = () => {
-
     setIsModal(true)
     props.getAllSessionRequest("")
   }
@@ -245,80 +244,96 @@ const FatLoseProgram = props => {
     // Format the result
     let formattedResult = `${minutes}`
     if (remainingSeconds > 0) {
-      formattedResult += `:${remainingSeconds < 10 ? "0" : ""
-        }${remainingSeconds}`
+      formattedResult += `:${
+        remainingSeconds < 10 ? "0" : ""
+      }${remainingSeconds}`
     }
 
     return formattedResult
   }
   const d = new Date()
   const day = d.getDay()
-  const getTotalExerciseCount = (workouts) => {
-    let total = 0;
+  const getTotalExerciseCount = workouts => {
+    let total = 0
     workouts?.forEach(workout => {
-      total += workout?.exercises?.length || 0;
-    });
-    return total;
+      total += workout?.exercises?.length || 0
+    })
+    return total
   }
-  const getTotalTimeInMinutes = (workouts) => {
-    let total = 0;
+  const getTotalTimeInMinutes = workouts => {
+    let total = 0
 
     workouts?.forEach(workout => {
       workout?.exercises?.forEach(exercise => {
         exercise?.sets?.forEach(set => {
-          total += (set?.timer || 0) / 60;
-        });
-      });
-    });
+          total += (set?.timer || 0) / 60
+        })
+      })
+    })
 
-    return Math.round(total);
+    return Math.round(total)
   }
 
-  const renderCard = (item) => {
-    const hasImages = item?.workouts && item.workouts.some((workout) => workout?.exercises?.length > 0);
+  const renderCard = item => {
+    const hasImages =
+      item?.workouts &&
+      item.workouts.some(workout => workout?.exercises?.length > 0)
 
     return (
-      <View style={{ margin: 5, flex: 1, }}>
-        <View style={[styles.cardView, { width: '100%' }]}>
+      <View style={{ margin: 5, flex: 1 }}>
+        <View style={[styles.cardView, { width: "100%" }]}>
           <View style={[row, justifyContentBetween]}>
-
             <Text
-              text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
-                }`}
+              text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
               color="primary"
               style={styles.dayText}
             />
-            <TouchableOpacity onPress={() => {
-              refDescription.current.open()
-              setCustomWorkoutData(item)
-              setCustomWorkout(true)
-            }}>
+            <TouchableOpacity
+              onPress={() => {
+                refDescription.current.open()
+                setCustomWorkoutData(item)
+                setCustomWorkout(true)
+              }}
+            >
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
-          <View style={[row,]}>
-
-            <ScrollView horizontal nestedScrollEnabled contentContainerStyle={{ height: 100, width: 100 }}>
+          <View style={[row]}>
+            <ScrollView
+              horizontal
+              nestedScrollEnabled
+              contentContainerStyle={{ height: 100, width: 100 }}
+            >
               {hasImages ? (
                 item?.workouts.map((workout, index) => (
-                  <View key={index} style={{ flexDirection: 'column' }}>
+                  <View key={index} style={{ flexDirection: "column" }}>
                     {workout?.exercises?.map((data, i) => (
                       <Image
                         key={i}
                         source={{
-                          uri: data?.exercise_type?.image,
+                          uri: data?.exercise_type?.image
                         }}
                         style={{
                           width: 50,
                           height: 50,
-                          marginTop: 5,
+                          marginTop: 5
                         }}
                       />
                     ))}
                   </View>
                 ))
               ) : (
-                <Text style={{ color: '#626262', width: 50, height: 50, marginLeft: 5, marginTop: 5 }}>No Image</Text>
+                <Text
+                  style={{
+                    color: "#626262",
+                    width: 50,
+                    height: 50,
+                    marginLeft: 5,
+                    marginTop: 5
+                  }}
+                >
+                  No Image
+                </Text>
               )}
             </ScrollView>
 
@@ -381,7 +396,7 @@ const FatLoseProgram = props => {
             </View>
           </View>
           <View style={[row]}></View>
-          <View style={[fill, center, Gutters.regularVMargin,]}>
+          <View style={[fill, center, Gutters.regularVMargin]}>
             <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
               <LinearGradient
                 start={start}
@@ -407,11 +422,15 @@ const FatLoseProgram = props => {
             </TouchableOpacity>
           </View>
         </View>
-      </View >
+      </View>
     )
   }
-  const showPromoCard = (todaySessions?.name !== "Rest" || todaySessions?.length >= 1) && profile.is_premium_user
-  const hasCSVImages = todaySessions?.workouts && todaySessions.workouts.some((workout) => workout?.exercises?.length > 0);
+  const showPromoCard =
+    (todaySessions?.name !== "Rest" || todaySessions?.length >= 1) &&
+    profile.is_premium_user
+  const hasCSVImages =
+    todaySessions?.workouts &&
+    todaySessions.workouts.some(workout => workout?.exercises?.length > 0)
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -439,7 +458,7 @@ const FatLoseProgram = props => {
                           marginRight: 10,
                           opacity:
                             getWeekSessions?.prev_week_number === 0 ||
-                              getWeekSessions?.prev_week_number === null
+                            getWeekSessions?.prev_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -457,10 +476,11 @@ const FatLoseProgram = props => {
                       />
                       <Text
                         color="primary"
-                        text={`Week ${getWeekSessions?.prev_week_number === null
-                          ? 1
-                          : getWeekSessions?.prev_week_number
-                          }`}
+                        text={`Week ${
+                          getWeekSessions?.prev_week_number === null
+                            ? 1
+                            : getWeekSessions?.prev_week_number
+                        }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                     </TouchableOpacity>
@@ -471,7 +491,7 @@ const FatLoseProgram = props => {
                         {
                           opacity:
                             getWeekSessions?.next_week_number === 0 ||
-                              getWeekSessions?.next_week_number === null
+                            getWeekSessions?.next_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -484,12 +504,13 @@ const FatLoseProgram = props => {
                     >
                       <Text
                         color="primary"
-                        text={`Week ${getWeekSessions?.date_in_week_number === 4
-                          ? 4
-                          : getWeekSessions?.date_in_week_number
+                        text={`Week ${
+                          getWeekSessions?.date_in_week_number === 4
+                            ? 4
+                            : getWeekSessions?.date_in_week_number
                             ? getWeekSessions?.date_in_week_number + 1
                             : 4
-                          }`}
+                        }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                       <Icon
@@ -602,7 +623,9 @@ const FatLoseProgram = props => {
                               />
                             )}
                           </View>
-                        ) : <></>}
+                        ) : (
+                          <></>
+                        )}
                       </TouchableOpacity>
                     )
                   })}
@@ -610,11 +633,21 @@ const FatLoseProgram = props => {
               </View>
             </>
           )}
+          {!profile?.is_premium_user ?? (
+            <>
+              <SubscriptionCard
+                cardHeading="Buy Subscription"
+                cardDescription="To enjoy our program, a subscription is required. Subscribe now for uninterrupted access to premium content"
+                buttonText="Find a Workout Program"
+              />
+            </>
+          )}
           {todayRequest || cRequesting ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
             </View>
-          ) : todaySessions?.length < 1 && getCustomExerciseState?.length < 1 ? (
+          ) : todaySessions?.length < 1 &&
+            getCustomExerciseState?.length < 1 ? (
             <View style={[Layout.center, { height: 200 }]}>
               <Text text={"No workout found!"} style={styles.headind2} />
             </View>
@@ -626,19 +659,20 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                        moment(new Date()).format("YYYY-MM-DD")
+                      moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Workout"
                         : `${moment(todaySessions.date_time).format(
-                          "dddd"
-                        )}'s Workout`
+                            "dddd"
+                          )}'s Workout`
                     }
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
                     <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
-                          }`}
+                        text={`Day ${
+                          weekDay === 0 ? 7 : weekDay ? weekDay : day
+                        }`}
                         color="primary"
                         style={styles.dayText}
                       />
@@ -648,7 +682,7 @@ const FatLoseProgram = props => {
                         <Image source={etc} style={styles.imgStyle} />
                       </TouchableOpacity>
                     </View>
-                    <View style={[row,]}>
+                    <View style={[row]}>
                       <View
                         style={[
                           row,
@@ -659,26 +693,36 @@ const FatLoseProgram = props => {
                           }
                         ]}
                       >
-                        <View style={{ flexDirection: 'column' }}>
+                        <View style={{ flexDirection: "column" }}>
                           {hasCSVImages ? (
-                            todaySessions?.workouts.slice(0, 1).map((workout) =>
+                            todaySessions?.workouts.slice(0, 1).map(workout =>
                               workout?.exercises?.map((data, i) => (
                                 <Image
                                   key={i}
                                   source={{
-                                    uri: data?.exercise_type?.image,
+                                    uri: data?.exercise_type?.image
                                   }}
                                   style={{
                                     width: 50,
                                     height: 50,
                                     marginLeft: 5,
-                                    marginTop: i > 1 ? 5 : 0,
+                                    marginTop: i > 1 ? 5 : 0
                                   }}
                                 />
                               ))
                             )
                           ) : (
-                            <Text style={{ color: '#626262', width: 50, height: 50, marginLeft: 5, marginTop: 5 }}>No Image</Text>
+                            <Text
+                              style={{
+                                color: "#626262",
+                                width: 50,
+                                height: 50,
+                                marginLeft: 5,
+                                marginTop: 5
+                              }}
+                            >
+                              No Image
+                            </Text>
                           )}
                         </View>
                       </View>
@@ -702,7 +746,9 @@ const FatLoseProgram = props => {
                             }}
                           />
                           <Text
-                            text={`${getTotalExerciseCount(todaySessions?.workouts)} exercises`}
+                            text={`${getTotalExerciseCount(
+                              todaySessions?.workouts
+                            )} exercises`}
                             style={{
                               fontSize: 12,
                               lineHeight: 12,
@@ -725,7 +771,9 @@ const FatLoseProgram = props => {
                           ]}
                         >
                           <Text
-                            text={`${getTotalTimeInMinutes(todaySessions?.workouts)} minutes`}
+                            text={`${getTotalTimeInMinutes(
+                              todaySessions?.workouts
+                            )} minutes`}
                             style={{
                               fontSize: 12,
                               lineHeight: 12,
@@ -775,17 +823,19 @@ const FatLoseProgram = props => {
                     </View>
                   </View>
                 </View>
-              ) : <></>}
+              ) : (
+                <></>
+              )}
               {getCustomExerciseState?.length ? (
                 <>
                   <Text
                     text={
                       todaySessions.date_time ===
-                        moment(new Date()).format("YYYY-MM-DD")
+                      moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Custom Workout"
                         : `${moment(todaySessions.date_time).format(
-                          "dddd"
-                        )}'s Custom Workout`
+                            "dddd"
+                          )}'s Custom Workout`
                     }
                     style={[styles.headind2]}
                   />
@@ -797,7 +847,9 @@ const FatLoseProgram = props => {
                     contentContainerStyle={{ paddingRight: 10 }}
                   />
                 </>
-              ) : <></>}
+              ) : (
+                <></>
+              )}
             </>
           ) : (
             <View>
@@ -871,16 +923,15 @@ const FatLoseProgram = props => {
             <View style={[fill, center, Gutters.regularVMargin]}>
               <TouchableOpacity
                 onPress={() => {
-                  
                   props.addCustomExercise([])
                   props.setPickedDate(index)
                   navigation.navigate("AddExercise")
                 }}
-              // disabled={
-              //   todayRequest ||
-              //   todaySessions?.length === 0 ||
-              //   todaySessions?.name === "Rest"
-              // }
+                // disabled={
+                //   todayRequest ||
+                //   todaySessions?.length === 0 ||
+                //   todaySessions?.name === "Rest"
+                // }
               >
                 <LinearGradient
                   start={start}
@@ -990,7 +1041,9 @@ const FatLoseProgram = props => {
           <View style={[regularHMargin, {}]}>
             <TouchableOpacity
               style={[row, alignItemsCenter]}
-              onPress={() => selectExerciseObj(customWorkoutData, customWorkout)}
+              onPress={() =>
+                selectExerciseObj(customWorkoutData, customWorkout)
+              }
             >
               <Image source={threeLine} style={{ width: 50, height: 50 }} />
               <Text
@@ -1004,8 +1057,9 @@ const FatLoseProgram = props => {
                   marginLeft: 30
                 }}
               />
-            </TouchableOpacity >
-            <TouchableOpacity style={[row, alignItemsCenter, { marginTop: 20 }]}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[row, alignItemsCenter, { marginTop: 20 }]}
               onPress={() => setOpenDatePicker(true)}
             >
               <Image source={circle} style={{ width: 50, height: 50 }} />
@@ -1031,7 +1085,7 @@ const FatLoseProgram = props => {
         open={openDatePicker}
         // date={customWorkout?.length ? new Date(customWorkoutData?.created_date) : new Date(todaySessions?.date_time) }
         date={new Date()}
-        onConfirm={(date) => {
+        onConfirm={date => {
           refDescription.current.close()
           setOpenDatePicker(false)
           reScheduleWorkout(date)
@@ -1040,10 +1094,21 @@ const FatLoseProgram = props => {
           refDescription.current.close()
           setOpenDatePicker(false)
         }}
-        minimumDate={getAllSessions ? new Date(getAllSessions?.query?.[0]?.date_time) : new Date()}
-        maximumDate={getAllSessions ? new Date(getAllSessions?.query?.[getAllSessions?.query?.length - 1]?.date_time) : null}
+        minimumDate={
+          getAllSessions
+            ? new Date(getAllSessions?.query?.[0]?.date_time)
+            : new Date()
+        }
+        maximumDate={
+          getAllSessions
+            ? new Date(
+                getAllSessions?.query?.[
+                  getAllSessions?.query?.length - 1
+                ]?.date_time
+              )
+            : null
+        }
       />
-
     </SafeAreaView>
   )
 }
@@ -1137,7 +1202,7 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   getAllSessionsRequesting: state.addExerciseReducer.getAllSessionsRequesting,
   cRequesting: state.addExerciseReducer.cRequesting,
-  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,
+  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1146,10 +1211,11 @@ const mapDispatchToProps = dispatch => ({
   getDaySessionRequest: data => dispatch(getDaySessionRequest(data)),
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   setCustom: type => dispatch(setCustom(type)),
-  setPickedDate:date => dispatch(setPickedDate(date)),
+  setPickedDate: date => dispatch(setPickedDate(date)),
   pickSession: (exerciseObj, selectedSession, nextWorkout) =>
     dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   addCustomExercise: () => dispatch(addCustomExercise([])),
-  customWorkoutRescheduleRequest: (id, date) => dispatch(customWorkoutRescheduleRequest(id, date)),
+  customWorkoutRescheduleRequest: (id, date) =>
+    dispatch(customWorkoutRescheduleRequest(id, date))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FatLoseProgram)
