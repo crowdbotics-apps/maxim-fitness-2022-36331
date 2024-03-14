@@ -7,8 +7,18 @@ import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
+import { profileData } from "../../../ScreenRedux/profileRedux"
+import { connect } from "react-redux"
 
-const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
+const PremiumCard = props => {
+  const {
+    onPress,
+    getPlans,
+    amount,
+    subsucriptionId,
+    profile,
+
+  } = props
   const {
     regularHMargin,
     regularVPadding,
@@ -84,11 +94,11 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {getPlans?.[0]?.id === subsucriptionId ? (
+        {/* {profile?.is_premium_user ? (
           <TouchableOpacity style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
-        ) : null}
+        ) : null} */}
         <View
           style={[
             row,
@@ -129,7 +139,7 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
         <Button
           color="secondary"
           text={
-            getPlans?.[0]?.id === subsucriptionId ? "Already Bought" : "Buy Now"
+            profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -137,7 +147,8 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
             regularHPadding,
             { height: 40, borderRadius: 30 }
           ]}
-          onPress={getPlans?.[0]?.id !== subsucriptionId ? onPress : null}
+          // disabled={profile?.is_premium_user}
+          onPress={!profile?.is_premium_user ? onPress : null}
         />
       </View>
     </>
@@ -177,4 +188,14 @@ const styles = StyleSheet.create({
   }
 })
 
-export default PremiumCard
+
+
+const mapStateToProps = state => ({
+  profile: state.login.userDetail,
+})
+
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+
+})
+export default connect(mapStateToProps, mapDispatchToProps)(PremiumCard)
