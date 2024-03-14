@@ -146,24 +146,88 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
         if request.method == "POST":
             csv_file = TextIOWrapper(request.FILES["csv_file"], encoding='utf-8-sig')
             reader = csv.reader(csv_file, delimiter=",")
-            program = ProgramAdmin.add_program(next(reader))
-            blank = 0
-            day = None
+            previous_exercise_ids = ''
+            is_previous_exercise = False
             for row in reader:
-                if row[0] == "":
-                    blank = blank + 1
-
-                    if blank == 3:
-                        break
-                    exercise, blank = ProgramAdmin.add_exercise(day, next(reader), blank)
+                print(row)
+                program_name = row[0].lower()
+                week_number = int(row[1])
+                day_numeber = int(row[2])
+                strength = True if row[3] == 'TRUE' else False
+                cardio = True if row[4] == 'TRUE' else False
+                cardio_length = int(row[5])
+                cardio_frequency = 1 # row[6]
+                location = row[7]
+                day_name = row[8]
+                exercise_ids = row[9]
+                exercises = []
+                try:
+                    if exercise_ids == '':
+                        exercise_ids = previous_exercise_ids
+                        is_previous_exercise = True
+                    else:
+                        previous_exercise_ids = exercise_ids
+                    exercise_ids = exercise_ids.split(',')
+                    for exercise_id in exercise_ids:
+                        try:
+                            exercises.append(Exercise.objects.get(exercise_id=exercise_id))
+                        except Exercise.DoesNotExist:
+                            print("exercise id not found", exercise_id)
+                except:
+                    exercise_id = exercise_ids
+                    exercises.append(Exercise.objects.get(exercise_id=exercise_id))
+                try:
+                    set_no = row[10]
+                    reps = row[11]
+                    weight = '1' # row[12]
+                    timer = float(row[13])
+                    set_type = row[14]
+                except:
+                    set_no = row[10]
+                    reps = row[11]
+                    weight = '1'  # row[12]
+                    timer = 0
+                    set_type = row[14]
+                program, created = Program.objects.get_or_create(name=program_name, description="program_description")
+                week, created = Week.objects.get_or_create(program=program, week=week_number)
+                day, created = Day.objects.get_or_create(cardio_length=cardio_length, cardio_frequency=cardio_frequency,
+                                                         week=week, week__program=program, cardio=cardio,day=day_numeber,
+                                                         strength=strength, location=location, name=day_name,
+                                                         carb=0, protein=0, carb_casual=0, heart_rate=0)
+                program_exercise_name = ''
+                if len(exercises) == 3:
+                    program_exercise_name = "GiantSet"
+                elif len(exercises) == 2:
+                    program_exercise_name = "SuperSet"
                 else:
-                    if blank == 2:
-                        day = ProgramAdmin.add_day(row, program)
-                        blank = 0
-                        continue
-                    blank = 0
-                    self.add_set(exercise, row)
-                    print('SET', row)
+                    program_exercise_name = exercises[0].name
+                if not day.name == 'Rest':
+                    program_exercise, created = ProgramExercise.objects.get_or_create(day=day, name=program_exercise_name)
+                    if not is_previous_exercise and created:
+                        program_exercise.exercises.set(exercises)
+                    elif is_previous_exercise and not created:
+                        pass
+                    program_set, created = ProgramSet.objects.get_or_create(exercise=program_exercise, set_no=set_no,
+                                                                            reps=reps, timer=timer, set_type=set_type)
+                is_previous_exercise = False
+                # program = ProgramAdmin.add_program(next(reader))
+            # blank = 0
+            # day = None
+            # for row in reader:
+            #     if row[0] == "":
+            #         blank = blank + 1
+            #
+            #         if blank == 3:
+            #             break
+            #         exercise, blank = ProgramAdmin.add_exercise(day, next(reader), blank)
+            #     else:
+            #         if blank == 2:
+            #             day = ProgramAdmin.add_day(row, program)
+            #             blank = 0
+            #             continue
+            #         blank = 0
+            #         self.add_set(exercise, row)
+            #         print('SET', row)
 
             print("reched here bro")
             self.message_user(request, "Your csv file has been imported")
