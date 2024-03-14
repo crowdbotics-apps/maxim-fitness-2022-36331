@@ -67,6 +67,7 @@ export default {
   messageImage: require("src/assets/images/messageIcon.png"),
   dropDownIcon: require("src/assets/images/dropDownIcon.png"),
   redBin: require("src/assets/images/redBin.png"),
+  radioDoneBlue: require("src/assets/images/radioDoneBlue.png"),
   radioBlue: require("src/assets/images/radioBlue.png"),
   doneImg: require("src/assets/images/doneImg.png"),
   greyNext: require("src/assets/images/greyNext.png"),
@@ -95,4 +96,5 @@ export default {
   emoji: require("src/assets/images/emoji.png"),
   high_amplitude: require("src/assets/images/high_amplitude_code.gif"),
   low_amplitude: require("src/assets/images/low_amplitude_code.gif")
+  
 }

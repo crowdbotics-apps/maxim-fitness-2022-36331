@@ -35,8 +35,14 @@ import { transformData } from "../../../utils/utils"
 import { useNavigation, useRoute } from "@react-navigation/native"
 
 const CustomExercise = props => {
-  const { redBin, circleClose, radioBlue, doneImg, greyNext, duplicateIcon } =
-    Images
+  const {
+    redBin,
+    circleClose,
+    radioBlue,
+    radioDoneBlue,
+    greyNext,
+    duplicateIcon
+  } = Images
   const {
     cRequesting,
     requesting,
@@ -48,7 +54,7 @@ const CustomExercise = props => {
     setCustom,
     postCustomExRequest,
     customExercise,
-    addCustomExercise    
+    addCustomExercise
   } = props
   const navigation = useNavigation()
   const route = useRoute()
@@ -70,6 +76,8 @@ const CustomExercise = props => {
   const [currentIndex, setCurrentIndex] = useState(false)
   const [dualReps, setDualReps] = useState({})
   const [droupSet, setDroupSets] = useState({})
+  const [checkedReps, setCheckedReps] = useState(false)
+  const [checkedRest, setCheckedRest] = useState(false)
 
   const [temporaryReps, setTemporaryReps] = useState(false)
   const [selectIndex, setSelectIndex] = useState(0)
@@ -161,7 +169,17 @@ const CustomExercise = props => {
       seconds: {}
     })
   }
-
+  useEffect(() => {
+    if (reps !== "" && checkedReps) {
+      remaingSameDualKeep()
+    }
+    if (temporaryReps !== "" && checkedReps) {
+      remaingSameDualKeep()
+    }
+    if (seconds !== "" && checkedRest|| minutes !== ""&& checkedRest)  {
+      remaingRestSameDualKeep()
+    }
+  }, [checkedReps || checkedRest])
   const updateDualReps = val => {
     const tempObj = { ...dualReps }
     const key = `state${dualSetState}`
@@ -412,7 +430,7 @@ const CustomExercise = props => {
       }
       setCustom(true)
       postCustomExRequest(payload, true)
-      navigation.pop(2);
+      navigation.pop(2)
     }
   }
   // Flatten the array
@@ -576,10 +594,7 @@ const CustomExercise = props => {
                     <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
                       <TouchableOpacity
                         onPress={() => {
-                          getExerciseTypeRequest(
-                            exe?.exercise_type?.id,
-                            ""
-                          )
+                          getExerciseTypeRequest(exe?.exercise_type?.id, "")
 
                           setActiveCard({ item: item, index: index })
                           replaceExercise.current.open()
@@ -761,6 +776,8 @@ const CustomExercise = props => {
               <View style={Gutters.largeHMargin}>
                 <TouchableOpacity
                   onPress={() => {
+                    setCheckedReps(false)
+                    setCheckedRest(false)
                     resetValues()
                     setExerciseIndex(index)
                     if (item?.exercises?.type?.length === 1) {
@@ -1102,12 +1119,16 @@ const CustomExercise = props => {
               <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (reps !== "") {
-                      remaingSameDualKeep()
-                    }
+                    setCheckedReps(!checkedReps)
+                    // if (reps !== "") {
+                    //   remaingSameDualKeep()
+                    // }
                   }}
                 >
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                  <Image
+                    source={checkedReps ? radioDoneBlue : radioBlue}
+                    style={{ width: 20, height: 20 }}
+                  />
                 </TouchableOpacity>
 
                 <Text
@@ -1123,12 +1144,13 @@ const CustomExercise = props => {
               <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (seconds !== "" || minutes !== "") {
-                      remaingRestSameDualKeep()
-                    }
+                    setCheckedRest(!checkedRest)
                   }}
                 >
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                  <Image
+                    source={checkedRest ? radioDoneBlue : radioBlue}
+                    style={{ width: 20, height: 20 }}
+                  />
                 </TouchableOpacity>
                 <Text
                   style={{
@@ -1372,13 +1394,14 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (temporaryReps !== "") {
-                        remaingSameDualKeep()
-                      }
+                      setCheckedReps(!checkedReps)
+                      // if (temporaryReps !== "") {
+                      //   remaingSameDualKeep()
+                      // }
                     }}
                   >
                     <Image
-                      source={radioBlue}
+                      source={checkedReps ? radioDoneBlue : radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
                   </TouchableOpacity>
@@ -1487,13 +1510,11 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (seconds !== "" || minutes !== "") {
-                        remaingRestSameDualKeep()
-                      }
+                      setCheckedRest(!checkedRest)
                     }}
                   >
                     <Image
-                      source={radioBlue}
+                      source={checkedRest ? radioDoneBlue : radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
                   </TouchableOpacity>
