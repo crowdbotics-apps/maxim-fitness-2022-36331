@@ -167,10 +167,10 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
                         is_previous_exercise = True
                     else:
                         previous_exercise_ids = exercise_ids
-                    exercise_ids = exercise_ids.split(',')
+                    exercise_ids = exercise_ids.split('/')
                     for exercise_id in exercise_ids:
                         try:
-                            exercises.append(Exercise.objects.get(exercise_id=exercise_id))
+                            exercises.append(Exercise.objects.get(exercise_id__iexact=exercise_id))
                         except Exercise.DoesNotExist:
                             print("exercise id not found", exercise_id)
                 except:
