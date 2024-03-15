@@ -1,15 +1,16 @@
 import React from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
+import { connect } from "react-redux"
 
 const Card = props => {
-  const { onPress, getPlans, amount, subsucriptionId } = props
+  const { onPress, getPlans, amount, subsucriptionId, profile } = props
   const {
     regularHMargin,
     regularVPadding,
@@ -73,8 +74,30 @@ const Card = props => {
           />
           {/* <Text text={" / month"} large color="secondary" /> */}
         </View>
-        {getPlans && getPlans[getPlans.length - 1]?.id === subsucriptionId ? (
-          <TouchableOpacity style={styles.cancelButton}>
+        {profile?.trial ? (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+                "We will be here soon with this functionality. Stay tuned!",
+                [
+                  {
+                    text: "Cancel",
+                    // onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      // onCancelation() //need to be implemented here
+                    }
+                  }
+                ],
+                { cancelable: false }
+              )
+            }}
+
+            style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
         ) : null}
@@ -109,6 +132,7 @@ const Card = props => {
           </Text>
         </View>
       </LinearGradient>
+      {console.log(profile)}
       <View
         style={[
           center,
@@ -119,7 +143,7 @@ const Card = props => {
         <Button
           color="secondary"
           text={
-            getPlans && getPlans[getPlans.length - 1]?.id === subsucriptionId
+            profile?.trial
               ? "Already Bought"
               : "Buy Now"
           }
@@ -131,6 +155,7 @@ const Card = props => {
           ]}
           //onPress={getPlans[getPlans.length - 1]?.id !== subsucriptionId ? onPress : null}
           onPress={onPress}
+          disabled={profile?.is_premium_user}
         />
       </View>
     </>
@@ -160,4 +185,12 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Card
+const mapStateToProps = state => ({
+  profile: state.login.userDetail,
+})
+
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Card)

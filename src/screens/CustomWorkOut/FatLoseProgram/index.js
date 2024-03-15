@@ -244,9 +244,8 @@ const FatLoseProgram = props => {
     // Format the result
     let formattedResult = `${minutes}`
     if (remainingSeconds > 0) {
-      formattedResult += `:${
-        remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds}`
+      formattedResult += `:${remainingSeconds < 10 ? "0" : ""
+        }${remainingSeconds}`
     }
 
     return formattedResult
@@ -458,7 +457,7 @@ const FatLoseProgram = props => {
                           marginRight: 10,
                           opacity:
                             getWeekSessions?.prev_week_number === 0 ||
-                            getWeekSessions?.prev_week_number === null
+                              getWeekSessions?.prev_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -476,49 +475,73 @@ const FatLoseProgram = props => {
                       />
                       <Text
                         color="primary"
-                        text={`Week ${
-                          getWeekSessions?.prev_week_number === null
-                            ? 1
-                            : getWeekSessions?.prev_week_number
-                        }`}
+                        text={`Week ${getWeekSessions?.prev_week_number === null
+                          ? 1
+                          : getWeekSessions?.prev_week_number
+                          }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                     </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        row,
-                        {
-                          opacity:
-                            getWeekSessions?.next_week_number === 0 ||
-                            getWeekSessions?.next_week_number === null
-                              ? 0.5
-                              : 1
+                    {(getWeekSessions?.next_week_number === 0 ||
+                      getWeekSessions?.next_week_number === null) ?
+                      <View
+                        style={[
+                          row,
+                          {
+                            opacity:
+                              getWeekSessions?.next_week_number === 0 ||
+                                getWeekSessions?.next_week_number === null
+                                ? 0.5
+                                : 1
+                          }
+                        ]}
+                        onPress={nextExercise}
+                        disabled={
+                          getWeekSessions?.next_week_number === 0 ||
+                          getWeekSessions?.next_week_number === null
                         }
-                      ]}
-                      onPress={nextExercise}
-                      disabled={
-                        getWeekSessions?.next_week_number === 0 ||
-                        getWeekSessions?.next_week_number === null
-                      }
-                    >
-                      <Text
-                        color="primary"
-                        text={`Week ${
-                          getWeekSessions?.date_in_week_number === 4
+                      >
+                        <Icon
+                          type="FontAwesome5"
+                          name={"chevron-right"}
+                          style={{ color: Colors.primary, fontSize: 14, marginLeft: -5, marginTop: 2 }}
+                        />
+                      </View>
+                      :
+                      <TouchableOpacity
+                        style={[
+                          row,
+                          {
+                            opacity:
+                              getWeekSessions?.next_week_number === 0 ||
+                                getWeekSessions?.next_week_number === null
+                                ? 0.5
+                                : 1
+                          }
+                        ]}
+                        onPress={nextExercise}
+                        disabled={
+                          getWeekSessions?.next_week_number === 0 ||
+                          getWeekSessions?.next_week_number === null
+                        }
+                      >
+                        <Text
+                          color="primary"
+                          text={`Week ${getWeekSessions?.date_in_week_number === 4
                             ? 4
                             : getWeekSessions?.date_in_week_number
-                            ? getWeekSessions?.date_in_week_number + 1
-                            : 4
-                        }`}
-                        style={[tinyLMargin, styles.smallText]}
-                      />
-                      <Icon
-                        type="FontAwesome5"
-                        name={"chevron-right"}
-                        style={styles.IconStyle}
-                      />
-                    </TouchableOpacity>
+                              ? getWeekSessions?.date_in_week_number + 1
+                              : 4
+                            }`}
+                          style={[tinyLMargin, styles.smallText]}
+                        />
+                        <Icon
+                          type="FontAwesome5"
+                          name={"chevron-right"}
+                          style={styles.IconStyle}
+                        />
+                      </TouchableOpacity>}
+
                   </View>
 
                   <TouchableOpacity style={row} onPress={openModal}>
@@ -633,7 +656,7 @@ const FatLoseProgram = props => {
               </View>
             </>
           )}
-          {!profile?.is_premium_user ?? (
+          {!profile?.is_premium_user && (
             <>
               <SubscriptionCard
                 cardHeading="Buy Subscription"
@@ -659,20 +682,19 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Workout`
+                          "dddd"
+                        )}'s Workout`
                     }
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
                     <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={`Day ${
-                          weekDay === 0 ? 7 : weekDay ? weekDay : day
-                        }`}
+                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
+                          }`}
                         color="primary"
                         style={styles.dayText}
                       />
@@ -831,11 +853,11 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Custom Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Custom Workout`
+                          "dddd"
+                        )}'s Custom Workout`
                     }
                     style={[styles.headind2]}
                   />
@@ -927,11 +949,11 @@ const FatLoseProgram = props => {
                   props.setPickedDate(index)
                   navigation.navigate("AddExercise")
                 }}
-                // disabled={
-                //   todayRequest ||
-                //   todaySessions?.length === 0 ||
-                //   todaySessions?.name === "Rest"
-                // }
+              // disabled={
+              //   todayRequest ||
+              //   todaySessions?.length === 0 ||
+              //   todaySessions?.name === "Rest"
+              // }
               >
                 <LinearGradient
                   start={start}
@@ -1095,18 +1117,18 @@ const FatLoseProgram = props => {
           setOpenDatePicker(false)
         }}
         minimumDate={
-          getAllSessions
-            ? new Date(getAllSessions?.query?.[0]?.date_time)
-            : new Date()
+          getAllSessions &&
+          new Date(getAllSessions?.query?.[0]?.date_time)
+          // : new Date()
         }
         maximumDate={
           getAllSessions
-            ? new Date(
-                getAllSessions?.query?.[
-                  getAllSessions?.query?.length - 1
-                ]?.date_time
-              )
-            : null
+          && new Date(
+            getAllSessions?.query?.[
+              getAllSessions?.query?.length - 1
+            ]?.date_time
+          )
+          // : new Date()
         }
       />
     </SafeAreaView>

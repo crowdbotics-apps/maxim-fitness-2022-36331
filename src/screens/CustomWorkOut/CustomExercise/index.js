@@ -169,23 +169,81 @@ const CustomExercise = props => {
       seconds: {}
     })
   }
+
   useEffect(() => {
-    if (reps !== "" && checkedReps) {
-      remaingSameDualKeep()
+    if (reps !== "") {
+      if (checkedReps) { remaingSameDualKeep() } else { clearNextPadValues() }
+
     }
-    if (temporaryReps !== "" && checkedReps) {
-      remaingSameDualKeep()
+    if (temporaryReps !== "") {
+      if (checkedReps) { remaingSameDualKeep() } else { clearNextPadValues() }
     }
-    if (seconds !== "" && checkedRest|| minutes !== ""&& checkedRest)  {
-      remaingRestSameDualKeep()
+
+  }, [checkedReps, dualSetState])
+  useEffect(() => {
+
+    if (seconds !== "" || minutes !== "") {
+      if (checkedRest) { remaingRestSameDualKeep() } else { clearNextIndexRestValue() }
     }
-  }, [checkedReps || checkedRest])
+  }, [checkedRest, dualSetState])
+
   const updateDualReps = val => {
     const tempObj = { ...dualReps }
     const key = `state${dualSetState}`
     tempObj[key] = val
     setDualReps(tempObj)
   }
+  const clearNextPadValues = () => {
+    const data = [...props?.customExercise];
+    const checkData = data?.[exerciseIndex];
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state2: null
+          });
+        }
+      } else {
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state2: null,
+            state3: null
+          });
+        } else if (selectIndex + 1 === 2) {
+          setDroupSets({
+            ...droupSet,
+            state3: null
+          });
+        }
+      }
+    } else {
+      if (findingData()?.activeSet?.value === 4) {
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state2: null,
+            state3: null
+          });
+        } else if (dualSetState === 2) {
+          setDualReps({
+            ...dualReps,
+            state3: null
+          });
+        }
+      } else {
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state2: null
+          });
+        }
+      }
+    }
+  };
+
 
   const remaingSameDualKeep = () => {
     const data = [...props?.customExercise]
@@ -363,6 +421,58 @@ const CustomExercise = props => {
     }
   }
 
+  const clearNextIndexRestValue = () => {
+    const data = [...props?.customExercise];
+    const checkData = data?.[exerciseIndex];
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null
+          }
+        }));
+      } else {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null,
+            sec3: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null,
+            mint3: null
+          }
+        }));
+      }
+    } else {
+      if (findingData()?.activeSet?.value === 4) {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null,
+            sec3: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null,
+            mint3: null
+          }
+        }));
+      }
+    }
+  };
+
+
   const renderInputValue = key => {
     const data = [...props?.customExercise]
     const checkData = data?.[exerciseIndex]
@@ -417,7 +527,7 @@ const CustomExercise = props => {
     const flattenedArray = arrayList.flat()
     return flattenedArray
   }
-  const startCutomWorkout = () => {
+  const startCutomWorkout = async () => {
     if (title === "Rest" || title === "rest") {
       showMessage({ message: "Title should not be Rest", type: "danger" })
     } else {
@@ -429,8 +539,8 @@ const CustomExercise = props => {
         // adding_exercise_in_workout: true
       }
       setCustom(true)
-      postCustomExRequest(payload, true)
-      navigation.pop(2)
+      await postCustomExRequest(payload, true)
+      await navigation.pop(2)
     }
   }
   // Flatten the array
@@ -663,7 +773,7 @@ const CustomExercise = props => {
                           borderRadius: 6,
                           backgroundColor:
                             currentIndex?.index === i &&
-                            currentIndex?.exerciseIndex === index
+                              currentIndex?.exerciseIndex === index
                               ? "#9cdaff"
                               : "#f3f1f4"
                         }
@@ -692,7 +802,7 @@ const CustomExercise = props => {
                         {
                           backgroundColor:
                             currentIndex?.index === i &&
-                            currentIndex?.exerciseIndex === index
+                              currentIndex?.exerciseIndex === index
                               ? "#74ccff"
                               : "#f1f1f1"
                         }
@@ -729,7 +839,7 @@ const CustomExercise = props => {
                         style={[
                           styles.dualSetsSecondView1,
                           findingData()?.activeSet?.value === 4 &&
-                            styles.borderStyle
+                          styles.borderStyle
                         ]}
                       >
                         <Text
@@ -805,12 +915,12 @@ const CustomExercise = props => {
                   onPress={() => {
                     duplicateSet(item)
                   }}
-                  // disabled={
-                  //   currentIndex?.exerciseIndex === index &&
-                  //   (currentIndex || currentIndex === 0)
-                  //     ? false
-                  //     : true
-                  // }
+                // disabled={
+                //   currentIndex?.exerciseIndex === index &&
+                //   (currentIndex || currentIndex === 0)
+                //     ? false
+                //     : true
+                // }
                 >
                   <Image
                     source={duplicateIcon}
@@ -832,12 +942,12 @@ const CustomExercise = props => {
                     setExerciseIndex(index)
                     setDeleteModal(true)
                   }}
-                  // disabled={
-                  //   currentIndex?.exerciseIndex === index &&
-                  //   (currentIndex || currentIndex === 0)
-                  //     ? false
-                  //     : true
-                  // }
+                // disabled={
+                //   currentIndex?.exerciseIndex === index &&
+                //   (currentIndex || currentIndex === 0)
+                //     ? false
+                //     : true
+                // }
                 >
                   <Image source={redBin} style={{ height: 22, width: 20 }} />
                 </TouchableOpacity>
@@ -863,14 +973,14 @@ const CustomExercise = props => {
               // disabled={cRequesting || title === "" || !checkSets()}
               onPress={() => navigation.goBack()}
 
-              // disabled={
-              //   activeSet?.id === 1
-              //     ? selectedItem?.length < 2
-              //     : activeSet?.value === 4
-              //     ? selectedItem?.length < 3
-              //     : selectedItem?.length < 1
-              // }
-              // onPress={makeDataParams}
+            // disabled={
+            //   activeSet?.id === 1
+            //     ? selectedItem?.length < 2
+            //     : activeSet?.value === 4
+            //     ? selectedItem?.length < 3
+            //     : selectedItem?.length < 1
+            // }
+            // onPress={makeDataParams}
             />
           </View>
         ) : null}
@@ -891,14 +1001,14 @@ const CustomExercise = props => {
               onPress={startCutomWorkout}
               loading={cRequesting}
 
-              // disabled={
-              //   activeSet?.id === 1
-              //     ? selectedItem?.length < 2
-              //     : activeSet?.value === 4
-              //     ? selectedItem?.length < 3
-              //     : selectedItem?.length < 1
-              // }
-              // onPress={makeDataParams}
+            // disabled={
+            //   activeSet?.id === 1
+            //     ? selectedItem?.length < 2
+            //     : activeSet?.value === 4
+            //     ? selectedItem?.length < 3
+            //     : selectedItem?.length < 1
+            // }
+            // onPress={makeDataParams}
             />
           </View>
         ) : (
@@ -970,8 +1080,8 @@ const CustomExercise = props => {
                     minWidth: 40,
                     marginTop:
                       findingData()?.activeSet &&
-                      (findingData()?.activeSet?.item === "Drop Set" ||
-                        findingData()?.activeSet?.item === "Triple Set")
+                        (findingData()?.activeSet?.item === "Drop Set" ||
+                          findingData()?.activeSet?.item === "Triple Set")
                         ? 0
                         : 5
                   }}
@@ -984,32 +1094,32 @@ const CustomExercise = props => {
                 />
                 {(findingData()?.activeSet?.item === "Drop Set" ||
                   findingData()?.activeSet?.item === "Triple Set") && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      position: "absolute",
-                      bottom: 8
-                    }}
-                  >
-                    {Array(findingData()?.activeSet?.value)
-                      .fill()
-                      .map((item, index) => (
-                        <Pressable
-                          // onPress={() => {
-                          //   droupSet?.state2 && setReps(droupSet?.state2)
-                          // }}
-                          style={{
-                            height: 5,
-                            width: 5,
-                            borderRadius: 50,
-                            backgroundColor: "black",
-                            marginRight: 5,
-                            opacity: index === selectIndex ? 1 : 0.5
-                          }}
-                        />
-                      ))}
-                  </View>
-                )}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        position: "absolute",
+                        bottom: 8
+                      }}
+                    >
+                      {Array(findingData()?.activeSet?.value)
+                        .fill()
+                        .map((item, index) => (
+                          <Pressable
+                            // onPress={() => {
+                            //   droupSet?.state2 && setReps(droupSet?.state2)
+                            // }}
+                            style={{
+                              height: 5,
+                              width: 5,
+                              borderRadius: 50,
+                              backgroundColor: "black",
+                              marginRight: 5,
+                              opacity: index === selectIndex ? 1 : 0.5
+                            }}
+                          />
+                        ))}
+                    </View>
+                  )}
               </View>
 
               <View
@@ -1019,7 +1129,7 @@ const CustomExercise = props => {
                     width: 120,
                     opacity:
                       findingData()?.activeSet?.item === "Drop Set" ||
-                      findingData()?.activeSet?.item === "Triple Set"
+                        findingData()?.activeSet?.item === "Triple Set"
                         ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
@@ -1049,11 +1159,11 @@ const CustomExercise = props => {
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                              findingData()?.activeSet?.item ===
-                                "Triple Set") &&
-                            (findingData()?.activeSet?.value === selectIndex + 1
-                              ? true
-                              : false)
+                            findingData()?.activeSet?.item ===
+                            "Triple Set") &&
+                          (findingData()?.activeSet?.value === selectIndex + 1
+                            ? true
+                            : false)
                       }
                       maxLength={2}
                       value={`${minutes}`}
@@ -1091,11 +1201,11 @@ const CustomExercise = props => {
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                              findingData()?.activeSet?.item ===
-                                "Triple Set") &&
-                            (findingData()?.activeSet?.value === selectIndex + 1
-                              ? true
-                              : false)
+                            findingData()?.activeSet?.item ===
+                            "Triple Set") &&
+                          (findingData()?.activeSet?.value === selectIndex + 1
+                            ? true
+                            : false)
                       }
                       value={`${seconds}`}
                     />
@@ -1194,9 +1304,9 @@ const CustomExercise = props => {
                         reps:
                           droupSet &&
                           droupSet?.state1 +
-                            "/" +
-                            droupSet?.state2 +
-                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                          "/" +
+                          droupSet?.state2 +
+                          (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                         weight: "",
                         set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                         rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
@@ -1211,9 +1321,9 @@ const CustomExercise = props => {
                           reps:
                             droupSet &&
                             droupSet?.state1 +
-                              "/" +
-                              droupSet?.state2 +
-                              (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                            "/" +
+                            droupSet?.state2 +
+                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                           weight: "",
                           set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                           rest:
@@ -1249,9 +1359,9 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                  (findingData()?.activeSet?.item === "Drop Set" ||
-                    findingData()?.activeSet?.item === "Triple Set") &&
-                  selectIndex + 1 < findingData()?.activeSet?.value
+                    (findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") &&
+                    selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
                 </Text>
@@ -1570,7 +1680,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1584,7 +1694,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1597,7 +1707,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1611,7 +1721,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1624,7 +1734,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1638,7 +1748,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1654,7 +1764,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1668,7 +1778,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1681,7 +1791,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1695,7 +1805,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1708,7 +1818,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1722,7 +1832,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1742,7 +1852,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1756,7 +1866,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1769,7 +1879,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1783,7 +1893,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1799,7 +1909,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1813,7 +1923,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1826,7 +1936,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1840,7 +1950,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1858,7 +1968,7 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                  dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
+                    dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
                     ? "Next"
                     : "Done"}
                 </Text>
@@ -1909,8 +2019,8 @@ const CustomExercise = props => {
               activeSet?.id === 1
                 ? selectedItem?.length < 2
                 : activeSet?.value === 4
-                ? selectedItem?.length < 3
-                : selectedItem?.length < 1
+                  ? selectedItem?.length < 3
+                  : selectedItem?.length < 1
             }
             onPress={updateDataParams}
             style={[styles.addSetsButton]}
@@ -1948,8 +2058,8 @@ const CustomExercise = props => {
                           item?.pictures[0]?.image
                             ? { uri: item?.pictures[0]?.image }
                             : item?.video_thumbnail
-                            ? { uri: item?.video_thumbnail }
-                            : foodImage
+                              ? { uri: item?.video_thumbnail }
+                              : foodImage
                         }
                         style={{ width: 80, height: 45 }}
                       />

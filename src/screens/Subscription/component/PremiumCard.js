@@ -1,7 +1,7 @@
 import React from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
@@ -94,11 +94,32 @@ const PremiumCard = props => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {/* {profile?.is_premium_user ? (
-          <TouchableOpacity style={styles.cancelButton}>
+        {profile?.is_premium_user ? (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+                "We will be here soon with this functionality. Stay tuned!",
+                [
+                  {
+                    text: "Cancel",
+                    // onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      // onCancelation() //need to be implemented here
+                    }
+                  }
+                ],
+                { cancelable: false }
+              )
+            }}
+            style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
-        ) : null} */}
+        ) : null}
         <View
           style={[
             row,

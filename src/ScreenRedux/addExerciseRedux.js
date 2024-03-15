@@ -69,7 +69,7 @@ export const getExerciseTypeSuccess = data => ({
   data
 })
 
-export const postCustomExRequest = (data,start) => ({
+export const postCustomExRequest = (data, start) => ({
   type: POST_CUSTOM_EXERCISE_REQUEST,
   data,
   start
@@ -217,24 +217,25 @@ async function postCustomExAPI(data) {
   return XHR(URL, options)
 }
 
-function* postCustomEx({ data,start }) {
+function* postCustomEx({ data, start }) {
   try {
-    if(start){
+    if (start) {
       const response = yield call(postCustomExAPI, data)
       yield put(postCustomExSuccess(response.data))
-    yield put(pickSession(null, response?.data?.workouts, null))
-    if (response?.data?.workouts) {
-      navigate("ExerciseScreen", {
-        workouts: response?.data?.workouts,
-        item: response?.data,
-      });
-    }
+      yield put(pickSession(null, response?.data?.workouts, null))
+      if (response?.data?.workouts) {
+        navigate("ExerciseScreen", {
+          workouts: response?.data?.workouts,
+          item: response?.data,
+        });
+      }
       yield put(addCustomExercise([]))
-    }else{ 
-    const response = yield call(postCustomExAPI, data)
-    yield put(postCustomExSuccess(response.data))
-    navigate("FatLoseProgram")
-    yield put(addCustomExercise([]))}
+    } else {
+      const response = yield call(postCustomExAPI, data)
+      yield put(postCustomExSuccess(response.data))
+      navigate("FatLoseProgram")
+      yield put(addCustomExercise([]))
+    }
   } catch (e) {
     yield put(postCustomExSuccess(false))
   }
