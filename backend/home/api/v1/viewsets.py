@@ -949,6 +949,8 @@ class SessionViewSet(ModelViewSet):
             for session in queryset:
                 session.reset()
         serializer = self.get_serializer(queryset, many=True)
+        if int(how_many_week) == 1:
+            next_week_number = None
         data = {
             "week": int(how_many_week),
             "date_in_week_number": date_in_week_number,
