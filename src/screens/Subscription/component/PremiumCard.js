@@ -131,7 +131,7 @@ const PremiumCard = props => {
           ]}
         >
           <Text color="secondary" center style={{ fontSize: 14 }}>
-            By subcribing to Orum Training, you agree to our {""}
+            By subscribing to Orum Training, you agree to our {""}
             <Text
               text={"\nPrivacy Policy"}
               color="secondary"
@@ -168,7 +168,7 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 40, borderRadius: 30 }
           ]}
-          // disabled={profile?.is_premium_user}
+          disabled={profile?.is_premium_user}
           onPress={!profile?.is_premium_user ? onPress : null}
         />
       </View>
