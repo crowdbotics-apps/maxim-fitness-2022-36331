@@ -3,11 +3,14 @@ import os
 
 from django.db.models import Q
 from django.http import JsonResponse
+from django.utils import timezone
+
+from home.models import CancelSubscription
 from maxim_fitness_2022_36331.settings import BASE_DIR
 from drf_yasg import openapi
 from rest_framework import viewsets, status
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
 # Create your views here.
 from djstripe.settings import STRIPE_SECRET_KEY
 
@@ -73,7 +76,6 @@ class SubscriptionViewSet(viewsets.ViewSet):
         try:
             subscription = stripe.Subscription.create(
                 customer=customer_id,
-                trial_period_days=7,
                 items=[
                     {"price": request.data['price_id']},
                 ],
@@ -129,20 +131,22 @@ class SubscriptionViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=['post'])
     def create_card(self, request):
-        serializer = CardDetailSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.data
+        # serializer = CardDetailSerializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # data = serializer.data
+        data = request.data
 
         try:
-            card_token = stripe.Token.create(
-                card={
-                    "name": data.get("card_holder_name"),
-                    "number": data.get("card_number"),
-                    "exp_month": data.get("card_exp_month"),
-                    "exp_year": data.get("card_exp_year"),
-                    "cvc": data.get("card_cvc")
-                },
-            )
+            # card_token = stripe.Token.create(
+            #     card={
+            #         "name": data.get("card_holder_name"),
+            #         "number": data.get("card_number"),
+            #         "exp_month": data.get("card_exp_month"),
+            #         "exp_year": data.get("card_exp_year"),
+            #         "cvc": data.get("card_cvc")
+            #     },
+            # )
+            card_token = data.get("card_token")
             internal_customer = InternalCustomer.objects.filter(user=request.user).first()
             if internal_customer:
                 customer_id = internal_customer.stripe_id
@@ -153,7 +157,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 internal_customer.save()
                 djstripe.models.Customer.sync_from_stripe_data(customer)
 
-            card_data = stripe.Customer.create_source(customer_id, source=card_token['id'])
+            card_data = stripe.Customer.create_source(customer_id, source=card_token)
             if data.get('default'):
                 stripe.Customer.modify(customer_id, metadata={"default_source": card_data["id"]})
         except Exception as e:
@@ -515,7 +519,17 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = CancelSubscriptionRequestSerializer(data=data)
         if serializer.is_valid():
             try:
-                subscription = stripe.Subscription.delete(data.get('subscription_id'))
+                # subscription = stripe.Subscription.cancel(data.get('subscription_id'))
+                subscription_id = data.get('subscription_id')
+                stripe.Subscription.modify(subscription_id, cancel_at_period_end=True)
+                subscription = stripe.Subscription.retrieve(subscription_id)
+                if request.user.is_premium_user:
+                    # Create a CancelSubscription object
+                    CancelSubscription.objects.create(
+                        subscription_id=subscription_id,
+                        user=request.user,
+                        cancel_at=subscription.current_period_end
+                    )
                 djstripe.models.Subscription.sync_from_stripe_data(subscription)
                 return Response(status=status.HTTP_200_OK, data={'detail': 'Subscription cancelled successfully'})
             except Exception as e:
