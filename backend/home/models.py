@@ -719,3 +719,10 @@ class ReportCommentReply(models.Model):
 
     def __str__(self):
         return f"{self.user}--{self.comment_reply}"
+
+
+class CancelSubscription(models.Model):
+    user = models.ForeignKey(User, related_name='user_cancel_subscriptions', on_delete=models.CASCADE)
+    cancel_at = models.DateTimeField()
+    subscription_id = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
