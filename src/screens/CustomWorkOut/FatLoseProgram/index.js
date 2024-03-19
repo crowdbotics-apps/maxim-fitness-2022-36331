@@ -23,8 +23,6 @@ import { Text, BottomSheet, SubscriptionCard } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
-import { Dimensions } from "react-native"
-
 //redux imports
 import {
   addCustomExercise,
@@ -276,17 +274,19 @@ const FatLoseProgram = props => {
     return Math.round(total)
   }
 
+  
+
   // Usage example
-  const screenWidth = Dimensions.get("window").width
 
   const renderCard = item => {
+console.log(item,'item');
     const hasImages =
       item?.workouts &&
       item.workouts.some(workout => workout?.exercises?.length > 0)
 
     return (
       <View style={{ margin: 5, flex: 1 }}>
-        <View style={[styles.cardView, { width: screenWidth - 39 }]}>
+        <View style={[styles.cardView, { width: "100%" }]}>
           <View style={[row, justifyContentBetween]}>
             <Text
               text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
@@ -303,25 +303,17 @@ const FatLoseProgram = props => {
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
-          <View>
-            <Text
-              text={`Workout Name: ${item?.name}`}
-              style={{
-                flex: 1,
-                fontSize: 15,
-                lineHeight: 20,
-                fontWeight: "bold",
-                color: "#626262"
-              }}
-            />
-          </View>
-          {/* <View style={[row]}> */}
-            {/* {hasImages ? (
+          <View style={[row]}>
+            <ScrollView
+              horizontal
+              nestedScrollEnabled
+              contentContainerStyle={{ height: 100, width: 100 }}
+            >
+              {hasImages ? (
                 item?.workouts.map((workout, index) => (
                   <View key={index} style={{ flexDirection: "column" }}>
                     {workout?.exercises?.map((data, i) => (
-                      <View style={[row,justifyContentBetween]}>
-                        
+                      <>
                       <Image
                         key={i}
                         source={{
@@ -333,8 +325,7 @@ const FatLoseProgram = props => {
                           marginTop: 5
                         }}
                       />
-                      <Text>{data?.exercise_type?.name}</Text>
-                      </View>
+                      </>
                     ))}
                   </View>
                 ))
@@ -350,97 +341,67 @@ const FatLoseProgram = props => {
                 >
                   No Image
                 </Text>
-              )} */}
-            <View style={{ flexDirection: "column" }}>
-              <ScrollView style={{height:'auto'}}>
-              {hasImages ? (
-                item?.workouts.map(workout =>
-                  workout?.exercises?.map((data, index) => {
-                    return (
-                      <View style={[row]}>
-                        <Image
-                          key={index}
-                          source={{
-                            uri: data?.exercise_type?.image
-                          }}
-                          style={{
-                            width: 50,
-                            height: 50,
-                            marginLeft: 5,
-                            marginTop: index > 1 ? 5 : 0
-                          }}
-                        />
-                        <View style={{ marginHorizontal: 10 }}>
-                          <View>
-                            <Text
-                              text={`${getTotalExerciseCount(
-                                item.workouts
-                              )} exercises`}
-                              style={{
-                                fontSize: 12,
-                                lineHeight: 12,
-                                fontWeight: "400",
-                                marginTop: 10,
-                                color: "#626262"
-                              }}
-                            />
-                          </View>
-
-                          <View
-                            style={[
-                              row,
-                              fill,
-                              alignItemsCenter,
-                              {
-                                marginVertical: 20,
-                                justifyContent: "space-between"
-                              }
-                            ]}
-                          >
-                            <Text
-                              text={`${getTotalTimeInMinutes(
-                                item?.workouts
-                              )} minutes`}
-                              style={{
-                                fontSize: 12,
-                                lineHeight: 12,
-                                fontWeight: "400",
-                                color: "#626262"
-                                // opacity: 0.7
-                              }}
-                            />
-                            <Text
-                              text={`${data?.exercise_type?.name}`}
-                              style={{
-                                fontSize: 15,
-                                lineHeight: 18,
-                                fontWeight: "bold",
-                                marginLeft: 30,
-                                color: "#626262"
-                              }}
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    )
-                  })
-                  )
-                  ) : (
-                    <Text
-                    style={{
-                      color: "#626262",
-                      width: 50,
-                      height: 50,
-                      marginLeft: 5,
-                      marginTop: 5
-                    }}
-                    >
-                  No Image
-                </Text>
               )}
-              </ScrollView>
+            </ScrollView>
+
+            <View style={{ flex: 1, width: "65%", marginHorizontal: 10 }}>
+              <View>
+                <Text
+                  text={item?.name}
+                  style={{
+                    flex: 1,
+                    fontSize: 15,
+                    lineHeight: 20,
+                    fontWeight: "bold",
+                    color: "#626262"
+                  }}
+                />
+                <Text
+                  text={`${getTotalExerciseCount(item.workouts)} exercises`}
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 12,
+                    fontWeight: "400",
+                    marginTop: 10,
+                    color: "#626262"
+                  }}
+                />
+              </View>
+
+              <View
+                style={[
+                  row,
+                  fill,
+                  alignItemsCenter,
+                  {
+                    marginVertical: 20,
+                    justifyContent: "space-between"
+                  }
+                ]}
+              >
+                <Text
+                  text={`${getTotalTimeInMinutes(item?.workouts)} minutes`}
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 12,
+                    fontWeight: "400",
+                    color: "#626262"
+                    // opacity: 0.7
+                  }}
+                />
+                <Text
+                  text="Steady State"
+                  style={{
+                    fontSize: 15,
+                    lineHeight: 18,
+                    fontWeight: "bold",
+                    marginLeft: 30,
+                    color: "#626262"
+                  }}
+                />
+              </View>
             </View>
-          {/* </View> */}
+          </View>
           <View style={[row]}></View>
           <View style={[fill, center, Gutters.regularVMargin]}>
             <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
@@ -772,7 +733,7 @@ const FatLoseProgram = props => {
                       >
                         <View style={{ flexDirection: "column" }}>
                           {hasCSVImages ? (
-                            todaySessions?.workouts.map(workout =>
+                            todaySessions?.workouts.slice(0, 1).map(workout =>
                               workout?.exercises?.map((data, i) => (
                                 <Image
                                   key={i}
@@ -918,7 +879,7 @@ const FatLoseProgram = props => {
                   />
                   <FlatList
                     keyExtractor={(item, index) => index.toString()}
-                    data={getCustomExerciseState || []}
+                    data={getCustomExerciseState[4] || []}
                     renderItem={data => renderCard(data.item)}
                     horizontal={true}
                     contentContainerStyle={{ paddingRight: 10 }}
