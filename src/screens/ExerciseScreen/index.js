@@ -481,9 +481,10 @@ const ExerciseScreen = props => {
                         }
                         setTimeout(() => {
                           if (item?.exercises?.length == 1) {
-                            refModal.current.close()
+                            refModal
+                            ?.current?.close()
                           } else {
-                            refModal.current.open()
+                            refModal.current?.open()
                           }
                         }, 800)
                       }}
