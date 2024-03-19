@@ -13,17 +13,26 @@ import {
 import { CreditCardInput } from "react-native-input-credit-card"
 import {
   getCustomerIdRequest,
-  postSubscriptionRequest
+  postSubscriptionRequest,
+  deleteCardRequest,
+  getCardRequest
 } from "../../ScreenRedux/subscriptionRedux"
 import CreditCardDisplay from "react-native-credit-card-display"
 import { Images } from "../../theme"
+import {  createToken } from '@stripe/stripe-react-native';
+import { showMessage } from "react-native-flash-message"
 let cardata = []
 const CreditCard = props => {
   const {
     navigation,
     route: {
       params: { plan_id, product, is_premium }
-    }
+    },
+    getCustomerIdRequest,
+    postSubscriptionRequest,
+    deleteCardRequest,
+    getCardRequest,
+    getCardData
   } = props
   const [data, setData] = useState([])
   const [visible, setVisible] = useState(false)
@@ -31,31 +40,54 @@ const CreditCard = props => {
   const [selected, setSelected] = useState("")
 
   useEffect(() => {
-    props.getCustomerIdRequest()
+    getCustomerIdRequest()
+    getCardRequest()
   }, [])
 
   const creditCardData = form => {
     setData(form)
   }
-
-  const getDataFromCard = () => {
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  const getDataFromCard =async () => {
+    try {
     const month = data.values.expiry.slice(0, 2)
     const year = data.values.expiry.slice(3, 5)
-    const newData = {
-      card_holder_name: data.values.name,
-      card_number: data.values.number,
-      card_exp_month: month,
-      card_exp_year: year,
-      card_cvc: data.values.cvc,
-      plan_id: plan_id,
-      premium_user: is_premium
-    }
-    props.postSubscriptionRequest(newData)
+
+    const  CreateCardTokenParams = {
+      brand:capitalizeFirstLetter(data.values.type),
+      complete:data?.valid,
+      expiryMonth:month,
+      expiryYear:year,
+      last4:data.values.number.slice(-4),
+      type:"Card",
+      validCVC:capitalizeFirstLetter(data.status.cvc),
+      validExpiryDate:capitalizeFirstLetter(data.status.expiry),
+      validNumber:capitalizeFirstLetter(data.status.number)
+
+  };
+    const res= await createToken(CreateCardTokenParams)
+      const newData = {
+        plan_id: plan_id,
+        premium_user: is_premium,
+        card_token:res?.token?.id
+      }
+
+    await postSubscriptionRequest(newData)
     // navigation.navigate('SurveyScreen');
+}catch (error) {
+  console.log(error,'rrrr');
+  showMessage(message='something wend wrong',type='error')
+  }
   }
   const saveData = () => {
-    cardata.push(data)
-    setCrdData(cardata)
+    createCard(data)
+    // cardata.push(data)
+    // setCrdData(cardata)
+  }
+  const deleteCard=(data)=>{
+    deleteCardRequest(data.id)
   }
   return (
     <>
@@ -68,9 +100,9 @@ const CreditCard = props => {
       <TouchableOpacity style={styles.addCard} onPress={() => setVisible(true)}>
         <Text style={{ fontSize: 17, fontWeight: "bold" }}>Add Card</Text>
       </TouchableOpacity>
-      {cardData ? (
+      {getCardData ? (
         <FlatList
-          data={cardData}
+          data={getCardData}
           keyExtractor={item => item.values.number}
           renderItem={({ item }) => (
             <View style={{ alignSelf: "center", marginTop: 40 }}>
@@ -130,7 +162,7 @@ const CreditCard = props => {
                       Pay
                     </Text>
                   </TouchableOpacity>
-                  <View
+                  <TouchableOpacity
                     style={{
                       height: 40,
                       width: "30%",
@@ -140,13 +172,14 @@ const CreditCard = props => {
                       alignItems: "center",
                       justifyContent: "center"
                     }}
+                    onPress={deleteCard}
                   >
                     <Text
                       style={{ fontSize: 17, fontWeight: "bold", color: "red" }}
                     >
                       Delete
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               ) : null}
             </View>
@@ -256,13 +289,17 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   customerId: state.subscriptionReducer.getCISuccess,
-  getPlans: state.subscriptionReducer.getPlanSuccess
+  getPlans: state.subscriptionReducer.getPlanSuccess,
+  getCardData: state.subscriptionReducer.getPlanSuccess,
   // subscription: state.subscription.subscription,
 })
 
 const mapDispatchToProps = dispatch => ({
   getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
-  postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data))
+  postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
+  deleteCardRequest:data => dispatch(deleteCardRequest(data)),
+  getCardRequest:data => dispatch(getCardRequest(data)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreditCard)
+  

@@ -801,7 +801,7 @@ const ExerciseScreen = props => {
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        // disabled={timmer}
+                        disabled={ item && item.done}
                       />
                       <FatGradientIconButton
                         buttonText={

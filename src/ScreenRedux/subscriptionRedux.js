@@ -30,6 +30,13 @@ const POST_SUBSCRIPTION_FAILURE =
 const PAYMENT_SUBSCRIPTION_REQUEST =
   "SUBSCRIPTION_SCREEN/PAYMENT_SUBSCRIPTION_REQUEST"
 
+  const GET_CARD_REQUEST =
+  "SUBSCRIPTION_SCREEN/GET_CARD_REQUEST"
+  const DELETE_CARD_REQUEST =
+  "SUBSCRIPTION_SCREEN/DELETE_CARD_REQUEST"
+const GET_CARD_REQUEST_SUCCESS = "SUBSCRIPTION_SCREEN/GET_CARD_REQUEST_SUCCESS"
+
+
 const initialState = {
   requesting: false,
   getPlanSuccess: false,
@@ -43,7 +50,8 @@ const initialState = {
   getSubscription: false,
   getSubscriptionError: false,
   subscriptionData: false,
-  subRequesting: false
+  subRequesting: false,
+  getCardData:[]
 }
 
 //Actions
@@ -101,6 +109,18 @@ export const paymentSubscriptionRequest = data => ({
   type: PAYMENT_SUBSCRIPTION_REQUEST,
   data
 })
+export const getCardRequest = data => ({
+  type: GET_CARD_REQUEST,
+  data
+})
+export const getCardRequestSuccess = data => ({
+  type: GET_CARD_REQUEST_SUCCESS,
+  data
+})
+export const deleteCardRequest = data => ({
+  type: DELETE_CARD_REQUEST,
+  data
+})
 
 export const reset = () => ({
   type: RESET
@@ -133,7 +153,17 @@ export const subscriptionReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
-
+      case GET_CARD_REQUEST:
+        return {
+          ...state,
+          requesting: true
+               }
+case GET_CARD_REQUEST_SUCCESS:
+      return {
+        ...state,
+        getCardData: action.data,
+        requesting: false
+      }
     case GET_CUSTOMERID_SUCCESS:
       return {
         ...state,
@@ -313,10 +343,69 @@ function* paymentSubscription({ data }) {
     yield put(reset())
   }
 }
+// <============================start card apis=====get==========>
+
+//assign CSV programs
+async function getCardDataApi(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/subscription/create_card/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(URL, options)
+}
+//generator function
+function* getCardsData({ data }) {
+  try {
+    const response = yield call(getCardDataApi, data)
+    yield put(getCardRequestSuccess(response.data))  
+  } catch (e) {
+    yield put(getCardRequestSuccess([]))  
+    const { response } = e
+  } finally {
+    yield put(reset())
+  }
+}
+// <============================end card apis========get=======>
+
+// <============================start card apis===delete===========>
+
+//assign CSV programs
+async function deleteCardApi(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/subscription/create_card/${data}`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "DELETE"
+  }
+  return XHR(URL, options)
+}
+//generator function
+function* deleteCard({ data }) {
+  try {
+    const response = yield call(deleteCardApi, data)
+    yield put(getCardRequest())  
+  } catch (e) {
+    yield put(getCardRequestSuccess([]))  
+    const { response } = e
+  } finally {
+    yield put(reset())
+  }
+}
+// <============================end card apis===delete============>
 
 export default all([
   takeLatest(GET_PLAN_REQUEST, getFeeds),
   takeLatest(GET_CUSTOMERID_REQUEST, getCustomerId),
   takeLatest(POST_SUBSCRIPTION_REQUEST, addSubscriptionCard),
-  takeLatest(PAYMENT_SUBSCRIPTION_REQUEST, paymentSubscription)
+  takeLatest(PAYMENT_SUBSCRIPTION_REQUEST, paymentSubscription),
+  takeLatest(GET_CARD_REQUEST, getCardsData),
+  takeLatest(DELETE_CARD_REQUEST, deleteCard)
 ])

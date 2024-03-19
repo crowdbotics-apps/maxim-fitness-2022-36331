@@ -227,7 +227,6 @@ const Feeds = props => {
                 disableFocus={true}
                 mixWithOthers={"mix"}
                 controls={true}
-                poster={videoUri?.video_thumbnail}
                 onLoadStart={() => setLoading(true)}
                 onLoad={() => setLoading(false)}
               />
