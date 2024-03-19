@@ -1,108 +1,134 @@
 //import liraries
-import { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Modal, TouchableOpacity, Text, Button } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
+import { CardField, createToken } from '@stripe/stripe-react-native';
+import { connect } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { Images } from '../../theme';
+import { postSubscriptionRequest } from '../../ScreenRedux/subscriptionRedux';
+import { showMessage } from 'react-native-flash-message';
 
-import { CardField ,createToken} from '@stripe/stripe-react-native';
+const PaymentScreen = props => {
+    const { postSubscriptionRequest } = props;
+    const navigation = useNavigation();
+    const [cardInfo, setCardInfo] = useState(null);
 
-// create a component
-const PaymentScreen = () => {
-
-    const [cardInfo, setCardInfo] = useState(null)
-    const [isLoading, setLoading] = useState(false)
-
-    const fetchCardDetail = (cardDetail) => {
-        console.log("my card details",cardDetail)
-        if (cardDetail.complete) {
-            setCardInfo(cardDetail)
+    const fetchCardDetail = cardDetail => {
+        if (cardDetail?.complete) {
+            setCardInfo(cardDetail);
         } else {
-            setCardInfo(null)
+            setCardInfo(null);
         }
-    }
+    };
 
-
-
-    const onDone = async () => {
-
- 
-
-     
-
-        console.log("cardInfocardInfocardInfo", cardInfo)
+    const saveData = async () => {
         if (!!cardInfo) {
             try {
-                console.log({ ...cardInfo, type: 'Card' });
-                const resToken = await createToken({ ...cardInfo, type: 'Card' })
-                console.log("resToken", resToken)
-
+                const res = await createToken({ ...cardInfo, type: 'Card' });
+                if (res?.token) {
+                    await postSubscriptionRequest({ card_token: res?.token?.id });
+                    navigation.navigate('CreditCard');
+                }
             } catch (error) {
-                console.log(error,'error');
-                alert("Error raised during create token")
+                showMessage(message = 'something went wrong during card creation', type = 'danger')
             }
         }
-
-
-    }
-
-
-
-
-
- 
+    };
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={{ flex: 1 }}>
-                <View style={{ padding: 16 }}>
-                    <CardField
-                        postalCodeEnabled={false}
-                        placeholders={{
-                            number: '4242 4242 4242 4242',
-                        }}
-
-                        cardStyle={{
-                            backgroundColor: '#FFFFFF',
-                            textColor: '#000000',
-                        }}
-                        style={{
-                            width: '100%',
-                            height: 50,
-                            marginVertical: 30,
-                        }}
-                        onCardChange={(cardDetails) => {
-                            fetchCardDetail(cardDetails)
-                        }}
-                        onFocus={(focusedField) => {
-                            console.log('focusField', focusedField);
-                        }}
-
-                    />
-
-                    <TouchableOpacity
-                     style={{
-                        backgroundColor: 'red',
+        <SafeAreaView style={styles.container}>
+            <TouchableOpacity
+                style={styles.leftArrow}
+                onPress={() => navigation.goBack()}
+            >
+                <Image source={Images.backArrow} style={styles.backArrowStyle} />
+            </TouchableOpacity>
+            <View style={styles.content}>
+                <Text style={styles.title}>
+                    Please Add Your Card Details
+                </Text>
+                <CardField
+                    postalCodeEnabled={false}
+                    placeholders={{
+                        number: '4242 4242 4242 4242',
+                    }}
+                    cardStyle={{
+                        backgroundColor: '#FFFFFF',
                         textColor: '#000000',
                     }}
-                        onPress={onDone}
-                        disabled={!cardInfo}
-                    ><Text>gggggg</Text></TouchableOpacity>
+                    style={styles.cardField}
+                    onCardChange={fetchCardDetail}
 
-                   
-
-                   
-
-                </View>
-            </SafeAreaView>
-        </View>
+                />
+                <TouchableOpacity
+                    disabled={!cardInfo?.complete}
+                    onPress={saveData}
+                    style={[styles.button, !cardInfo?.complete && styles.disabledButton]}
+                >
+                    <Text style={styles.buttonText}>Confirm</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
     );
 };
 
-// define your styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
+    },
+    leftArrow: {
+        marginTop: 20,
+        zIndex: 22,
+        left: 10,
+        width: 50,
+        height: 50,
+    },
+    content: {
+        padding: 16,
+        flex: 1,
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        alignSelf: 'center',
+        marginTop: 50,
+    },
+    cardField: {
+        width: '100%',
+        height: 50,
+        marginVertical: 30,
+    },
+    button: {
+        height: 40,
+        width: '100%',
+        backgroundColor: 'white',
+        elevation: 5,
+        borderRadius: 10,
+        marginTop: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    disabledButton: {
+        backgroundColor: 'lightgrey',
+    },
+    buttonText: {
+        fontSize: 17,
+        fontWeight: 'bold',
     },
 });
 
-//make this component available to the app
-export default PaymentScreen;
+const mapStateToProps = state => ({
+    customerId: state.subscriptionReducer.getCISuccess,
+    getPlans: state.subscriptionReducer.getPlanSuccess,
+    getCardData: state.subscriptionReducer.getCardData,
+    cardRequesting: state.subscriptionReducer.cardRequesting,
+    cardPlanData: state.subscriptionReducer.cardPlanData,
+
+});
+
+const mapDispatchToProps = dispatch => ({
+    postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PaymentScreen);

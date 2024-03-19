@@ -63,7 +63,7 @@ const Card = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
-        <Loader isLoading={amount} />
+        {/* <Loader isLoading={amount} /> */}
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
             text={`$ ${amount || 0}`}
@@ -74,7 +74,7 @@ const Card = props => {
           />
           {/* <Text text={" / month"} large color="secondary" /> */}
         </View>
-        {profile?.trial ? (
+        {/* {profile?.trial ? (
           <TouchableOpacity
             onPress={() => {
               Alert.alert(
@@ -83,13 +83,13 @@ const Card = props => {
                 [
                   {
                     text: "Cancel",
-                    // onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                   },
                   {
                     text: "OK",
                     onPress: () => {
-                      // onCancelation() //need to be implemented here
+                      
+                      // onCancelation() 
                     }
                   }
                 ],
@@ -100,7 +100,7 @@ const Card = props => {
             style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
-        ) : null}
+        ) : null} */}
 
         <View
           style={[
@@ -132,7 +132,6 @@ const Card = props => {
           </Text>
         </View>
       </LinearGradient>
-      {console.log(profile)}
       <View
         style={[
           center,

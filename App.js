@@ -10,7 +10,7 @@ import { NativeBaseProvider } from "native-base"
 import Navigation from "src/navigation"
 import { MenuProvider } from "react-native-popup-menu"
 import { StripeProvider } from '@stripe/stripe-react-native';
-import {SP_KEY} from '@env'
+import { SP_KEY } from '@env'
 LogBox.ignoreLogs(["Warning: ..."])
 LogBox.ignoreAllLogs()
 
@@ -24,13 +24,13 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <NativeBaseProvider theme={theme}>
           <MenuProvider>
-       <StripeProvider
-      publishableKey={SP_KEY}
-      urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
-      merchantIdentifier="merchant.com.{{YOUR_APP_NAME}}" // required for Apple Pay
-    >
-            <Navigation />
-      </StripeProvider>
+            <StripeProvider
+              publishableKey={SP_KEY}
+              urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+              merchantIdentifier="merchant.com.{{YOUR_APP_NAME}}" // required for Apple Pay
+            >
+              <Navigation />
+            </StripeProvider>
           </MenuProvider>
           <FlashMessage />
         </NativeBaseProvider>

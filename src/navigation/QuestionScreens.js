@@ -18,9 +18,23 @@ import MealTime from '../screens/Questions/MealTime';
 import NutritionUnderstanding from '../screens/Questions/NutritionUnderstanding';
 import ThingsToKnow from '../screens/Questions/ThingsToKnow';
 const questionStack = createStackNavigator();
-
+import SubscriptionScreen from "../screens/Subscription"
+import CreditCard from '../screens/CreditCard';
+import PaymentScreen from '../screens/CreditCard/PaymentScreen';
 const QuestionStackScreen = () => (
-  <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Birthday">
+  <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="SubscriptionScreen">
+    <questionStack.Screen
+      name="SubscriptionScreen"
+      component={SubscriptionScreen}
+      options={{ animationEnabled: false }}
+    />
+    <questionStack.Screen name="PaymentScreen" component={PaymentScreen} />
+
+    <questionStack.Screen
+      name="CreditCard"
+      component={CreditCard}
+      options={{ animationEnabled: false }}
+    />
     <questionStack.Screen
       name="Birthday"
       component={Birthday}

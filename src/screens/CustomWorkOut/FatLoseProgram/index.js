@@ -273,6 +273,7 @@ const FatLoseProgram = props => {
     return Math.round(total)
   }
 
+
   const renderCard = item => {
     const hasImages =
       item?.workouts &&
@@ -874,59 +875,61 @@ const FatLoseProgram = props => {
               )}
             </>
           ) : (
-            <View>
-              <Text text={"Rest day"} style={styles.headind2} />
-              <View style={styles.cardView}>
-                <View style={[row, justifyContentBetween]}>
-                  <Text
-                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
-                    color="primary"
-                    style={styles.dayText}
-                  />
-                  {/* <Image source={etc} style={styles.imgStyle} /> */}
-                </View>
-                <View style={[row, Gutters.smallVMargin]}>
-                  <Text
-                    text={
-                      "No workout for today. We do encourage you to follow one of our quick stretching and mobility routines during your off days."
-                    }
-                    style={{
-                      fontSize: 13,
-                      lineHeight: 16,
-                      color: "black",
-                      fontWeight: "500",
-                      textAlign: "left",
-                      opacity: 0.8
-                    }}
-                  />
-                </View>
-                <View style={[fill, center, Gutters.regularVMargin]}>
-                  <TouchableOpacity>
-                    <LinearGradient
-                      start={start}
-                      end={end}
-                      colors={["#00e200", "#00e268"]}
-                      style={[
-                        fill,
-                        Gutters.small2xHPadding,
-                        Gutters.regularVPadding,
-                        styles.gradientWrapper
-                      ]}
-                    >
-                      <Text
-                        text="Find Routine"
-                        style={{
-                          fontSize: 16,
-                          lineHeight: 18,
-                          fontWeight: "bold",
-                          color: "#545454"
-                        }}
-                      />
-                    </LinearGradient>
-                  </TouchableOpacity>
+            profile.is_premium_user ? (
+              <View>
+                <Text text={"Rest day"} style={styles.headind2} />
+                <View style={styles.cardView}>
+                  <View style={[row, justifyContentBetween]}>
+                    <Text
+                      text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
+                      color="primary"
+                      style={styles.dayText}
+                    />
+                    {/* <Image source={etc} style={styles.imgStyle} /> */}
+                  </View>
+                  <View style={[row, Gutters.smallVMargin]}>
+                    <Text
+                      text={
+                        "No workout for today. We do encourage you to follow one of our quick stretching and mobility routines during your off days."
+                      }
+                      style={{
+                        fontSize: 13,
+                        lineHeight: 16,
+                        color: "black",
+                        fontWeight: "500",
+                        textAlign: "left",
+                        opacity: 0.8
+                      }}
+                    />
+                  </View>
+                  <View style={[fill, center, Gutters.regularVMargin]}>
+                    <TouchableOpacity>
+                      <LinearGradient
+                        start={start}
+                        end={end}
+                        colors={["#00e200", "#00e268"]}
+                        style={[
+                          fill,
+                          Gutters.small2xHPadding,
+                          Gutters.regularVPadding,
+                          styles.gradientWrapper
+                        ]}
+                      >
+                        <Text
+                          text="Find Routine"
+                          style={{
+                            fontSize: 16,
+                            lineHeight: 18,
+                            fontWeight: "bold",
+                            color: "#545454"
+                          }}
+                        />
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
+            ) : <></>
           )}
 
           <View style={[center, styles.cardView2]}>

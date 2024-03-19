@@ -6,7 +6,6 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   Text,
   FlatList
 } from "react-native"
@@ -15,28 +14,27 @@ import {
   getCustomerIdRequest,
   postSubscriptionRequest,
   deleteCardRequest,
-  getCardRequest
+  getCardRequest,
+  paymentSubscriptionRequest
 } from "../../ScreenRedux/subscriptionRedux"
 import CreditCardDisplay from "react-native-credit-card-display"
 import { Images } from "../../theme"
-import {  createToken } from '@stripe/stripe-react-native';
-import { showMessage } from "react-native-flash-message"
-let cardata = []
+import { Loader } from "../../components"
+import { profileData } from "../../ScreenRedux/profileRedux"
 const CreditCard = props => {
   const {
     navigation,
-    route: {
-      params: { plan_id, product, is_premium }
-    },
     getCustomerIdRequest,
-    postSubscriptionRequest,
     deleteCardRequest,
     getCardRequest,
-    getCardData
+    getCardData,
+    paymentSubscriptionRequest,
+    cardRequesting,
+    cardPlanData,
+    profile,
   } = props
-  const [data, setData] = useState([])
-  const [visible, setVisible] = useState(false)
-  const [cardData, setCrdData] = useState([])
+  const { plan_id, product, is_premium } = cardPlanData
+
   const [selected, setSelected] = useState("")
 
   useEffect(() => {
@@ -44,220 +42,141 @@ const CreditCard = props => {
     getCardRequest()
   }, [])
 
-  const creditCardData = form => {
-    setData(form)
-  }
-  function capitalizeFirstLetter(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-  const getDataFromCard =async () => {
-    try {
-    const month = data.values.expiry.slice(0, 2)
-    const year = data.values.expiry.slice(3, 5)
+  // const creditCardData = form => {
+  //   setData(form)
+  // }
 
-    const  CreateCardTokenParams = {
-      brand:capitalizeFirstLetter(data.values.type),
-      complete:data?.valid,
-      expiryMonth:month,
-      expiryYear:year,
-      last4:data.values.number.slice(-4),
-      type:"Card",
-      validCVC:capitalizeFirstLetter(data.status.cvc),
-      validExpiryDate:capitalizeFirstLetter(data.status.expiry),
-      validNumber:capitalizeFirstLetter(data.status.number)
+  const getDataFromCard = () => {
+    const newData = {
+      plan_id: plan_id,
+      premium_user: is_premium,
+      profile: profile
+    }
+    paymentSubscriptionRequest(newData)
 
-  };
-    const res= await createToken(CreateCardTokenParams)
-      const newData = {
-        plan_id: plan_id,
-        premium_user: is_premium,
-        card_token:res?.token?.id
-      }
+  }
 
-    await postSubscriptionRequest(newData)
-    // navigation.navigate('SurveyScreen');
-}catch (error) {
-  console.log(error,'rrrr');
-  showMessage(message='something wend wrong',type='error')
-  }
-  }
-  const saveData = () => {
-    createCard(data)
-    // cardata.push(data)
-    // setCrdData(cardata)
-  }
-  const deleteCard=(data)=>{
-    deleteCardRequest(data.id)
+  const deleteCard = (id) => {
+    deleteCardRequest({ card_id: id })
   }
   return (
     <>
+
       <TouchableOpacity
         style={styles.leftArrow}
         onPress={() => navigation.goBack()}
       >
         <Image source={Images.backArrow} style={styles.backArrowStyle} />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.addCard} onPress={() => setVisible(true)}>
+
+      <TouchableOpacity style={styles.addCard} onPress={() => navigation.navigate('PaymentScreen')}>
         <Text style={{ fontSize: 17, fontWeight: "bold" }}>Add Card</Text>
+
       </TouchableOpacity>
-      {getCardData ? (
+      <Loader isLoading={!cardRequesting} />
+
+
+      {getCardData.length ? (
         <FlatList
           data={getCardData}
-          keyExtractor={item => item.values.number}
-          renderItem={({ item }) => (
-            <View style={{ alignSelf: "center", marginTop: 40 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-evenly",
-                  width: "100%"
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => setSelected(item.values.number)}
-                >
-                  <View
-                    style={{
-                      height: 20,
-                      width: 20,
-                      borderRadius: 30,
-                      borderWidth: 2,
-                      borderColor: "grey",
-                      backgroundColor:
-                        selected == item.values.number ? "#A020F0" : "white"
-                    }}
-                  />
-                </TouchableOpacity>
-                <CreditCardDisplay
-                  number={item.values.number}
-                  cvc={item.values.cvc}
-                  expiration={item.values.expiry}
-                  name={item.values.name}
-                  flipped={false}
-                />
-              </View>
-              {selected == item.values.number ? (
+          keyExtractor={item => item?.id}
+          renderItem={({ item }) => {
+            const { exp_month, exp_year } = item;
+            const formattedMonth = exp_month < 10 ? `0${exp_month}` : exp_month;
+            const formattedDate = `${formattedMonth}/${exp_year}`;
+
+            return (
+
+              <View style={{ alignSelf: "center", marginTop: 40 }}>
                 <View
                   style={{
                     flexDirection: "row",
+                    alignItems: "center",
                     justifyContent: "space-evenly",
-                    marginTop: 20,
-                    marginBottom: 10
+                    width: "100%"
                   }}
                 >
                   <TouchableOpacity
-                    onPress={() => getDataFromCard()}
-                    style={{
-                      height: 40,
-                      width: "30%",
-                      backgroundColor: "white",
-                      elevation: 6,
-                      borderRadius: 10,
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
+                    onPress={() => setSelected(item?.id)}
                   >
-                    <Text style={{ fontSize: 17, fontWeight: "bold" }}>
-                      Pay
-                    </Text>
+                    <View
+                      style={{
+                        height: 20,
+                        width: 20,
+                        borderRadius: 30,
+                        borderWidth: 2,
+                        borderColor: "grey",
+                        backgroundColor:
+                          selected == item?.id ? "#A020F0" : "white"
+                      }}
+                    />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{
-                      height: 40,
-                      width: "30%",
-                      backgroundColor: "white",
-                      elevation: 6,
-                      borderRadius: 10,
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                    onPress={deleteCard}
-                  >
-                    <Text
-                      style={{ fontSize: 17, fontWeight: "bold", color: "red" }}
-                    >
-                      Delete
-                    </Text>
-                  </TouchableOpacity>
+                  <CreditCardDisplay
+                    number={`**** **** **** ${item?.last4}`}
+                    cvc={item?.cvc}
+                    expiration={formattedDate}
+                    name={item?.name}
+                    flipped={false}
+                  />
                 </View>
-              ) : null}
-            </View>
-          )}
+                {selected == item?.id ? (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginTop: 20,
+                      marginBottom: 10
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => getDataFromCard(item)}
+                      style={{
+                        height: 40,
+                        width: "30%",
+                        backgroundColor: "white",
+                        elevation: 6,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                    >
+                      <Text style={{ fontSize: 17, fontWeight: "bold" }}>
+                        Pay
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        height: 40,
+                        width: "30%",
+                        backgroundColor: "white",
+                        elevation: 6,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                      onPress={() => deleteCard(item?.id)}
+                    >
+                      <Text
+                        style={{ fontSize: 17, fontWeight: "bold", color: "red" }}
+                      >
+                        Delete
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
+              </View>
+            )
+          }}
         />
       ) : (
-        <Text style={{ fontSize: 17, fontWeight: "bold" }}>
-          No Cards Available
-        </Text>
-      )}
-      <Modal visible={visible}>
-        <View style={{ backgroundColor: "white", flex: 1 }}>
-          <TouchableOpacity
-            style={styles.leftArrow}
-            onPress={() => setVisible(false)}
-          >
-            <Image source={Images.backArrow} style={styles.backArrowStyle} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              alignSelf: "center",
-              marginTop: 50
-            }}
-          >
-            Please Add Your Card Details
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+
+          <Text style={{ fontSize: 17, fontWeight: "bold", textAlign: 'center' }}>
+            No Cards Available
           </Text>
-          <View style={{ marginTop: 30 }}>
-            <CreditCardInput
-              requiresName
-              onChange={form => creditCardData(form)}
-            />
-          </View>
-          <View
-            style={{
-              marginHorizontal: 20,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <TouchableOpacity
-              disabled={!data.valid}
-              onPress={() => {
-                saveData()
-                setVisible(false)
-              }}
-              style={{
-                height: 40,
-                width: "100%",
-                backgroundColor: "white",
-                elevation: 5,
-                borderRadius: 10,
-                marginTop: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Text style={{ fontSize: 17, fontWeight: "bold" }}>Confirm</Text>
-            </TouchableOpacity>
-            {/* <Button
-          color="primary"
-          text={'Add'}
-          center
-          style={{
-            height: 40,
-            width: '100%',
-            borderWidth: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          onPress={()=>saveData()}
-          //onPress={() => getDataFromCard()}
-          //disabled={!data.valid}
-        /> */}
-          </View>
         </View>
-      </Modal>
+      )}
+
     </>
   )
 }
@@ -290,16 +209,19 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   customerId: state.subscriptionReducer.getCISuccess,
   getPlans: state.subscriptionReducer.getPlanSuccess,
-  getCardData: state.subscriptionReducer.getPlanSuccess,
-  // subscription: state.subscription.subscription,
+  getCardData: state.subscriptionReducer.getCardData,
+  cardRequesting: state.subscriptionReducer.cardRequesting,
+  cardPlanData: state.subscriptionReducer.cardPlanData,
+  profile: state.login.userDetail,
 })
 
 const mapDispatchToProps = dispatch => ({
+  paymentSubscriptionRequest: data => dispatch(paymentSubscriptionRequest(data)),
   getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
   postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
-  deleteCardRequest:data => dispatch(deleteCardRequest(data)),
-  getCardRequest:data => dispatch(getCardRequest(data)),
+  deleteCardRequest: data => dispatch(deleteCardRequest(data)),
+  getCardRequest: data => dispatch(getCardRequest(data)),
+  profileData: () => dispatch(profileData()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreditCard)
-  

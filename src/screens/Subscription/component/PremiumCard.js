@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 // components
 import { View, StyleSheet, TouchableOpacity, Alert } from "react-native"
@@ -9,6 +9,7 @@ import LinearGradient from "react-native-linear-gradient"
 import { Gutters, Layout, Global } from "../../../theme"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
+import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
 
 const PremiumCard = props => {
   const {
@@ -17,8 +18,13 @@ const PremiumCard = props => {
     amount,
     subsucriptionId,
     profile,
-
+    cardPlanData,
+    getSubscriptIdRequest,
+    subscriptionIdData,
+    subIdRequesting,
+    subscriptionCancelation
   } = props
+
   const {
     regularHMargin,
     regularVPadding,
@@ -40,6 +46,10 @@ const PremiumCard = props => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
+  useEffect(() => {
+    getSubscriptIdRequest()
+  }, [])
+
   return (
     <>
       <LinearGradient
@@ -84,7 +94,7 @@ const PremiumCard = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
-        <Loader isLoading={!amount} />
+        <Loader isLoading={!amount || !subIdRequesting} />
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
             text={`$ ${amount || "0"}`}
@@ -99,17 +109,17 @@ const PremiumCard = props => {
             onPress={() => {
               Alert.alert(
                 `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
-                "We will be here soon with this functionality. Stay tuned!",
+                "Are you sure you want to cancel the subscription?",
                 [
                   {
-                    text: "Cancel",
-                    // onPress: () => console.log("Cancel Pressed"),
+                    text: "NO",
                     style: "cancel"
                   },
                   {
-                    text: "OK",
+                    text: "YES",
                     onPress: () => {
-                      // onCancelation() //need to be implemented here
+
+                      subscriptionIdData && subscriptionCancelation(subscriptionIdData?.id)
                     }
                   }
                 ],
@@ -166,10 +176,11 @@ const PremiumCard = props => {
             border,
             center,
             regularHPadding,
-            { height: 40, borderRadius: 30 }
+            { height: 43, borderRadius: 30 }
           ]}
           disabled={profile?.is_premium_user}
           onPress={!profile?.is_premium_user ? onPress : null}
+
         />
       </View>
     </>
@@ -213,10 +224,15 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   profile: state.login.userDetail,
+  subscriptionIdData: state.subscriptionReducer.subscriptionIdData,
+  subIdRequesting: state.subscriptionReducer.subIdRequesting,
 })
 
 const mapDispatchToProps = dispatch => ({
   profileData: () => dispatch(profileData()),
+  getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
+  subscriptionCancelation: (data) => dispatch(subscriptionCancelation(data))
+
 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(PremiumCard)

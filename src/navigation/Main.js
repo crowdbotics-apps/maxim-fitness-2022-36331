@@ -12,6 +12,9 @@ import ViewPost from "../screens/ViewPost"
 import AddPost from "../screens/AddPost"
 import Subscription from "../screens/Subscription"
 import CreditCard from "../screens/CreditCard"
+import PaymentScreen from "../screens/CreditCard/PaymentScreen"
+
+
 import ProgramScreen from "../screens/ProgramScreen"
 import ExerciseScreen from "../screens/ExerciseScreen"
 import ProfileScreen from "../screens/ProfileScreen"
@@ -75,8 +78,8 @@ const BottomNavigator = () => {
         )
           ? undefined
           : () => {
-              return null
-            }
+            return null
+          }
       })}
     >
       <Tab.Screen
@@ -289,6 +292,8 @@ const MainNavigator = () => (
     <mainStack.Screen name="LogFoods" component={LogFoods} />
     <mainStack.Screen name="BarCodeScreen" component={BarCodeScreen} />
     <mainStack.Screen name="Alexa" component={Alexa} />
+    <mainStack.Screen name="PaymentScreen" component={PaymentScreen} />
+
     <mainStack.Screen
       name="SwapExerciseScreen"
       component={SwapExerciseScreen}
