@@ -119,7 +119,7 @@ const PremiumCard = props => {
                     text: "YES",
                     onPress: () => {
 
-                      subscriptionIdData && subscriptionCancelation(subscriptionIdData?.id)
+                      subscriptionIdData && subscriptionCancelation({subscription_id:subscriptionIdData?.id})
                     }
                   }
                 ],

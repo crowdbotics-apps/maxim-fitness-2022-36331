@@ -23,6 +23,8 @@ import { Text, BottomSheet, SubscriptionCard } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
+import { Dimensions } from "react-native"
+
 //redux imports
 import {
   addCustomExercise,
@@ -244,8 +246,9 @@ const FatLoseProgram = props => {
     // Format the result
     let formattedResult = `${minutes}`
     if (remainingSeconds > 0) {
-      formattedResult += `:${remainingSeconds < 10 ? "0" : ""
-        }${remainingSeconds}`
+      formattedResult += `:${
+        remainingSeconds < 10 ? "0" : ""
+      }${remainingSeconds}`
     }
 
     return formattedResult
@@ -273,6 +276,8 @@ const FatLoseProgram = props => {
     return Math.round(total)
   }
 
+  // Usage example
+  const screenWidth = Dimensions.get("window").width
 
   const renderCard = item => {
     const hasImages =
@@ -281,7 +286,7 @@ const FatLoseProgram = props => {
 
     return (
       <View style={{ margin: 5, flex: 1 }}>
-        <View style={[styles.cardView, { width: "100%" }]}>
+        <View style={[styles.cardView, { width: screenWidth - 39 }]}>
           <View style={[row, justifyContentBetween]}>
             <Text
               text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
@@ -298,16 +303,25 @@ const FatLoseProgram = props => {
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
-          <View style={[row]}>
-            <ScrollView
-              horizontal
-              nestedScrollEnabled
-              contentContainerStyle={{ height: 100, width: 100 }}
-            >
-              {hasImages ? (
+          <View>
+            <Text
+              text={`Workout Name: ${item?.name}`}
+              style={{
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 20,
+                fontWeight: "bold",
+                color: "#626262"
+              }}
+            />
+          </View>
+          {/* <View style={[row]}> */}
+            {/* {hasImages ? (
                 item?.workouts.map((workout, index) => (
                   <View key={index} style={{ flexDirection: "column" }}>
                     {workout?.exercises?.map((data, i) => (
+                      <View style={[row,justifyContentBetween]}>
+                        
                       <Image
                         key={i}
                         source={{
@@ -319,6 +333,8 @@ const FatLoseProgram = props => {
                           marginTop: 5
                         }}
                       />
+                      <Text>{data?.exercise_type?.name}</Text>
+                      </View>
                     ))}
                   </View>
                 ))
@@ -334,67 +350,97 @@ const FatLoseProgram = props => {
                 >
                   No Image
                 </Text>
+              )} */}
+            <View style={{ flexDirection: "column" }}>
+              <ScrollView style={{height:'auto'}}>
+              {hasImages ? (
+                item?.workouts.map(workout =>
+                  workout?.exercises?.map((data, index) => {
+                    return (
+                      <View style={[row]}>
+                        <Image
+                          key={index}
+                          source={{
+                            uri: data?.exercise_type?.image
+                          }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            marginLeft: 5,
+                            marginTop: index > 1 ? 5 : 0
+                          }}
+                        />
+                        <View style={{ marginHorizontal: 10 }}>
+                          <View>
+                            <Text
+                              text={`${getTotalExerciseCount(
+                                item.workouts
+                              )} exercises`}
+                              style={{
+                                fontSize: 12,
+                                lineHeight: 12,
+                                fontWeight: "400",
+                                marginTop: 10,
+                                color: "#626262"
+                              }}
+                            />
+                          </View>
+
+                          <View
+                            style={[
+                              row,
+                              fill,
+                              alignItemsCenter,
+                              {
+                                marginVertical: 20,
+                                justifyContent: "space-between"
+                              }
+                            ]}
+                          >
+                            <Text
+                              text={`${getTotalTimeInMinutes(
+                                item?.workouts
+                              )} minutes`}
+                              style={{
+                                fontSize: 12,
+                                lineHeight: 12,
+                                fontWeight: "400",
+                                color: "#626262"
+                                // opacity: 0.7
+                              }}
+                            />
+                            <Text
+                              text={`${data?.exercise_type?.name}`}
+                              style={{
+                                fontSize: 15,
+                                lineHeight: 18,
+                                fontWeight: "bold",
+                                marginLeft: 30,
+                                color: "#626262"
+                              }}
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    )
+                  })
+                  )
+                  ) : (
+                    <Text
+                    style={{
+                      color: "#626262",
+                      width: 50,
+                      height: 50,
+                      marginLeft: 5,
+                      marginTop: 5
+                    }}
+                    >
+                  No Image
+                </Text>
               )}
-            </ScrollView>
-
-            <View style={{ flex: 1, width: "65%", marginHorizontal: 10 }}>
-              <View>
-                <Text
-                  text={item?.name}
-                  style={{
-                    flex: 1,
-                    fontSize: 15,
-                    lineHeight: 20,
-                    fontWeight: "bold",
-                    color: "#626262"
-                  }}
-                />
-                <Text
-                  text={`${getTotalExerciseCount(item.workouts)} exercises`}
-                  style={{
-                    fontSize: 12,
-                    lineHeight: 12,
-                    fontWeight: "400",
-                    marginTop: 10,
-                    color: "#626262"
-                  }}
-                />
-              </View>
-
-              <View
-                style={[
-                  row,
-                  fill,
-                  alignItemsCenter,
-                  {
-                    marginVertical: 20,
-                    justifyContent: "space-between"
-                  }
-                ]}
-              >
-                <Text
-                  text={`${getTotalTimeInMinutes(item?.workouts)} minutes`}
-                  style={{
-                    fontSize: 12,
-                    lineHeight: 12,
-                    fontWeight: "400",
-                    color: "#626262"
-                    // opacity: 0.7
-                  }}
-                />
-                <Text
-                  text="Steady State"
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 18,
-                    fontWeight: "bold",
-                    marginLeft: 30,
-                    color: "#626262"
-                  }}
-                />
-              </View>
+              </ScrollView>
             </View>
-          </View>
+          {/* </View> */}
           <View style={[row]}></View>
           <View style={[fill, center, Gutters.regularVMargin]}>
             <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
@@ -458,7 +504,7 @@ const FatLoseProgram = props => {
                           marginRight: 10,
                           opacity:
                             getWeekSessions?.prev_week_number === 0 ||
-                              getWeekSessions?.prev_week_number === null
+                            getWeekSessions?.prev_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -476,22 +522,23 @@ const FatLoseProgram = props => {
                       />
                       <Text
                         color="primary"
-                        text={`Week ${getWeekSessions?.prev_week_number === null
-                          ? 1
-                          : getWeekSessions?.prev_week_number
-                          }`}
+                        text={`Week ${
+                          getWeekSessions?.prev_week_number === null
+                            ? 1
+                            : getWeekSessions?.prev_week_number
+                        }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                     </TouchableOpacity>
-                    {(getWeekSessions?.next_week_number === 0 ||
-                      getWeekSessions?.next_week_number === null) ?
+                    {getWeekSessions?.next_week_number === 0 ||
+                    getWeekSessions?.next_week_number === null ? (
                       <View
                         style={[
                           row,
                           {
                             opacity:
                               getWeekSessions?.next_week_number === 0 ||
-                                getWeekSessions?.next_week_number === null
+                              getWeekSessions?.next_week_number === null
                                 ? 0.5
                                 : 1
                           }
@@ -505,17 +552,22 @@ const FatLoseProgram = props => {
                         <Icon
                           type="FontAwesome5"
                           name={"chevron-right"}
-                          style={{ color: Colors.primary, fontSize: 14, marginLeft: -5, marginTop: 2 }}
+                          style={{
+                            color: Colors.primary,
+                            fontSize: 14,
+                            marginLeft: -5,
+                            marginTop: 2
+                          }}
                         />
                       </View>
-                      :
+                    ) : (
                       <TouchableOpacity
                         style={[
                           row,
                           {
                             opacity:
                               getWeekSessions?.next_week_number === 0 ||
-                                getWeekSessions?.next_week_number === null
+                              getWeekSessions?.next_week_number === null
                                 ? 0.5
                                 : 1
                           }
@@ -528,12 +580,13 @@ const FatLoseProgram = props => {
                       >
                         <Text
                           color="primary"
-                          text={`Week ${getWeekSessions?.date_in_week_number === 4
-                            ? 4
-                            : getWeekSessions?.date_in_week_number
+                          text={`Week ${
+                            getWeekSessions?.date_in_week_number === 4
+                              ? 4
+                              : getWeekSessions?.date_in_week_number
                               ? getWeekSessions?.date_in_week_number + 1
                               : 4
-                            }`}
+                          }`}
                           style={[tinyLMargin, styles.smallText]}
                         />
                         <Icon
@@ -541,8 +594,8 @@ const FatLoseProgram = props => {
                           name={"chevron-right"}
                           style={styles.IconStyle}
                         />
-                      </TouchableOpacity>}
-
+                      </TouchableOpacity>
+                    )}
                   </View>
 
                   <TouchableOpacity style={row} onPress={openModal}>
@@ -683,19 +736,20 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                        moment(new Date()).format("YYYY-MM-DD")
+                      moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Workout"
                         : `${moment(todaySessions.date_time).format(
-                          "dddd"
-                        )}'s Workout`
+                            "dddd"
+                          )}'s Workout`
                     }
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
                     <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
-                          }`}
+                        text={`Day ${
+                          weekDay === 0 ? 7 : weekDay ? weekDay : day
+                        }`}
                         color="primary"
                         style={styles.dayText}
                       />
@@ -718,7 +772,7 @@ const FatLoseProgram = props => {
                       >
                         <View style={{ flexDirection: "column" }}>
                           {hasCSVImages ? (
-                            todaySessions?.workouts.slice(0, 1).map(workout =>
+                            todaySessions?.workouts.map(workout =>
                               workout?.exercises?.map((data, i) => (
                                 <Image
                                   key={i}
@@ -854,11 +908,11 @@ const FatLoseProgram = props => {
                   <Text
                     text={
                       todaySessions.date_time ===
-                        moment(new Date()).format("YYYY-MM-DD")
+                      moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Custom Workout"
                         : `${moment(todaySessions.date_time).format(
-                          "dddd"
-                        )}'s Custom Workout`
+                            "dddd"
+                          )}'s Custom Workout`
                     }
                     style={[styles.headind2]}
                   />
@@ -874,62 +928,62 @@ const FatLoseProgram = props => {
                 <></>
               )}
             </>
-          ) : (
-            profile.is_premium_user ? (
-              <View>
-                <Text text={"Rest day"} style={styles.headind2} />
-                <View style={styles.cardView}>
-                  <View style={[row, justifyContentBetween]}>
-                    <Text
-                      text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
-                      color="primary"
-                      style={styles.dayText}
-                    />
-                    {/* <Image source={etc} style={styles.imgStyle} /> */}
-                  </View>
-                  <View style={[row, Gutters.smallVMargin]}>
-                    <Text
-                      text={
-                        "No workout for today. We do encourage you to follow one of our quick stretching and mobility routines during your off days."
-                      }
-                      style={{
-                        fontSize: 13,
-                        lineHeight: 16,
-                        color: "black",
-                        fontWeight: "500",
-                        textAlign: "left",
-                        opacity: 0.8
-                      }}
-                    />
-                  </View>
-                  <View style={[fill, center, Gutters.regularVMargin]}>
-                    <TouchableOpacity>
-                      <LinearGradient
-                        start={start}
-                        end={end}
-                        colors={["#00e200", "#00e268"]}
-                        style={[
-                          fill,
-                          Gutters.small2xHPadding,
-                          Gutters.regularVPadding,
-                          styles.gradientWrapper
-                        ]}
-                      >
-                        <Text
-                          text="Find Routine"
-                          style={{
-                            fontSize: 16,
-                            lineHeight: 18,
-                            fontWeight: "bold",
-                            color: "#545454"
-                          }}
-                        />
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </View>
+          ) : profile.is_premium_user ? (
+            <View>
+              <Text text={"Rest day"} style={styles.headind2} />
+              <View style={styles.cardView}>
+                <View style={[row, justifyContentBetween]}>
+                  <Text
+                    text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
+                    color="primary"
+                    style={styles.dayText}
+                  />
+                  {/* <Image source={etc} style={styles.imgStyle} /> */}
+                </View>
+                <View style={[row, Gutters.smallVMargin]}>
+                  <Text
+                    text={
+                      "No workout for today. We do encourage you to follow one of our quick stretching and mobility routines during your off days."
+                    }
+                    style={{
+                      fontSize: 13,
+                      lineHeight: 16,
+                      color: "black",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      opacity: 0.8
+                    }}
+                  />
+                </View>
+                <View style={[fill, center, Gutters.regularVMargin]}>
+                  <TouchableOpacity>
+                    <LinearGradient
+                      start={start}
+                      end={end}
+                      colors={["#00e200", "#00e268"]}
+                      style={[
+                        fill,
+                        Gutters.small2xHPadding,
+                        Gutters.regularVPadding,
+                        styles.gradientWrapper
+                      ]}
+                    >
+                      <Text
+                        text="Find Routine"
+                        style={{
+                          fontSize: 16,
+                          lineHeight: 18,
+                          fontWeight: "bold",
+                          color: "#545454"
+                        }}
+                      />
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </View>
               </View>
-            ) : <></>
+            </View>
+          ) : (
+            <></>
           )}
 
           <View style={[center, styles.cardView2]}>
@@ -952,11 +1006,11 @@ const FatLoseProgram = props => {
                   props.setPickedDate(index)
                   navigation.navigate("AddExercise")
                 }}
-              // disabled={
-              //   todayRequest ||
-              //   todaySessions?.length === 0 ||
-              //   todaySessions?.name === "Rest"
-              // }
+                // disabled={
+                //   todayRequest ||
+                //   todaySessions?.length === 0 ||
+                //   todaySessions?.name === "Rest"
+                // }
               >
                 <LinearGradient
                   start={start}
@@ -1120,13 +1174,12 @@ const FatLoseProgram = props => {
           setOpenDatePicker(false)
         }}
         minimumDate={
-          getAllSessions &&
-          new Date(getAllSessions?.query?.[0]?.date_time)
+          getAllSessions && new Date(getAllSessions?.query?.[0]?.date_time)
           // : new Date()
         }
         maximumDate={
-          getAllSessions
-          && new Date(
+          getAllSessions &&
+          new Date(
             getAllSessions?.query?.[
               getAllSessions?.query?.length - 1
             ]?.date_time
