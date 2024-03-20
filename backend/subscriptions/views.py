@@ -69,7 +69,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
             djstripe.models.Customer.sync_from_stripe_data(customer)
 
         active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
-
+        if request.user.trial and request.data.get('premium_user') and active_subscriptions.get('data'):
+            for subscription in active_subscriptions.get("data"):
+                stripe.Subscription.cancel(subscription['id'])
+        active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
         if active_subscriptions.get('data'):
             return Response('User already has active subscription.', status=status.HTTP_400_BAD_REQUEST)
 
@@ -89,6 +92,11 @@ class SubscriptionViewSet(viewsets.ViewSet):
         if premium_user:
             user.is_premium_user = True
             user.save()
+            current_date = timezone.now().date()
+            end_date = datetime.fromtimestamp(subscription.current_period_end).date()
+            CancelSubscription.objects.filter(user=user).delete()
+            CancelSubscription.objects.create(user=user, subscription_id=subscription.id,
+                                              is_current=True, subscription_end_date=end_date)
         else:
             user.trial = True
             user.save()
@@ -258,7 +266,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
             internal_customer.save()
             djstripe.models.Customer.sync_from_stripe_data(customer)
         data = stripe.Subscription.list(status='active', customer=customer_id)
-        return Response(data, status=status.HTTP_200_OK)
+        if data:
+            return Response(data['data'], status=status.HTTP_200_OK)
+        else:
+            return Response([], status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['GET'], permission_classes=[AllowAny])
     def plans(self, request, *args, **kwargs):
@@ -451,7 +462,8 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 djstripe.models.Customer.sync_from_stripe_data(customer)
 
             cards = stripe.Customer.list_sources(customer_id, object="card")
-            return Response(status=status.HTTP_200_OK, data=cards)
+
+            return Response(status=status.HTTP_200_OK, data=cards['data'])
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
                 'detail': f"An error occurred while processing your request. ErrorInfo: {str(e)}"
@@ -519,16 +531,31 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = CancelSubscriptionRequestSerializer(data=data)
         if serializer.is_valid():
             try:
-                # subscription = stripe.Subscription.cancel(data.get('subscription_id'))
                 subscription_id = data.get('subscription_id')
+                if request.data.get('reactivate_subscription'):
+                    stripe.Subscription.modify(subscription_id, cancel_at_period_end=False)
+                    CancelSubscription.objects.filter(
+                        subscription_id=subscription_id, user=request.user).update(
+                        is_subscription_canceled=False,
+                        is_subscription_days_remaining=False
+                    )
+                    return Response(status=status.HTTP_200_OK, data={'detail': 'Subscription reactivated successfully'})
+                # subscription = stripe.Subscription.cancel(data.get('subscription_id'))
                 stripe.Subscription.modify(subscription_id, cancel_at_period_end=True)
                 subscription = stripe.Subscription.retrieve(subscription_id)
                 if request.user.is_premium_user:
                     # Create a CancelSubscription object
-                    CancelSubscription.objects.create(
-                        subscription_id=subscription_id,
-                        user=request.user,
-                        cancel_at=subscription.current_period_end
+                    current_date = timezone.now().date()
+                    end_date = datetime.fromtimestamp(subscription.current_period_end).date()
+                    if end_date > current_date:
+                        remaining_days = True
+                    else:
+                        remaining_days = False
+                    CancelSubscription.objects.filter(
+                        subscription_id=subscription_id, user=request.user).update(
+                        is_subscription_canceled=True,
+                        subscription_end_date=end_date,
+                        is_subscription_days_remaining=remaining_days
                     )
                 djstripe.models.Subscription.sync_from_stripe_data(subscription)
                 return Response(status=status.HTTP_200_OK, data={'detail': 'Subscription cancelled successfully'})
