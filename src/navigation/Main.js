@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { View, Image, Text, StyleSheet, Platform } from "react-native"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createStackNavigator } from "@react-navigation/stack"
@@ -47,6 +47,8 @@ import BarCodeScreen from "../screens/BarCodeScreen"
 import { modules } from "@modules"
 
 import SubscriptionScreen from "../screens/Subscription"
+import { connect } from "react-redux"
+import { profileData } from "../ScreenRedux/profileRedux"
 const { home, profileTab, feed, nutrition, exercise } = Images
 
 // const Chat = modules[0].value.navigator;
@@ -54,7 +56,7 @@ const mainStack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 
 // @refresh reset
-const BottomNavigator = () => {
+export const BottomNavigator = () => {
   return (
     <Tab.Navigator
       initialRouteName="Feed"
@@ -242,70 +244,86 @@ const styles = StyleSheet.create({
   image2: { width: 20, height: 21, resizeMode: "contain" }
 })
 
-const MainNavigator = () => (
-  <mainStack.Navigator
-    screenOptions={{ headerShown: false, animationEnabled: false }}
-    initialRouteName="BottomBar"
-  >
-    <mainStack.Screen name="BottomBar" component={BottomNavigator} />
-    <mainStack.Screen name="AddPost" component={AddPost} />
-    <mainStack.Screen name="ViewPost" component={ViewPost} />
-    <mainStack.Screen name="Subscription" component={Subscription} />
-    <mainStack.Screen name="CreditCard" component={CreditCard} />
-    <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
-    {/* <mainStack.Screen name="Feeds" component={Feeds} /> */}
-    <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
-    <mainStack.Screen name="EditProfile" component={EditProfile} />
-    {/* <mainStack.Screen name="ProfileScreen" component={ProfileScreen} /> */}
-    {/* <mainStack.Screen name="CustomCalories" component={CustomCalories} /> */}
-    <mainStack.Screen name="SearchProfile" component={SearchProfile} />
-    <mainStack.Screen name="MessageScreen" component={MessageScreen} />
-    <mainStack.Screen name="ChatScreen" component={ChatScreen} />
-    <mainStack.Screen
-      name="NotificationScreen"
-      component={NotificationScreen}
-    />
+const MainNavigator = props => {
+  const { profile, profileData } = props
+  useEffect(() => {
+    profileData()
+  }, [])
 
-    {/* <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} /> */}
-    <mainStack.Screen name="CustomExercise" component={CustomExercise} />
-    <mainStack.Screen name="AddExercise" component={AddExercise} />
-    <mainStack.Screen name="SettingScreen" component={SettingScreen} />
-    <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
-    <mainStack.Screen
-      name="EditCaloriesManually"
-      component={EditCaloriesManually}
-    />
-    <mainStack.Screen
-      name="MealPreference"
-      component={MealPreference}
-      options={{ animationEnabled: false }}
-    />
-    <mainStack.Screen
-      name="MealTime"
-      component={MealTime}
-      options={{ animationEnabled: false }}
-    />
+  return (
+    <mainStack.Navigator
+      screenOptions={{ headerShown: false, animationEnabled: false }}
+      initialRouteName={profile?.is_premium_user || profile?.trial ? "BottomBar" : "Subscription"}
+    >
+      <mainStack.Screen name="BottomBar" component={BottomNavigator} />
+      <mainStack.Screen name="AddPost" component={AddPost} />
+      <mainStack.Screen name="ViewPost" component={ViewPost} />
+      <mainStack.Screen name="Subscription" component={Subscription} />
+      <mainStack.Screen name="CreditCard" component={CreditCard} />
+      <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
+      <mainStack.Screen name="Feeds" component={Feeds} />
+      <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />
+      <mainStack.Screen name="EditProfile" component={EditProfile} />
+      {/* <mainStack.Screen name="ProfileScreen" component={ProfileScreen} /> */}
+      {/* <mainStack.Screen name="CustomCalories" component={CustomCalories} /> */}
+      <mainStack.Screen name="SearchProfile" component={SearchProfile} />
+      <mainStack.Screen name="MessageScreen" component={MessageScreen} />
+      <mainStack.Screen name="ChatScreen" component={ChatScreen} />
+      <mainStack.Screen
+        name="NotificationScreen"
+        component={NotificationScreen}
+      />
 
-    <mainStack.Screen name="SurveyScreenMeal" component={SurveyScreenMeal} />
-    <mainStack.Screen name="MealRegulator" component={MealRegulator} />
-    <mainStack.Screen name="SelectBrand" component={SelectBrand} />
-    <mainStack.Screen name="LogFoods" component={LogFoods} />
-    <mainStack.Screen name="BarCodeScreen" component={BarCodeScreen} />
-    <mainStack.Screen name="Alexa" component={Alexa} />
-    <mainStack.Screen name="PaymentScreen" component={PaymentScreen} />
+      {/* <mainStack.Screen name="FatLoseProgram" component={FatLoseProgram} /> */}
+      <mainStack.Screen name="CustomExercise" component={CustomExercise} />
+      <mainStack.Screen name="AddExercise" component={AddExercise} />
+      <mainStack.Screen name="SettingScreen" component={SettingScreen} />
+      <mainStack.Screen name="EditCustomCal" component={EditCustomCal} />
+      <mainStack.Screen
+        name="EditCaloriesManually"
+        component={EditCaloriesManually}
+      />
+      <mainStack.Screen
+        name="MealPreference"
+        component={MealPreference}
+        options={{ animationEnabled: false }}
+      />
+      <mainStack.Screen
+        name="MealTime"
+        component={MealTime}
+        options={{ animationEnabled: false }}
+      />
 
-    <mainStack.Screen
-      name="SwapExerciseScreen"
-      component={SwapExerciseScreen}
-    />
-    <mainStack.Screen name="WorkoutCard" component={WorkoutCard} />
+      <mainStack.Screen name="SurveyScreenMeal" component={SurveyScreenMeal} />
+      <mainStack.Screen name="MealRegulator" component={MealRegulator} />
+      <mainStack.Screen name="SelectBrand" component={SelectBrand} />
+      <mainStack.Screen name="LogFoods" component={LogFoods} />
+      <mainStack.Screen name="BarCodeScreen" component={BarCodeScreen} />
+      <mainStack.Screen name="Alexa" component={Alexa} />
+      <mainStack.Screen name="PaymentScreen" component={PaymentScreen} />
 
-    <mainStack.Screen
-      name="SubscriptionScreen"
-      component={SubscriptionScreen}
-    />
-    {/* <mainStack.Screen name="Chat" component={Chat} /> */}
-  </mainStack.Navigator>
-)
+      <mainStack.Screen
+        name="SwapExerciseScreen"
+        component={SwapExerciseScreen}
+      />
+      <mainStack.Screen name="WorkoutCard" component={WorkoutCard} />
 
-export default MainNavigator
+      <mainStack.Screen
+        name="SubscriptionScreen"
+        component={SubscriptionScreen}
+      />
+      {/* <mainStack.Screen name="Chat" component={Chat} /> */}
+    </mainStack.Navigator>
+
+  )
+}
+
+const mapStateToProps = state => ({
+  profile: state.login.userDetail,
+})
+
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainNavigator)

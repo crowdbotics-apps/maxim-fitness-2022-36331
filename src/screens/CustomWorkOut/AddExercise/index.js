@@ -52,7 +52,15 @@ const AddExercies = props => {
   useEffect(() => {
     // isFocused && props.getExerciseRequest()
     props.getExerciseRequest()
+
   }, [])
+  const isFocused = useIsFocused()
+  useEffect(() => {
+    setSelectedItem([])
+    setActiveSet(false)
+    setSelectMuscle(0)
+  }, [isFocused])
+
   useEffect(() => {
     getExerciseState &&
       props.getExerciseTypeRequest(
@@ -99,7 +107,7 @@ const AddExercies = props => {
       ? activeSet
       : { id: 0, value: 0, item: "Single Set" }
 
-    navigation.navigate("CustomExercise", { exercises, activeSet: data})
+    navigation.navigate("CustomExercise", { exercises, activeSet: data })
     let newObj = {}
     newObj[`type`] = exercises
     const newData = [

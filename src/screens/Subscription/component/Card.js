@@ -1,13 +1,14 @@
 import React from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
 import { connect } from "react-redux"
+import { API_URL } from "../../../config/app"
 
 const Card = props => {
   const { onPress, getPlans, amount, subsucriptionId, profile } = props
@@ -31,6 +32,9 @@ const Card = props => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
+  const openPrivacyPolicy = () => {
+    Linking.openURL(`${API_URL}/privacy-policy/`)
+  }
   return (
     <>
       <LinearGradient
@@ -114,21 +118,25 @@ const Card = props => {
         >
           <Text color="secondary" center style={{ fontSize: 14 }}>
             By subcribing to Orum Training, you agree to our {""}
-            <Text
-              text={"\nPrivacy Policy"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"\nPrivacy Policy"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
             {""} and {""}
-            <Text
-              text={"Terms of Services"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"Terms of Services"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
           </Text>
         </View>
       </LinearGradient>
@@ -150,7 +158,7 @@ const Card = props => {
             border,
             center,
             regularHPadding,
-            { height: 40, borderRadius: 30 }
+            { height: 43, borderRadius: 30, }
           ]}
           //onPress={getPlans[getPlans.length - 1]?.id !== subsucriptionId ? onPress : null}
           onPress={onPress}

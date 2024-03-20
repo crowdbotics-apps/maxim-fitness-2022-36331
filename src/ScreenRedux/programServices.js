@@ -28,6 +28,8 @@ const REPS_CUSTOM_WEIGHT_REQUEST = "ProgramScreen/REPS_CUSTOM_WEIGHT_REQUEST"
 
 
 const PICK_SESSION = "ProgramScreen/PICK_SESSION"
+
+const SET_EXERCISE_TITLE = "ProgramScreen/SET_EXERCISE_TITLE"
 const CUSTOM_SESSION = "ProgramScreen/CUSTOM_SESSION"
 const PICKED_DATE = "ProgramScreen/PICKED_DATE"
 
@@ -127,6 +129,11 @@ export const setCustom = data => ({
   type: CUSTOM_SESSION,
   data,
 })
+export const setExerciseTitle = data => ({
+  type: SET_EXERCISE_TITLE,
+  data,
+})
+
 export const setPickedDate = date => ({
   type: PICKED_DATE,
   date
@@ -226,9 +233,9 @@ export const allSwapExerciseError = () => ({
 const initialState = {
   requesting: false,
   getAllSessions: false,
-  getAllCustomSessions:false,
+  getAllCustomSessions: false,
   getAllSessionsRequesting: false,
-  getAllCustomSessionsRequesting:[],
+  getAllCustomSessionsRequesting: [],
   getWeekSessions: false,
 
   loader: false,
@@ -240,7 +247,8 @@ const initialState = {
   selectedSession: false,
   nextWorkout: false,
   isCustom: false,
-  pickedDate:new Date(),
+  exerciseTitle: false,
+  pickedDate: new Date(),
   setLoading: false,
   setDone: false,
   exeLoading: false,
@@ -266,13 +274,13 @@ export const programReducer = (state = initialState, action) => {
         getAllSessions: action.data,
         getAllSessionsRequesting: false
       }
-      case ALL_CUSTOM_SESSIONS_SUCCESS:
-        return {
-          ...state,
-          getAllCustomSessions: action.data,
-          getAllCustomSessionsRequesting: false
-        }
-      
+    case ALL_CUSTOM_SESSIONS_SUCCESS:
+      return {
+        ...state,
+        getAllCustomSessions: action.data,
+        getAllCustomSessionsRequesting: false
+      }
+
 
     case WEEK_SESSIONS_SUCCESS:
       return {
@@ -356,10 +364,17 @@ export const programReducer = (state = initialState, action) => {
         isCustom: action.data,
       }
     }
+    case SET_EXERCISE_TITLE: {
+      return {
+        ...state,
+        exerciseTitle: action.data,
+      }
+    }
+
     case PICKED_DATE: {
       return {
         ...state,
-        pickedDate:action.date
+        pickedDate: action.date
 
       }
     }
@@ -869,7 +884,7 @@ async function getCustomExerciseAPI(data) {
 }
 async function getallCustomExerciseAPI() {
   const token = await AsyncStorage.getItem("authToken")
-  
+
   const URL = `${API_URL}/new_custom_workout/?all=true`
   const options = {
     headers: {
@@ -881,23 +896,24 @@ async function getallCustomExerciseAPI() {
   return XHR(URL, options)
 }
 
-function* swapCustomExercisesData({ data,all }) {
+function* swapCustomExercisesData({ data, all }) {
   try {
-    if(all){
+    if (all) {
       const response = yield call(getallCustomExerciseAPI)
-      yield put(getAllCustomSessionSuccess(response?.data ))
+      yield put(getAllCustomSessionSuccess(response?.data))
     }
-    else{
-    const response = yield call(swapCustomExercisesAPI, data)
-    yield put(swapExerciseisTrue())
-    const customData = yield getCustomExerciseAPI(data?.workout_id)
-    yield put(pickSession(null, customData?.data?.workouts, null))
-    if (customData?.data?.workouts) {
-      navigate("ExerciseScreen", {
-        workouts: customData?.data?.workouts,
-        item: customData?.data,
-      });
-    }}
+    else {
+      const response = yield call(swapCustomExercisesAPI, data)
+      yield put(swapExerciseisTrue())
+      const customData = yield getCustomExerciseAPI(data?.workout_id)
+      yield put(pickSession(null, customData?.data?.workouts, null))
+      if (customData?.data?.workouts) {
+        navigate("ExerciseScreen", {
+          workouts: customData?.data?.workouts,
+          item: customData?.data,
+        });
+      }
+    }
   } catch (e) {
     showMessage({ message: "Something went wrong", type: "danger" })
     yield put(swapExerciseisTrue())

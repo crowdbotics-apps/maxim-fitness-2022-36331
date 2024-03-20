@@ -30,9 +30,9 @@ import {
   addCustomExercise,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
-import { setCustom } from "../../../ScreenRedux/programServices"
+import { setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
 import { transformData } from "../../../utils/utils"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native"
 
 const CustomExercise = props => {
   const {
@@ -54,14 +54,16 @@ const CustomExercise = props => {
     setCustom,
     postCustomExRequest,
     customExercise,
-    addCustomExercise
+    addCustomExercise,
+    exerciseTitle,
+    setExerciseTitle
   } = props
   const navigation = useNavigation()
   const route = useRoute()
   const { width, height } = Dimensions.get("window")
   const { exercises, activeSet } = route?.params
   const [reps, setReps] = useState("")
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = useState('')
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [deleteModal, setDeleteModal] = useState(false)
@@ -107,8 +109,16 @@ const CustomExercise = props => {
   useEffect(() => {
     if (todaySessions?.id && todaySessions?.name !== "Rest") {
       setTitle("")
+    } else {
+      setTitle(exerciseTitle)
     }
   }, [])
+  const onFocus = useIsFocused()
+  useEffect(() => {
+
+    setTitle(exerciseTitle)
+
+  }, [onFocus])
 
   const findingData = () => {
     const checkData = customExercise[exerciseIndex]
@@ -541,6 +551,7 @@ const CustomExercise = props => {
       setCustom(true)
       await postCustomExRequest(payload, true)
       await navigation.pop(2)
+
     }
   }
   // Flatten the array
@@ -622,6 +633,10 @@ const CustomExercise = props => {
     setActiveCard({ item: {}, index: 0 })
   }
 
+
+  const goBackScreen = () => {
+    navigation.goBack()
+  }
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
@@ -637,7 +652,7 @@ const CustomExercise = props => {
             justifyContentBetween
           ]}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={goBackScreen}>
             <Image
               source={Images.back2}
               style={{ width: 30, height: 25, resizeMode: "contain" }}
@@ -674,8 +689,11 @@ const CustomExercise = props => {
         >
           <InputField
             inputStyle={[Fonts.titleRegular, fill]}
-            value={title}
-            onChangeText={val => setTitle(val)}
+            value={exerciseTitle || title}
+            onChangeText={val => {
+              setTitle(val)
+              setExerciseTitle(val)
+            }}
             placeholder="Workout Title"
             autoCapitalize="none"
           />
@@ -971,7 +989,7 @@ const CustomExercise = props => {
               textStyle={[{ color: "white" }]}
               style={[styles.btn]}
               // disabled={cRequesting || title === "" || !checkSets()}
-              onPress={() => navigation.goBack()}
+              onPress={goBackScreen}
 
             // disabled={
             //   activeSet?.id === 1
@@ -997,7 +1015,7 @@ const CustomExercise = props => {
                   opacity: title === "" || !checkSets() ? 0.5 : 1
                 }
               ]}
-              disabled={cRequesting || title === "" || !checkSets()}
+              disabled={cRequesting || title === "" || exerciseTitle === '' || !checkSets()}
               onPress={startCutomWorkout}
               loading={cRequesting}
 
@@ -2374,7 +2392,8 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   getExerciseType: state.addExerciseReducer.getExerciseType,
   requesting: state.addExerciseReducer.requesting,
-  pickedDate: state.programReducer.pickedDate
+  pickedDate: state.programReducer.pickedDate,
+  exerciseTitle: state.programReducer.exerciseTitle,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -2383,6 +2402,7 @@ const mapDispatchToProps = dispatch => ({
   addCustomExercise: data => dispatch(addCustomExercise(data)),
   getExerciseTypeRequest: (data, search) =>
     dispatch(getExerciseTypeRequest(data, search)),
-  setCustom: type => dispatch(setCustom(type))
+  setCustom: type => dispatch(setCustom(type)),
+  setExerciseTitle: type => dispatch(setExerciseTitle(type))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

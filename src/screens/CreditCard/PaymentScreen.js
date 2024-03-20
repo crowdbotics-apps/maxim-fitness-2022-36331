@@ -22,7 +22,7 @@ const PaymentScreen = props => {
     };
 
     const saveData = async () => {
-        if (!!cardInfo) {
+        if (cardInfo) {
             try {
                 const res = await createToken({ ...cardInfo, type: 'Card' });
                 if (res?.token) {

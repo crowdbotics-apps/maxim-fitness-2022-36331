@@ -48,7 +48,8 @@ const FatLoseProgram = props => {
     getWeekSessions,
     profile,
     getCustomExerciseState,
-    profileData
+    profileData,
+    getAllSessionsRequesting,
   } = props
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
@@ -117,6 +118,7 @@ const FatLoseProgram = props => {
       setIndex(false)
     })
     return unsubscribe
+
   }, [navigation])
 
   const { etc, workout1, workout2, workout3, threeLine, circle } = Images
@@ -244,9 +246,8 @@ const FatLoseProgram = props => {
     // Format the result
     let formattedResult = `${minutes}`
     if (remainingSeconds > 0) {
-      formattedResult += `:${
-        remainingSeconds < 10 ? "0" : ""
-      }${remainingSeconds}`
+      formattedResult += `:${remainingSeconds < 10 ? "0" : ""
+        }${remainingSeconds}`
     }
 
     return formattedResult
@@ -274,12 +275,11 @@ const FatLoseProgram = props => {
     return Math.round(total)
   }
 
-  
 
-  // Usage example
+
 
   const renderCard = item => {
-console.log(item,'item');
+
     const hasImages =
       item?.workouts &&
       item.workouts.some(workout => workout?.exercises?.length > 0)
@@ -314,17 +314,17 @@ console.log(item,'item');
                   <View key={index} style={{ flexDirection: "column" }}>
                     {workout?.exercises?.map((data, i) => (
                       <>
-                      <Image
-                        key={i}
-                        source={{
-                          uri: data?.exercise_type?.image
-                        }}
-                        style={{
-                          width: 50,
-                          height: 50,
-                          marginTop: 5
-                        }}
-                      />
+                        <Image
+                          key={i}
+                          source={{
+                            uri: data?.exercise_type?.image
+                          }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            marginTop: 5
+                          }}
+                        />
                       </>
                     ))}
                   </View>
@@ -465,7 +465,7 @@ console.log(item,'item');
                           marginRight: 10,
                           opacity:
                             getWeekSessions?.prev_week_number === 0 ||
-                            getWeekSessions?.prev_week_number === null
+                              getWeekSessions?.prev_week_number === null
                               ? 0.5
                               : 1
                         }
@@ -483,23 +483,22 @@ console.log(item,'item');
                       />
                       <Text
                         color="primary"
-                        text={`Week ${
-                          getWeekSessions?.prev_week_number === null
-                            ? 1
-                            : getWeekSessions?.prev_week_number
-                        }`}
+                        text={`Week ${getWeekSessions?.prev_week_number === null
+                          ? 1
+                          : getWeekSessions?.prev_week_number
+                          }`}
                         style={[tinyLMargin, styles.smallText]}
                       />
                     </TouchableOpacity>
                     {getWeekSessions?.next_week_number === 0 ||
-                    getWeekSessions?.next_week_number === null ? (
+                      getWeekSessions?.next_week_number === null ? (
                       <View
                         style={[
                           row,
                           {
                             opacity:
                               getWeekSessions?.next_week_number === 0 ||
-                              getWeekSessions?.next_week_number === null
+                                getWeekSessions?.next_week_number === null
                                 ? 0.5
                                 : 1
                           }
@@ -528,7 +527,7 @@ console.log(item,'item');
                           {
                             opacity:
                               getWeekSessions?.next_week_number === 0 ||
-                              getWeekSessions?.next_week_number === null
+                                getWeekSessions?.next_week_number === null
                                 ? 0.5
                                 : 1
                           }
@@ -541,13 +540,12 @@ console.log(item,'item');
                       >
                         <Text
                           color="primary"
-                          text={`Week ${
-                            getWeekSessions?.date_in_week_number === 4
-                              ? 4
-                              : getWeekSessions?.date_in_week_number
+                          text={`Week ${getWeekSessions?.date_in_week_number === 4
+                            ? 4
+                            : getWeekSessions?.date_in_week_number
                               ? getWeekSessions?.date_in_week_number + 1
                               : 4
-                          }`}
+                            }`}
                           style={[tinyLMargin, styles.smallText]}
                         />
                         <Icon
@@ -680,7 +678,7 @@ console.log(item,'item');
               />
             </>
           )}
-          {todayRequest || cRequesting ? (
+          {todayRequest || cRequesting || getAllSessionsRequesting ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
             </View>
@@ -697,20 +695,19 @@ console.log(item,'item');
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Workout`
+                          "dddd"
+                        )}'s Workout`
                     }
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
                     <View style={[row, justifyContentBetween]}>
                       <Text
-                        text={`Day ${
-                          weekDay === 0 ? 7 : weekDay ? weekDay : day
-                        }`}
+                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
+                          }`}
                         color="primary"
                         style={styles.dayText}
                       />
@@ -869,11 +866,11 @@ console.log(item,'item');
                   <Text
                     text={
                       todaySessions.date_time ===
-                      moment(new Date()).format("YYYY-MM-DD")
+                        moment(new Date()).format("YYYY-MM-DD")
                         ? "Today's Custom Workout"
                         : `${moment(todaySessions.date_time).format(
-                            "dddd"
-                          )}'s Custom Workout`
+                          "dddd"
+                        )}'s Custom Workout`
                     }
                     style={[styles.headind2]}
                   />
@@ -967,11 +964,11 @@ console.log(item,'item');
                   props.setPickedDate(index)
                   navigation.navigate("AddExercise")
                 }}
-                // disabled={
-                //   todayRequest ||
-                //   todaySessions?.length === 0 ||
-                //   todaySessions?.name === "Rest"
-                // }
+              // disabled={
+              //   todayRequest ||
+              //   todaySessions?.length === 0 ||
+              //   todaySessions?.name === "Rest"
+              // }
               >
                 <LinearGradient
                   start={start}
@@ -1021,7 +1018,7 @@ console.log(item,'item');
           }
         ]}
       >
-        {props.getAllSessionsRequesting ? (
+        {getAllSessionsRequesting ? (
           <View
             style={[
               Layout.fill,
@@ -1030,7 +1027,7 @@ console.log(item,'item');
               Global.topLRBorderRadius20
             ]}
           >
-            <ActivityIndicator size="large" color="green" />
+            {/* <ActivityIndicator size="large" color="green" /> */}
           </View>
         ) : (
           <View style={[Global.topLRBorderRadius20, Global.secondaryBg]}>
@@ -1255,6 +1252,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   addCustomExercise: () => dispatch(addCustomExercise([])),
   customWorkoutRescheduleRequest: (id, date) =>
-    dispatch(customWorkoutRescheduleRequest(id, date))
+    dispatch(customWorkoutRescheduleRequest(id, date)),
+
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FatLoseProgram)

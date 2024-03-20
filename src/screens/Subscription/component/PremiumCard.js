@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
@@ -10,7 +10,7 @@ import { Gutters, Layout, Global } from "../../../theme"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
 import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
-
+import { API_URL } from "../../../config/app"
 const PremiumCard = props => {
   const {
     onPress,
@@ -24,6 +24,9 @@ const PremiumCard = props => {
     subIdRequesting,
     subscriptionCancelation
   } = props
+  const openPrivacyPolicy = () => {
+    Linking.openURL(`${API_URL}/privacy-policy/`)
+  }
 
   const {
     regularHMargin,
@@ -49,7 +52,56 @@ const PremiumCard = props => {
   useEffect(() => {
     getSubscriptIdRequest()
   }, [])
+  const canceledButton = (call) => {
+    profile?.user_subscription?.is_subscription_canceled
+    profile?.user_subscription?.is_subscription_days_remaining
+    profile?.is_premium_user
 
+    if (profile?.is_premium_user && profile?.user_subscription?.is_subscription_days_remaining && profile?.user_subscription?.is_subscription_canceled) {
+      call && Alert.alert(
+        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+        "Are you sure you want to reactivate your current  subscription?",
+        [
+          {
+            text: "NO",
+            style: "cancel"
+          },
+          {
+            text: "YES",
+            onPress: () => {
+              subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id, reactivate_subscription: true })
+            }
+          }
+        ],
+        { cancelable: false }
+      )
+
+      return { text: "Reactivate Subscription", show: true }
+    } else
+      if (profile?.is_premium_user) {
+        call && Alert.alert(
+          `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+          "Are you sure you want to cancel the subscription?",
+          [
+            {
+              text: "NO",
+              style: "cancel"
+            },
+            {
+              text: "YES",
+              onPress: () => {
+                subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id })
+              }
+            }
+          ],
+          { cancelable: false }
+        )
+        return { text: "Cancel", show: true }
+      }
+      else {
+        return { text: "Cancel", show: false }
+      }
+  }
   return (
     <>
       <LinearGradient
@@ -64,11 +116,11 @@ const PremiumCard = props => {
           styles.gradientWrapper
         ]}
       >
-        <View style={[fill, justifyContentAround, mediumHMargin]}>
+        <View style={[fill, mediumHMargin, justifyContentCenter]}>
           <View style={[row, alignItemsCenter]}>
             <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5 }} />
             <Text
-              text={"User will recieve a nutrition plan."}
+              text={"User will receive a nutrition plan."}
               color="secondary"
               style={{ fontSize: 16 }}
             />
@@ -104,30 +156,13 @@ const PremiumCard = props => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {profile?.is_premium_user ? (
+        {canceledButton().show ? (
           <TouchableOpacity
             onPress={() => {
-              Alert.alert(
-                `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
-                "Are you sure you want to cancel the subscription?",
-                [
-                  {
-                    text: "NO",
-                    style: "cancel"
-                  },
-                  {
-                    text: "YES",
-                    onPress: () => {
-
-                      subscriptionIdData && subscriptionCancelation({subscription_id:subscriptionIdData?.id})
-                    }
-                  }
-                ],
-                { cancelable: false }
-              )
+              canceledButton(true)
             }}
             style={styles.cancelButton}>
-            <Text style={styles.text}>Cancel</Text>
+            <Text style={styles.text}>{canceledButton().text}</Text>
           </TouchableOpacity>
         ) : null}
         <View
@@ -142,22 +177,28 @@ const PremiumCard = props => {
         >
           <Text color="secondary" center style={{ fontSize: 14 }}>
             By subscribing to Orum Training, you agree to our {""}
-            <Text
-              text={"\nPrivacy Policy"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"\nPrivacy Policy"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
             {""} and {""}
-            <Text
-              text={"Terms of Services"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"Terms of Services"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+
+            </TouchableOpacity>
           </Text>
+
         </View>
       </LinearGradient>
       <View
@@ -203,7 +244,9 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     height: 40,
-    width: "50%",
+    padding: 10,
+    width: "auto",
+    minWidth: "50%",
     backgroundColor: "white",
     alignSelf: "center",
     justifyContent: "center",

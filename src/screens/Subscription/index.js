@@ -20,7 +20,7 @@ import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
 
 const SubscriptionScreen = props => {
-  const { navigation, getPlans, userDetail, subscriptionData, setPlanCardData, profileData } = props
+  const { navigation, getPlans, subscriptionData, setPlanCardData, profileData, profile } = props
 
 
   const [curentTab, setCurentTab] = useState(0)
@@ -67,7 +67,9 @@ const SubscriptionScreen = props => {
     <>
       <TouchableOpacity
         style={styles.leftArrow}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          !profile?.is_survey ? navigation.navigate("Birthday") : navigation.goBack()
+        }}
       >
         <Image source={Images.backImage} style={styles.backArrowStyle} />
       </TouchableOpacity>
@@ -237,7 +239,7 @@ const mapStateToProps = state => ({
   customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.subRequesting,
-  userDetail: state.login.userDetail
+  profile: state.login.userDetail
   // subscription: state.subscription.subscription,
 })
 

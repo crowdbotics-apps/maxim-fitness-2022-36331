@@ -32,6 +32,7 @@ const CreditCard = props => {
     cardRequesting,
     cardPlanData,
     profile,
+    profileData
   } = props
   const { plan_id, product, is_premium } = cardPlanData
 
@@ -40,6 +41,7 @@ const CreditCard = props => {
   useEffect(() => {
     getCustomerIdRequest()
     getCardRequest()
+    profileData()
   }, [])
 
   // const creditCardData = form => {

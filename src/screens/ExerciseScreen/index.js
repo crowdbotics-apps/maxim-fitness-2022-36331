@@ -39,7 +39,8 @@ import {
   sessionDone,
   allSwapExercise,
   allSwapCustomExercise,
-  customSessionDone
+  customSessionDone,
+  setExerciseTitle
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
 import { useIsFocused, useRoute } from "@react-navigation/native"
@@ -50,7 +51,8 @@ const ExerciseScreen = props => {
     repsWeightState,
     exerciseObj,
     selectedSession,
-    isCustom
+    isCustom,
+    setExerciseTitle
   } = props
   const route = useRoute()
   let refDescription = useRef("")
@@ -158,6 +160,7 @@ const ExerciseScreen = props => {
   useEffect(() => {
     setParms(route?.params)
     getData()
+    setExerciseTitle('')
   }, [onFocus, route])
   const getData = async () => {
     if (route) {
@@ -223,9 +226,8 @@ const ExerciseScreen = props => {
     setRepsColor(true)
     refReps.current.close()
     const id = repsWeightState.id
-    const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${
-      showModalRepsThree ? "/" : ""
-    }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
+    const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${showModalRepsThree ? "/" : ""
+      }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
     const dd = "reps"
     if (isCustom) {
       props.repsCustomWeightRequest(id, reps, dd)
@@ -241,9 +243,8 @@ const ExerciseScreen = props => {
     setWeightColor(true)
     refWeight.current.close()
     const id = repsWeightState.id
-    const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${
-      showModalWeightThree ? "/" : ""
-    }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
+    const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${showModalWeightThree ? "/" : ""
+      }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
     const dd = "weight"
     if (isCustom) {
       props.repsCustomWeightRequest(id, weight, dd)
@@ -482,7 +483,7 @@ const ExerciseScreen = props => {
                         setTimeout(() => {
                           if (item?.exercises?.length == 1) {
                             refModal
-                            ?.current?.close()
+                              ?.current?.close()
                           } else {
                             refModal.current?.open()
                           }
@@ -529,9 +530,8 @@ const ExerciseScreen = props => {
                           ellipsizeMode="tail"
                           numberOfLines={3}
                         >
-                          {`${i + 1}. ${
-                            item?.name || item?.exercises?.[0]?.name
-                          }`}
+                          {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name
+                            }`}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -563,52 +563,52 @@ const ExerciseScreen = props => {
               >
                 {selectedExercise?.length !== 0
                   ? selectedExercise?.exercises?.map((list, i) => (
-                      <TouchableOpacity
-                        // disabled={timmer}
-                        onPress={() => selectExercise(list, i)}
-                        style={[
-                          row,
-                          center,
-                          smallHPadding,
-                          {
-                            minHeight: active === i ? 80 : 60,
-                            borderRadius: active === i ? 8 : 10,
-                            marginHorizontal: active === i ? 0 : 2,
-                            backgroundColor: active === i ? "white" : "#F2F2F2"
-                          }
-                        ]}
-                      >
-                        {list?.done ? (
-                          <View style={styles.doneWrapper}>
-                            <Image
-                              source={Images.iconDoneProgram}
-                              style={styles.imageWrapper}
-                            />
-                          </View>
-                        ) : null}
-                        <View
-                          style={{
-                            justifyContent: "center",
-                            alignItems: "center",
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            width: 100
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "black",
-                              fontSize: 15,
-                              textAlign: "center"
-                            }}
-                            ellipsizeMode="tail"
-                            numberOfLines={3}
-                          >
-                            {`${i + 1}. ${list?.name}`}
-                          </Text>
+                    <TouchableOpacity
+                      // disabled={timmer}
+                      onPress={() => selectExercise(list, i)}
+                      style={[
+                        row,
+                        center,
+                        smallHPadding,
+                        {
+                          minHeight: active === i ? 80 : 60,
+                          borderRadius: active === i ? 8 : 10,
+                          marginHorizontal: active === i ? 0 : 2,
+                          backgroundColor: active === i ? "white" : "#F2F2F2"
+                        }
+                      ]}
+                    >
+                      {list?.done ? (
+                        <View style={styles.doneWrapper}>
+                          <Image
+                            source={Images.iconDoneProgram}
+                            style={styles.imageWrapper}
+                          />
                         </View>
-                      </TouchableOpacity>
-                    ))
+                      ) : null}
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          width: 100
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "black",
+                            fontSize: 15,
+                            textAlign: "center"
+                          }}
+                          ellipsizeMode="tail"
+                          numberOfLines={3}
+                        >
+                          {`${i + 1}. ${list?.name}`}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
                   : null}
               </View>
             </ScrollView>
@@ -732,7 +732,7 @@ const ExerciseScreen = props => {
                               "#d3d3d3"
                             }
                             repsWeightState={repsWeightState}
-                            // disabled={timmer}
+                          // disabled={timmer}
                           />
                         ))}
                       </ScrollView>
@@ -743,7 +743,7 @@ const ExerciseScreen = props => {
                 <View style={[fill, secondaryBg]}>
                   <ScrollView contentContainerStyle={[fillGrow]}>
                     {repsWeightState?.set_type?.toLowerCase() ===
-                    "cr" ? null : (
+                      "cr" ? null : (
                       <View style={[row, tinyHPadding]}>
                         <FatExerciseButton
                           reps
@@ -753,13 +753,13 @@ const ExerciseScreen = props => {
                             refReps.current.open()
                             setShowModalRepsTwo(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "ds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "ds"
                             )
                             setShowModalRepsThree(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "tds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "tds"
                             )
                           }}
                           loadingReps={props.loader}
@@ -775,13 +775,13 @@ const ExerciseScreen = props => {
                             refWeight.current.open()
                             setShowModalWeightTwo(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "ds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "ds"
                             )
                             setShowModalWeightThree(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "tds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "tds"
                             )
                           }}
                           loadingWeight={props.loader}
@@ -796,21 +796,21 @@ const ExerciseScreen = props => {
                         buttonText="Exercise Description"
                         buttonIcon={Images.detailIcon}
                         onPress={() => refDescription.current.open()}
-                        // disabled={timmer}
+                      // disabled={timmer}
                       />
                       <FatExerciseIconButton
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        disabled={ item && item.done}
+                        disabled={item && item.done}
                       />
                       <FatGradientIconButton
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === "cr"
                             ? "Complete"
                             : item?.sets && item?.sets?.[activeSet]?.done
-                            ? "Done"
-                            : "Done, Start Rest"
+                              ? "Done"
+                              : "Done, Start Rest"
                         }
                         buttonIcon={Images.iconDoneStartRest}
                         colorsGradient={["#3180BD", "#6EC2FA"]}
@@ -836,13 +836,13 @@ const ExerciseScreen = props => {
                       onPress={() => {
                         isCustom
                           ? props.customSessionDone(
-                              params?.item?.id,
-                              screenNavigation
-                            )
+                            params?.item?.id,
+                            screenNavigation
+                          )
                           : props.sessionDone(
-                              params?.item?.id,
-                              screenNavigation
-                            )
+                            params?.item?.id,
+                            screenNavigation
+                          )
                         setStartTimer(false)
                         setTimmer(false)
                       }}
@@ -873,7 +873,7 @@ const ExerciseScreen = props => {
         >
           <View style={[regularHMargin]}>
             {selectedExercise?.length !== 0 &&
-            selectedExercise?.exercises?.[active]?.description ? (
+              selectedExercise?.exercises?.[active]?.description ? (
               selectedExercise?.exercises?.[active]?.description
                 ?.split("/n")
                 .map(item => <Text text={item} style={{ color: "#626262" }} />)
@@ -1115,12 +1115,11 @@ const ExerciseScreen = props => {
                           <Text
                             regularTitle
                             color="quinary"
-                            text={`${
-                              (index + 1 === 1 && "a") ||
+                            text={`${(index + 1 === 1 && "a") ||
                               (index + 1 === 2 && "b") ||
                               (index + 1 === 3 && "c") ||
                               (index + 1 === 4 && "d")
-                            }. ${exercise?.name}`}
+                              }. ${exercise?.name}`}
                           />
                         </View>
                         <View style={center}>
@@ -1281,7 +1280,9 @@ const mapDispatchToProps = dispatch => ({
   customSessionDone: (id, screenNavigation) =>
     dispatch(customSessionDone(id, screenNavigation)),
   allSwapExercise: id => dispatch(allSwapExercise(id)),
-  allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id))
+  allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id)),
+  setExerciseTitle: type => dispatch(setExerciseTitle(type))
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen)

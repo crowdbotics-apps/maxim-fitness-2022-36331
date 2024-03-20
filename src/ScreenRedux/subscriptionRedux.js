@@ -373,7 +373,10 @@ async function submitQuestionAPI() {
 function* paymentSubscription({ data }) {
   try {
     const response = yield call(paymentSubscriptionAPI, data)
-    if (data?.profile.is_survey) { navigate("Feeds") } else { navigate("Birthday") }
+    if (data?.profile.is_survey) { navigate("BottomBar") } else { navigate("Birthday") }
+    if (data?.profile.is_survey && response?.data?.is_premium_user) {
+      submitQuestionAPI()
+    }
     showMessage({
       message: "Bought subscription successfully",
       type: "success"
@@ -499,7 +502,7 @@ async function subscriptionCancelationApi(data) {
 function* subscriptionCancelationRequest({ data }) {
   try {
     const response = yield call(subscriptionCancelationApi, data)
-    navigate("SubscriptionScreen")
+    navigate("BottomBar")
   } catch (e) {
     const { response } = e
   } finally {
