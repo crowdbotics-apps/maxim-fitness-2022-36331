@@ -240,15 +240,23 @@ class UserSerializer(serializers.ModelSerializer):
         current_date = timezone.now().date()
         if obj.is_premium_user:
             user_subscription = CancelSubscription.objects.filter(user=obj).last()
-            if user_subscription and user_subscription.is_subscription_canceled and user_subscription.is_current:
-                if user_subscription.subscription_end_date >= current_date:
-                    return UserSubscriptionSerializer(user_subscription).data
-                else:
+            if user_subscription:
+                if user_subscription.is_subscription_canceled:
+                    if user_subscription.subscription_end_date >= current_date:
+                        return UserSubscriptionSerializer(user_subscription).data
+                    else:
+                        user_subscription.subscription_end_date = None
+                        user_subscription.is_subscription_days_remaining = False
+                        user_subscription.save()
+                        obj.is_premium_user = False
+                        obj.save()
+                elif user_subscription.subscription_end_date < current_date:
                     user_subscription.subscription_end_date = None
                     user_subscription.is_subscription_days_remaining = False
                     user_subscription.save()
                     obj.is_premium_user = False
                     obj.save()
+
         return None
 
 
