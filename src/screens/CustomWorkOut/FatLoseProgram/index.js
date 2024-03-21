@@ -23,6 +23,8 @@ import { Text, BottomSheet, SubscriptionCard } from "../../../components"
 import { Layout, Global, Gutters, Images, Colors } from "../../../theme"
 import { letterCapitalize } from "../../../utils/functions"
 import { exerciseArray } from "../../../utils/utils"
+import { Dimensions } from "react-native"
+
 //redux imports
 import {
   addCustomExercise,
@@ -276,17 +278,25 @@ const FatLoseProgram = props => {
   }
 
 
-
-
+  const screenWidth = Dimensions.get('window').width;
+  
+  const [expanded, setExpanded] = useState(false);
+  const expandedHeight = 'auto'; // You can set the height to auto or a specific value when expanded
   const renderCard = item => {
-
+  
+    const toggleExpanded = () => {
+      setExpanded(!expanded);
+    };
+  
     const hasImages =
       item?.workouts &&
-      item.workouts.some(workout => workout?.exercises?.length > 0)
-
+      item.workouts.some(workout => workout?.exercises?.length > 0);
+  
     return (
       <View style={{ margin: 5, flex: 1 }}>
-        <View style={[styles.cardView, { width: "100%" }]}>
+      <View style={[{ width: screenWidth - 39, height: expanded ? expandedHeight : 244 },]}>
+        
+        <View style={[styles.cardView, ]}>
           <View style={[row, justifyContentBetween]}>
             <Text
               text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
@@ -295,112 +305,119 @@ const FatLoseProgram = props => {
             />
             <TouchableOpacity
               onPress={() => {
-                refDescription.current.open()
-                setCustomWorkoutData(item)
-                setCustomWorkout(true)
+                refDescription.current.open();
+                setCustomWorkoutData(item);
+                setCustomWorkout(true);
               }}
             >
               <Image source={etc} style={styles.imgStyle} />
             </TouchableOpacity>
           </View>
           <View style={[row]}>
-            <ScrollView
-              horizontal
-              nestedScrollEnabled
-              contentContainerStyle={{ height: 100, width: 100 }}
-            >
+            <Text
+              text={`Workout Name: ${item?.name}`}
+              style={{
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 20,
+                fontWeight: 'bold',
+                color: '#626262',
+              }}
+            />
+            {item?.workouts?.length>1&&
+            <TouchableOpacity onPress={toggleExpanded}>
+          <Text style={{ color: 'blue', textAlign: 'center' }}>
+            {expanded ? 'Show Less' : 'Show More'}
+          </Text>
+        </TouchableOpacity>}
+          </View>
+          <View style={{ flexDirection: 'column' }}>
+            <ScrollView style={{ height: 'auto' }}>
               {hasImages ? (
-                item?.workouts.map((workout, index) => (
-                  <View key={index} style={{ flexDirection: "column" }}>
-                    {workout?.exercises?.map((data, i) => (
-                      <>
+                item?.workouts.map(workout =>
+                  workout?.exercises?.map((data, index) => {
+                    return (
+                      <View style={[row]}>
                         <Image
-                          key={i}
+                          key={index}
                           source={{
-                            uri: data?.exercise_type?.image
+                            uri: data?.exercise_type?.image,
                           }}
                           style={{
                             width: 50,
                             height: 50,
-                            marginTop: 5
+                            marginLeft: 5,
+                            marginTop: index > 1 ? 5 : 0,
                           }}
                         />
-                      </>
-                    ))}
-                  </View>
-                ))
+                        <View style={{ marginHorizontal: 10 }}>
+                          <View>
+                            <Text
+                              text={`${getTotalExerciseCount(
+                                item.workouts,
+                              )} exercises`}
+                              style={{
+                                fontSize: 12,
+                                lineHeight: 12,
+                                fontWeight: '400',
+                                marginTop: 10,
+                                color: '#626262',
+                              }}
+                            />
+                          </View>
+  
+                          <View
+                            style={[
+                              row,
+                              fill,
+                              alignItemsCenter,
+                              {
+                                marginVertical: 20,
+                                justifyContent: 'space-between',
+                              },
+                            ]}
+                          >
+                            <Text
+                              text={`${getTotalTimeInMinutes(
+                                item?.workouts,
+                              )} minutes`}
+                              style={{
+                                fontSize: 12,
+                                lineHeight: 12,
+                                fontWeight: '400',
+                                color: '#626262',
+                              }}
+                            />
+                            <Text
+                              text={`${data?.exercise_type?.name}`}
+                              style={{
+                                fontSize: 15,
+                                lineHeight: 18,
+                                fontWeight: 'bold',
+                                marginLeft: 30,
+                                color: '#626262',
+                              }}
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }),
+                )
               ) : (
                 <Text
                   style={{
-                    color: "#626262",
+                    color: '#626262',
                     width: 50,
                     height: 50,
                     marginLeft: 5,
-                    marginTop: 5
+                    marginTop: 5,
                   }}
                 >
                   No Image
                 </Text>
               )}
             </ScrollView>
-
-            <View style={{ flex: 1, width: "65%", marginHorizontal: 10 }}>
-              <View>
-                <Text
-                  text={item?.name}
-                  style={{
-                    flex: 1,
-                    fontSize: 15,
-                    lineHeight: 20,
-                    fontWeight: "bold",
-                    color: "#626262"
-                  }}
-                />
-                <Text
-                  text={`${getTotalExerciseCount(item.workouts)} exercises`}
-                  style={{
-                    fontSize: 12,
-                    lineHeight: 12,
-                    fontWeight: "400",
-                    marginTop: 10,
-                    color: "#626262"
-                  }}
-                />
-              </View>
-
-              <View
-                style={[
-                  row,
-                  fill,
-                  alignItemsCenter,
-                  {
-                    marginVertical: 20,
-                    justifyContent: "space-between"
-                  }
-                ]}
-              >
-                <Text
-                  text={`${getTotalTimeInMinutes(item?.workouts)} minutes`}
-                  style={{
-                    fontSize: 12,
-                    lineHeight: 12,
-                    fontWeight: "400",
-                    color: "#626262"
-                    // opacity: 0.7
-                  }}
-                />
-                <Text
-                  text="Steady State"
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 18,
-                    fontWeight: "bold",
-                    marginLeft: 30,
-                    color: "#626262"
-                  }}
-                />
-              </View>
-            </View>
           </View>
           <View style={[row]}></View>
           <View style={[fill, center, Gutters.regularVMargin]}>
@@ -408,12 +425,12 @@ const FatLoseProgram = props => {
               <LinearGradient
                 start={start}
                 end={end}
-                colors={["#00e200", "#00e268"]}
+                colors={['#00e200', '#00e268']}
                 style={[
                   fill,
                   Gutters.small2xHPadding,
                   Gutters.regularVPadding,
-                  styles.gradientWrapper
+                  styles.gradientWrapper,
                 ]}
               >
                 <Text
@@ -421,8 +438,8 @@ const FatLoseProgram = props => {
                   style={{
                     fontSize: 16,
                     lineHeight: 18,
-                    fontWeight: "bold",
-                    color: "#545454"
+                    fontWeight: 'bold',
+                    color: '#545454',
                   }}
                 />
               </LinearGradient>
@@ -430,8 +447,10 @@ const FatLoseProgram = props => {
           </View>
         </View>
       </View>
-    )
-  }
+      </View>
+    );
+  };
+  
   const showPromoCard =
     (todaySessions?.name !== "Rest" || todaySessions?.length >= 1) &&
     profile.is_premium_user
@@ -730,7 +749,7 @@ const FatLoseProgram = props => {
                       >
                         <View style={{ flexDirection: "column" }}>
                           {hasCSVImages ? (
-                            todaySessions?.workouts.slice(0, 1).map(workout =>
+                            todaySessions?.workouts.map(workout =>
                               workout?.exercises?.map((data, i) => (
                                 <Image
                                   key={i}
@@ -876,7 +895,7 @@ const FatLoseProgram = props => {
                   />
                   <FlatList
                     keyExtractor={(item, index) => index.toString()}
-                    data={getCustomExerciseState[4] || []}
+                    data={getCustomExerciseState || []}
                     renderItem={data => renderCard(data.item)}
                     horizontal={true}
                     contentContainerStyle={{ paddingRight: 10 }}

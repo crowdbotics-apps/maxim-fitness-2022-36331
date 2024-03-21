@@ -40,7 +40,9 @@ import {
   allSwapExercise,
   allSwapCustomExercise,
   customSessionDone,
-  setExerciseTitle
+  setExerciseTitle,
+  getCustomWorkoutDataRequest,
+  getCSVWorkoutDataRequest
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
 import { useIsFocused, useRoute } from "@react-navigation/native"
@@ -52,7 +54,10 @@ const ExerciseScreen = props => {
     exerciseObj,
     selectedSession,
     isCustom,
-    setExerciseTitle
+    setExerciseTitle,
+    getCSVWorkoutDataRequest,
+    getCustomWorkoutDataRequest,
+    workoutData
   } = props
   const route = useRoute()
   let refDescription = useRef("")
@@ -170,9 +175,13 @@ const ExerciseScreen = props => {
     if (isCustom) {
       const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
       await props.repsCustomWeightRequest(setId, null, null)
+    getCustomWorkoutDataRequest( route?.params?.item?.id)
+
     } else {
       const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
       await props.repsWeightRequest(setId, null, null)
+    getCSVWorkoutDataRequest( route?.params?.item?.id)
+
     }
   }
 
@@ -375,10 +384,10 @@ const ExerciseScreen = props => {
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
           data: selectedSession?.[mainActive]?.exercises?.[active],
-          date_time: params?.item?.date_time,
-          workout: params?.workouts?.[mainActive]?.id,
+          date_time: workoutData?.date_time,
+          workout: workoutData?.workouts?.[mainActive]?.id,
           custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
-          workout_id: params?.item?.id
+          workout_id: workoutData?.id
         }
       })
     } else {
@@ -386,10 +395,10 @@ const ExerciseScreen = props => {
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
           data: selectedSession?.[mainActive]?.exercises?.[active],
-          date_time: params?.item?.date_time,
-          workout: params?.workouts?.[mainActive]?.id,
+          date_time: workoutData?.date_time,
+          workout: workoutData?.workouts?.[mainActive]?.id,
           custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
-          workout_id: params?.item?.id
+          workout_id: workoutData?.id
         }
       })
     }
@@ -667,7 +676,7 @@ const ExerciseScreen = props => {
                       ]}
                     >
                       <Text
-                        text={route?.params?.item?.cardio_length}
+                        text={workoutData?.cardio_length}
                         largeTitle
                         bold
                         style={{ color: "#626262" }}
@@ -836,11 +845,11 @@ const ExerciseScreen = props => {
                       onPress={() => {
                         isCustom
                           ? props.customSessionDone(
-                            params?.item?.id,
+                            workoutData.id,
                             screenNavigation
                           )
                           : props.sessionDone(
-                            params?.item?.id,
+                            workoutData.id,
                             screenNavigation
                           )
                         setStartTimer(false)
@@ -1264,7 +1273,8 @@ const mapStateToProps = state => ({
   selectedSession: state.programReducer.selectedSession,
   nextWorkout: state.programReducer.nextWorkout,
   setDone: state.programReducer.setDone,
-  isCustom: state.programReducer.isCustom
+  isCustom: state.programReducer.isCustom,
+  workoutData:state.programReducer.workoutData
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1281,8 +1291,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(customSessionDone(id, screenNavigation)),
   allSwapExercise: id => dispatch(allSwapExercise(id)),
   allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id)),
-  setExerciseTitle: type => dispatch(setExerciseTitle(type))
-
+  setExerciseTitle: type => dispatch(setExerciseTitle(type)),
+  getCustomWorkoutDataRequest:id=>dispatch(getCustomWorkoutDataRequest(id)),
+  getCSVWorkoutDataRequest:id=>dispatch(getCSVWorkoutDataRequest(id)),
+  
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen)

@@ -66,6 +66,13 @@ const ALL_SWAP_CUSTOM_EXERCISE = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE"
 const ALL_SWAP_CUSTOM_EXERCISE_SUCCESS = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE_SUCCESS"
 const ALL_SWAP_CUSTOM_EXERCISE_ERROR = "ProgramScreen/ALL_SWAP_CUSTOM_EXERCISE_ERROR"
 
+const GET_WORKOUT_DETAILS_REQUEST = "ProgramScreen/GET_WORKOUT_DETAILS_REQUEST"
+const GET_CUSTOM_WORKOUT_DETAILS_SUCCESS = "ProgramScreen/GET_CUSTOM_WORKOUT_DETAILS_SUCCESS"
+
+const GET_CUSTOM_WORKOUT_DETAILS_REQUEST = "ProgramScreen/GET_CUSTOM_WORKOUT_DETAILS_REQUEST"
+
+
+
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -220,6 +227,20 @@ export const allSwapCustomExercise = exerciseId => ({
   type: ALL_SWAP_CUSTOM_EXERCISE,
   exerciseId
 })
+export const getCustomWorkoutDataRequest = data => ({
+  type: GET_CUSTOM_WORKOUT_DETAILS_REQUEST,
+  data
+})
+export const getCSVWorkoutDataRequest = data => ({
+  type: GET_WORKOUT_DETAILS_REQUEST,
+  data
+})
+
+
+export const getCustomWorkoutDataSuccess = data => ({
+  type: GET_CUSTOM_WORKOUT_DETAILS_SUCCESS,
+  data
+})
 
 export const allSwapExerciseSuccess = data => ({
   type: ALL_SWAP_EXERCISE_SUCCESS,
@@ -256,8 +277,9 @@ const initialState = {
 
   todayRequest: false,
   todaySessions: false,
-
-  allExerciseSwapped: false
+  allExerciseSwapped: false,
+  workoutLoading:false,
+  workoutData:false
 }
 
 export const programReducer = (state = initialState, action) => {
@@ -316,6 +338,26 @@ export const programReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: true
+      }
+    }
+    
+    case GET_CUSTOM_WORKOUT_DETAILS_REQUEST: {
+      return {
+        ...state,
+        workoutLoading: true
+      }
+    }
+    case GET_WORKOUT_DETAILS_REQUEST: {
+      return {
+        ...state,
+        workoutLoading: true
+      }
+    }
+    case GET_CUSTOM_WORKOUT_DETAILS_SUCCESS: {
+      return {
+        ...state,
+        workoutData: action.data,
+        loading: false
       }
     }
     case ALL_SWAP_CUSTOM_EXERCISE: {
@@ -968,6 +1010,55 @@ function* allSwapCustomExerciseData({ exerciseId }) {
 }
 // <============end===allSwapCustomExerciseData   ===== custom workouts===========>
 
+
+
+
+// <============end===allSwapCustomExerciseData   ===== custom workouts===========>
+
+// <============start===workout details   ===== custom workouts===========>
+
+function* getCustomWorkoutDetails({ data }) {
+  try {
+   
+      const customData = yield getCustomExerciseAPI(data)
+      yield put(getCustomWorkoutDataSuccess(customData.data))
+      yield put(pickSession(null, customData?.data?.workouts, null))
+  } catch (e) {
+    showMessage({ message: "Something went wrong", type: "danger" })
+    yield put(getCustomWorkoutDataSuccess(false))
+  }
+}
+
+// <============end=====workout details   ====== custom workouts===========>
+// <============start=====workout details   ====== CSV workouts===========>
+
+async function getsessionDetailsApi(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/session/${data}`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET"
+  }
+  return XHR(data ? URL_All : URL, options)
+}
+
+function* getWorkoutDetails({ data }) {
+  try {
+    if (data && data !== "all") {
+      const response = yield call(getsessionDetailsApi, data)
+      yield put(getCustomWorkoutDataSuccess(response.data))
+      yield put(pickSession(null, response?.data?.query, null))}
+  } catch (e) {
+    yield put(getCustomWorkoutDataSuccess(false))
+
+  }
+}
+// <============end=====workout details   ====== CSV workouts===========>
+
+
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
   takeLatest(REPS_WEIGHT_REQUEST, updateRepsWeight),
@@ -981,6 +1072,10 @@ export default all([
   takeLatest(SWAP_EXERCISE, swapExercisesData),
   takeLatest(SWAP_CUSTOM_EXERCISE, swapCustomExercisesData),
   takeLatest(ALL_SWAP_EXERCISE, allSwapExerciseData),
-  takeLatest(ALL_SWAP_CUSTOM_EXERCISE, allSwapCustomExerciseData)
+  takeLatest(ALL_SWAP_CUSTOM_EXERCISE, allSwapCustomExerciseData),
+  takeLatest(GET_CUSTOM_WORKOUT_DETAILS_REQUEST, getCustomWorkoutDetails),
+  takeLatest(GET_WORKOUT_DETAILS_REQUEST, getWorkoutDetails)
+
+
 
 ])
