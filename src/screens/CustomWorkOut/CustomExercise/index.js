@@ -549,8 +549,8 @@ const CustomExercise = props => {
         // adding_exercise_in_workout: true
       }
       setCustom(true)
+      navigation.pop(2)
       await postCustomExRequest(payload, true)
-      await navigation.pop(2)
 
     }
   }
@@ -636,6 +636,8 @@ const CustomExercise = props => {
 
   const goBackScreen = () => {
     navigation.goBack()
+    setExerciseTitle(title)
+
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -692,7 +694,6 @@ const CustomExercise = props => {
             value={exerciseTitle || title}
             onChangeText={val => {
               setTitle(val)
-              setExerciseTitle(val)
             }}
             placeholder="Workout Title"
             autoCapitalize="none"
@@ -1015,7 +1016,7 @@ const CustomExercise = props => {
                   opacity: title === "" || !checkSets() ? 0.5 : 1
                 }
               ]}
-              disabled={cRequesting || title === "" || exerciseTitle === '' || !checkSets()}
+              disabled={cRequesting || title === "" || !checkSets()}
               onPress={startCutomWorkout}
               loading={cRequesting}
 

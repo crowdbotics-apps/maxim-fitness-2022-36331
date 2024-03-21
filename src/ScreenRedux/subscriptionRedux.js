@@ -327,11 +327,10 @@ async function addSubscriptionCardAPI(data) {
 function* addSubscriptionCard({ data }) {
   try {
     const response = yield call(addSubscriptionCardAPI, data)
-    if (response.data) {
-
-      showMessage(message = 'Card added successfully', type = 'success')
-    }
     yield put(getCardRequest())
+    showMessage(
+      message = 'Card added successfully',
+      type = 'success')
   } catch (e) {
     showMessage({
       message: "something went wrong",
@@ -377,6 +376,7 @@ function* paymentSubscription({ data }) {
     if (data?.profile.is_survey && response?.data?.is_premium_user) {
       submitQuestionAPI()
     }
+
     showMessage({
       message: "Bought subscription successfully",
       type: "success"
@@ -440,8 +440,16 @@ function* deleteCard({ data }) {
   try {
     const response = yield call(deleteCardApi, data)
     yield put(getCardRequest())
+    showMessage({
+      message: "Card deleted successfully",
+      type: "success"
+    })
   } catch (e) {
     yield put(getCardRequestSuccess([]))
+    showMessage({
+      message: "Something went wrong",
+      type: "danger"
+    })
     const { response } = e
   } finally {
     yield put(reset())
@@ -502,8 +510,16 @@ async function subscriptionCancelationApi(data) {
 function* subscriptionCancelationRequest({ data }) {
   try {
     const response = yield call(subscriptionCancelationApi, data)
+    showMessage({
+      message: "Task done apply successfully",
+      type: "success"
+    })
     navigate("BottomBar")
   } catch (e) {
+    showMessage({
+      message: "something went wrong",
+      type: "danger"
+    })
     const { response } = e
   } finally {
     yield put(reset())

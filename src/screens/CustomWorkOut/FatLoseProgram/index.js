@@ -39,6 +39,7 @@ import {
   setPickedDate
 } from "../../../ScreenRedux/programServices"
 import { profileData } from "../../../ScreenRedux/profileRedux"
+import ReactNativeCalendarStrip from "react-native-calendar-strip"
 
 const FatLoseProgram = props => {
   const {
@@ -61,6 +62,7 @@ const FatLoseProgram = props => {
   const [customWorkoutData, setCustomWorkoutData] = useState([])
   const [openDatePicker, setOpenDatePicker] = useState(false)
   const [data, setData] = useState({})
+  const [expanded, setExpanded] = useState(false);
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
   useEffect(() => {
@@ -196,11 +198,9 @@ const FatLoseProgram = props => {
       const [itemWorkoutUndone, nextWorkout] = data.workouts.filter(
         workoutItem => !workoutItem.done
       )
-      props.pickSession(itemWorkoutUndone, data?.workouts, nextWorkout)
       refDescription.current.close()
       props.setCustom(true)
       navigation.navigate("ExerciseScreen", {
-        workouts: data?.workouts,
         item: data
       })
     } else {
@@ -209,11 +209,9 @@ const FatLoseProgram = props => {
           const [itemWorkoutUndone, nextWorkout] = item.workouts.filter(
             workoutItem => !workoutItem.done
           )
-          props.pickSession(itemWorkoutUndone, item?.workouts, nextWorkout)
           refDescription.current.close()
           props.setCustom(false)
           navigation.navigate("ExerciseScreen", {
-            workouts: item?.workouts,
             item: item
           })
         }
@@ -278,182 +276,225 @@ const FatLoseProgram = props => {
   }
 
 
+  const getTotalExerciseTimeInMinutes = exercises => {
+    let total = 0
+
+    exercises?.forEach(exercise => {
+      exercise?.sets?.forEach(set => {
+        total += (set?.timer || 0) / 60
+      })
+    })
+
+    return Math.round(total)
+  }
+
   const screenWidth = Dimensions.get('window').width;
-  
-  const [expanded, setExpanded] = useState(false);
-  const expandedHeight = 'auto'; // You can set the height to auto or a specific value when expanded
-  const renderCard = item => {
-  
-    const toggleExpanded = () => {
-      setExpanded(!expanded);
-    };
-  
-    const hasImages =
-      item?.workouts &&
-      item.workouts.some(workout => workout?.exercises?.length > 0);
-  
-    return (
-      <View style={{ margin: 5, flex: 1 }}>
-      <View style={[{ width: screenWidth - 39, height: expanded ? expandedHeight : 244 },]}>
-        
-        <View style={[styles.cardView, ]}>
-          <View style={[row, justifyContentBetween]}>
+
+
+
+  const groupExerciseTypes = (data) => {
+    const groupedExercises = {};
+    data.workouts.forEach(workout => {
+      workout.exercises.forEach(exercise => {
+        const exerciseTypeId = exercise.exercise_type.id;
+
+        if (!groupedExercises[exerciseTypeId]) {
+          // Initialize the exercise type group data if it doesn't exist
+          groupedExercises[exerciseTypeId] = {
+            exercise_type: exercise.exercise_type,
+            exercises: []
+          };
+        }
+
+        groupedExercises[exerciseTypeId].exercises.push(exercise);
+      });
+    });
+
+    const groupedExerciseArray = Object.values(groupedExercises);
+    return groupedExerciseArray;
+  };
+
+
+  const renderSortedData = (item) => {
+    const sortedData = groupExerciseTypes(item)
+    return sortedData.map((data, index) => (
+      <View style={[row,]} key={index}>
+        <View>
+          <Image
+            source={{
+              uri: data?.exercise_type?.image,
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              marginLeft: 5,
+              marginTop: index > 1 ? 5 : 0,
+            }}
+          />
+        </View>
+        <View style={{ marginHorizontal: 10 }}>
+          <View>
             <Text
-              text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
-              color="primary"
-              style={styles.dayText}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                refDescription.current.open();
-                setCustomWorkoutData(item);
-                setCustomWorkout(true);
-              }}
-            >
-              <Image source={etc} style={styles.imgStyle} />
-            </TouchableOpacity>
-          </View>
-          <View style={[row]}>
-            <Text
-              text={`Workout Name: ${item?.name}`}
+              text={`${data?.exercises?.length || 1} exercises`}
               style={{
-                flex: 1,
-                fontSize: 15,
-                lineHeight: 20,
-                fontWeight: 'bold',
+                fontSize: 12,
+                lineHeight: 12,
+                fontWeight: '400',
+                marginTop: 10,
                 color: '#626262',
               }}
             />
-            {item?.workouts?.length>1&&
-            <TouchableOpacity onPress={toggleExpanded}>
-          <Text style={{ color: 'blue', textAlign: 'center' }}>
-            {expanded ? 'Show Less' : 'Show More'}
-          </Text>
-        </TouchableOpacity>}
           </View>
-          <View style={{ flexDirection: 'column' }}>
-            <ScrollView style={{ height: 'auto' }}>
-              {hasImages ? (
-                item?.workouts.map(workout =>
-                  workout?.exercises?.map((data, index) => {
-                    return (
-                      <View style={[row]}>
-                        <Image
-                          key={index}
-                          source={{
-                            uri: data?.exercise_type?.image,
-                          }}
-                          style={{
-                            width: 50,
-                            height: 50,
-                            marginLeft: 5,
-                            marginTop: index > 1 ? 5 : 0,
-                          }}
-                        />
-                        <View style={{ marginHorizontal: 10 }}>
-                          <View>
-                            <Text
-                              text={`${getTotalExerciseCount(
-                                item.workouts,
-                              )} exercises`}
-                              style={{
-                                fontSize: 12,
-                                lineHeight: 12,
-                                fontWeight: '400',
-                                marginTop: 10,
-                                color: '#626262',
-                              }}
-                            />
-                          </View>
-  
-                          <View
-                            style={[
-                              row,
-                              fill,
-                              alignItemsCenter,
-                              {
-                                marginVertical: 20,
-                                justifyContent: 'space-between',
-                              },
-                            ]}
-                          >
-                            <Text
-                              text={`${getTotalTimeInMinutes(
-                                item?.workouts,
-                              )} minutes`}
-                              style={{
-                                fontSize: 12,
-                                lineHeight: 12,
-                                fontWeight: '400',
-                                color: '#626262',
-                              }}
-                            />
-                            <Text
-                              text={`${data?.exercise_type?.name}`}
-                              style={{
-                                fontSize: 15,
-                                lineHeight: 18,
-                                fontWeight: 'bold',
-                                marginLeft: 30,
-                                color: '#626262',
-                              }}
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  }),
-                )
-              ) : (
+
+          <View
+            style={[
+              row,
+              fill,
+              alignItemsCenter,
+              {
+                marginVertical: 20,
+                justifyContent: 'space-between',
+              },
+            ]}
+          >
+            <Text
+              text={`${getTotalExerciseTimeInMinutes(
+                data?.exercises,
+              )} minutes`}
+              style={{
+                fontSize: 12,
+                lineHeight: 12,
+                fontWeight: '400',
+                color: '#626262',
+              }}
+            />
+
+          </View>
+          <View>
+
+          </View>
+        </View>
+        <View>
+          <Text
+            text={`${data?.exercise_type?.name}`}
+            style={{
+              fontSize: 15,
+              lineHeight: 18,
+              fontWeight: 'bold',
+              marginLeft: 50,
+              marginTop: 20,
+              color: '#626262',
+            }}
+          />
+        </View>
+      </View>
+    ));
+  };
+
+
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
+  const renderCard = item => {
+
+    const hasImages =
+      item?.workouts &&
+      item.workouts.some(workout => workout?.exercises?.length > 0);
+
+    return (
+      <View style={{ margin: 5, flex: 1 }}>
+        <View style={[{ width: screenWidth - 39, },]}>
+
+          <View style={[styles.cardView,]}>
+            <View style={[{ height: expanded ? 'auto' : 240 }]}>
+              <View style={[row, justifyContentBetween]}>
                 <Text
-                  style={{
-                    color: '#626262',
-                    width: 50,
-                    height: 50,
-                    marginLeft: 5,
-                    marginTop: 5,
+                  text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day}`}
+                  color="primary"
+                  style={styles.dayText}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    refDescription.current.open();
+                    setCustomWorkoutData(item);
+                    setCustomWorkout(true);
                   }}
                 >
-                  No Image
-                </Text>
-              )}
-            </ScrollView>
-          </View>
-          <View style={[row]}></View>
-          <View style={[fill, center, Gutters.regularVMargin]}>
-            <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
-              <LinearGradient
-                start={start}
-                end={end}
-                colors={['#00e200', '#00e268']}
-                style={[
-                  fill,
-                  Gutters.small2xHPadding,
-                  Gutters.regularVPadding,
-                  styles.gradientWrapper,
-                ]}
-              >
+                  <Image source={etc} style={styles.imgStyle} />
+                </TouchableOpacity>
+              </View>
+              <View style={[row]}>
                 <Text
-                  text="Start Workout"
+                  text={`Workout Name: ${item?.name}`}
                   style={{
-                    fontSize: 16,
-                    lineHeight: 18,
+                    flex: 1,
+                    fontSize: 15,
+                    lineHeight: 20,
+                    marginBottom: 20,
                     fontWeight: 'bold',
-                    color: '#545454',
+                    color: '#626262',
                   }}
                 />
-              </LinearGradient>
-            </TouchableOpacity>
+                {groupExerciseTypes(item)?.length > 2 &&
+                  <TouchableOpacity onPress={toggleExpanded}>
+                    <Text style={{ color: 'blue', textAlign: 'center' }}>
+                      {expanded ? 'Show Less' : 'Show More'}
+                    </Text>
+                  </TouchableOpacity>}
+              </View>
+              <View style={{ flexDirection: 'column' }}>
+                {hasImages ? (
+                  renderSortedData(item)
+                ) : (
+                  <Text
+                    style={{
+                      color: '#626262',
+                      width: 50,
+                      height: 50,
+                      marginLeft: 5,
+                      marginTop: 5,
+                    }}
+                  >
+                    No Image
+                  </Text>
+                )}
+              </View>
+            </View>
+            <View style={[row]}></View>
+            <View style={[fill, center, Gutters.regularVMargin]}>
+              <TouchableOpacity onPress={() => selectExerciseObj(item, true)}>
+                <LinearGradient
+                  start={start}
+                  end={end}
+                  colors={['#00e200', '#00e268']}
+                  style={[
+                    fill,
+                    Gutters.small2xHPadding,
+                    Gutters.regularVPadding,
+                    styles.gradientWrapper,
+                  ]}
+                >
+                  <Text
+                    text="Start Workout"
+                    style={{
+                      fontSize: 16,
+                      lineHeight: 18,
+                      fontWeight: 'bold',
+                      color: '#545454',
+                    }}
+                  />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
-      </View>
     );
   };
-  
+
   const showPromoCard =
-    (todaySessions?.name !== "Rest" || todaySessions?.length >= 1) &&
-    profile.is_premium_user
+    (todaySessions?.name !== "Rest" || todaySessions?.length > 1) && profile.is_premium_user
   const hasCSVImages =
     todaySessions?.workouts &&
     todaySessions.workouts.some(workout => workout?.exercises?.length > 0)
@@ -465,229 +506,261 @@ const FatLoseProgram = props => {
             {letterCapitalize(profile?.first_name || profile?.username)}'s{" "}
             {exerciseArray[profile?.fitness_goal - 1]?.heading + " Program"}
           </Text>
-          {!todayRequest && getWeekSessions?.query?.length > 0 && (
+          {profile?.is_premium_user ? (
             <>
-              {getWeekSessions?.query?.length > 6 ? (
-                <View
-                  style={[
-                    row,
-                    alignItemsCenter,
-                    justifyContentBetween,
-                    Gutters.small2xTMargin
-                  ]}
-                >
-                  <View style={{ flexDirection: "row" }}>
-                    <TouchableOpacity
+              {/* <====================week calender==================start=> */}
+              {!todayRequest && getWeekSessions?.query?.length > 0 && (
+                <>
+                  {getWeekSessions?.query?.length > 6 ? (
+                    <View
                       style={[
                         row,
-                        {
-                          marginRight: 10,
-                          opacity:
-                            getWeekSessions?.prev_week_number === 0 ||
-                              getWeekSessions?.prev_week_number === null
-                              ? 0.5
-                              : 1
-                        }
+                        alignItemsCenter,
+                        justifyContentBetween,
+                        Gutters.small2xTMargin
                       ]}
-                      onPress={previousExercise}
-                      disabled={
-                        getWeekSessions?.prev_week_number === 0 ||
-                        getWeekSessions?.prev_week_number === null
-                      }
                     >
-                      <Icon
-                        type="FontAwesome5"
-                        name={"chevron-left"}
-                        style={styles.IconStyle}
-                      />
-                      <Text
-                        color="primary"
-                        text={`Week ${getWeekSessions?.prev_week_number === null
-                          ? 1
-                          : getWeekSessions?.prev_week_number
-                          }`}
-                        style={[tinyLMargin, styles.smallText]}
-                      />
-                    </TouchableOpacity>
-                    {getWeekSessions?.next_week_number === 0 ||
-                      getWeekSessions?.next_week_number === null ? (
-                      <View
-                        style={[
-                          row,
-                          {
-                            opacity:
-                              getWeekSessions?.next_week_number === 0 ||
-                                getWeekSessions?.next_week_number === null
-                                ? 0.5
-                                : 1
+                      <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity
+                          style={[
+                            row,
+                            {
+                              marginRight: 10,
+                              opacity:
+                                getWeekSessions?.prev_week_number === 0 ||
+                                  getWeekSessions?.prev_week_number === null
+                                  ? 0.5
+                                  : 1
+                            }
+                          ]}
+                          onPress={previousExercise}
+                          disabled={
+                            getWeekSessions?.prev_week_number === 0 ||
+                            getWeekSessions?.prev_week_number === null
                           }
-                        ]}
-                        onPress={nextExercise}
-                        disabled={
-                          getWeekSessions?.next_week_number === 0 ||
-                          getWeekSessions?.next_week_number === null
-                        }
-                      >
-                        <Icon
-                          type="FontAwesome5"
-                          name={"chevron-right"}
-                          style={{
-                            color: Colors.primary,
-                            fontSize: 14,
-                            marginLeft: -5,
-                            marginTop: 2
-                          }}
-                        />
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        style={[
-                          row,
-                          {
-                            opacity:
-                              getWeekSessions?.next_week_number === 0 ||
-                                getWeekSessions?.next_week_number === null
-                                ? 0.5
-                                : 1
-                          }
-                        ]}
-                        onPress={nextExercise}
-                        disabled={
-                          getWeekSessions?.next_week_number === 0 ||
-                          getWeekSessions?.next_week_number === null
-                        }
-                      >
-                        <Text
-                          color="primary"
-                          text={`Week ${getWeekSessions?.date_in_week_number === 4
-                            ? 4
-                            : getWeekSessions?.date_in_week_number
-                              ? getWeekSessions?.date_in_week_number + 1
-                              : 4
-                            }`}
-                          style={[tinyLMargin, styles.smallText]}
-                        />
-                        <Icon
-                          type="FontAwesome5"
-                          name={"chevron-right"}
-                          style={styles.IconStyle}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  <TouchableOpacity style={row} onPress={openModal}>
-                    <Text
-                      text={"Calendar"}
-                      style={[tinyLMargin, styles.CalenderText]}
-                    />
-                    <Icon
-                      type="FontAwesome5"
-                      name="chevron-right"
-                      style={[styles.IconStyle, { color: "gray" }]}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ) : null}
-              <View style={Layout.alignItemsCenter}>
-                <ScrollView
-                  horizontal
-                  contentContainerStyle={[
-                    Layout.fillGrow,
-                    Layout.justifyContentBetween
-                  ]}
-                >
-                  {getWeekSessions?.query?.map((d, i) => {
-                    const day = new Date(d.date_time).getDate()
-                    const weekDayName = moment(d.date_time).format("dd")
-                    const selectDate = moment(d.date_time).format("YYYY-MM-DD")
-
-                    return (
-                      <TouchableOpacity
-                        key={i}
-                        onPress={() => selectDay(d, i)}
-                        style={{
-                          marginHorizontal: 8,
-                          marginVertical: 10,
-                          alignItems: "center",
-                          marginTop:
-                            getWeekSessions?.query?.length < 6 ? 20 : 10
-                        }}
-                      >
-                        <Text
-                          text={
-                            (weekDayName === "Tu" && "T") ||
-                            (weekDayName === "We" && "W") ||
-                            (weekDayName === "Th" && "T") ||
-                            (weekDayName === "Fr" && "F") ||
-                            (weekDayName === "Sa" && "S") ||
-                            (weekDayName === "Su" && "S") ||
-                            (weekDayName === "Mo" && "M")
-                          }
-                          style={{
-                            fontSize: 15,
-                            lineHeight: 18,
-                            fontWeight: "bold",
-                            opacity: 0.7,
-                            color: "black"
-                          }}
-                        />
-                        <View
-                          style={{
-                            width: 28,
-                            height: 28,
-                            marginVertical: 5,
-                            backgroundColor:
-                              index === selectDate ? "#00a2ff" : "white",
-                            borderRadius: 100,
-                            alignItems: "center",
-                            justifyContent: "center"
-                          }}
                         >
-                          <Text
-                            text={day}
-                            style={{
-                              fontSize: 15,
-                              lineHeight: 18,
-                              fontWeight: "bold",
-                              color: index !== selectDate ? "#000" : "white"
-                            }}
+                          <Icon
+                            type="FontAwesome5"
+                            name={"chevron-left"}
+                            style={styles.IconStyle}
                           />
-                        </View>
-                        {d?.name !== "Rest" ? (
-                          <View style={row}>
-                            {d?.cardio && (
-                              <View
-                                style={{
-                                  backgroundColor: "red",
-                                  height: 6,
-                                  width: 6,
-                                  borderRadius: 10
-                                }}
-                              />
-                            )}
-                            {d?.strength && (
-                              <View
-                                style={{
-                                  backgroundColor: "blue",
-                                  left: 2,
-                                  height: 6,
-                                  width: 6,
-                                  borderRadius: 10
-                                }}
-                              />
-                            )}
+                          <Text
+                            color="primary"
+                            text={`Week ${getWeekSessions?.prev_week_number === null
+                              ? 1
+                              : getWeekSessions?.prev_week_number
+                              }`}
+                            style={[tinyLMargin, styles.smallText]}
+                          />
+                        </TouchableOpacity>
+                        {getWeekSessions?.next_week_number === 0 ||
+                          getWeekSessions?.next_week_number === null ? (
+                          <View
+                            style={[
+                              row,
+                              {
+                                opacity:
+                                  getWeekSessions?.next_week_number === 0 ||
+                                    getWeekSessions?.next_week_number === null
+                                    ? 0.5
+                                    : 1
+                              }
+                            ]}
+                            onPress={nextExercise}
+                            disabled={
+                              getWeekSessions?.next_week_number === 0 ||
+                              getWeekSessions?.next_week_number === null
+                            }
+                          >
+                            <Icon
+                              type="FontAwesome5"
+                              name={"chevron-right"}
+                              style={{
+                                color: Colors.primary,
+                                fontSize: 14,
+                                marginLeft: -5,
+                                marginTop: 2
+                              }}
+                            />
                           </View>
                         ) : (
-                          <></>
+                          <TouchableOpacity
+                            style={[
+                              row,
+                              {
+                                opacity:
+                                  getWeekSessions?.next_week_number === 0 ||
+                                    getWeekSessions?.next_week_number === null
+                                    ? 0.5
+                                    : 1
+                              }
+                            ]}
+                            onPress={nextExercise}
+                            disabled={
+                              getWeekSessions?.next_week_number === 0 ||
+                              getWeekSessions?.next_week_number === null
+                            }
+                          >
+                            <Text
+                              color="primary"
+                              text={`Week ${getWeekSessions?.date_in_week_number === 4
+                                ? 4
+                                : getWeekSessions?.date_in_week_number
+                                  ? getWeekSessions?.date_in_week_number + 1
+                                  : 4
+                                }`}
+                              style={[tinyLMargin, styles.smallText]}
+                            />
+                            <Icon
+                              type="FontAwesome5"
+                              name={"chevron-right"}
+                              style={styles.IconStyle}
+                            />
+                          </TouchableOpacity>
                         )}
+                      </View>
+
+                      <TouchableOpacity style={row} onPress={openModal}>
+                        <Text
+                          text={"Calendar"}
+                          style={[tinyLMargin, styles.CalenderText]}
+                        />
+                        <Icon
+                          type="FontAwesome5"
+                          name="chevron-right"
+                          style={[styles.IconStyle, { color: "gray" }]}
+                        />
                       </TouchableOpacity>
-                    )
-                  })}
-                </ScrollView>
-              </View>
-            </>
-          )}
+                    </View>
+                  ) : null}
+                  <View style={Layout.alignItemsCenter}>
+                    <ScrollView
+                      horizontal
+                      contentContainerStyle={[
+                        Layout.fillGrow,
+                        Layout.justifyContentBetween
+                      ]}
+                    >
+                      {getWeekSessions?.query?.map((d, i) => {
+                        const day = new Date(d.date_time).getDate()
+                        const weekDayName = moment(d.date_time).format("dd")
+                        const selectDate = moment(d.date_time).format("YYYY-MM-DD")
+
+                        return (
+                          <TouchableOpacity
+                            key={i}
+                            onPress={() => selectDay(d, i)}
+                            style={{
+                              marginHorizontal: 8,
+                              marginVertical: 10,
+                              alignItems: "center",
+                              marginTop:
+                                getWeekSessions?.query?.length < 6 ? 20 : 10
+                            }}
+                          >
+                            <Text
+                              text={
+                                (weekDayName === "Tu" && "T") ||
+                                (weekDayName === "We" && "W") ||
+                                (weekDayName === "Th" && "T") ||
+                                (weekDayName === "Fr" && "F") ||
+                                (weekDayName === "Sa" && "S") ||
+                                (weekDayName === "Su" && "S") ||
+                                (weekDayName === "Mo" && "M")
+                              }
+                              style={{
+                                fontSize: 15,
+                                lineHeight: 18,
+                                fontWeight: "bold",
+                                opacity: 0.7,
+                                color: "black"
+                              }}
+                            />
+                            <View
+                              style={{
+                                width: 28,
+                                height: 28,
+                                marginVertical: 5,
+                                backgroundColor:
+                                  index === selectDate ? "#00a2ff" : "white",
+                                borderRadius: 100,
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
+                            >
+                              <Text
+                                text={day}
+                                style={{
+                                  fontSize: 15,
+                                  lineHeight: 18,
+                                  fontWeight: "bold",
+                                  color: index !== selectDate ? "#000" : "white"
+                                }}
+                              />
+                            </View>
+                            {d?.name !== "Rest" ? (
+                              <View style={row}>
+                                {d?.cardio && (
+                                  <View
+                                    style={{
+                                      backgroundColor: "red",
+                                      height: 6,
+                                      width: 6,
+                                      borderRadius: 10
+                                    }}
+                                  />
+                                )}
+                                {d?.strength && (
+                                  <View
+                                    style={{
+                                      backgroundColor: "blue",
+                                      left: 2,
+                                      height: 6,
+                                      width: 6,
+                                      borderRadius: 10
+                                    }}
+                                  />
+                                )}
+                              </View>
+                            ) : (
+                              <></>
+                            )}
+                          </TouchableOpacity>
+                        )
+                      })}
+                    </ScrollView>
+                  </View>
+                </>
+              )}
+            </>) : (
+            <>
+              <ReactNativeCalendarStrip
+                calendarAnimation={{ type: 'sequence', duration: 30 }}
+                daySelectionAnimation={{ type: 'background', duration: 200, borderWidth: 1, backgroundColor: 'red' }}
+                style={{ height: 100, paddingTop: 20, paddingBottom: 10 }}
+                // calendarHeaderStyle={{ color: 'red' }}
+                // calendarColor={'#7743CE'}
+                // dateNumberStyle={{ color: 'red' }}
+                // dateNameStyle={{ color: 'blue' }}
+                highlightDateNumberStyle={{ color: 'blue' }}
+                highlightDateNameStyle={{ color: 'blue' }}
+                disabledDateNameStyle={{ color: 'grey' }}
+                disabledDateNumberStyle={{ color: 'grey' }}
+
+                minDate={new Date()}
+                selectDate={moment().format('YYYY-MM-DD')}
+                onDateSelected={date => {
+                  console.log(moment().toDate());
+                  const newDate = moment(date).format("YYYY-MM-DD")
+                  setIndex(newDate)
+                  props.getDaySessionRequest(newDate)
+                  props.getCustomExerciseRequest(newDate)
+                }}
+              />
+
+            </>)}
+          {/* <====================week calender==================start=> */}
+
           {!profile?.is_premium_user && (
             <>
               <SubscriptionCard
@@ -707,7 +780,7 @@ const FatLoseProgram = props => {
               <Text text={"No workout found!"} style={styles.headind2} />
             </View>
           ) : (todaySessions?.name && todaySessions?.name !== "Rest") ||
-            getCustomExerciseState?.length ? (
+            getCustomExerciseState?.length > 0 ? (
             <>
               {showPromoCard ? (
                 <View>
@@ -723,63 +796,59 @@ const FatLoseProgram = props => {
                     style={[styles.headind2]}
                   />
                   <View style={styles.cardView}>
-                    <View style={[row, justifyContentBetween]}>
-                      <Text
-                        text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
-                          }`}
-                        color="primary"
-                        style={styles.dayText}
-                      />
-                      <TouchableOpacity
-                        onPress={() => refDescription.current.open()}
-                      >
-                        <Image source={etc} style={styles.imgStyle} />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={[row]}>
-                      <View
-                        style={[
-                          row,
-                          {
-                            maxWidth: 200,
-                            marginTop: 5,
-                            flexWrap: "wrap"
-                          }
-                        ]}
-                      >
-                        <View style={{ flexDirection: "column" }}>
-                          {hasCSVImages ? (
-                            todaySessions?.workouts.map(workout =>
-                              workout?.exercises?.map((data, i) => (
-                                <Image
-                                  key={i}
-                                  source={{
-                                    uri: data?.exercise_type?.image
-                                  }}
-                                  style={{
-                                    width: 50,
-                                    height: 50,
-                                    marginLeft: 5,
-                                    marginTop: i > 1 ? 5 : 0
-                                  }}
-                                />
-                              ))
-                            )
-                          ) : (
-                            <Text
-                              style={{
-                                color: "#626262",
-                                width: 50,
-                                height: 50,
-                                marginLeft: 5,
-                                marginTop: 5
-                              }}
-                            >
-                              No Image
-                            </Text>
-                          )}
-                        </View>
+                    <View style={[{ height: expanded ? 'auto' : 40 }]}>
+                      <View style={[row, justifyContentBetween]}>
+                        <Text
+                          text={`Day ${weekDay === 0 ? 7 : weekDay ? weekDay : day
+                            }`}
+                          color="primary"
+                          style={styles.dayText}
+                        />
+                        <TouchableOpacity
+                          onPress={() => refDescription.current.open()}
+                        >
+                          <Image source={etc} style={styles.imgStyle} />
+                        </TouchableOpacity>
                       </View>
+                    </View>
+
+                    <View style={[row]}>
+                      <Text
+                        text={`Workout Name: ${todaySessions?.name}`}
+                        style={{
+                          flex: 1,
+                          fontSize: 15,
+                          lineHeight: 20,
+                          marginBottom: 20,
+                          fontWeight: 'bold',
+                          color: '#626262',
+                        }}
+                      />
+                      {groupExerciseTypes(todaySessions)?.length > 3 &&
+                        <TouchableOpacity onPress={toggleExpanded}>
+                          <Text style={{ color: 'blue', textAlign: 'center' }}>
+                            {expanded ? 'Show Less' : 'Show More'}
+                          </Text>
+                        </TouchableOpacity>}
+                    </View>
+                    <View style={{ flexDirection: "column" }}>
+                      {hasCSVImages ? (
+                        renderSortedData(todaySessions)
+
+                      ) : (
+                        <Text
+                          style={{
+                            color: "#626262",
+                            width: 50,
+                            height: 50,
+                            marginLeft: 5,
+                            marginTop: 5
+                          }}
+                        >
+                          No Image
+                        </Text>
+                      )}
+
 
                       <View
                         style={{
@@ -789,64 +858,7 @@ const FatLoseProgram = props => {
                           fllex: 1
                         }}
                       >
-                        <View>
-                          <Text
-                            text={todaySessions?.name}
-                            style={{
-                              fontSize: 15,
-                              lineHeight: 20,
-                              fontWeight: "bold",
-                              color: "#626262"
-                            }}
-                          />
-                          <Text
-                            text={`${getTotalExerciseCount(
-                              todaySessions?.workouts
-                            )} exercises`}
-                            style={{
-                              fontSize: 12,
-                              lineHeight: 12,
-                              fontWeight: "400",
-                              marginTop: 10,
-                              color: "#626262"
-                            }}
-                          />
-                        </View>
 
-                        <View
-                          style={[
-                            row,
-                            fill,
-                            alignItemsCenter,
-                            {
-                              marginVertical: 20,
-                              justifyContent: "space-between"
-                            }
-                          ]}
-                        >
-                          <Text
-                            text={`${getTotalTimeInMinutes(
-                              todaySessions?.workouts
-                            )} minutes`}
-                            style={{
-                              fontSize: 12,
-                              lineHeight: 12,
-                              fontWeight: "400",
-                              color: "#626262"
-                              // opacity: 0.7
-                            }}
-                          />
-                          <Text
-                            text="Steady State"
-                            style={{
-                              fontSize: 15,
-                              lineHeight: 18,
-                              fontWeight: "bold",
-                              marginLeft: 30,
-                              color: "#626262"
-                            }}
-                          />
-                        </View>
                       </View>
                     </View>
                     <View style={[row]}></View>
@@ -933,7 +945,13 @@ const FatLoseProgram = props => {
                   />
                 </View>
                 <View style={[fill, center, Gutters.regularVMargin]}>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      props.addCustomExercise([])
+                      props.setPickedDate(index)
+                      navigation.navigate("AddExercise")
+                    }}
+                  >
                     <LinearGradient
                       start={start}
                       end={end}
@@ -1150,21 +1168,17 @@ const FatLoseProgram = props => {
           refDescription.current.close()
           setOpenDatePicker(false)
         }}
-        minimumDate={
-          getAllSessions && new Date(getAllSessions?.query?.[0]?.date_time)
-          // : new Date()
-        }
+        minimumDate={new Date()}
         maximumDate={
-          getAllSessions &&
-          new Date(
-            getAllSessions?.query?.[
-              getAllSessions?.query?.length - 1
-            ]?.date_time
-          )
-          // : new Date()
+          customWorkout ? null :
+            moment(
+              getAllSessions?.query?.[
+                getAllSessions?.query?.length - 1
+              ]?.date_time
+            )
         }
       />
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }
 const styles = StyleSheet.create({
@@ -1257,7 +1271,7 @@ const mapStateToProps = state => ({
   profile: state.login.userDetail,
   getAllSessionsRequesting: state.addExerciseReducer.getAllSessionsRequesting,
   cRequesting: state.addExerciseReducer.cRequesting,
-  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState
+  getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1267,8 +1281,6 @@ const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
   setCustom: type => dispatch(setCustom(type)),
   setPickedDate: date => dispatch(setPickedDate(date)),
-  pickSession: (exerciseObj, selectedSession, nextWorkout) =>
-    dispatch(pickSession(exerciseObj, selectedSession, nextWorkout)),
   addCustomExercise: () => dispatch(addCustomExercise([])),
   customWorkoutRescheduleRequest: (id, date) =>
     dispatch(customWorkoutRescheduleRequest(id, date)),

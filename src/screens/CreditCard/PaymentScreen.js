@@ -24,11 +24,13 @@ const PaymentScreen = props => {
     const saveData = async () => {
         if (cardInfo) {
             try {
+                console.log(cardInfo, 'cardInfo response');
                 const res = await createToken({ ...cardInfo, type: 'Card' });
                 if (res?.token) {
-                    await postSubscriptionRequest({ card_token: res?.token?.id });
+                    await postSubscriptionRequest({ card_token: res?.token?.id, last4: res?.token?.card?.last4 });
                     navigation.navigate('CreditCard');
                 }
+                console.log(res, 'response');
             } catch (error) {
                 showMessage(message = 'something went wrong during card creation', type = 'danger')
             }
@@ -50,7 +52,7 @@ const PaymentScreen = props => {
                 <CardField
                     postalCodeEnabled={false}
                     placeholders={{
-                        number: '4242 4242 4242 4242',
+                        number: 'XXXX  XXXX XXXXX',
                     }}
                     cardStyle={{
                         backgroundColor: '#FFFFFF',

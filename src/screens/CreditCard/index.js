@@ -72,7 +72,7 @@ const CreditCard = props => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.addCard} onPress={() => navigation.navigate('PaymentScreen')}>
-        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Add Card</Text>
+        <Text style={{ fontSize: 17, fontWeight: "bold", color: 'black' }}>Add Card</Text>
 
       </TouchableOpacity>
       <Loader isLoading={!cardRequesting} />
@@ -142,7 +142,7 @@ const CreditCard = props => {
                         justifyContent: "center"
                       }}
                     >
-                      <Text style={{ fontSize: 17, fontWeight: "bold" }}>
+                      <Text style={{ fontSize: 17, fontWeight: "bold", color: 'black' }}>
                         Pay
                       </Text>
                     </TouchableOpacity>

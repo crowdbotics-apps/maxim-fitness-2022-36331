@@ -51,13 +51,12 @@ const ExerciseScreen = props => {
   const {
     navigation,
     repsWeightState,
-    exerciseObj,
-    selectedSession,
     isCustom,
     setExerciseTitle,
     getCSVWorkoutDataRequest,
     getCustomWorkoutDataRequest,
-    workoutData
+    workoutData,
+    setDoneSuccess
   } = props
   const route = useRoute()
   let refDescription = useRef("")
@@ -117,7 +116,7 @@ const ExerciseScreen = props => {
         setModal("ct")
       }
       if (repsWeightState?.set_type?.toLowerCase() === "r") {
-        setModal(null)
+        setModal('r')
       }
     }, 500)
   }, [])
@@ -166,23 +165,27 @@ const ExerciseScreen = props => {
     setParms(route?.params)
     getData()
     setExerciseTitle('')
+    setSelectedExercise(workoutData?.workouts?.[0])
   }, [onFocus, route])
+
+  useEffect(() => {
+    setSelectedExercise(workoutData?.workouts?.[mainActive])
+
+  }, [workoutData])
+
   const getData = async () => {
-    if (route) {
-      selectedSession && setSelectedExercise(selectedSession?.[0])
-    }
 
     if (isCustom) {
-      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      await getCustomWorkoutDataRequest(route?.params?.item?.id)
+      const setId = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.sets?.[activeSet]?.id
       await props.repsCustomWeightRequest(setId, null, null)
-    getCustomWorkoutDataRequest( route?.params?.item?.id)
-
     } else {
-      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      await getCSVWorkoutDataRequest(route?.params?.item?.id)
+      const setId = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.sets?.[activeSet]?.id
       await props.repsWeightRequest(setId, null, null)
-    getCSVWorkoutDataRequest( route?.params?.item?.id)
 
     }
+
   }
 
   const {
@@ -304,7 +307,8 @@ const ExerciseScreen = props => {
     setWeightColor(false)
   }
 
-  const submitData = data => {
+  const submitData = async (data) => {
+    console.log(data?.sets[activeSet], 'data');
     const findSetId = data?.sets[activeSet]
     const allDone = data?.sets?.every(set => set.done)
     const arrayHowManyDone = data?.sets?.filter(
@@ -318,14 +322,15 @@ const ExerciseScreen = props => {
         const data = {
           activeSet,
           active,
-          selectedSession: selectedSession,
+          workoutData: workoutData,
           setTimmer
         }
         if (isCustom) {
-          props.customSetDoneRequest(findSetId.id, data)
+          await props.customSetDoneRequest(findSetId.id, data)
         } else {
-          props.setDoneRequest(findSetId.id, data)
+          await props.setDoneRequest(findSetId.id, data)
         }
+        await getData()
       }
     }
 
@@ -342,9 +347,9 @@ const ExerciseScreen = props => {
     setActive(i)
     setActiveSet(0)
     if (isCustom) {
-      props.repsCustomWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+      props.repsCustomWeightRequest(item?.sets?.[activeSet]?.id, null, null, callBack)
     } else {
-      props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+      props.repsWeightRequest(item?.sets?.[activeSet]?.id, null, null, callBack)
     }
   }
 
@@ -377,27 +382,29 @@ const ExerciseScreen = props => {
   }
 
   const swipeFunc = () => {
+    console.log(workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id, 'workoutData');
+    const exerciseTypeId =
+      workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id
     if (isCustom) {
-      const exerciseTypeId =
-        selectedSession?.[mainActive]?.exercises?.[active]?.exercise_type?.id
       props.allSwapCustomExercise(exerciseTypeId)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
-          data: selectedSession?.[mainActive]?.exercises?.[active],
+          data: workoutData?.[mainActive]?.exercises?.[active],
           date_time: workoutData?.date_time,
           workout: workoutData?.workouts?.[mainActive]?.id,
-          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
-          workout_id: workoutData?.id
+          custom_workouts_exercise_id: workoutData?.[mainActive]?.id,
+          workout_id: 87
         }
       })
     } else {
-      props.allSwapExercise(selectedSession?.[active]?.id)
+      console.log(workoutData?.workouts?.[active]?.id);
+      props.allSwapExercise(workoutData?.workouts?.[active]?.id)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
-          data: selectedSession?.[mainActive]?.exercises?.[active],
+          data: workoutData?.[mainActive]?.exercises?.[active],
           date_time: workoutData?.date_time,
           workout: workoutData?.workouts?.[mainActive]?.id,
-          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
+          custom_workouts_exercise_id: workoutData?.[mainActive]?.id,
           workout_id: workoutData?.id
         }
       })
@@ -413,7 +420,7 @@ const ExerciseScreen = props => {
   }
 
   const checkDoneExcercise = () => {
-    const allDone = selectedSession?.every(item => item.done === true)
+    const allDone = workoutData?.every(item => item.done === true)
     return allDone
   }
   const sortDataByDoneStatus = data => {
@@ -472,8 +479,8 @@ const ExerciseScreen = props => {
           automaticallyAdjustContentInsets={false}
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
-            {selectedSession?.length ? (
-              selectedSession?.map((item, i) => {
+            {workoutData?.workouts?.length ? (
+              workoutData.workouts?.map((item, i) => {
                 return (
                   <View>
                     <TouchableOpacity
@@ -539,7 +546,7 @@ const ExerciseScreen = props => {
                           ellipsizeMode="tail"
                           numberOfLines={3}
                         >
-                          {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name
+                          {`${i + 1}. ${item?.name || item?.exercises?.[active]?.name
                             }`}
                         </Text>
                       </View>
@@ -1269,12 +1276,13 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   repsWeightState: state.programReducer.repsWeight,
   loader: state.programReducer.loader,
-  exerciseObj: state.programReducer.exerciseObj,
-  selectedSession: state.programReducer.selectedSession,
-  nextWorkout: state.programReducer.nextWorkout,
+  // exerciseObj: state.programReducer.exerciseObj,
+  // selectedSession: state.programReducer.selectedSession,
+  // nextWorkout: state.programReducer.nextWorkout,
   setDone: state.programReducer.setDone,
   isCustom: state.programReducer.isCustom,
-  workoutData:state.programReducer.workoutData
+  workoutData: state.programReducer.workoutData,
+  setDoneSuccess: state.programReducer.setDoneSuccess,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1292,9 +1300,9 @@ const mapDispatchToProps = dispatch => ({
   allSwapExercise: id => dispatch(allSwapExercise(id)),
   allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id)),
   setExerciseTitle: type => dispatch(setExerciseTitle(type)),
-  getCustomWorkoutDataRequest:id=>dispatch(getCustomWorkoutDataRequest(id)),
-  getCSVWorkoutDataRequest:id=>dispatch(getCSVWorkoutDataRequest(id)),
-  
+  getCustomWorkoutDataRequest: id => dispatch(getCustomWorkoutDataRequest(id)),
+  getCSVWorkoutDataRequest: id => dispatch(getCSVWorkoutDataRequest(id)),
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen)

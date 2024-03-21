@@ -278,8 +278,9 @@ const initialState = {
   todayRequest: false,
   todaySessions: false,
   allExerciseSwapped: false,
-  workoutLoading:false,
-  workoutData:false
+  workoutLoading: false,
+  workoutData: false,
+  setDoneSuccess: false
 }
 
 export const programReducer = (state = initialState, action) => {
@@ -340,7 +341,7 @@ export const programReducer = (state = initialState, action) => {
         loading: true
       }
     }
-    
+
     case GET_CUSTOM_WORKOUT_DETAILS_REQUEST: {
       return {
         ...state,
@@ -450,7 +451,7 @@ export const programReducer = (state = initialState, action) => {
     case SETS_DONE_SUCCESS:
       return {
         ...state,
-        // setDone: action.data,
+        setDoneSuccess: action.data,
         setLoading: false
       }
 
@@ -1019,10 +1020,10 @@ function* allSwapCustomExerciseData({ exerciseId }) {
 
 function* getCustomWorkoutDetails({ data }) {
   try {
-   
-      const customData = yield getCustomExerciseAPI(data)
-      yield put(getCustomWorkoutDataSuccess(customData.data))
-      yield put(pickSession(null, customData?.data?.workouts, null))
+
+    const customData = yield getCustomExerciseAPI(data)
+    yield put(getCustomWorkoutDataSuccess(customData.data))
+    yield put(pickSession(null, customData?.data?.workouts, null))
   } catch (e) {
     showMessage({ message: "Something went wrong", type: "danger" })
     yield put(getCustomWorkoutDataSuccess(false))
@@ -1034,7 +1035,7 @@ function* getCustomWorkoutDetails({ data }) {
 
 async function getsessionDetailsApi(data) {
   const token = await AsyncStorage.getItem("authToken")
-  const URL = `${API_URL}/session/${data}`
+  const URL = `${API_URL}/session/${data}/`
   const options = {
     headers: {
       "Content-Type": "application/json",
@@ -1042,15 +1043,15 @@ async function getsessionDetailsApi(data) {
     },
     method: "GET"
   }
-  return XHR(data ? URL_All : URL, options)
+  return XHR(URL, options)
 }
 
 function* getWorkoutDetails({ data }) {
   try {
-    if (data && data !== "all") {
-      const response = yield call(getsessionDetailsApi, data)
-      yield put(getCustomWorkoutDataSuccess(response.data))
-      yield put(pickSession(null, response?.data?.query, null))}
+
+    const response = yield call(getsessionDetailsApi, data)
+    yield put(getCustomWorkoutDataSuccess(response.data))
+    // yield put(pickSession(null, response?.data, null))
   } catch (e) {
     yield put(getCustomWorkoutDataSuccess(false))
 
