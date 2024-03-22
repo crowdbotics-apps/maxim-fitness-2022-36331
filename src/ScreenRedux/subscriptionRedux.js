@@ -377,13 +377,14 @@ function* addSubscriptionCard({ data }) {
   try {
     const response = yield call(addSubscriptionCardAPI, data)
     yield put(getCardRequest())
+    postSubscriptionSuccess(response.data)
     showMessage({
       message: "Card added successfully",
       type: "success"
     })
   } catch (e) {
     showMessage({
-      message: "something went wrong",
+      message: e?.response?.data?.error || "something went wrong",
       type: "danger"
     })
     const { response } = e

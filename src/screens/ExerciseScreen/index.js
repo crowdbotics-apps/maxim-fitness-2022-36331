@@ -842,7 +842,6 @@ const ExerciseScreen = props => {
                         }}
                       />
                     </View>
-                    {console.log(item?.sets && item?.sets?.[activeSet]?.timer, 'item?.sets && item?.sets?.[activeSet]?.timer')}
                     <RestContainer
                       upNext={"next"}
                       startRest={timmer}
@@ -850,11 +849,11 @@ const ExerciseScreen = props => {
                       onPress={() => {
                         isCustom
                           ? props.customSessionDone(
-                            workoutData.workouts.id,
+                            workoutData.id,
                             screenNavigation
                           )
                           : props.sessionDone(
-                            workoutData?.workouts?.id,
+                            workoutData?.id,
                             screenNavigation
                           )
                         setStartTimer(false)
