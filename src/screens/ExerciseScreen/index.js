@@ -99,6 +99,7 @@ const ExerciseScreen = props => {
   let deviceHeight = Dimensions.get("window").height
 
   useEffect(() => {
+    setActiveSet(0)
     setTimeout(() => {
       if (repsWeightState?.set_type?.toLowerCase() === "ss") {
         setModal("ss")
@@ -122,6 +123,7 @@ const ExerciseScreen = props => {
   }, [])
 
   const checkModalType = param => {
+
     switch (param) {
       case "ss":
         return (
@@ -308,7 +310,6 @@ const ExerciseScreen = props => {
   }
 
   const submitData = async (data) => {
-    console.log(data?.sets[activeSet], 'data');
     const findSetId = data?.sets[activeSet]
     const allDone = data?.sets?.every(set => set.done)
     const arrayHowManyDone = data?.sets?.filter(
@@ -382,29 +383,28 @@ const ExerciseScreen = props => {
   }
 
   const swipeFunc = () => {
-    console.log(workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id, 'workoutData');
+    console.log(workoutData?.workouts, 'workoutData');
     const exerciseTypeId =
       workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id
     if (isCustom) {
       props.allSwapCustomExercise(exerciseTypeId)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
-          data: workoutData?.[mainActive]?.exercises?.[active],
+          data: workoutData?.workouts?.[mainActive]?.exercises?.[active],
           date_time: workoutData?.date_time,
           workout: workoutData?.workouts?.[mainActive]?.id,
-          custom_workouts_exercise_id: workoutData?.[mainActive]?.id,
-          workout_id: 87
+          custom_workouts_exercise_id: workoutData?.workouts?.[mainActive]?.id,
+          workout_id: workoutData?.id
         }
       })
     } else {
-      console.log(workoutData?.workouts?.[active]?.id);
       props.allSwapExercise(workoutData?.workouts?.[active]?.id)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
-          data: workoutData?.[mainActive]?.exercises?.[active],
+          data: workoutData?.workouts?.[mainActive]?.exercises?.[active],
           date_time: workoutData?.date_time,
           workout: workoutData?.workouts?.[mainActive]?.id,
-          custom_workouts_exercise_id: workoutData?.[mainActive]?.id,
+          custom_workouts_exercise_id: workoutData?.workouts?.[mainActive]?.id,
           workout_id: workoutData?.id
         }
       })
@@ -492,7 +492,7 @@ const ExerciseScreen = props => {
                           item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
                           item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
                         ) {
-                          selectExercise(item?.exercises?.[i], 0)
+                          selectExercise(item?.exercises?.[activeSet], 0)
                         } else {
                           selectExercise(item?.exercises?.[0], 0)
                         }
@@ -820,6 +820,7 @@ const ExerciseScreen = props => {
                         onPress={swipeFunc}
                         disabled={item && item.done}
                       />
+
                       <FatGradientIconButton
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === "cr"
@@ -836,15 +837,12 @@ const ExerciseScreen = props => {
                           (item?.sets && item?.sets?.[activeSet]?.done)
                         }
                         onPress={() => {
-                          if (item?.sets && item?.sets?.[activeSet].done) {
-                            setTimmer(true)
-                          } else {
-                            setTimmer(false)
-                          }
+                          setTimmer(true)
                           submitData(item)
                         }}
                       />
                     </View>
+                    {console.log(item?.sets && item?.sets?.[activeSet]?.timer, 'item?.sets && item?.sets?.[activeSet]?.timer')}
                     <RestContainer
                       upNext={"next"}
                       startRest={timmer}
@@ -852,11 +850,11 @@ const ExerciseScreen = props => {
                       onPress={() => {
                         isCustom
                           ? props.customSessionDone(
-                            workoutData.id,
+                            workoutData.workouts.id,
                             screenNavigation
                           )
                           : props.sessionDone(
-                            workoutData.id,
+                            workoutData?.workouts?.id,
                             screenNavigation
                           )
                         setStartTimer(false)
@@ -864,6 +862,15 @@ const ExerciseScreen = props => {
                       }}
                       resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
                       onFinish={() => {
+                        isCustom
+                          ? props.customSessionDone(
+                            workoutData.workouts.id,
+                            screenNavigation
+                          )
+                          : props.sessionDone(
+                            workoutData?.workouts?.id,
+                            screenNavigation
+                          )
                         setTimmer(false)
                         setStartTimer(false)
                       }}
@@ -877,7 +884,6 @@ const ExerciseScreen = props => {
       ) : (
         <></>
       )}
-
       {/*===============================================*/}
       {/*===============================================*/}
 

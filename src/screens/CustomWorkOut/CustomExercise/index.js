@@ -109,8 +109,6 @@ const CustomExercise = props => {
   useEffect(() => {
     if (todaySessions?.id && todaySessions?.name !== "Rest") {
       setTitle("")
-    } else {
-      setTitle(exerciseTitle)
     }
   }, [])
   const onFocus = useIsFocused()
@@ -691,7 +689,7 @@ const CustomExercise = props => {
         >
           <InputField
             inputStyle={[Fonts.titleRegular, fill]}
-            value={exerciseTitle || title}
+            value={title}
             onChangeText={val => {
               setTitle(val)
             }}

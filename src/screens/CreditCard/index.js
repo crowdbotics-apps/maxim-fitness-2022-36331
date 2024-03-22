@@ -7,7 +7,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from "react-native"
 import { CreditCardInput } from "react-native-input-credit-card"
 import {
@@ -32,7 +33,9 @@ const CreditCard = props => {
     cardRequesting,
     cardPlanData,
     profile,
-    profileData
+    profileData,
+    cardDeleteRequesting,
+    cardPayRequesting
   } = props
   const { plan_id, product, is_premium } = cardPlanData
 
@@ -63,7 +66,6 @@ const CreditCard = props => {
   }
   return (
     <>
-
       <TouchableOpacity
         style={styles.leftArrow}
         onPress={() => navigation.goBack()}
@@ -142,9 +144,12 @@ const CreditCard = props => {
                         justifyContent: "center"
                       }}
                     >
-                      <Text style={{ fontSize: 17, fontWeight: "bold", color: 'black' }}>
-                        Pay
-                      </Text>
+                      {cardPayRequesting ?
+                        <ActivityIndicator size="small" color="blue" />
+                        : (
+                          <Text style={{ fontSize: 17, fontWeight: "bold", color: 'black' }}>
+                            Pay
+                          </Text>)}
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
@@ -158,11 +163,14 @@ const CreditCard = props => {
                       }}
                       onPress={() => deleteCard(item?.id)}
                     >
-                      <Text
-                        style={{ fontSize: 17, fontWeight: "bold", color: "red" }}
-                      >
-                        Delete
-                      </Text>
+                      {cardDeleteRequesting ? (
+                        <ActivityIndicator size="small" color="blue" />
+                      ) : (
+                        <Text
+                          style={{ fontSize: 17, fontWeight: "bold", color: "red" }}
+                        >
+                          Delete
+                        </Text>)}
                     </TouchableOpacity>
                   </View>
                 ) : null}
@@ -214,6 +222,8 @@ const mapStateToProps = state => ({
   getCardData: state.subscriptionReducer.getCardData,
   cardRequesting: state.subscriptionReducer.cardRequesting,
   cardPlanData: state.subscriptionReducer.cardPlanData,
+  cardDeleteRequesting: state.subscriptionReducer.cardDeleteRequesting,
+  cardPayRequesting: state.subscriptionReducer.cardPayRequesting,
   profile: state.login.userDetail,
 })
 

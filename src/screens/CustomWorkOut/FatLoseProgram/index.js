@@ -284,7 +284,6 @@ const FatLoseProgram = props => {
         total += (set?.timer || 0) / 60
       })
     })
-
     return Math.round(total)
   }
 
@@ -317,78 +316,93 @@ const FatLoseProgram = props => {
 
   const renderSortedData = (item) => {
     const sortedData = groupExerciseTypes(item)
-    return sortedData.map((data, index) => (
-      <View style={[row,]} key={index}>
-        <View>
-          <Image
-            source={{
-              uri: data?.exercise_type?.image,
-            }}
-            style={{
-              width: 50,
-              height: 50,
-              marginLeft: 5,
-              marginTop: index > 1 ? 5 : 0,
-            }}
-          />
-        </View>
-        <View style={{ marginHorizontal: 10 }}>
+
+    return sortedData.map((data, index) => {
+
+      return (
+        <View style={[row,]} key={index}>
+          <View>
+            {data?.exercise_type?.image?.length ?
+              <Image
+                source={{
+                  uri: data?.exercise_type?.image,
+                }}
+                style={{
+                  width: 50,
+                  height: 50,
+                  marginLeft: 5,
+                  marginTop: index > 1 ? 5 : 0,
+                }}
+              /> :
+              <Text
+                style={{
+                  color: '#626262',
+                  width: 50,
+                  height: 50,
+                  marginLeft: 5,
+                  marginTop: 5,
+                }}
+              >
+                No Image
+              </Text>}
+
+          </View>
+          <View style={{ marginHorizontal: 10 }}>
+            <View>
+              <Text
+                text={`${data?.exercises?.length || 1} exercises`}
+                style={{
+                  fontSize: 12,
+                  lineHeight: 12,
+                  fontWeight: '400',
+                  marginTop: 10,
+                  color: '#626262',
+                }}
+              />
+            </View>
+
+            <View
+              style={[
+                row,
+                fill,
+                alignItemsCenter,
+                {
+                  marginVertical: 20,
+                  justifyContent: 'space-between',
+                },
+              ]}
+            >
+              <Text
+                text={`${getTotalExerciseTimeInMinutes(data?.exercises)} minutes`}
+                style={{
+                  fontSize: 12,
+                  lineHeight: 12,
+                  fontWeight: '400',
+                  color: '#626262',
+                }}
+              />
+
+            </View>
+            <View>
+
+            </View>
+          </View>
           <View>
             <Text
-              text={`${data?.exercises?.length || 1} exercises`}
+              text={`${data?.exercise_type?.name}`}
               style={{
-                fontSize: 12,
-                lineHeight: 12,
-                fontWeight: '400',
-                marginTop: 10,
+                fontSize: 15,
+                lineHeight: 18,
+                fontWeight: 'bold',
+                marginLeft: 50,
+                marginTop: 20,
                 color: '#626262',
               }}
             />
           </View>
-
-          <View
-            style={[
-              row,
-              fill,
-              alignItemsCenter,
-              {
-                marginVertical: 20,
-                justifyContent: 'space-between',
-              },
-            ]}
-          >
-            <Text
-              text={`${getTotalExerciseTimeInMinutes(
-                data?.exercises,
-              )} minutes`}
-              style={{
-                fontSize: 12,
-                lineHeight: 12,
-                fontWeight: '400',
-                color: '#626262',
-              }}
-            />
-
-          </View>
-          <View>
-
-          </View>
         </View>
-        <View>
-          <Text
-            text={`${data?.exercise_type?.name}`}
-            style={{
-              fontSize: 15,
-              lineHeight: 18,
-              fontWeight: 'bold',
-              marginLeft: 50,
-              marginTop: 20,
-              color: '#626262',
-            }}
-          />
-        </View>
-      </View>
-    ));
+      )
+    })
   };
 
 
@@ -398,9 +412,6 @@ const FatLoseProgram = props => {
 
   const renderCard = item => {
 
-    const hasImages =
-      item?.workouts &&
-      item.workouts.some(workout => workout?.exercises?.length > 0);
 
     return (
       <View style={{ margin: 5, flex: 1 }}>
@@ -444,21 +455,11 @@ const FatLoseProgram = props => {
                   </TouchableOpacity>}
               </View>
               <View style={{ flexDirection: 'column' }}>
-                {hasImages ? (
-                  renderSortedData(item)
-                ) : (
-                  <Text
-                    style={{
-                      color: '#626262',
-                      width: 50,
-                      height: 50,
-                      marginLeft: 5,
-                      marginTop: 5,
-                    }}
-                  >
-                    No Image
-                  </Text>
-                )}
+                {/* {hasImages ? ( */}
+                {renderSortedData(item)}
+                {/* ) : ( */}
+
+                {/* )} */}
               </View>
             </View>
             <View style={[row]}></View>
@@ -495,9 +496,6 @@ const FatLoseProgram = props => {
 
   const showPromoCard =
     (todaySessions?.name !== "Rest" || todaySessions?.length > 1) && profile.is_premium_user
-  const hasCSVImages =
-    todaySessions?.workouts &&
-    todaySessions.workouts.some(workout => workout?.exercises?.length > 0)
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -736,24 +734,21 @@ const FatLoseProgram = props => {
             <>
               <ReactNativeCalendarStrip
                 calendarAnimation={{ type: 'sequence', duration: 30 }}
-                daySelectionAnimation={{ type: 'background', duration: 200, borderWidth: 1, backgroundColor: 'red' }}
-                style={{ height: 100, paddingTop: 20, paddingBottom: 10 }}
-                // calendarHeaderStyle={{ color: 'red' }}
-                // calendarColor={'#7743CE'}
-                // dateNumberStyle={{ color: 'red' }}
-                // dateNameStyle={{ color: 'blue' }}
-                highlightDateNumberStyle={{ color: 'blue' }}
-                highlightDateNameStyle={{ color: 'blue' }}
+                daySelectionAnimation={{ type: 'background', duration: 200, highlightColor: '#00a2ff' }}
+                style={{ height: 100, paddingTop: 20, paddingBottom: 10, marginHorizontal: 5 }}
+                calendarHeaderStyle={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}
+                calendarColor={'white'}
+                dateNumberStyle={{ color: 'black' }}
+                dateNameStyle={{ color: 'blue' }}
+                highlightDateNumberStyle={{ color: 'white' }}
+                highlightDateNameStyle={{ color: 'white' }}
                 disabledDateNameStyle={{ color: 'grey' }}
                 disabledDateNumberStyle={{ color: 'grey' }}
-
-                minDate={new Date()}
-                selectDate={moment().format('YYYY-MM-DD')}
+                minDate={moment().format('YYYY-MM-DD')}
+                selectedDate={moment().format('YYYY-MM-DD')}
                 onDateSelected={date => {
-                  console.log(moment().toDate());
                   const newDate = moment(date).format("YYYY-MM-DD")
                   setIndex(newDate)
-                  props.getDaySessionRequest(newDate)
                   props.getCustomExerciseRequest(newDate)
                 }}
               />
@@ -832,23 +827,7 @@ const FatLoseProgram = props => {
                         </TouchableOpacity>}
                     </View>
                     <View style={{ flexDirection: "column" }}>
-                      {hasCSVImages ? (
-                        renderSortedData(todaySessions)
-
-                      ) : (
-                        <Text
-                          style={{
-                            color: "#626262",
-                            width: 50,
-                            height: 50,
-                            marginLeft: 5,
-                            marginTop: 5
-                          }}
-                        >
-                          No Image
-                        </Text>
-                      )}
-
+                      {renderSortedData(todaySessions)}
 
                       <View
                         style={{

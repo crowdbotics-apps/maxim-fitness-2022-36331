@@ -34,11 +34,16 @@ const GET_CARD_REQUEST =
   "SUBSCRIPTION_SCREEN/GET_CARD_REQUEST"
 const DELETE_CARD_REQUEST =
   "SUBSCRIPTION_SCREEN/DELETE_CARD_REQUEST"
+const DELETE_CARD_REQUEST_SUCCESS =
+  "SUBSCRIPTION_SCREEN/DELETE_CARD_REQUEST_SUCCESS"
+
 const GET_CARD_REQUEST_SUCCESS = "SUBSCRIPTION_SCREEN/GET_CARD_REQUEST_SUCCESS"
 const SET_CARD_DATA = "SUBSCRIPTION_SCREEN/SET_CARD_DATA"
 const GET_SUBSCRIPTION_ID_REQUEST = "SUBSCRIPTION_SCREEN/GET_SUBSCRIPTION_ID_REQUEST"
 const GET_SUBSCRIPTION_ID_SUCCESS = "SUBSCRIPTION_SCREEN/GET_SUBSCRIPTION_ID_SUCCESS"
 const SUBSCRIPTION_CANCELATION_REQUEST = "SUBSCRIPTION_SCREEN/SUBSCRIPTION_CANCELATION_REQUEST"
+const SUBSCRIPTION_CANCELATION_SUCCESS = "SUBSCRIPTION_SCREEN/SUBSCRIPTION_CANCELATION_SUCCESS"
+
 
 
 
@@ -60,7 +65,11 @@ const initialState = {
   cardRequesting: false,
   cardPlanData: {},
   subscriptionIdData: false,
-  subIdRequesting: false
+  subIdRequesting: false,
+  cardAddRequesting: false,
+  cardDeleteRequesting: false,
+  cardPayRequesting: false,
+  cancelRequesting: false
 }
 
 //Actions
@@ -133,6 +142,11 @@ export const deleteCardRequest = data => ({
   type: DELETE_CARD_REQUEST,
   data
 })
+export const deleteCardSuccess = data => ({
+  type: DELETE_CARD_REQUEST_SUCCESS,
+  data
+})
+
 
 export const reset = () => ({
   type: RESET
@@ -150,6 +164,10 @@ export const subscriptionCancelation = data => ({
   data
 })
 
+export const subscriptionCancelationSuccess = data => ({
+  type: SUBSCRIPTION_CANCELATION_SUCCESS,
+  data
+})
 
 //Reducers
 export const subscriptionReducer = (state = initialState, action) => {
@@ -172,6 +190,17 @@ export const subscriptionReducer = (state = initialState, action) => {
         subRequesting: true
       }
 
+
+    case DELETE_CARD_REQUEST:
+      return {
+        ...state,
+        cardDeleteRequesting: true
+      }
+    case DELETE_CARD_REQUEST_SUCCESS:
+      return {
+        ...state,
+        cardDeleteRequesting: false
+      }
     case GET_PLAN_SUCCESS:
       return {
         ...state,
@@ -199,12 +228,15 @@ export const subscriptionReducer = (state = initialState, action) => {
         ...state,
         cardRequesting: true
       }
+
     case GET_CARD_REQUEST_SUCCESS:
       return {
         ...state,
         getCardData: action.data,
-        requesting: false
+        cardAddRequesting: false
       }
+
+
     case GET_CUSTOMERID_SUCCESS:
       return {
         ...state,
@@ -221,14 +253,20 @@ export const subscriptionReducer = (state = initialState, action) => {
     case POST_SUBSCRIPTION_REQUEST:
       return {
         ...state,
-        requesting: true
+        cardAddRequesting: true
+      }
+    case PAYMENT_SUBSCRIPTION_REQUEST:
+      return {
+        ...state,
+        cardPayRequesting: true
       }
 
     case POST_SUBSCRIPTION_SUCCESS:
       return {
         ...state,
         getSubscription: action.data,
-        requesting: false
+        requesting: false,
+        cardPayRequesting: false
       }
     case POST_SUBSCRIPTION_FAILURE:
       return {
@@ -242,6 +280,17 @@ export const subscriptionReducer = (state = initialState, action) => {
         ...state,
         subscriptionData: action.data
       }
+    case SUBSCRIPTION_CANCELATION_REQUEST:
+      return {
+        ...state,
+        cancelRequesting: true
+      }
+    case SUBSCRIPTION_CANCELATION_SUCCESS:
+      return {
+        ...state,
+        cancelRequesting: false
+      }
+
 
     case RESET:
       return {
@@ -328,9 +377,10 @@ function* addSubscriptionCard({ data }) {
   try {
     const response = yield call(addSubscriptionCardAPI, data)
     yield put(getCardRequest())
-    showMessage(
-      message = 'Card added successfully',
-      type = 'success')
+    showMessage({
+      message: "Card added successfully",
+      type: "success"
+    })
   } catch (e) {
     showMessage({
       message: "something went wrong",
@@ -376,7 +426,7 @@ function* paymentSubscription({ data }) {
     if (data?.profile.is_survey && response?.data?.is_premium_user) {
       submitQuestionAPI()
     }
-
+    yield put(postSubscriptionSuccess(response.data))
     showMessage({
       message: "Bought subscription successfully",
       type: "success"
@@ -440,6 +490,8 @@ function* deleteCard({ data }) {
   try {
     const response = yield call(deleteCardApi, data)
     yield put(getCardRequest())
+    yield put(deleteCardSuccess(response?.data))
+
     showMessage({
       message: "Card deleted successfully",
       type: "success"
@@ -511,9 +563,10 @@ function* subscriptionCancelationRequest({ data }) {
   try {
     const response = yield call(subscriptionCancelationApi, data)
     showMessage({
-      message: "Task done apply successfully",
+      message: data?.reactivate_subscription ? "Subscription reactivated successfully" : 'Subscription cancelled successfully',
       type: "success"
     })
+    yield put(subscriptionCancelationSuccess(response.data))
     navigate("BottomBar")
   } catch (e) {
     showMessage({
@@ -541,3 +594,4 @@ export default all([
 
 
 ])
+
