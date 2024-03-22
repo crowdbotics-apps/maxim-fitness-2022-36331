@@ -164,10 +164,15 @@ const ExerciseScreen = props => {
   }
   const onFocus = useIsFocused()
   useEffect(() => {
-    setParms(route?.params)
-    getData()
-    setExerciseTitle('')
-    setSelectedExercise(workoutData?.workouts?.[0])
+    async function getAllData() {
+      setParms(route?.params)
+      isCustom ? await getCustomWorkoutDataRequest(route?.params?.item?.id) : await props.repsWeightRequest(setId, null, null)
+
+      getData()
+      setExerciseTitle('')
+      setSelectedExercise(workoutData?.workouts?.[0])
+    }
+    getAllData()
   }, [onFocus, route])
 
   useEffect(() => {
