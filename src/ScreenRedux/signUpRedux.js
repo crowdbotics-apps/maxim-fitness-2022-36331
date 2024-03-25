@@ -72,11 +72,11 @@ function* SignUp({ data }) {
     //     type: "success"
     //   })
   } catch (e) {
+    const { response } = e
     showMessage({
       message: response && response?.data?.email[0],
       type: "danger"
     })
-    const { response } = e
   } finally {
     yield put(reset())
   }
