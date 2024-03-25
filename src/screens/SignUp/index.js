@@ -32,6 +32,7 @@ import {
   facebookLoginUser
 } from "../../ScreenRedux/loginRedux"
 import { API_URL } from "../../config/app"
+import { showMessage } from "react-native-flash-message"
 
 const { backIcon, orumIcon, smallGoogleIcon, faceBookIcon } = Images
 const SignUp = props => {
@@ -211,7 +212,7 @@ const SignUp = props => {
           <Text style={styles.loginTextStyle}>Or Register with</Text>
           <View style={{ marginHorizontal: 3 }}>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               style={[styles.inputStyle, { marginTop: 9 }]}
               onChangeText={value => handleOnChange("firstName", value)}
               placeholder="First Name"
@@ -219,7 +220,7 @@ const SignUp = props => {
             />
             <Text style={{ color: "red" }}>{state.firstName.error}</Text>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               style={[
                 styles.inputStyle,
                 { marginTop: state.firstName.error ? 9 : 0 }
