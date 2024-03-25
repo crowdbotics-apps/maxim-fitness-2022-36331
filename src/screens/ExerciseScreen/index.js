@@ -33,21 +33,35 @@ import VideoPlayer from "../../components/VideoPlayer"
 import {
   getAllSessionRequest,
   repsWeightRequest,
+  repsCustomWeightRequest,
   setDoneRequest,
+  customSetDoneRequest,
   sessionDone,
-  allSwapExercise
+  allSwapExercise,
+  allSwapCustomExercise,
+  customSessionDone,
+  setExerciseTitle
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
+import { useIsFocused, useRoute } from "@react-navigation/native"
 
 const ExerciseScreen = props => {
-  const { navigation, route, repsWeightState, exerciseObj, selectedSession } =
-    props
+  const {
+    navigation,
+    repsWeightState,
+    exerciseObj,
+    selectedSession,
+    isCustom,
+    setExerciseTitle
+  } = props
+  const route = useRoute()
   let refDescription = useRef("")
   let refWeight = useRef("")
   let refReps = useRef("")
   let refModal = useRef("")
 
   const [videoLoader, setVideoLoader] = useState(false)
+  const [mainActive, setMainActive] = useState(0)
   const [active, setActive] = useState(0)
   const [params, setParms] = useState({})
   const [startTimer, setStartTimer] = useState(false)
@@ -64,6 +78,7 @@ const ExerciseScreen = props => {
   const [weightThree, setWeightThree] = useState("")
   const [showModalWeightTwo, setShowModalWeightTwo] = useState(false)
   const [showModalWeightThree, setShowModalWeightThree] = useState(false)
+  const [selectedExercise, setSelectedExercise] = useState([])
 
   // change color state
   const [repsColor, setRepsColor] = useState(false)
@@ -79,33 +94,28 @@ const ExerciseScreen = props => {
 
   let deviceHeight = Dimensions.get("window").height
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'ss') {
-  //       setModal('ss')
-  //       refModal.current.open()
-  //     }
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'gs') {
-  //       setModal('gs')
-  //       refModal.current.open()
-  //     }
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'ds') {
-  //       setModal('ds')
-  //       refModal.current.open()
-  //     }
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'tds') {
-  //       setModal('tds')
-  //       refModal.current.open()
-  //     }
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'ct') {
-  //       setModal('ct')
-  //       refModal.current.open()
-  //     }
-  //     if (repsWeightState?.set_type?.toLowerCase() === 'r') {
-  //       setModal(null)
-  //     }
-  //   }, 500);
-  // }, [repsWeightState]);
+  useEffect(() => {
+    setTimeout(() => {
+      if (repsWeightState?.set_type?.toLowerCase() === "ss") {
+        setModal("ss")
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === "gs") {
+        setModal("gs")
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === "ds") {
+        setModal("ds")
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === "tds") {
+        setModal("tds")
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === "ct") {
+        setModal("ct")
+      }
+      if (repsWeightState?.set_type?.toLowerCase() === "r") {
+        setModal(null)
+      }
+    }, 500)
+  }, [])
 
   const checkModalType = param => {
     switch (param) {
@@ -146,22 +156,25 @@ const ExerciseScreen = props => {
         break
     }
   }
+  const onFocus = useIsFocused()
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // const [findFirstNotDoneSet] = exerciseObj?.sets?.filter(item => !item?.done);
-      // if (findFirstNotDoneSet !== undefined) {
-      const setId = sortDataByDoneStatus(selectedSession)[0]?.sets[0]?.id
-      props.repsWeightRequest(setId, null, null)
-      // }
-    })
-    return unsubscribe
-  }, [navigation])
-
-  useEffect(() => {
+    setParms(route?.params)
+    getData()
+    setExerciseTitle('')
+  }, [onFocus, route])
+  const getData = async () => {
     if (route) {
-      setParms(route.params)
+      selectedSession && setSelectedExercise(selectedSession?.[0])
     }
-  }, [route])
+
+    if (isCustom) {
+      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      await props.repsCustomWeightRequest(setId, null, null)
+    } else {
+      const setId = selectedSession?.[0]?.exercises?.[0]?.sets?.[0]?.id
+      await props.repsWeightRequest(setId, null, null)
+    }
+  }
 
   const {
     row,
@@ -213,11 +226,14 @@ const ExerciseScreen = props => {
     setRepsColor(true)
     refReps.current.close()
     const id = repsWeightState.id
-    const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${
-      showModalRepsThree ? "/" : ""
-    }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
+    const reps = `${repsState}${showModalRepsTwo ? "/" : ""}${showModalRepsThree ? "/" : ""
+      }${repsTwo}${showModalRepsThree ? "/" : ""}${repsThree}`
     const dd = "reps"
-    props.repsWeightRequest(id, reps, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, reps, dd)
+    } else {
+      props.repsWeightRequest(id, reps, dd)
+    }
     setReps("")
     setRepsTwo("")
     setRepsThree("")
@@ -227,11 +243,14 @@ const ExerciseScreen = props => {
     setWeightColor(true)
     refWeight.current.close()
     const id = repsWeightState.id
-    const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${
-      showModalWeightThree ? "/" : ""
-    }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
+    const weight = `${weightState}${showModalWeightTwo ? "/" : ""}${showModalWeightThree ? "/" : ""
+      }${weightTwo}${showModalWeightThree ? "/" : ""}${weightThree}`
     const dd = "weight"
-    props.repsWeightRequest(id, weight, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, weight, dd)
+    } else {
+      props.repsWeightRequest(id, weight, dd)
+    }
     setWeight("")
     setWeightTwo("")
     setWeightThree("")
@@ -267,7 +286,11 @@ const ExerciseScreen = props => {
     const id = set?.id
     const individual = null
     const dd = null
-    props.repsWeightRequest(id, individual, dd)
+    if (isCustom) {
+      props.repsCustomWeightRequest(id, individual, dd)
+    } else {
+      props.repsWeightRequest(id, individual, dd)
+    }
     setRepsColor(false)
     setWeightColor(false)
   }
@@ -286,10 +309,14 @@ const ExerciseScreen = props => {
         const data = {
           activeSet,
           active,
-          selectedSession: sortDataByDoneStatus(selectedSession),
+          selectedSession: selectedSession,
           setTimmer
         }
-        props.setDoneRequest(findSetId.id, data)
+        if (isCustom) {
+          props.customSetDoneRequest(findSetId.id, data)
+        } else {
+          props.setDoneRequest(findSetId.id, data)
+        }
       }
     }
 
@@ -305,45 +332,67 @@ const ExerciseScreen = props => {
   const selectExercise = (item, i) => {
     setActive(i)
     setActiveSet(0)
-    props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    if (isCustom) {
+      props.repsCustomWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    } else {
+      props.repsWeightRequest(item?.sets?.[0]?.id, null, null, callBack)
+    }
   }
 
   const callBack = item => {
     setTimmer(false)
     if (item?.set_type?.toLowerCase() === "ss") {
       setModal("ss")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "gs") {
       setModal("gs")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "ds") {
       setModal("ds")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "tds") {
       setModal("tds")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "ct") {
       setModal("ct")
-      refModal.current.open()
+      // refModal.current.open()
     }
     if (item?.set_type?.toLowerCase() === "r") {
       setModal("r")
-      refModal.current.open()
+      // refModal.current.open()
     }
   }
 
   const swipeFunc = () => {
-    props.allSwapExercise(sortDataByDoneStatus(selectedSession)?.[active]?.id)
-    navigation.navigate("SwapExerciseScreen", {
-      ScreenData: {
-        data: sortDataByDoneStatus(selectedSession)?.[active],
-        date_time: params?.item?.date_time
-      }
-    })
+    if (isCustom) {
+      const exerciseTypeId =
+        selectedSession?.[mainActive]?.exercises?.[active]?.exercise_type?.id
+      props.allSwapCustomExercise(exerciseTypeId)
+      navigation.navigate("SwapExerciseScreen", {
+        ScreenData: {
+          data: selectedSession?.[mainActive]?.exercises?.[active],
+          date_time: params?.item?.date_time,
+          workout: params?.workouts?.[mainActive]?.id,
+          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
+          workout_id: params?.item?.id
+        }
+      })
+    } else {
+      props.allSwapExercise(selectedSession?.[active]?.id)
+      navigation.navigate("SwapExerciseScreen", {
+        ScreenData: {
+          data: selectedSession?.[mainActive]?.exercises?.[active],
+          date_time: params?.item?.date_time,
+          workout: params?.workouts?.[mainActive]?.id,
+          custom_workouts_exercise_id: selectedSession?.[mainActive]?.id,
+          workout_id: params?.item?.id
+        }
+      })
+    }
   }
 
   const screenNavigation = () => {
@@ -358,7 +407,6 @@ const ExerciseScreen = props => {
     const allDone = selectedSession?.every(item => item.done === true)
     return allDone
   }
-
   const sortDataByDoneStatus = data => {
     return data.sort((a, b) => {
       if (a.done === b.done) {
@@ -400,6 +448,7 @@ const ExerciseScreen = props => {
             setHours={setHours}
           />
         </View>
+
         <View />
       </View>
       <View style={[row, center, secondaryBg]}>
@@ -414,72 +463,172 @@ const ExerciseScreen = props => {
           automaticallyAdjustContentInsets={false}
         >
           <View style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}>
-            {selectedSession &&
-              sortDataByDoneStatus(selectedSession)?.map((item, i) => {
+            {selectedSession?.length ? (
+              selectedSession?.map((item, i) => {
                 return (
-                  <TouchableOpacity
-                    // disabled={timmer}
-                    onPress={() => selectExercise(item, i)}
-                    style={[
-                      row,
-                      center,
-                      smallHPadding,
-                      {
-                        minHeight: active === i ? 80 : 60,
-                        borderRadius: active === i ? 8 : 10,
-                        marginHorizontal: active === i ? 0 : 2,
-                        backgroundColor: active === i ? "white" : "#F2F2F2"
-                      }
-                    ]}
-                  >
-                    {item?.done ? (
-                      <View style={styles.doneWrapper}>
-                        <Image
-                          source={Images.iconDoneProgram}
-                          style={styles.imageWrapper}
-                        />
-                      </View>
-                    ) : null}
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        width: 100
+                  <View>
+                    <TouchableOpacity
+                      // disabled={timmer}
+                      onPress={() => {
+                        setSelectedExercise(item)
+                        setMainActive(i)
+                        if (
+                          item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
+                          item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
+                        ) {
+                          selectExercise(item?.exercises?.[i], 0)
+                        } else {
+                          selectExercise(item?.exercises?.[0], 0)
+                        }
+                        setTimeout(() => {
+                          if (item?.exercises?.length == 1) {
+                            refModal
+                              ?.current?.close()
+                          } else {
+                            refModal.current?.open()
+                          }
+                        }, 800)
                       }}
+                      style={[
+                        row,
+                        center,
+                        smallHPadding,
+                        {
+                          minHeight: mainActive === i ? 80 : 60,
+                          borderRadius: mainActive === i ? 8 : 10,
+                          marginHorizontal: mainActive === i ? 0 : 2,
+                          backgroundColor:
+                            mainActive === i ? "white" : "#F2F2F2"
+                        }
+                      ]}
                     >
-                      <Text
+                      {item?.done ? (
+                        <View style={styles.doneWrapper}>
+                          <Image
+                            source={Images.iconDoneProgram}
+                            style={styles.imageWrapper}
+                          />
+                        </View>
+                      ) : (
+                        <></>
+                      )}
+                      <View
                         style={{
-                          color: "black",
-                          fontSize: 15,
-                          textAlign: "center"
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          width: 100
                         }}
-                        ellipsizeMode="tail"
-                        numberOfLines={3}
                       >
-                        {`${i + 1}. ${item?.exercise?.name}`}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                        <Text
+                          style={{
+                            color: "black",
+                            fontSize: 15,
+                            textAlign: "center"
+                          }}
+                          ellipsizeMode="tail"
+                          numberOfLines={3}
+                        >
+                          {`${i + 1}. ${item?.name || item?.exercises?.[0]?.name
+                            }`}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 )
-              })}
+              })
+            ) : (
+              <></>
+            )}
           </View>
         </ScrollView>
       </View>
-      {selectedSession &&
-        sortDataByDoneStatus(selectedSession)?.map((item, index) => {
+      {selectedExercise?.length !== 0 &&
+        (selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "ss" ||
+          selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "gs") && (
+          <View style={[row, center, secondaryBg]}>
+            <ScrollView
+              horizontal
+              contentContainerStyle={[
+                fillGrow,
+                alignItemsEnd,
+                { height: 80, backgroundColor: "#F2F2F2" }
+              ]}
+              showsHorizontalScrollIndicator={false}
+              automaticallyAdjustContentInsets={false}
+            >
+              <View
+                style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}
+              >
+                {selectedExercise?.length !== 0
+                  ? selectedExercise?.exercises?.map((list, i) => (
+                    <TouchableOpacity
+                      // disabled={timmer}
+                      onPress={() => selectExercise(list, i)}
+                      style={[
+                        row,
+                        center,
+                        smallHPadding,
+                        {
+                          minHeight: active === i ? 80 : 60,
+                          borderRadius: active === i ? 8 : 10,
+                          marginHorizontal: active === i ? 0 : 2,
+                          backgroundColor: active === i ? "white" : "#F2F2F2"
+                        }
+                      ]}
+                    >
+                      {list?.done ? (
+                        <View style={styles.doneWrapper}>
+                          <Image
+                            source={Images.iconDoneProgram}
+                            style={styles.imageWrapper}
+                          />
+                        </View>
+                      ) : null}
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          width: 100
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "black",
+                            fontSize: 15,
+                            textAlign: "center"
+                          }}
+                          ellipsizeMode="tail"
+                          numberOfLines={3}
+                        >
+                          {`${i + 1}. ${list?.name}`}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                  : null}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+      {/*===============================================*/}
+
+      {selectedExercise?.length != 0 ? (
+        selectedExercise?.exercises?.map((item, index) => {
           if (active === index) {
             return (
               <View style={[fill]}>
                 <View style={[{ backgroundColor: "#F2F2F2" }]}>
-                  {item?.exercise?.video ? (
+                  {item?.video ? (
                     <VideoPlayer
                       video={{
-                        uri: item?.exercise?.video
+                        uri: item?.video
                       }}
                       resizeMode="stretch"
-                      thumbnail={{ uri: item?.exercise?.video_thumbnail }}
+                      thumbnail={{ uri: item?.video_thumbnail }}
                       disableFullscreen={false}
                     />
                   ) : (
@@ -496,6 +645,7 @@ const ExerciseScreen = props => {
                     </View>
                   )}
                 </View>
+
                 {repsWeightState?.set_type?.toLowerCase() === "cr" ? (
                   props.loader ? (
                     <View
@@ -562,6 +712,7 @@ const ExerciseScreen = props => {
                         { height: 60, paddingHorizontal: 10 }
                       ]}
                     >
+                      {/* <====================sets=====start======================> */}
                       <ScrollView
                         horizontal
                         contentContainerStyle={fillGrow}
@@ -581,17 +732,18 @@ const ExerciseScreen = props => {
                               "#d3d3d3"
                             }
                             repsWeightState={repsWeightState}
-                            // disabled={timmer}
+                          // disabled={timmer}
                           />
                         ))}
                       </ScrollView>
                     </View>
                   </>
                 )}
+                {/* <====================sets===========end================> */}
                 <View style={[fill, secondaryBg]}>
                   <ScrollView contentContainerStyle={[fillGrow]}>
                     {repsWeightState?.set_type?.toLowerCase() ===
-                    "cr" ? null : (
+                      "cr" ? null : (
                       <View style={[row, tinyHPadding]}>
                         <FatExerciseButton
                           reps
@@ -601,13 +753,13 @@ const ExerciseScreen = props => {
                             refReps.current.open()
                             setShowModalRepsTwo(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "ds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "ds"
                             )
                             setShowModalRepsThree(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "tds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "tds"
                             )
                           }}
                           loadingReps={props.loader}
@@ -623,13 +775,13 @@ const ExerciseScreen = props => {
                             refWeight.current.open()
                             setShowModalWeightTwo(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "ds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "ds"
                             )
                             setShowModalWeightThree(
                               repsWeightState &&
-                                repsWeightState?.set_type?.toLowerCase() ===
-                                  "tds"
+                              repsWeightState?.set_type?.toLowerCase() ===
+                              "tds"
                             )
                           }}
                           loadingWeight={props.loader}
@@ -644,21 +796,21 @@ const ExerciseScreen = props => {
                         buttonText="Exercise Description"
                         buttonIcon={Images.detailIcon}
                         onPress={() => refDescription.current.open()}
-                        // disabled={timmer}
+                      // disabled={timmer}
                       />
                       <FatExerciseIconButton
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        // disabled={timmer}
+                        disabled={item && item.done}
                       />
                       <FatGradientIconButton
                         buttonText={
                           repsWeightState?.set_type?.toLowerCase() === "cr"
                             ? "Complete"
                             : item?.sets && item?.sets?.[activeSet]?.done
-                            ? "Done"
-                            : "Done, Start Rest"
+                              ? "Done"
+                              : "Done, Start Rest"
                         }
                         buttonIcon={Images.iconDoneStartRest}
                         colorsGradient={["#3180BD", "#6EC2FA"]}
@@ -682,7 +834,15 @@ const ExerciseScreen = props => {
                       startRest={timmer}
                       activeSet={activeSet}
                       onPress={() => {
-                        props.sessionDone(params?.item?.id, screenNavigation)
+                        isCustom
+                          ? props.customSessionDone(
+                            params?.item?.id,
+                            screenNavigation
+                          )
+                          : props.sessionDone(
+                            params?.item?.id,
+                            screenNavigation
+                          )
                         setStartTimer(false)
                         setTimmer(false)
                       }}
@@ -697,8 +857,12 @@ const ExerciseScreen = props => {
               </View>
             )
           }
-        })}
+        })
+      ) : (
+        <></>
+      )}
 
+      {/*===============================================*/}
       {/*===============================================*/}
 
       <BottomSheet reff={refDescription} h={400}>
@@ -708,10 +872,10 @@ const ExerciseScreen = props => {
           style={[fill, { width: "100%", marginTop: 20 }]}
         >
           <View style={[regularHMargin]}>
-            {sortDataByDoneStatus(selectedSession)?.[active]?.exercise
-              ?.description ? (
-              sortDataByDoneStatus(selectedSession)
-                ?.[active]?.exercise?.description?.split("/n")
+            {selectedExercise?.length !== 0 &&
+              selectedExercise?.exercises?.[active]?.description ? (
+              selectedExercise?.exercises?.[active]?.description
+                ?.split("/n")
                 .map(item => <Text text={item} style={{ color: "#626262" }} />)
             ) : (
               <Text
@@ -936,8 +1100,8 @@ const ExerciseScreen = props => {
           >
             {modal === "ss" || modal === "gs" ? (
               <>
-                {repsWeightState?.exercises?.length > 0 ? (
-                  repsWeightState?.exercises?.map((exercise, index) => {
+                {selectedExercise?.exercises?.length > 0 ? (
+                  selectedExercise?.exercises?.map((exercise, index) => {
                     return (
                       <View key={index} style={[justifyContentCenter]}>
                         <View
@@ -951,12 +1115,11 @@ const ExerciseScreen = props => {
                           <Text
                             regularTitle
                             color="quinary"
-                            text={`${
-                              (index + 1 === 1 && "a") ||
+                            text={`${(index + 1 === 1 && "a") ||
                               (index + 1 === 2 && "b") ||
                               (index + 1 === 3 && "c") ||
                               (index + 1 === 4 && "d")
-                            }. ${exercise?.name}`}
+                              }. ${exercise?.name}`}
                           />
                         </View>
                         <View style={center}>
@@ -976,17 +1139,14 @@ const ExerciseScreen = props => {
                       <Text
                         regularTitle
                         color="quinary"
-                        text={`1. ${
-                          sortDataByDoneStatus(selectedSession)?.[active]
-                            ?.exercise?.name
-                        }`}
+                        text={`1. ${selectedExercise?.exercises?.[active]?.name}`}
                       />
                     </View>
                     <View style={center}>
                       <Image
                         source={{
-                          uri: sortDataByDoneStatus(selectedSession)?.[active]
-                            ?.exercise?.video_thumbnail
+                          uri: selectedExercise?.exercises?.[active]
+                            ?.video_thumbnail
                         }}
                         style={styles.modalImageStyle}
                       />
@@ -1000,18 +1160,15 @@ const ExerciseScreen = props => {
                   <Text
                     regularTitle
                     color="quinary"
-                    text={`1. ${
-                      sortDataByDoneStatus(selectedSession)?.[active]?.exercise
-                        ?.name
-                    }`}
+                    text={`1. ${selectedExercise?.exercises?.[active]?.name}`}
                   />
                 </View>
 
                 <View style={center}>
                   <Image
                     source={{
-                      uri: sortDataByDoneStatus(selectedSession)?.[active]
-                        ?.exercise?.video_thumbnail
+                      uri: selectedExercise?.exercises?.[active]
+                        ?.video_thumbnail
                     }}
                     style={styles.modalImageStyle}
                   />
@@ -1106,18 +1263,26 @@ const mapStateToProps = state => ({
   exerciseObj: state.programReducer.exerciseObj,
   selectedSession: state.programReducer.selectedSession,
   nextWorkout: state.programReducer.nextWorkout,
-
-  setDone: state.programReducer.setDone
+  setDone: state.programReducer.setDone,
+  isCustom: state.programReducer.isCustom
 })
 
 const mapDispatchToProps = dispatch => ({
   getAllSessionRequest: data => dispatch(getAllSessionRequest(data)),
+  repsCustomWeightRequest: (id, data, dd, callBack) =>
+    dispatch(repsCustomWeightRequest(id, data, dd, callBack)),
   repsWeightRequest: (id, data, dd, callBack) =>
     dispatch(repsWeightRequest(id, data, dd, callBack)),
   setDoneRequest: (id, data) => dispatch(setDoneRequest(id, data)),
+  customSetDoneRequest: (id, data) => dispatch(customSetDoneRequest(id, data)),
   sessionDone: (id, screenNavigation) =>
     dispatch(sessionDone(id, screenNavigation)),
-  allSwapExercise: id => dispatch(allSwapExercise(id))
+  customSessionDone: (id, screenNavigation) =>
+    dispatch(customSessionDone(id, screenNavigation)),
+  allSwapExercise: id => dispatch(allSwapExercise(id)),
+  allSwapCustomExercise: id => dispatch(allSwapCustomExercise(id)),
+  setExerciseTitle: type => dispatch(setExerciseTitle(type))
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExerciseScreen)

@@ -97,6 +97,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
             CancelSubscription.objects.filter(user=user).delete()
             CancelSubscription.objects.create(user=user, subscription_id=subscription.id,
                                               is_current=True, subscription_end_date=end_date)
+
         else:
             user.trial = True
             user.save()

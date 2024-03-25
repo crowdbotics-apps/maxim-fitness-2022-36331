@@ -18,12 +18,12 @@ import { Images } from "../../theme"
 import { CustomModal } from "../../components"
 
 //actions
-import { swapExercises } from "../../ScreenRedux/programServices"
+import { swapExercises, swapCustomExercises } from "../../ScreenRedux/programServices"
 
 const windowHeight = Dimensions.get("window").height
 
 const SwapExerciseContainer = props => {
-  const { navigation, swapExercises, allExerciseSwapped, route, requesting } =
+  const { navigation, swapExercises, swapCustomExercises, isCustom, allExerciseSwapped, route, requesting } =
     props
 
   const [loading, setLoading] = useState([])
@@ -45,11 +45,17 @@ const SwapExerciseContainer = props => {
   const swapDone = () => {
     if (selectItem) {
       const swapData = {
-        workout_id: route?.params?.ScreenData?.data?.id,
-        exercise_id: route?.params?.ScreenData?.data?.exercise.id,
-        rest_of_program: selectItem
+
+        workout_id: route?.params?.ScreenData?.workout_id,
+        exercise_id: route?.params?.ScreenData?.data?.id,
+        rest_of_program: selectItem,
+        custom_workouts_exercise_id: route?.params?.ScreenData?.custom_workouts_exercise_id
       }
-      swapExercises(swapData, route?.params?.ScreenData?.date_time)
+      if (isCustom) {
+        swapCustomExercises(swapData, route?.params?.ScreenData?.date_time)
+      } else {
+        swapExercises(swapData, route?.params?.ScreenData?.date_time)
+      }
     }
   }
 
@@ -123,7 +129,7 @@ const SwapExerciseContainer = props => {
         ) : (
           <>
             {allExerciseSwapped?.length > 0 &&
-            allExerciseSwapped !== "no exercise available" ? (
+              allExerciseSwapped !== "no exercise available" ? (
               <FlatList
                 data={allExerciseSwapped || []}
                 keyExtractor={index => index.toString()}
@@ -191,11 +197,14 @@ const styles = StyleSheet.create({
 const mapState = state => ({
   allExerciseSwapped:
     state.programReducer && state.programReducer.allExerciseSwapped,
-  requesting: state.programReducer && state.programReducer.loading
+  requesting: state.programReducer && state.programReducer.loading,
+  isCustom: state.programReducer && state.programReducer.isCustom,
+
 })
 
 const mapDispatchToProps = dispatch => ({
-  swapExercises: (data, date_time) => dispatch(swapExercises(data, date_time))
+  swapExercises: (data, date_time) => dispatch(swapExercises(data, date_time)),
+  swapCustomExercises: (data, date_time) => dispatch(swapCustomExercises(data, date_time)),
 })
 
 export default connect(mapState, mapDispatchToProps)(SwapExerciseContainer)

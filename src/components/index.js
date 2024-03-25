@@ -28,7 +28,7 @@ import MealHistory from "./MealHistory"
 import CustomModal from "./CustomModal"
 import ExerciseCard from "./ExerciseCard"
 import SkeletonLoader from "./SkeletonLoader"
-
+import SubscriptionCard from "./SubscriptionCard"
 export {
   Text,
   Header,
@@ -59,5 +59,6 @@ export {
   MealHistory,
   CustomModal,
   ExerciseCard,
-  SkeletonLoader
+  SkeletonLoader,
+  SubscriptionCard
 }

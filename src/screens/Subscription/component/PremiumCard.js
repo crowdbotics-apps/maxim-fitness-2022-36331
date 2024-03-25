@@ -1,14 +1,33 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity } from "react-native"
-import { Text } from "../../../components"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
+import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
+import { profileData } from "../../../ScreenRedux/profileRedux"
+import { connect } from "react-redux"
+import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
+import { API_URL } from "../../../config/app"
+const PremiumCard = props => {
+  const {
+    onPress,
+    getPlans,
+    amount,
+    subsucriptionId,
+    profile,
+    cardPlanData,
+    getSubscriptIdRequest,
+    subscriptionIdData,
+    subIdRequesting,
+    subscriptionCancelation
+  } = props
+  const openPrivacyPolicy = () => {
+    Linking.openURL(`${API_URL}/privacy-policy/`)
+  }
 
-const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
   const {
     regularHMargin,
     regularVPadding,
@@ -30,6 +49,59 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
+  useEffect(() => {
+    getSubscriptIdRequest()
+  }, [])
+  const canceledButton = (call) => {
+    profile?.user_subscription?.is_subscription_canceled
+    profile?.user_subscription?.is_subscription_days_remaining
+    profile?.is_premium_user
+
+    if (profile?.is_premium_user && profile?.user_subscription?.is_subscription_days_remaining && profile?.user_subscription?.is_subscription_canceled) {
+      call && Alert.alert(
+        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+        "Are you sure you want to reactivate your current  subscription?",
+        [
+          {
+            text: "NO",
+            style: "cancel"
+          },
+          {
+            text: "YES",
+            onPress: () => {
+              subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id, reactivate_subscription: true })
+            }
+          }
+        ],
+        { cancelable: false }
+      )
+
+      return { text: "Reactivate Subscription", show: true }
+    } else
+      if (profile?.is_premium_user) {
+        call && Alert.alert(
+          `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+          "Are you sure you want to cancel the subscription?",
+          [
+            {
+              text: "NO",
+              style: "cancel"
+            },
+            {
+              text: "YES",
+              onPress: () => {
+                subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id })
+              }
+            }
+          ],
+          { cancelable: false }
+        )
+        return { text: "Cancel", show: true }
+      }
+      else {
+        return { text: "Cancel", show: false }
+      }
+  }
   return (
     <>
       <LinearGradient
@@ -44,11 +116,11 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
           styles.gradientWrapper
         ]}
       >
-        <View style={[fill, justifyContentAround, mediumHMargin]}>
+        <View style={[fill, mediumHMargin, justifyContentCenter]}>
           <View style={[row, alignItemsCenter]}>
             <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5 }} />
             <Text
-              text={"User will recieve a nutrition plan."}
+              text={"User will receive a nutrition plan."}
               color="secondary"
               style={{ fontSize: 16 }}
             />
@@ -74,13 +146,23 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
+        <Loader isLoading={!amount || !subIdRequesting} />
         <View style={[row, center, fill, mediumTMargin]}>
-          <Text text={`$ ${amount}`} regularTitle color="secondary" bold />
+          <Text
+            text={`$ ${amount || "0"}`}
+            regularTitle
+            color="secondary"
+            bold
+          />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {getPlans?.[0]?.id === subsucriptionId ? (
-          <TouchableOpacity style={styles.cancelButton}>
-            <Text style={styles.text}>Cancel</Text>
+        {canceledButton().show ? (
+          <TouchableOpacity
+            onPress={() => {
+              canceledButton(true)
+            }}
+            style={styles.cancelButton}>
+            <Text style={styles.text}>{canceledButton().text}</Text>
           </TouchableOpacity>
         ) : null}
         <View
@@ -94,23 +176,29 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
           ]}
         >
           <Text color="secondary" center style={{ fontSize: 14 }}>
-            By subcribing to Orum Training, you agree to our {""}
-            <Text
-              text={"\nPrivacy Policy"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            By subscribing to Orum Training, you agree to our {""}
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"\nPrivacy Policy"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
             {""} and {""}
-            <Text
-              text={"Terms of Services"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"Terms of Services"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+
+            </TouchableOpacity>
           </Text>
+
         </View>
       </LinearGradient>
       <View
@@ -123,15 +211,17 @@ const PremiumCard = ({ onPress, getPlans, amount, subsucriptionId }) => {
         <Button
           color="secondary"
           text={
-            getPlans?.[0]?.id === subsucriptionId ? "Already Bought" : "Buy Now"
+            profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
             center,
             regularHPadding,
-            { height: 40, borderRadius: 30 }
+            { height: 43, borderRadius: 30 }
           ]}
-          onPress={getPlans?.[0]?.id !== subsucriptionId ? onPress : null}
+          disabled={profile?.is_premium_user}
+          onPress={!profile?.is_premium_user ? onPress : null}
+
         />
       </View>
     </>
@@ -154,7 +244,9 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     height: 40,
-    width: "50%",
+    padding: 10,
+    width: "auto",
+    minWidth: "50%",
     backgroundColor: "white",
     alignSelf: "center",
     justifyContent: "center",
@@ -171,4 +263,19 @@ const styles = StyleSheet.create({
   }
 })
 
-export default PremiumCard
+
+
+const mapStateToProps = state => ({
+  profile: state.login.userDetail,
+  subscriptionIdData: state.subscriptionReducer.subscriptionIdData,
+  subIdRequesting: state.subscriptionReducer.subIdRequesting,
+})
+
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+  getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
+  subscriptionCancelation: (data) => dispatch(subscriptionCancelation(data))
+
+
+})
+export default connect(mapStateToProps, mapDispatchToProps)(PremiumCard)

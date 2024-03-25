@@ -1,6 +1,6 @@
 import React from "react"
 import Text from "../Text"
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, Image } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 import { Gutters, Layout, Global } from "../../theme"
 
@@ -27,20 +27,21 @@ const RuningWorkout = ({ item, index, todayDayStr }) => {
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 0 }
 
-  const calculateDay = () => {
-    let day = 1
-    day += index
-    return day
-  }
+  // const calculateDay = () => {
+  //   let day = 1
+  //   day += index
+  //   return day
+  // }
+  // const calculateWeek = () => {
+  //   let dayNo = calculateDay()
+  //   let week = 1
 
-  const calculateWeek = () => {
-    let dayNo = calculateDay()
-    let week = 1
-    if (dayNo >= 8) {
-      week += 1
-    }
-    return week
-  }
+  //   if (dayNo >= 8) {
+  //     week += Math.floor((dayNo - 1) / 7)
+  //   }
+
+  //   return week
+  // }
   return (
     <LinearGradient
       start={start}
@@ -65,17 +66,26 @@ const RuningWorkout = ({ item, index, todayDayStr }) => {
           regularHPadding,
           styles.parentImage
         ]}
-      />
+      >
+        <Image
+          source={{
+            uri: item?.workouts?.[0]?.exercises?.[0]?.video_thumbnail
+          }}
+          style={styles.parentImage}
+        />
+      </View>
 
       <View style={[smallLMargin, justifyContentBetween, fill]}>
         <View style={[row, alignItemsEnd, tinyBMargin]}>
-          <Text text={`Day ${calculateDay()}`} color="quaternary" medium />
+       { item?.day_number&&
+          <Text text={`Day ${item?.day_number||''}`} color="quaternary" medium />}
+         { item?.week_number&&
           <Text
-            text={`Week ${calculateWeek()}`}
+            text={`Week ${item?.week_number||''}`}
             color="septenary"
             style={smallLMargin}
             regular
-          />
+          />}
         </View>
         <View
           style={[row, justifyContentBetween, tinyVMargin, alignItemsCenter]}

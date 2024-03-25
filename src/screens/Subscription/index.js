@@ -10,20 +10,25 @@ import { connect } from "react-redux"
 import {
   // getSubscriptionRequest,
   getPlanRequest,
-  getCustomerIdRequest
+  getCustomerIdRequest,
+  setPlanCardData
 } from "../../ScreenRedux/subscriptionRedux"
 
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
+import { profileData } from "../../ScreenRedux/profileRedux"
 
 const SubscriptionScreen = props => {
-  const { navigation, getPlans, userDetail, subscriptionData } = props
+  const { navigation, getPlans, subscriptionData, setPlanCardData, profileData, profile } = props
+
+
   const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
 
   useEffect(() => {
+    profileData()
     props.getPlanRequest()
     props.getCustomerIdRequest()
   }, [])
@@ -35,12 +40,13 @@ const SubscriptionScreen = props => {
       getPlans?.length > 0 &&
       getPlans &&
       getPlans?.[getPlans.length - 1]?.product
+    setPlanCardData({ plan_id, product, is_premium: false })
     navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
   }
   const premiumCardData = () => {
     let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
     let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
-
+    setPlanCardData({ plan_id, product, is_premium: true })
     navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
   }
 
@@ -61,7 +67,9 @@ const SubscriptionScreen = props => {
     <>
       <TouchableOpacity
         style={styles.leftArrow}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          !profile?.is_survey ? navigation.navigate("Birthday") : navigation.goBack()
+        }}
       >
         <Image source={Images.backImage} style={styles.backArrowStyle} />
       </TouchableOpacity>
@@ -97,7 +105,8 @@ const SubscriptionScreen = props => {
             navigation={navigation}
             getPlans={getPlans}
             amount={
-              getPlans?.length && getPlans[getPlans?.length - 1]?.unit_amount
+              getPlans?.length &&
+              getPlans[getPlans?.length - 1]?.unit_amount
             }
             subsucriptionId={subscriptionData?.plan?.id}
           />
@@ -202,6 +211,7 @@ const SubscriptionScreen = props => {
       </Modal>
     </>
   )
+
 }
 const styles = StyleSheet.create({
   leftArrow: {
@@ -229,12 +239,14 @@ const mapStateToProps = state => ({
   customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.subRequesting,
-  userDetail: state.login.userDetail
+  profile: state.login.userDetail
   // subscription: state.subscription.subscription,
 })
 
 const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
   getPlanRequest: () => dispatch(getPlanRequest()),
+  setPlanCardData: data => dispatch(setPlanCardData(data)),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
   getCustomerIdRequest: () => dispatch(getCustomerIdRequest())
 })

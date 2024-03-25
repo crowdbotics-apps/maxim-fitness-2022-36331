@@ -256,7 +256,7 @@ const Feeds = props => {
         isVisible={isModalVisible}
         animationIn="zoomIn"
         animationOut={"zoomOut"}
-        // onBackdropPress={() => toggleModal(false)}
+      // onBackdropPress={() => toggleModal(false)}
       >
         <View style={styles.modalStyle}>
           <View style={styles.reportStyle}>

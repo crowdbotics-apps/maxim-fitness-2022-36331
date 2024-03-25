@@ -22,39 +22,55 @@ import { Text, InputField, BottomSheet, Button } from "../../../components"
 //Libraries
 import Modal from "react-native-modal"
 import RBSheet from "react-native-raw-bottom-sheet"
-import ImagePicker from "react-native-image-crop-picker"
 
 //Themes
 import { Global, Gutters, Layout, Colors, Images, Fonts } from "../../../theme"
 import {
   postCustomExRequest,
-  addCustomExercise
+  addCustomExercise,
+  getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
+import { setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
 import { transformData } from "../../../utils/utils"
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native"
 
 const CustomExercise = props => {
-  const { redBin, circleClose, radioBlue, doneImg, greyNext, duplicateIcon } =
-    Images
   const {
-    navigation,
-    route,
+    redBin,
+    circleClose,
+    radioBlue,
+    radioDoneBlue,
+    greyNext,
+    duplicateIcon
+  } = Images
+  const {
     cRequesting,
+    requesting,
     getCustomExState,
     todaySessions,
-    profile
+    profile,
+    getExerciseType,
+    pickedDate,
+    setCustom,
+    postCustomExRequest,
+    customExercise,
+    addCustomExercise,
+    exerciseTitle,
+    setExerciseTitle
   } = props
+  const navigation = useNavigation()
+  const route = useRoute()
   const { width, height } = Dimensions.get("window")
-
+  const { exercises, activeSet } = route?.params
   const [reps, setReps] = useState("")
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = useState('')
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [deleteModal, setDeleteModal] = useState(false)
-
   //BottomSheetRefs
   const refRBSheet = useRef()
   const refRBSheetDual = useRef()
-
+  let replaceExercise = useRef("")
   const [sets, setSets] = useState([])
   const [dualSets, setDualSets] = useState([])
   const [dualSetState, setDualSetState] = useState(1)
@@ -62,15 +78,30 @@ const CustomExercise = props => {
   const [currentIndex, setCurrentIndex] = useState(false)
   const [dualReps, setDualReps] = useState({})
   const [droupSet, setDroupSets] = useState({})
+  const [checkedReps, setCheckedReps] = useState(false)
+  const [checkedRest, setCheckedRest] = useState(false)
 
   const [temporaryReps, setTemporaryReps] = useState(false)
   const [selectIndex, setSelectIndex] = useState(0)
   const [exerciseIndex, setExerciseIndex] = useState(0)
-
+  const [selectedItem, setSelectedItem] = useState([])
+  const [activeCard, setActiveCard] = useState({ item: {}, index: 0 })
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
   })
+  const {
+    alignItemsEnd,
+    row,
+    fill,
+    center,
+    alignItemsCenter,
+    justifyContentCenter,
+    justifyContentBetween,
+    fillGrow,
+    justifyContentAround
+  } = Layout
+  const { foodImage, iconI } = Images
 
   // const numberOfExercise = route?.params?.exercises?.length
   // const activeSet = route?.params?.activeSet
@@ -78,11 +109,19 @@ const CustomExercise = props => {
   useEffect(() => {
     if (todaySessions?.id && todaySessions?.name !== "Rest") {
       setTitle("")
+    } else {
+      setTitle(exerciseTitle)
     }
   }, [])
+  const onFocus = useIsFocused()
+  useEffect(() => {
+
+    setTitle(exerciseTitle)
+
+  }, [onFocus])
 
   const findingData = () => {
-    const checkData = props?.customExercise[exerciseIndex]
+    const checkData = customExercise[exerciseIndex]
     return {
       activeSet: checkData?.activeSet,
       exercises: checkData?.exercises?.type,
@@ -91,7 +130,7 @@ const CustomExercise = props => {
   }
 
   const updateReducer = (type, updatedData) => {
-    const data = [...props.customExercise]
+    const data = [...customExercise]
     const updatedObject = { ...data[exerciseIndex] }
 
     // Perform the deep update
@@ -103,7 +142,7 @@ const CustomExercise = props => {
     data[exerciseIndex] = updatedObject
 
     // Update the state or props
-    props.addCustomExercise(data)
+    addCustomExercise(data)
     setCurrentIndex(false)
   }
 
@@ -112,14 +151,14 @@ const CustomExercise = props => {
   const duplicateSet = item => {
     const newData = [...props?.customExercise]
     newData.push(item)
-    props.addCustomExercise(newData)
+    addCustomExercise(newData)
     setCurrentIndex(false)
   }
 
   const deleteSet = () => {
     const data = [...props?.customExercise]
     data.splice(exerciseIndex, 1)
-    props.addCustomExercise(data)
+    addCustomExercise(data)
     setSets(data)
     setDeleteModal(false)
     setCurrentIndex(false)
@@ -141,12 +180,80 @@ const CustomExercise = props => {
     })
   }
 
+  useEffect(() => {
+    if (reps !== "") {
+      if (checkedReps) { remaingSameDualKeep() } else { clearNextPadValues() }
+
+    }
+    if (temporaryReps !== "") {
+      if (checkedReps) { remaingSameDualKeep() } else { clearNextPadValues() }
+    }
+
+  }, [checkedReps, dualSetState])
+  useEffect(() => {
+
+    if (seconds !== "" || minutes !== "") {
+      if (checkedRest) { remaingRestSameDualKeep() } else { clearNextIndexRestValue() }
+    }
+  }, [checkedRest, dualSetState])
+
   const updateDualReps = val => {
     const tempObj = { ...dualReps }
     const key = `state${dualSetState}`
     tempObj[key] = val
     setDualReps(tempObj)
   }
+  const clearNextPadValues = () => {
+    const data = [...props?.customExercise];
+    const checkData = data?.[exerciseIndex];
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state2: null
+          });
+        }
+      } else {
+        if (selectIndex + 1 === 1) {
+          setDroupSets({
+            ...droupSet,
+            state2: null,
+            state3: null
+          });
+        } else if (selectIndex + 1 === 2) {
+          setDroupSets({
+            ...droupSet,
+            state3: null
+          });
+        }
+      }
+    } else {
+      if (findingData()?.activeSet?.value === 4) {
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state2: null,
+            state3: null
+          });
+        } else if (dualSetState === 2) {
+          setDualReps({
+            ...dualReps,
+            state3: null
+          });
+        }
+      } else {
+        if (dualSetState === 1) {
+          setDualReps({
+            ...dualReps,
+            state2: null
+          });
+        }
+      }
+    }
+  };
+
 
   const remaingSameDualKeep = () => {
     const data = [...props?.customExercise]
@@ -324,6 +431,58 @@ const CustomExercise = props => {
     }
   }
 
+  const clearNextIndexRestValue = () => {
+    const data = [...props?.customExercise];
+    const checkData = data?.[exerciseIndex];
+
+    if (!setType?.includes(checkData?.activeSet?.item)) {
+      if (findingData()?.activeSet?.item === "Drop Set") {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null
+          }
+        }));
+      } else {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null,
+            sec3: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null,
+            mint3: null
+          }
+        }));
+      }
+    } else {
+      if (findingData()?.activeSet?.value === 4) {
+        setTimeData(prevState => ({
+          ...prevState,
+          seconds: {
+            ...prevState.seconds,
+            sec2: null,
+            sec3: null
+          },
+          mints: {
+            ...prevState.mints,
+            mint2: null,
+            mint3: null
+          }
+        }));
+      }
+    }
+  };
+
+
   const renderInputValue = key => {
     const data = [...props?.customExercise]
     const checkData = data?.[exerciseIndex]
@@ -378,26 +537,43 @@ const CustomExercise = props => {
     const flattenedArray = arrayList.flat()
     return flattenedArray
   }
-
-  // Flatten the array
-  const addDataCustomEx = () => {
+  const startCutomWorkout = async () => {
     if (title === "Rest" || title === "rest") {
       showMessage({ message: "Title should not be Rest", type: "danger" })
     } else {
       const payload = {
         name: title ? title : "title",
         user: profile?.id,
-        custom_exercises: transformData(props.customExercise)
+        created_date: pickedDate,
+        custom_exercises: transformData(customExercise)
         // adding_exercise_in_workout: true
       }
+      setCustom(true)
+      await postCustomExRequest(payload, true)
+      await navigation.pop(2)
 
-      props.postCustomExRequest(payload)
     }
   }
+  // Flatten the array
+  // const addDataCustomEx = () => {
+  //   if (title === "Rest" || title === "rest") {
+  //     showMessage({ message: "Title should not be Rest", type: "danger" })
+  //   } else {
+  //     const payload = {
+  //       name: title ? title : "title",
+  //       user: profile?.id,
+  //       created_date: route?.params?.date,
+  //       custom_exercises: transformData(props.customExercise)
+  //       // adding_exercise_in_workout: true
+  //     }
+
+  //     props.postCustomExRequest(payload, false)
+  //   }
+  // }
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
   const checkSets = () => {
-    const jsonData = transformData(props.customExercise)
+    const jsonData = transformData(customExercise)
 
     for (const entry of jsonData) {
       if (entry.custom_sets.length === 0) {
@@ -413,22 +589,70 @@ const CustomExercise = props => {
     return true
   }
 
+  const onSelectItem = i => {
+    let array = [...selectedItem]
+    if (array.includes(i)) {
+      array = array.filter(index => index !== i)
+    } else {
+      if (activeSet?.id === 1) {
+        if (selectedItem.length < 2) {
+          array.push(i)
+        }
+      } else if (activeSet?.value === 4) {
+        if (selectedItem.length < 3) {
+          array.push(i)
+        }
+      } else {
+        array = [i]
+      }
+    }
+    setSelectedItem(array)
+  }
+
+  const updateDataParams = () => {
+    const exercises = []
+    getExerciseType &&
+      getExerciseType.forEach((item, ind) => {
+        if (selectedItem.includes(ind)) {
+          exercises.push(item)
+        }
+      })
+
+    const newObj = { type: exercises }
+
+    const newData = customExercise.map((existingData, idx) => {
+      if (idx === activeCard.index) {
+        return { ...existingData, exercises: newObj }
+      } else {
+        return existingData
+      }
+    })
+
+    addCustomExercise(newData)
+    replaceExercise.current.close()
+    setActiveCard({ item: {}, index: 0 })
+  }
+
+
+  const goBackScreen = () => {
+    navigation.goBack()
+  }
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
-        contentContainerStyle={Layout.fillGrow}
+        contentContainerStyle={fillGrow}
         keyboardShouldPersistTaps={"handled"}
       >
         <View
           style={[
-            Layout.row,
+            row,
             Gutters.regularVMargin,
             Gutters.regularHMargin,
-            Layout.alignItemsCenter,
-            Layout.justifyContentBetween
+            alignItemsCenter,
+            justifyContentBetween
           ]}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={goBackScreen}>
             <Image
               source={Images.back2}
               style={{ width: 30, height: 25, resizeMode: "contain" }}
@@ -454,19 +678,22 @@ const CustomExercise = props => {
 
         <View
           style={[
-            Layout.row,
+            row,
             Global.borderB,
             Global.height60,
             Global.borderAlto,
-            Layout.alignItemsCenter,
+            alignItemsCenter,
             Gutters.regularHMargin,
-            Layout.justifyContentBetween
+            justifyContentBetween
           ]}
         >
           <InputField
-            inputStyle={[Fonts.titleRegular, Layout.fill]}
-            value={title}
-            onChangeText={val => setTitle(val)}
+            inputStyle={[Fonts.titleRegular, fill]}
+            value={exerciseTitle || title}
+            onChangeText={val => {
+              setTitle(val)
+              setExerciseTitle(val)
+            }}
             placeholder="Workout Title"
             autoCapitalize="none"
           />
@@ -484,7 +711,7 @@ const CustomExercise = props => {
             >
               {
                 //numberOfExercise === 1 ? (
-                //<View style={[Layout.row, Gutters.smallHMargin, Gutters.smallVMargin]}>
+                //<View style={[row, Gutters.smallHMargin, Gutters.smallVMargin]}>
                 //<Image source={Images.profileBackGround} style={styles.exerciseImage} />
                 //<Text text="Barbell bench press" style={styles.exerciseName} />
                 //</View>
@@ -493,7 +720,15 @@ const CustomExercise = props => {
                 item?.exercises?.type?.map((exe, i) => {
                   return (
                     <View style={[Gutters.smallHMargin, Gutters.smallVMargin]}>
-                      <View style={Layout.row}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          getExerciseTypeRequest(exe?.exercise_type?.id, "")
+
+                          setActiveCard({ item: item, index: index })
+                          replaceExercise.current.open()
+                        }}
+                        style={row}
+                      >
                         <Image
                           source={
                             exe?.video_thumbnail
@@ -510,9 +745,9 @@ const CustomExercise = props => {
                               : `${list[i]}. ${exe.name}`
                           }
                         />
-                      </View>
+                      </TouchableOpacity>
 
-                      {/* <View style={[Layout.row, Gutters.smallTMargin]}>
+                      {/* <View style={[row, Gutters.smallTMargin]}>
                     <Image source={Images.profileBackGround} style={styles.exerciseImage1} />
                     <Text style={styles.exerciseName1} text={`a. ${ex2}`} />
                   </View> */}
@@ -523,10 +758,10 @@ const CustomExercise = props => {
 
               <View
                 style={[
-                  Layout.row,
+                  row,
                   Gutters.smallHMargin,
                   Gutters.smallTMargin,
-                  Layout.justifyContentAround
+                  justifyContentAround
                 ]}
               >
                 <Text style={styles.setStyle} text="Set" />
@@ -546,17 +781,17 @@ const CustomExercise = props => {
                         setCurrentIndex(data)
                       }}
                       style={[
-                        Layout.row,
+                        row,
                         Global.height35,
                         Gutters.tinyTMargin,
                         Gutters.largeHMargin,
-                        Layout.alignItemsCenter,
-                        Layout.justifyContentAround,
+                        alignItemsCenter,
+                        justifyContentAround,
                         {
                           borderRadius: 6,
                           backgroundColor:
                             currentIndex?.index === i &&
-                            currentIndex?.exerciseIndex === index
+                              currentIndex?.exerciseIndex === index
                               ? "#9cdaff"
                               : "#f3f1f4"
                         }
@@ -585,7 +820,7 @@ const CustomExercise = props => {
                         {
                           backgroundColor:
                             currentIndex?.index === i &&
-                            currentIndex?.exerciseIndex === index
+                              currentIndex?.exerciseIndex === index
                               ? "#74ccff"
                               : "#f1f1f1"
                         }
@@ -622,7 +857,7 @@ const CustomExercise = props => {
                         style={[
                           styles.dualSetsSecondView1,
                           findingData()?.activeSet?.value === 4 &&
-                            styles.borderStyle
+                          styles.borderStyle
                         ]}
                       >
                         <Text
@@ -650,7 +885,7 @@ const CustomExercise = props => {
                           />
                           <Text
                             style={styles.dualSecondReps}
-                            text={items.exerciseC.reps}
+                            text={items.exerciseC?.reps}
                           />
                           <Text
                             style={styles.dualSecondRest}
@@ -669,6 +904,8 @@ const CustomExercise = props => {
               <View style={Gutters.largeHMargin}>
                 <TouchableOpacity
                   onPress={() => {
+                    setCheckedReps(false)
+                    setCheckedRest(false)
                     resetValues()
                     setExerciseIndex(index)
                     if (item?.exercises?.type?.length === 1) {
@@ -685,23 +922,23 @@ const CustomExercise = props => {
 
               <View
                 style={[
-                  Layout.row,
+                  row,
                   Gutters.smallHMargin,
                   Gutters.small2xTMargin,
-                  Layout.justifyContentBetween
+                  justifyContentBetween
                 ]}
               >
                 <TouchableOpacity
-                  style={Layout.row}
+                  style={row}
                   onPress={() => {
                     duplicateSet(item)
                   }}
-                  // disabled={
-                  //   currentIndex?.exerciseIndex === index &&
-                  //   (currentIndex || currentIndex === 0)
-                  //     ? false
-                  //     : true
-                  // }
+                // disabled={
+                //   currentIndex?.exerciseIndex === index &&
+                //   (currentIndex || currentIndex === 0)
+                //     ? false
+                //     : true
+                // }
                 >
                   <Image
                     source={duplicateIcon}
@@ -723,12 +960,12 @@ const CustomExercise = props => {
                     setExerciseIndex(index)
                     setDeleteModal(true)
                   }}
-                  // disabled={
-                  //   currentIndex?.exerciseIndex === index &&
-                  //   (currentIndex || currentIndex === 0)
-                  //     ? false
-                  //     : true
-                  // }
+                // disabled={
+                //   currentIndex?.exerciseIndex === index &&
+                //   (currentIndex || currentIndex === 0)
+                //     ? false
+                //     : true
+                // }
                 >
                   <Image source={redBin} style={{ height: 22, width: 20 }} />
                 </TouchableOpacity>
@@ -748,29 +985,53 @@ const CustomExercise = props => {
         {props?.customExercise?.length !== 0 ? (
           <View style={{ marginHorizontal: 15 }}>
             <Button
-              text={"Add Exercie"}
+              text={"Add Exercise"}
+              textStyle={[{ color: "white" }]}
+              style={[styles.btn]}
+              // disabled={cRequesting || title === "" || !checkSets()}
+              onPress={goBackScreen}
+
+            // disabled={
+            //   activeSet?.id === 1
+            //     ? selectedItem?.length < 2
+            //     : activeSet?.value === 4
+            //     ? selectedItem?.length < 3
+            //     : selectedItem?.length < 1
+            // }
+            // onPress={makeDataParams}
+            />
+          </View>
+        ) : null}
+        {props?.customExercise?.length !== 0 ? (
+          <View style={{ marginHorizontal: 15 }}>
+            <Button
+              text={"Start Workout"}
               textStyle={[{ color: "white" }]}
               style={[
                 styles.btn,
                 {
+                  flex: 1,
+                  backgroundColor: "green",
                   opacity: title === "" || !checkSets() ? 0.5 : 1
                 }
               ]}
-              disabled={cRequesting || title === "" || !checkSets()}
-              onPress={addDataCustomEx}
+              disabled={cRequesting || title === "" || exerciseTitle === '' || !checkSets()}
+              onPress={startCutomWorkout}
               loading={cRequesting}
 
-              // disabled={
-              //   activeSet?.id === 1
-              //     ? selectedItem?.length < 2
-              //     : activeSet?.value === 4
-              //     ? selectedItem?.length < 3
-              //     : selectedItem?.length < 1
-              // }
-              // onPress={makeDataParams}
+            // disabled={
+            //   activeSet?.id === 1
+            //     ? selectedItem?.length < 2
+            //     : activeSet?.value === 4
+            //     ? selectedItem?.length < 3
+            //     : selectedItem?.length < 1
+            // }
+            // onPress={makeDataParams}
             />
           </View>
-        ) : null}
+        ) : (
+          <></>
+        )}
       </KeyboardAwareScrollView>
 
       <RBSheet
@@ -793,24 +1054,15 @@ const CustomExercise = props => {
         <View style={styles.secondView}>
           <ScrollView keyboardShouldPersistTaps={"handled"}>
             <View
-              style={[
-                Layout.row,
-                Layout.fill,
-                Gutters.small2xHMargin,
-                Layout.justifyContentBetween
-              ]}
+              style={[row, fill, Gutters.small2xHMargin, justifyContentBetween]}
             >
-              <View style={Layout.fill} />
-              <View style={[Layout.fill, Layout.center]}>
+              <View style={fill} />
+              <View style={[fill, center]}>
                 <Text style={styles.setOneTextStyle} text="Set 1" />
               </View>
               <TouchableOpacity
                 onPress={() => refRBSheet.current.close()}
-                style={[
-                  Layout.fill,
-                  Layout.alignItemsEnd,
-                  Layout.justifyContentCenter
-                ]}
+                style={[fill, alignItemsEnd, justifyContentCenter]}
               >
                 <Image source={circleClose} style={{ height: 25, width: 25 }} />
               </TouchableOpacity>
@@ -818,10 +1070,10 @@ const CustomExercise = props => {
 
             <View
               style={[
-                Layout.row,
+                row,
                 Gutters.largeHMargin,
                 Gutters.small2xTMargin,
-                Layout.justifyContentBetween
+                justifyContentBetween
               ]}
             >
               <View style={styles.secondaryBoxes}>
@@ -846,8 +1098,8 @@ const CustomExercise = props => {
                     minWidth: 40,
                     marginTop:
                       findingData()?.activeSet &&
-                      (findingData()?.activeSet?.item === "Drop Set" ||
-                        findingData()?.activeSet?.item === "Triple Set")
+                        (findingData()?.activeSet?.item === "Drop Set" ||
+                          findingData()?.activeSet?.item === "Triple Set")
                         ? 0
                         : 5
                   }}
@@ -860,32 +1112,32 @@ const CustomExercise = props => {
                 />
                 {(findingData()?.activeSet?.item === "Drop Set" ||
                   findingData()?.activeSet?.item === "Triple Set") && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      position: "absolute",
-                      bottom: 8
-                    }}
-                  >
-                    {Array(findingData()?.activeSet?.value)
-                      .fill()
-                      .map((item, index) => (
-                        <Pressable
-                          // onPress={() => {
-                          //   droupSet?.state2 && setReps(droupSet?.state2)
-                          // }}
-                          style={{
-                            height: 5,
-                            width: 5,
-                            borderRadius: 50,
-                            backgroundColor: "black",
-                            marginRight: 5,
-                            opacity: index === selectIndex ? 1 : 0.5
-                          }}
-                        />
-                      ))}
-                  </View>
-                )}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        position: "absolute",
+                        bottom: 8
+                      }}
+                    >
+                      {Array(findingData()?.activeSet?.value)
+                        .fill()
+                        .map((item, index) => (
+                          <Pressable
+                            // onPress={() => {
+                            //   droupSet?.state2 && setReps(droupSet?.state2)
+                            // }}
+                            style={{
+                              height: 5,
+                              width: 5,
+                              borderRadius: 50,
+                              backgroundColor: "black",
+                              marginRight: 5,
+                              opacity: index === selectIndex ? 1 : 0.5
+                            }}
+                          />
+                        ))}
+                    </View>
+                  )}
               </View>
 
               <View
@@ -895,7 +1147,7 @@ const CustomExercise = props => {
                     width: 120,
                     opacity:
                       findingData()?.activeSet?.item === "Drop Set" ||
-                      findingData()?.activeSet?.item === "Triple Set"
+                        findingData()?.activeSet?.item === "Triple Set"
                         ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
@@ -907,7 +1159,7 @@ const CustomExercise = props => {
                   style={{ color: "#00a1ff", fontWeight: "700" }}
                   text="Enter Rest"
                 />
-                <View style={[Layout.row, Layout.alignItemsCenter]}>
+                <View style={[row, alignItemsCenter]}>
                   <View>
                     <TextInput
                       style={{
@@ -925,11 +1177,11 @@ const CustomExercise = props => {
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                              findingData()?.activeSet?.item ===
-                                "Triple Set") &&
-                            (findingData()?.activeSet?.value === selectIndex + 1
-                              ? true
-                              : false)
+                            findingData()?.activeSet?.item ===
+                            "Triple Set") &&
+                          (findingData()?.activeSet?.value === selectIndex + 1
+                            ? true
+                            : false)
                       }
                       maxLength={2}
                       value={`${minutes}`}
@@ -967,11 +1219,11 @@ const CustomExercise = props => {
                         findingData()?.activeSet?.item === "Single Set"
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
-                              findingData()?.activeSet?.item ===
-                                "Triple Set") &&
-                            (findingData()?.activeSet?.value === selectIndex + 1
-                              ? true
-                              : false)
+                            findingData()?.activeSet?.item ===
+                            "Triple Set") &&
+                          (findingData()?.activeSet?.value === selectIndex + 1
+                            ? true
+                            : false)
                       }
                       value={`${seconds}`}
                     />
@@ -986,27 +1238,25 @@ const CustomExercise = props => {
             </View>
             <View
               style={[
-                Layout.row,
+                row,
                 Gutters.largeHMargin,
                 Gutters.small2xTMargin,
-                Layout.justifyContentBetween
+                justifyContentBetween
               ]}
             >
-              <View
-                style={[
-                  Layout.row,
-                  Gutters.smallTMargin,
-                  Layout.alignItemsCenter
-                ]}
-              >
+              <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (reps !== "") {
-                      remaingSameDualKeep()
-                    }
+                    setCheckedReps(!checkedReps)
+                    // if (reps !== "") {
+                    //   remaingSameDualKeep()
+                    // }
                   }}
                 >
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                  <Image
+                    source={checkedReps ? radioDoneBlue : radioBlue}
+                    style={{ width: 20, height: 20 }}
+                  />
                 </TouchableOpacity>
 
                 <Text
@@ -1019,21 +1269,16 @@ const CustomExercise = props => {
                   Keep reps the{"\n"} same for {"\n"} remaining sets
                 </Text>
               </View>
-              <View
-                style={[
-                  Layout.row,
-                  Gutters.smallTMargin,
-                  Layout.alignItemsCenter
-                ]}
-              >
+              <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (seconds !== "" || minutes !== "") {
-                      remaingRestSameDualKeep()
-                    }
+                    setCheckedRest(!checkedRest)
                   }}
                 >
-                  <Image source={radioBlue} style={{ width: 20, height: 20 }} />
+                  <Image
+                    source={checkedRest ? radioDoneBlue : radioBlue}
+                    style={{ width: 20, height: 20 }}
+                  />
                 </TouchableOpacity>
                 <Text
                   style={{
@@ -1048,11 +1293,7 @@ const CustomExercise = props => {
             </View>
 
             <View
-              style={[
-                Layout.center,
-                Gutters.smallVMargin,
-                Gutters.regularBPadding
-              ]}
+              style={[center, Gutters.smallVMargin, Gutters.regularBPadding]}
             >
               <TouchableOpacity
                 style={{
@@ -1081,9 +1322,9 @@ const CustomExercise = props => {
                         reps:
                           droupSet &&
                           droupSet?.state1 +
-                            "/" +
-                            droupSet?.state2 +
-                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                          "/" +
+                          droupSet?.state2 +
+                          (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                         weight: "",
                         set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                         rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
@@ -1098,9 +1339,9 @@ const CustomExercise = props => {
                           reps:
                             droupSet &&
                             droupSet?.state1 +
-                              "/" +
-                              droupSet?.state2 +
-                              (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
+                            "/" +
+                            droupSet?.state2 +
+                            (droupSet?.state3 ? "/" + droupSet?.state3 : ""),
                           weight: "",
                           set_type: selectIndex + 1 === 3 ? "tds" : "ds",
                           rest:
@@ -1136,9 +1377,9 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                  (findingData()?.activeSet?.item === "Drop Set" ||
-                    findingData()?.activeSet?.item === "Triple Set") &&
-                  selectIndex + 1 < findingData()?.activeSet?.value
+                    (findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") &&
+                    selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
                 </Text>
@@ -1281,13 +1522,14 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (temporaryReps !== "") {
-                        remaingSameDualKeep()
-                      }
+                      setCheckedReps(!checkedReps)
+                      // if (temporaryReps !== "") {
+                      //   remaingSameDualKeep()
+                      // }
                     }}
                   >
                     <Image
-                      source={radioBlue}
+                      source={checkedReps ? radioDoneBlue : radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
                   </TouchableOpacity>
@@ -1396,13 +1638,11 @@ const CustomExercise = props => {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      if (seconds !== "" || minutes !== "") {
-                        remaingRestSameDualKeep()
-                      }
+                      setCheckedRest(!checkedRest)
                     }}
                   >
                     <Image
-                      source={radioBlue}
+                      source={checkedRest ? radioDoneBlue : radioBlue}
                       style={{ width: 20, height: 20 }}
                     />
                   </TouchableOpacity>
@@ -1458,7 +1698,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1472,7 +1712,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1485,7 +1725,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1499,7 +1739,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1512,7 +1752,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1526,7 +1766,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint3
                                 ? timeData?.mints?.mint3
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec3
                                   ? timeData?.seconds?.sec3
@@ -1542,7 +1782,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1556,7 +1796,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1569,7 +1809,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1583,7 +1823,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1596,7 +1836,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1610,7 +1850,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint3
                               ? timeData?.mints?.mint3
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec3
                                 ? timeData?.seconds?.sec3
@@ -1630,7 +1870,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1644,7 +1884,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec1
                                   ? timeData?.seconds?.sec1
@@ -1657,7 +1897,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1671,7 +1911,7 @@ const CustomExercise = props => {
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
                                 : 0) *
-                                60 +
+                              60 +
                               parseFloat(
                                 timeData?.seconds?.sec2
                                   ? timeData?.seconds?.sec2
@@ -1687,7 +1927,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1701,7 +1941,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec1
                                 ? timeData?.seconds?.sec1
@@ -1714,7 +1954,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1728,7 +1968,7 @@ const CustomExercise = props => {
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
                               : 0) *
-                              60 +
+                            60 +
                             parseFloat(
                               timeData?.seconds?.sec2
                                 ? timeData?.seconds?.sec2
@@ -1746,7 +1986,7 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                  dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
+                    dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
                     ? "Next"
                     : "Done"}
                 </Text>
@@ -1768,6 +2008,94 @@ const CustomExercise = props => {
           </ScrollView>
         </View>
       </RBSheet>
+      <BottomSheet
+        reff={replaceExercise}
+        isDrage={true}
+        h={700}
+        Iconbg={Colors.athensgray}
+        bg={Colors.athensgray}
+        customStyles={{
+          draggableIcon: {
+            backgroundColor: "red"
+          }
+        }}
+        onClose={() => setActiveCard({ item: {}, index: 0 })}
+      >
+        <View
+          style={[
+            row,
+            justifyContentBetween,
+            { marginTop: 25, marginHorizontal: 25 }
+          ]}
+        >
+          <Text
+            text="Popular Exercises"
+            style={[styles.heading, { color: "#626262" }]}
+          />
+          <TouchableOpacity
+            disabled={
+              activeSet?.id === 1
+                ? selectedItem?.length < 2
+                : activeSet?.value === 4
+                  ? selectedItem?.length < 3
+                  : selectedItem?.length < 1
+            }
+            onPress={updateDataParams}
+            style={[styles.addSetsButton]}
+          >
+            <Text>Done</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView>
+          <View style={{ marginBottom: 20 }}>
+            {getExerciseType === false && !requesting && requesting ? (
+              <ActivityIndicator size={"large"} color="green" />
+            ) : getExerciseType && getExerciseType?.length ? (
+              getExerciseType.map((item, i) => (
+                <TouchableOpacity
+                  style={[
+                    styles.cardView,
+                    {
+                      backgroundColor: selectedItem.includes(i)
+                        ? "#74ccff"
+                        : "#e5e5e5"
+                    }
+                  ]}
+                  onPress={() => onSelectItem(i)}
+                >
+                  <View
+                    style={[
+                      row,
+                      justifyContentBetween,
+                      { position: "relative" }
+                    ]}
+                  >
+                    <View style={[center, styles.cardImg]}>
+                      <Image
+                        source={
+                          item?.pictures[0]?.image
+                            ? { uri: item?.pictures[0]?.image }
+                            : item?.video_thumbnail
+                              ? { uri: item?.video_thumbnail }
+                              : foodImage
+                        }
+                        style={{ width: 80, height: 45 }}
+                      />
+                    </View>
+                    <View style={[center, { marginRight: 50, flex: 1 }]}>
+                      <Text text={item.name} style={styles.heading1} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={styles.notFound}>
+                <Text bold>No exercise found</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </BottomSheet>
 
       <Modal
         isVisible={deleteModal}
@@ -1780,7 +2108,7 @@ const CustomExercise = props => {
             Gutters.small2xHMargin,
             Global.secondaryBg,
             Global.borderR10,
-            Layout.center,
+            center,
             {
               height: 250
             }
@@ -1791,7 +2119,7 @@ const CustomExercise = props => {
             text="Are you sure you want to delete this exercise?"
           />
 
-          <View style={[Layout.row, Gutters.small2xTMargin]}>
+          <View style={[row, Gutters.small2xTMargin]}>
             <TouchableOpacity
               style={[styles.delBtnStyles, { backgroundColor: "#74ccff" }]}
               onPress={() => deleteSet()}
@@ -2026,6 +2354,33 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
     height: 40
+  },
+  heading: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold"
+  },
+  cardView: {
+    padding: 13,
+    marginTop: 15,
+    borderRadius: 10,
+    backgroundColor: Colors.brightturquoise,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 5,
+    marginHorizontal: 8
+  },
+  cardImg: {
+    backgroundColor: "white",
+    width: 90,
+    height: 60,
+    borderRadius: 10
   }
 })
 
@@ -2034,11 +2389,20 @@ const mapStateToProps = state => ({
   getCustomExState: state.addExerciseReducer.getCustomExState,
   todaySessions: state.programReducer.todaySessions,
   customExercise: state.addExerciseReducer.custom,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
+  getExerciseType: state.addExerciseReducer.getExerciseType,
+  requesting: state.addExerciseReducer.requesting,
+  pickedDate: state.programReducer.pickedDate,
+  exerciseTitle: state.programReducer.exerciseTitle,
 })
 
 const mapDispatchToProps = dispatch => ({
-  postCustomExRequest: data => dispatch(postCustomExRequest(data)),
-  addCustomExercise: data => dispatch(addCustomExercise(data))
+  postCustomExRequest: (data, start) =>
+    dispatch(postCustomExRequest(data, start)),
+  addCustomExercise: data => dispatch(addCustomExercise(data)),
+  getExerciseTypeRequest: (data, search) =>
+    dispatch(getExerciseTypeRequest(data, search)),
+  setCustom: type => dispatch(setCustom(type)),
+  setExerciseTitle: type => dispatch(setExerciseTitle(type))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

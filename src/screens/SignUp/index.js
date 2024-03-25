@@ -304,7 +304,7 @@ const SignUp = props => {
                 )}
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => props.navigation.navigate("Subscription")}
               disabled={true}
             >
@@ -312,14 +312,14 @@ const SignUp = props => {
                 style={[styles.logInButton]}
                 colors={["#048ECC", "#0460BB", "#0480C6"]}
               >
-                {/* {props.requesting ? (
+                {props.requesting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <Text style={styles.loginText}>Continue</Text>
-                )} */}
+                )} 
                 <Text style={styles.loginText}>Continue</Text>
               </LinearGradient>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </KeyboardAwareScrollView>

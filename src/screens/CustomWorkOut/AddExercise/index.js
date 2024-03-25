@@ -39,9 +39,9 @@ const data = [
 const AddExercies = props => {
   const { navigation, getExerciseState, requesting, getExerciseType } = props
   let refDescription = useRef("")
-  let isFocused = useIsFocused()
   const [activeSet, setActiveSet] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
+
   const [desription, setDesription] = useState(false)
   const [selectMuscle, setSelectMuscle] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -52,7 +52,14 @@ const AddExercies = props => {
   useEffect(() => {
     // isFocused && props.getExerciseRequest()
     props.getExerciseRequest()
+
   }, [])
+  const isFocused = useIsFocused()
+  useEffect(() => {
+    setSelectedItem([])
+    setActiveSet(false)
+    setSelectMuscle(0)
+  }, [isFocused])
 
   useEffect(() => {
     getExerciseState &&
@@ -256,7 +263,7 @@ const AddExercies = props => {
           </View>
           <View style={{ marginTop: 25 }}>
             <Text
-              text="Poupular Exercies"
+              text="Popular Exercises"
               style={[styles.heading, { color: "#626262" }]}
             />
           </View>
@@ -286,8 +293,8 @@ const AddExercies = props => {
                         item?.pictures[0]?.image
                           ? { uri: item?.pictures[0]?.image }
                           : item?.video_thumbnail
-                          ? { uri: item?.video_thumbnail }
-                          : foodImage
+                            ? { uri: item?.video_thumbnail }
+                            : foodImage
                       }
                       style={{ width: 80, height: 45 }}
                     />
@@ -319,15 +326,15 @@ const AddExercies = props => {
       </ScrollView>
       <View style={{ alignSelf: "center" }}>
         <Button
-          text={"Add Exercies"}
+          text={"Add Exercise"}
           textStyle={[{ color: "white" }]}
           style={styles.btn}
           disabled={
             activeSet?.id === 1
               ? selectedItem?.length < 2
               : activeSet?.value === 4
-              ? selectedItem?.length < 3
-              : selectedItem?.length < 1
+                ? selectedItem?.length < 3
+                : selectedItem?.length < 1
           }
           onPress={makeDataParams}
         />

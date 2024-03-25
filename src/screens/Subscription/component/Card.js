@@ -1,15 +1,17 @@
 import React from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity } from "react-native"
-import { Text } from "../../../components"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
+import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
 
 import { Gutters, Layout, Global } from "../../../theme"
+import { connect } from "react-redux"
+import { API_URL } from "../../../config/app"
 
 const Card = props => {
-  const { onPress, getPlans, amount, subsucriptionId } = props
+  const { onPress, getPlans, amount, subsucriptionId, profile } = props
   const {
     regularHMargin,
     regularVPadding,
@@ -30,6 +32,9 @@ const Card = props => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
+  const openPrivacyPolicy = () => {
+    Linking.openURL(`${API_URL}/privacy-policy/`)
+  }
   return (
     <>
       <LinearGradient
@@ -62,9 +67,10 @@ const Card = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
+        {/* <Loader isLoading={amount} /> */}
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
-            text={`$ ${amount || "0"}`}
+            text={`$ ${amount || 0}`}
             regularTitle
             color="secondary"
             bold
@@ -72,11 +78,33 @@ const Card = props => {
           />
           {/* <Text text={" / month"} large color="secondary" /> */}
         </View>
-        {getPlans && getPlans[getPlans.length - 1]?.id === subsucriptionId ? (
-          <TouchableOpacity style={styles.cancelButton}>
+        {/* {profile?.trial ? (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+                "We will be here soon with this functionality. Stay tuned!",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      
+                      // onCancelation() 
+                    }
+                  }
+                ],
+                { cancelable: false }
+              )
+            }}
+
+            style={styles.cancelButton}>
             <Text style={styles.text}>Cancel</Text>
           </TouchableOpacity>
-        ) : null}
+        ) : null} */}
 
         <View
           style={[
@@ -90,21 +118,25 @@ const Card = props => {
         >
           <Text color="secondary" center style={{ fontSize: 14 }}>
             By subcribing to Orum Training, you agree to our {""}
-            <Text
-              text={"\nPrivacy Policy"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"\nPrivacy Policy"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
             {""} and {""}
-            <Text
-              text={"Terms of Services"}
-              color="secondary"
-              regular
-              center
-              underlined
-            />
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text
+                text={"Terms of Services"}
+                color="secondary"
+                regular
+                center
+                underlined
+              />
+            </TouchableOpacity>
           </Text>
         </View>
       </LinearGradient>
@@ -118,7 +150,7 @@ const Card = props => {
         <Button
           color="secondary"
           text={
-            getPlans && getPlans[getPlans.length - 1]?.id === subsucriptionId
+            profile?.trial
               ? "Already Bought"
               : "Buy Now"
           }
@@ -126,10 +158,11 @@ const Card = props => {
             border,
             center,
             regularHPadding,
-            { height: 40, borderRadius: 30 }
+            { height: 43, borderRadius: 30, }
           ]}
           //onPress={getPlans[getPlans.length - 1]?.id !== subsucriptionId ? onPress : null}
           onPress={onPress}
+          disabled={profile?.is_premium_user}
         />
       </View>
     </>
@@ -159,4 +192,12 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Card
+const mapStateToProps = state => ({
+  profile: state.login.userDetail,
+})
+
+const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
+
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Card)
