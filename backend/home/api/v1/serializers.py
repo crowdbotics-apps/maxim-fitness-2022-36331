@@ -24,7 +24,7 @@ from requests.exceptions import HTTPError
 from home.models import Product, ProductUnit, Meal, FoodItem, Recipe, RecipeItem, Category, Post, Comment, Form, \
     Answer, Question, QuestionType, CaloriesRequired, ConsumeCalories, ReportAPost, BlockUser, Chat, PostImage, \
     PostCommentReply, PostCommentLike, PostVideo, ReportAUser, ReportAComment, ReportCommentReply, AltMeasure, MealTime, \
-    MealHistory
+    MealHistory, CancelSubscription
 
 from program.models import Exercise, Session, Workout, Set, ExerciseType, ExerciseImages, Report, CustomWorkout, \
     CustomExercise, CustomSet
@@ -206,10 +206,17 @@ class BlockedUserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CancelSubscription
+        fields = "__all__"
+
+
 class UserSerializer(serializers.ModelSerializer):
     settings = SettingsSerializer(read_only=True)
     request_user = BlockedUserSerializer(read_only=True, many=True)
     block_user = BlockedUserSerializer(read_only=True, many=True)
+    user_subscription = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -220,7 +227,7 @@ class UserSerializer(serializers.ModelSerializer):
                   "exercise_level", "activity_level",
                   "understanding_level", "number_of_meal", "number_of_training_days",
                   "fitness_goal", "settings", 'stripe_customer_id', "is_survey", "is_superuser", 'request_user',
-                  'block_user', 'is_premium_user'
+                  'block_user', 'is_premium_user', 'user_subscription'
                   ]
 
     def _get_request(self):
@@ -228,6 +235,30 @@ class UserSerializer(serializers.ModelSerializer):
         if request and not isinstance(request, HttpRequest) and hasattr(request, '_request'):
             request = request._request
         return request
+
+    def get_user_subscription(self, obj):
+        current_date = timezone.now().date()
+        if obj.is_premium_user:
+            user_subscription = CancelSubscription.objects.filter(user=obj).last()
+            if user_subscription:
+                if user_subscription.is_subscription_canceled:
+                    if user_subscription.subscription_end_date >= current_date:
+                        return UserSubscriptionSerializer(user_subscription).data
+                    else:
+                        user_subscription.subscription_end_date = None
+                        user_subscription.is_subscription_days_remaining = False
+                        user_subscription.save()
+                        obj.is_premium_user = False
+                        obj.save()
+                elif user_subscription.subscription_end_date < current_date:
+                    user_subscription.subscription_end_date = None
+                    user_subscription.is_subscription_days_remaining = False
+                    user_subscription.save()
+                    obj.is_premium_user = False
+                    obj.save()
+
+        return None
+
 
 
 

@@ -949,6 +949,8 @@ class SessionViewSet(ModelViewSet):
             for session in queryset:
                 session.reset()
         serializer = self.get_serializer(queryset, many=True)
+        if int(how_many_week) == 1:
+            next_week_number = None
         data = {
             "week": int(how_many_week),
             "date_in_week_number": date_in_week_number,
@@ -1812,36 +1814,36 @@ class CustomWorkoutViewSet(ModelViewSet):
         workout_id = request.data.get('workout_id')  # workout id
         schedule_date = request.data.get('schedule_date')  # schedule date
 
-        # Validate inputs
         if not workout_id:
             return Response({'error': 'workout_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         if not schedule_date:
             return Response({'error': 'schedule_date is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get the original workout
-        workout = CustomWorkout.objects.filter(id=workout_id).first()
+        # Get the workout
+        workout = CustomWorkout.objects.filter(id=workout_id).last()
         if not workout:
             return Response({'error': 'Workout not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
-        # Create a new workout with the same exercises and sets
-        new_workout = CustomWorkout.objects.create(created_date=schedule_date, name=workout.name, user=workout.user)
-
-        # Clone exercises and sets from the original workout
-        for exercise in workout.custom_exercises_workouts.all():
-            new_exercise = CustomExercise.objects.create(custom_workout=new_workout, name=exercise.name)
-            new_exercise.exercises.set(exercise.exercises.all())
-            for set_obj in exercise.custom_set_exercises.all():
-                new_set = CustomSet.objects.create(
-                    custom_exercise=new_exercise,
-                    set_no=set_obj.set_no,
-                    reps=set_obj.reps,
-                    rest=set_obj.rest,
-                    weight=set_obj.weight,
-                    timer=set_obj.timer,
-                    set_type=set_obj.set_type,
-                    done=False  # Assuming the sets are not marked as done initially
-                )
+        workout.created_date = schedule_date
+        workout.save()
+        # # Create a new workout with the same exercises and sets
+        # new_workout = CustomWorkout.objects.create(created_date=schedule_date, name=workout.name, user=workout.user)
+        #
+        # # Clone exercises and sets from the original workout
+        # for exercise in workout.custom_exercises_workouts.all():
+        #     new_exercise = CustomExercise.objects.create(custom_workout=new_workout, name=exercise.name)
+        #     new_exercise.exercises.set(exercise.exercises.all())
+        #     for set_obj in exercise.custom_set_exercises.all():
+        #         new_set = CustomSet.objects.create(
+        #             custom_exercise=new_exercise,
+        #             set_no=set_obj.set_no,
+        #             reps=set_obj.reps,
+        #             rest=set_obj.rest,
+        #             weight=set_obj.weight,
+        #             timer=set_obj.timer,
+        #             set_type=set_obj.set_type,
+        #             done=False  # Assuming the sets are not marked as done initially
+        #         )
 
         return Response({'success': 'Workout rescheduled successfully'}, status=status.HTTP_201_CREATED)
 

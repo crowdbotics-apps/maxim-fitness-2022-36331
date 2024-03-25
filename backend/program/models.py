@@ -40,6 +40,8 @@ class Session(models.Model):
     carb_casual = models.FloatField(null=True, blank=True)
     done = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    week_number = models.PositiveIntegerField(null=True, blank=True)
+    day_number = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user}_{self.date_time}{self.id}"
@@ -131,10 +133,11 @@ class Program(models.Model):
         existing_session = Session.objects.filter(user=user)
         if existing_session:
             existing_session.update(is_active=False)
-        weeks = self.weeks.all()
+        weeks = self.weeks.all().order_by("week")
         print('weeks', weeks)
         days_gap = 0
         for week in weeks:
+            day_no = 1
             days = week.days.all().order_by("id")
             print('total_days', days)
             # days_gap = 0
@@ -154,9 +157,12 @@ class Program(models.Model):
                     carb=day.carb,
                     carb_casual=day.carb_casual,
                     name=day.name,
+                    week_number=week.week,
+                    day_number=day_no,
                 )
                 order = 1
                 days_gap += 1
+                day_no += 1
                 if user.is_premium_user:
                     for exercise in day.day_exercises.all():
                         if not exercise.name:
