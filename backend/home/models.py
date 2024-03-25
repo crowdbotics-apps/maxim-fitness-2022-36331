@@ -730,3 +730,9 @@ class CancelSubscription(models.Model):
     is_current = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+class DuplicateCard(models.Model):
+    user = models.ForeignKey(User, related_name='user_cards', on_delete=models.CASCADE)
+    card_number = models.CharField(max_length=20)
+
+

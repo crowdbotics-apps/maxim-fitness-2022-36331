@@ -1072,20 +1072,27 @@ class SessionViewSet(ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def list_exercises(self, request):
-        id = request.GET.get('id')
-        if id:
-            workout = Workout.objects.filter(id=id).first()
-            if workout:
-                program = workout.session.program
-                exercise = ProgramExercise.objects.filter(exercise=workout.exercise, day__week__program=program).first()
-                replacements = []
-                if exercise:
-                    for rep in exercise.replacements.all():
-                        replacements.append(rep.replacement)
-                    serializer = ExerciseSerializer(replacements, many=True, context={'request': request})
-                    return Response(serializer.data)
-                return Response("no exercise available")
-            return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
+        # id = request.GET.get('id')
+        # if id:
+        #     workout = Workout.objects.filter(id=id).first()
+        #     if workout:
+        #         program = workout.session.program
+        #         exercises = workout.exercises.all().values_list('id', flat=True).distinct()
+        #         exercise = ProgramExercise.objects.filter(exercises__in=exercises, day__week__program=program).first()
+        #         replacements = []
+        #         if exercise:
+        #             for rep in exercise.replacements.all():
+        #                 replacements.append(rep.replacement)
+        #             serializer = ExerciseSerializer(replacements, many=True, context={'request': request})
+        #             return Response(serializer.data)
+        #         return Response("no exercise available")
+        #     return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
+        # return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
+        exercise_type_id = request.GET.get('id')
+        if exercise_type_id:
+            exercises = Exercise.objects.filter(exercise_type_id=exercise_type_id)
+            serializer = ExerciseSerializer(exercises, many=True, context={'request': request})
+            return Response(serializer.data)
         return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
@@ -1099,12 +1106,17 @@ class SessionViewSet(ModelViewSet):
             exercise = Exercise.objects.filter(id=exercise_id).first()
             if workout and exercise:
                 if rest_of_program:
-                    workouts = Workout.objects.filter(session=workout.session, exercise=workout.exercise)
-                    for workout in workouts:
-                        rest = Exercise.objects.filter(id=rest_of_program).first()
-                        workout.exercise = rest
-                        # workout.exercise = exercise
-                        workout.save()
+                    # workouts = Workout.objects.filter(session=workout.session, exercise=workout.exercise)
+                    # for workout in workouts:
+                    rest = Exercise.objects.filter(id=rest_of_program).first()
+                    workout.exercises.remove(exercise)  # Remove the matched exercise
+                    workout.exercises.add(rest)
+                    workout.save()
+                    sets = Set.objects.filter(workout=workout, exercises__in=exercise)
+                    for set in sets:
+                        set.exercises.remove(exercise)
+                        set.exercises.add(rest)
+                        set.save()
                 else:
                     workout.exercise = exercise
                     workout.save()
