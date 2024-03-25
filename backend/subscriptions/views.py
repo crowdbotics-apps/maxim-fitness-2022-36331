@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 
-from home.models import CancelSubscription
+from home.models import CancelSubscription, DuplicateCard
 from maxim_fitness_2022_36331.settings import BASE_DIR
 from drf_yasg import openapi
 from rest_framework import viewsets, status
@@ -144,6 +144,12 @@ class SubscriptionViewSet(viewsets.ViewSet):
         # serializer.is_valid(raise_exception=True)
         # data = serializer.data
         data = request.data
+        if data.get('last4'):
+            duplicate = DuplicateCard.objects.filter(user=request.user, card_number=data.get('last4'))
+            if duplicate.exists():
+                return Response({"error" : 'User already have this card.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                DuplicateCard.objects.create(user=request.user, card_number=data.get('last4'))
 
         try:
             # card_token = stripe.Token.create(
