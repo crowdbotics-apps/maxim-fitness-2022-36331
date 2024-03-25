@@ -219,9 +219,9 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          // disabled={profile?.is_premium_user}
-          // onPress={!profile?.is_premium_user ? onPress : null}
-          onPress={onPress}
+          disabled={profile?.is_premium_user}
+          onPress={!profile?.is_premium_user ? onPress : null}
+
         />
       </View>
     </>
