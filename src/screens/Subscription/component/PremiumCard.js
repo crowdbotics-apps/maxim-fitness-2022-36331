@@ -146,7 +146,7 @@ const PremiumCard = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
-        <Loader isLoading={!amount || !subIdRequesting} />
+        <Loader isLoading={!amount || subIdRequesting} />
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
             text={`$ ${amount || "0"}`}

@@ -1149,8 +1149,8 @@ const FatLoseProgram = props => {
         }}
         minimumDate={new Date()}
         maximumDate={
-          customWorkout ? null :
-            moment(
+          customWorkout &&
+            new Date(
               getAllSessions?.query?.[
                 getAllSessions?.query?.length - 1
               ]?.date_time
