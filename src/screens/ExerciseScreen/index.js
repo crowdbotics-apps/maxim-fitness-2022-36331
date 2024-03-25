@@ -501,7 +501,7 @@ const ExerciseScreen = props => {
                           item?.exercises?.[i]?.sets?.[0]?.set_type === "ss" ||
                           item?.exercises?.[i]?.sets?.[0]?.set_type === "gs"
                         ) {
-                          selectExercise(item?.exercises?.[activeSet], 0)
+                          selectExercise(item?.exercises?.[i], 0)
                         } else {
                           selectExercise(item?.exercises?.[0], 0)
                         }
@@ -865,20 +865,13 @@ const ExerciseScreen = props => {
                             workoutData?.id,
                             screenNavigation
                           )
+                        console.log(workoutData?.id, 'workoutData?.id,');
                         setStartTimer(false)
                         setTimmer(false)
                       }}
                       resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
                       onFinish={() => {
-                        isCustom
-                          ? props.customSessionDone(
-                            workoutData.workouts.id,
-                            screenNavigation
-                          )
-                          : props.sessionDone(
-                            workoutData?.workouts?.id,
-                            screenNavigation
-                          )
+                        getData()
                         setTimmer(false)
                         setStartTimer(false)
                       }}
