@@ -13,7 +13,8 @@ const ProfileComponent = ({
   onPressMsg,
   onPressSocial,
   unreadCount,
-  profile
+  profile,
+  countUnread
 }) => {
   const {
     row,
@@ -95,12 +96,7 @@ const ProfileComponent = ({
       </View>
       <View style={[row, fill, alignItemsCenter, justifyContentEnd]}>
         <TouchableOpacity onPress={onPressNotify}>
-          <Icon
-            type="FontAwesome5"
-            name="bell"
-            size={25}
-            // color="black"
-          />
+          <Icon type="FontAwesome5" name="bell" size={25} color="#626262" />
           {true && unreadCount && (
             <View
               style={[
@@ -124,13 +120,13 @@ const ProfileComponent = ({
             name="comment-alt"
             // style={{ fontSize: 25, color: "black" }}
             size={25}
-            // color="#000"
+            color="#626262"
           />
-          {false && (
+          {countUnread ? (
             <View style={styles.messageStyle}>
-              <Text text={"2"} style={styles.messageStyleText} />
+              <Text text={countUnread} style={styles.messageStyleText} />
             </View>
-          )}
+          ) : null}
         </TouchableOpacity>
       </View>
     </View>

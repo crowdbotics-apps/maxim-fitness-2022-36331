@@ -170,7 +170,8 @@ const SearchProfile = props => {
     return (
       <TouchableOpacity
         onPress={() => [
-          route.params?.isFeed ? createChat(item) : movetoNextScreen(item)
+          route.params?.isFeed ? createChat(item) : movetoNextScreen(item),
+          props.getUserProfile("", 1, setNextPage)
         ]}
         style={{
           marginTop: 20,
@@ -203,7 +204,7 @@ const SearchProfile = props => {
                   : letterCapitalize(item?.user_detail?.username)
               }
               bold
-              style={{ fontSize: 12 }}
+              style={{ fontSize: 12, color: "#626262" }}
             />
             {item?.user_detail?.first_name && (
               <Text
@@ -257,7 +258,11 @@ const SearchProfile = props => {
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1.5 }}>
-            <Text text="People" style={{ fontSize: 22 }} bold />
+            <Text
+              text="People"
+              style={{ fontSize: 22, color: "#626262" }}
+              bold
+            />
           </View>
         </View>
         <View
@@ -276,9 +281,11 @@ const SearchProfile = props => {
               borderWidth: 1,
               paddingHorizontal: 60,
               width: "100%",
-              position: "relative"
+              position: "relative",
+              color: "black"
             }}
             placeholder="Search People"
+            placeholderTextColor="#525252"
             onChangeText={e => {
               setSearchText(e)
               props.getUserProfile(e, 1, setNextPage)
@@ -353,16 +360,22 @@ const SearchProfile = props => {
             }
             ListEmptyComponent={() => (
               <View style={styles.loaderStyle}>
-                <Text style={{ fontSize: 18 }}>No record found</Text>
+                <Text style={{ fontSize: 18, color: "#626262" }}>
+                  No record found
+                </Text>
               </View>
             )}
           />
         ) : (
           // </View>
           <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
           >
-            <Text text="No Record Found" />
+            <Text text="No Record Found" style={{ color: "#626262" }} />
           </View>
         )}
       </View>

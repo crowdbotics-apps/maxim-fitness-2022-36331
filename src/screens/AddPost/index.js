@@ -14,14 +14,14 @@ import {
   Dimensions,
   Platform
 } from "react-native"
-// import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import ImagePicker from "react-native-image-crop-picker"
+import { launchImageLibrary } from "react-native-image-picker"
 import { createThumbnail } from "react-native-create-thumbnail"
 import { Images } from "src/theme"
 import { connect } from "react-redux"
+import { showMessage } from "react-native-flash-message"
 
 //action
-import { AddPostData } from "../../ScreenRedux/addPostRequest"
+import { AddPostData, reset } from "../../ScreenRedux/addPostRequest"
 import { useIsFocused } from "@react-navigation/native"
 
 const { closeIcon, colorAddIcon, circleClose } = Images
@@ -33,7 +33,6 @@ const AddPost = props => {
   const [showPost, setShowPost] = useState(false)
   const [imageData, setImageData] = useState([])
   const [content, setContent] = useState(false)
-  const [videoThumbnail, setVideoThumbNail] = useState(false)
   const isFocused = useIsFocused()
 
   useEffect(() => {
@@ -44,18 +43,9 @@ const AddPost = props => {
     }
   }, [isFocused])
 
-  // useEffect(() => {
-  //   if (imageData.length) {
-  //     createThumbnail({
-  //       url:  imageData[0].path,
-  //     })
-  //       .then(response => [setVideoThumbNail(response), console.log('response---', response)])
-  //       .catch(err => console.log({err}));
-  //   }
-  // }, [imageData]);
-
   const aa = () => {
     let formData = new FormData()
+    formData.append("content", content)
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"]
     // formData.append('video_thumbnail', {
     //   uri: videoThumbnail.path,
@@ -63,21 +53,21 @@ const AddPost = props => {
     //   name: videoThumbnail.path,
     // });
     imageData.map((item, index) => {
-      const fileExtension = item?.path?.split(".").pop().toLowerCase()
+      const fileExtension = item?.uri?.split(".").pop().toLowerCase()
       if (
-        item?.mime.startsWith("video/") &&
+        item?.type.startsWith("video/") &&
         videoExtensions.includes(fileExtension)
       ) {
         formData.append("video", {
-          uri: item.path,
-          type: item.mime,
-          name: item.path
+          uri: item.uri,
+          type: item.type,
+          name: item.uri
         })
       } else {
         formData.append("image", {
-          uri: item.path,
-          type: item.mime,
-          name: item.path
+          uri: item.uri,
+          type: item.type,
+          name: item.uri
         })
       }
     })
@@ -88,7 +78,7 @@ const AddPost = props => {
     props.AddPostData(aa())
   }
   const checkFileType = item => {
-    if (item?.mime.startsWith("video/")) {
+    if (item?.type.startsWith("video/")) {
       return true
     } else {
       return false
@@ -97,27 +87,38 @@ const AddPost = props => {
 
   const onChangePostImage = () => {
     if (imageData?.length < 5) {
-      ImagePicker.openPicker({
+      launchImageLibrary({
         // width: 300,
         // height: 400,
         mediaType: "any",
-        multiple: true
-      }).then(image => {
+        multiple: true,
+        selectionLimit: 5,
+
+        compressVideoPreset: "Passthrough"
+      }).then(data => {
+        const image = data.assets
         image.length &&
           image?.slice(0, 5 - imageData?.length).forEach(item => {
-            if (checkFileType(item) && Platform.OS === "ios") {
-              createThumbnail({
-                url: item.path,
-                timeStamp: 10000
+            if (item.fileSize > 60 * 1024 * 1024) {
+              showMessage({
+                message: "File size can't be greater then 60MBs",
+                type: "danger"
               })
-                .then(response => {
-                  const thumbnail = `file://${response?.path}`
-                  item["thumbnail"] = thumbnail
-                  setImageData(previous => [...previous, item])
-                })
-                .catch(err => {})
             } else {
-              setImageData(previous => [...previous, item])
+              if (checkFileType(item) && Platform.OS === "ios") {
+                createThumbnail({
+                  url: item.uri,
+                  timeStamp: 10000
+                })
+                  .then(response => {
+                    const thumbnail = item.uri
+                    item["thumbnail"] = thumbnail
+                    setImageData(previous => [...previous, item])
+                  })
+                  .catch(err => {})
+              } else {
+                setImageData(previous => [...previous, item])
+              }
             }
           })
       })
@@ -125,7 +126,7 @@ const AddPost = props => {
   }
 
   const filterData = item => {
-    let filterData = imageData.filter(v => v.path !== item.path)
+    let filterData = imageData.filter(v => v.uri !== item.uri)
     setImageData(filterData)
   }
 
@@ -144,7 +145,12 @@ const AddPost = props => {
             paddingHorizontal: 20
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              props.reset()
+              navigation.goBack()
+            }}
+          >
             <Image source={closeIcon} style={{ height: 14, width: 14 }} />
           </TouchableOpacity>
           <Text
@@ -167,6 +173,8 @@ const AddPost = props => {
               paddingHorizontal: 30,
               paddingVertical: 10
             }}
+            placeholder="Enter post title"
+            placeholderTextColor="#525252"
           />
         ) : (
           <TouchableOpacity
@@ -196,7 +204,7 @@ const AddPost = props => {
                     borderRadius: 15
                   }}
                   source={{
-                    uri: item?.thumbnail ? item?.thumbnail : item.path
+                    uri: item?.thumbnail ? item?.thumbnail : item.uri
                   }}
                 />
 
@@ -284,6 +292,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  AddPostData: data => dispatch(AddPostData(data))
+  AddPostData: data => dispatch(AddPostData(data)),
+  reset: () => dispatch(reset())
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddPost)

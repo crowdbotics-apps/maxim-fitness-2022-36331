@@ -8,7 +8,7 @@ import { DEEP_LINKING_API_URL } from "../config/app"
 import messaging from "@react-native-firebase/messaging"
 
 import AuthStackScreen from "./AuthScreens"
-import MainNavigator from "./Main"
+import MainNavigator, { BottomNavigator } from "./Main"
 import QuestionStackScreen from "./QuestionScreens"
 import { profileData, routeData } from "../ScreenRedux/profileRedux"
 import { navigate } from "../navigation/NavigationService"
@@ -22,7 +22,11 @@ const questionStack = createStackNavigator()
 // const Drawer = createDrawerNavigator()
 
 const Navigation = props => {
-  const { routeData, renderTab, profile, accessToken } = props
+  const { routeData, renderTab, profile, profileData, accessToken } = props
+  useEffect(() => {
+    profileData()
+  }, [])
+
   messaging().onNotificationOpenedApp(remoteMessage => {
     if (remoteMessage?.data?.post_id) {
       navigate("ViewPost", remoteMessage?.data?.post_id)
@@ -91,6 +95,8 @@ const Navigation = props => {
             <authStack.Screen name="AuthStack" component={AuthStackScreen} />
             //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
           )}
+          <mainStack.Screen name="BottomBar" component={BottomNavigator} />
+
         </authStack.Navigator>
       </NavigationContainer>
     </PubNubProvider>

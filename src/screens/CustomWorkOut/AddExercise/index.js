@@ -23,6 +23,7 @@ import { connect } from "react-redux"
 
 import { TextInput } from "react-native-gesture-handler"
 import {
+  addCustomExercise,
   getExerciseRequest,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
@@ -38,9 +39,9 @@ const data = [
 const AddExercies = props => {
   const { navigation, getExerciseState, requesting, getExerciseType } = props
   let refDescription = useRef("")
-  let isFocused = useIsFocused()
   const [activeSet, setActiveSet] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
+
   const [desription, setDesription] = useState(false)
   const [selectMuscle, setSelectMuscle] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -51,7 +52,14 @@ const AddExercies = props => {
   useEffect(() => {
     // isFocused && props.getExerciseRequest()
     props.getExerciseRequest()
+
   }, [])
+  const isFocused = useIsFocused()
+  useEffect(() => {
+    setSelectedItem([])
+    setActiveSet(false)
+    setSelectMuscle(0)
+  }, [isFocused])
 
   useEffect(() => {
     getExerciseState &&
@@ -98,7 +106,15 @@ const AddExercies = props => {
     const data = activeSet?.item
       ? activeSet
       : { id: 0, value: 0, item: "Single Set" }
+
     navigation.navigate("CustomExercise", { exercises, activeSet: data })
+    let newObj = {}
+    newObj[`type`] = exercises
+    const newData = [
+      ...props.customExercise,
+      { exercises: newObj, activeSet: data }
+    ]
+    props.addCustomExercise(newData)
   }
 
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
@@ -110,6 +126,7 @@ const AddExercies = props => {
       value
     )
   }
+
   const onHandlePress = (i, item) => {
     setSelectedItem([])
     setSelectMuscle(i)
@@ -144,6 +161,7 @@ const AddExercies = props => {
               <InputField
                 inputStyle={[Global.height40, Fonts.textMedium, { padding: 0 }]}
                 placeholder="search"
+                placeholderTextColor={"#626262"}
                 autoCapitalize="none"
                 value={search}
                 onChangeText={val => {
@@ -165,7 +183,11 @@ const AddExercies = props => {
                   key={i}
                   onPress={() => {
                     setSelectedItem([])
-                    setActiveSet(set)
+                    if (activeSet?.id === set?.id) {
+                      setActiveSet("")
+                    } else {
+                      setActiveSet(set)
+                    }
                   }}
                   style={[
                     styles.pillStyle,
@@ -188,7 +210,10 @@ const AddExercies = props => {
             })}
           </ScrollView>
           <View style={[{ marginTop: 20 }]}>
-            <Text text="Muscle Group" style={styles.heading} />
+            <Text
+              text="Muscle Group"
+              style={[styles.heading, { color: "#626262" }]}
+            />
             <ScrollView
               horizontal={true}
               contentContainerStyle={{ paddingBottom: 10 }}
@@ -237,7 +262,10 @@ const AddExercies = props => {
             </ScrollView>
           </View>
           <View style={{ marginTop: 25 }}>
-            <Text text="Poupular Exercies" style={styles.heading} />
+            <Text
+              text="Popular Exercises"
+              style={[styles.heading, { color: "#626262" }]}
+            />
           </View>
         </View>
         <View style={{ marginBottom: 20 }}>
@@ -265,8 +293,8 @@ const AddExercies = props => {
                         item?.pictures[0]?.image
                           ? { uri: item?.pictures[0]?.image }
                           : item?.video_thumbnail
-                          ? { uri: item?.video_thumbnail }
-                          : foodImage
+                            ? { uri: item?.video_thumbnail }
+                            : foodImage
                       }
                       style={{ width: 80, height: 45 }}
                     />
@@ -298,15 +326,15 @@ const AddExercies = props => {
       </ScrollView>
       <View style={{ alignSelf: "center" }}>
         <Button
-          text={"Add Exercies"}
+          text={"Add Exercise"}
           textStyle={[{ color: "white" }]}
           style={styles.btn}
           disabled={
             activeSet?.id === 1
               ? selectedItem?.length < 2
               : activeSet?.value === 4
-              ? selectedItem?.length < 3
-              : selectedItem?.length < 1
+                ? selectedItem?.length < 3
+                : selectedItem?.length < 1
           }
           onPress={makeDataParams}
         />
@@ -511,6 +539,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 16,
     marginTop: 5,
+    color: "#626262",
     opacity: 0.7
   },
   btn: {
@@ -524,8 +553,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     lineHeight: 40,
-    marginTop: 10,
-    opacity: 0.8
+    marginTop: 10
   },
   pillStyle: {
     borderWidth: 1,
@@ -559,7 +587,8 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 16,
     lineHeight: 20,
-    fontWeight: "700"
+    fontWeight: "700",
+    color: "#626262"
   },
   smallText: { fontSize: 15, lineHeight: 18 },
   IconStyle: { color: Colors.primary, fontSize: 15, marginLeft: 3 },
@@ -667,19 +696,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20
+    marginTop: 20,
+    color: "#626262"
   }
 })
 const mapStateToProps = state => ({
   requesting: state.addExerciseReducer.requesting,
   request: state.addExerciseReducer.request,
   getExerciseState: state.addExerciseReducer.getExerciseState,
-  getExerciseType: state.addExerciseReducer.getExerciseType
+  getExerciseType: state.addExerciseReducer.getExerciseType,
+  customExercise: state.addExerciseReducer.custom
 })
 
 const mapDispatchToProps = dispatch => ({
   getExerciseRequest: () => dispatch(getExerciseRequest()),
   getExerciseTypeRequest: (data, search) =>
-    dispatch(getExerciseTypeRequest(data, search))
+    dispatch(getExerciseTypeRequest(data, search)),
+  addCustomExercise: data => dispatch(addCustomExercise(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(AddExercies)

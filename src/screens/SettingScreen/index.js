@@ -77,7 +77,7 @@ const SettingScreen = props => {
           onPress={() => navigation.navigate("SubscriptionScreen")}
           style={[styles.mainHeading]}
         >
-          <Text text="SubScription Plan" style={styles.mainText} bold />
+          <Text text="Subscription Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </TouchableOpacity>
         <View style={[styles.mainHeading]}>

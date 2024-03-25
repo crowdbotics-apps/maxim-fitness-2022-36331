@@ -19,6 +19,31 @@ export const handleTextChange = (text, setValue) => {
   }
 }
 
+export const transformData = jsonData => {
+  const transformedData = []
+  jsonData.forEach(entry => {
+    // Extract exercises
+    const exercisesData = entry?.exercises?.type
+    const exercises = exercisesData.map(exercise => exercise?.id)
+
+    let sets = []
+    if (entry?.dualSets && entry?.dualSets) {
+      const arrayList = entry?.dualSets.map(item => {
+        return Object.values(item).map(exercise => ({ ...exercise }))
+      })
+      sets = arrayList.flat()
+    } else if (entry?.single && entry?.single) {
+      sets = entry.single
+    }
+    const transformedEntry = {
+      exercises,
+      custom_sets: sets
+    }
+    transformedData.push(transformedEntry)
+  })
+  return transformedData
+}
+
 export const exerciseArray = [
   {
     value: 1,

@@ -31,6 +31,7 @@ import Icon from "react-native-vector-icons/FontAwesome5"
 import { Layout, Global, Gutters, Colors, Images, Fonts } from "../../theme"
 import { calculatePostTime } from "../../utils/functions"
 import { exerciseArray } from "../../utils/utils"
+import { usePubNub } from "pubnub-react"
 
 import { TabOne, TabThree } from "./components"
 //Actions
@@ -47,7 +48,8 @@ import { useIsFocused } from "@react-navigation/native"
 import { getNotificationCount } from "../../ScreenRedux/nutritionRedux"
 import {
   getAllSessionRequest,
-  getDaySessionRequest
+  getDaySessionRequest,
+  swapCustomExercises
 } from "../../ScreenRedux/programServices"
 import {
   GoogleSignin,
@@ -68,11 +70,14 @@ const CustomCalories = props => {
     navigation,
     requesting,
     updateLoader,
-    loader
+    loader,
+    getAllCustomSessions
   } = props
 
   let refWeight = useRef("")
   let refTrainingDay = useRef("")
+  const pubnub = usePubNub()
+
   const { state, dispatch } = useStore()
   const [tab, setTab] = useState(2)
   const [value, setValue] = useState(false)
@@ -81,10 +86,12 @@ const CustomCalories = props => {
   const [showModalHistory, setShowModalHistory] = useState(false)
   const [exerciseLevel, setExerciseLevel] = useState(false)
   const [typeData, setTypeData] = useState(false)
+  const [channelCount, setChannelCount] = useState()
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", () => {
       // props.getCustomCalRequest()
+      props.swapCustomExercises("", true)
       props.getMealsHistoryRequest()
     })
     return unsubscribe
@@ -93,6 +100,7 @@ const CustomCalories = props => {
   const isFocused = useIsFocused()
 
   useEffect(() => {
+    unreadMessage()
     // isFocused && calculateMeals() && props.getCustomCalRequest(calculateMeals())
     props.getNotificationCount()
   }, [meals, isFocused])
@@ -202,13 +210,38 @@ const CustomCalories = props => {
     navigation.navigate("MealPreference", { isHome: true })
   }
 
+  //<==================custom Workouts list==============start==========>
+  const sortedCustomData = () => {
+    const data = getAllCustomSessions?.sort(
+      (a, b) => new Date(b.created_date) - new Date(a.created_date)
+    )
+    return data || []
+  }
+
+  const checkCustomValue = () => {
+    const data =
+      getAllCustomSessions?.length &&
+      getAllCustomSessions?.map((item, index) => {
+        if (item?.done) {
+          return true
+        } else {
+          return false
+        }
+      })
+
+    const isData = data && data?.find(item => item)
+
+    return isData
+  }
+
+  //<==================custom Workouts list==============end==========>
+
   const sortedData = () => {
     const data = getAllSessions?.query?.sort(
       (a, b) => new Date(b.date_time) - new Date(a.date_time)
     )
     return data || []
   }
-
   const checkValue = () => {
     const data = getAllSessions?.query?.map((item, index) => {
       if (item?.workouts?.some(item => item?.done)) {
@@ -220,7 +253,6 @@ const CustomCalories = props => {
     const isData = data && data?.find(item => item)
     return isData
   }
-
   const logOut = async () => {
     if (await GoogleSignin.isSignedIn()) {
       try {
@@ -275,6 +307,63 @@ const CustomCalories = props => {
     refTrainingDay.current.close()
   }
 
+  const unreadMessage = () => {
+    pubnub.objects
+      .getMemberships({
+        include: {
+          customFields: true
+        }
+      })
+      .then(res => {
+        let countData = []
+        res?.data?.forEach(item => {
+          if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
+            pubnub.fetchMessages(
+              {
+                channels: [item?.channel?.id],
+                count: 1
+              },
+              (_, response) => {
+                if (response?.channels) {
+                  const lastMessage = response.channels[item.channel.id][0]
+
+                  if (lastMessage?.message?.sender !== profile?.id) {
+                    pubnub
+                      .messageCounts({
+                        channels: [item?.channel?.id],
+                        channelTimetokens: [item?.custom?.lastReadTimetoken]
+                      })
+                      .then(resMsg => {
+                        Object.entries(resMsg?.channels)
+                          .map(([id, rest]) => ({
+                            id,
+                            rest
+                          }))
+                          .map(obj => {
+                            countData.push({ id: obj?.id, count: obj?.rest })
+                          })
+                      })
+                  }
+                }
+              }
+            )
+          }
+        })
+        setTimeout(() => {
+          setChannelCount(countData)
+        }, 1000)
+      })
+  }
+
+  const countUnread = () => {
+    if (channelCount) {
+      var sum = channelCount?.reduce(function (total, obj) {
+        return total + obj.count
+      }, 0)
+      return sum
+    }
+  }
+
   return (
     <SafeAreaView style={[fill, secondaryBg, fullWidth]}>
       {(updateLoader || loader) && <Loader />}
@@ -287,6 +376,7 @@ const CustomCalories = props => {
         onPressNotify={() => props.navigation.navigate("NotificationScreen")}
         unreadCount={unreadCount ? unreadCount : false}
         profile={profile}
+        countUnread={countUnread()}
       />
       <View
         style={[
@@ -370,47 +460,104 @@ const CustomCalories = props => {
           // </View>
 
           <Content contentContainerStyle={fillGrow}>
-            <View
-              style={[
-                row,
-                justifyContentBetween,
-                alignItemsCenter,
-                small2xHMargin,
-                smallVPadding
-              ]}
-            >
-              <Text style={styles.comingSoonWork} text="Workouts" />
-            </View>
             {requesting ? (
               <View style={styles.loaderContainer}>
                 <ActivityIndicator color="#000" size={"large"} />
               </View>
-            ) : checkValue() && sortedData()?.length ? (
-              sortedData()?.map((item, index) => {
-                const todayDayString = moment(item.date_time).format(
-                  "MM/DD/YYYY"
-                )
+            ) : (checkValue() && sortedData()?.length) ||
+              (checkCustomValue() && sortedCustomData()?.length) ? (
+              <>
+                {checkValue() && sortedData()?.length && (
+                  <View
+                    style={[
+                      row,
+                      justifyContentBetween,
+                      alignItemsCenter,
+                      small2xHMargin,
+                      smallVPadding
+                    ]}
+                  >
+                    <Text style={styles.comingSoonWork} text="Workouts" />
+                  </View>
+                )}
+                {checkValue() && sortedData()?.length
+                  ? sortedData()?.map((item, index) => {
+                      const todayDayString = moment(item.date_time).format(
+                        "MM/DD/YYYY"
+                      )
 
-                if (item?.workouts?.some(item => item?.done)) {
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() =>
-                        navigation.navigate("WorkoutCard", {
-                          summary: item.workouts,
-                          uppercard: item
-                        })
+                      if (item?.workouts?.some(item => item?.done)) {
+                        return (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() =>
+                              navigation.navigate("WorkoutCard", {
+                                summary: item.workouts,
+                                uppercard: item
+                              })
+                            }
+                          >
+                            <RuningWorkout
+                              item={item}
+                              index={index}
+                              todayDayStr={todayDayString}
+                            />
+                          </TouchableOpacity>
+                        )
+                      } else {
+                        return null
                       }
+                    })
+                  : null}
+
+                {checkCustomValue() && sortedCustomData()?.length ? (
+                  <>
+                    <View
+                      style={[
+                        row,
+                        justifyContentBetween,
+                        alignItemsCenter,
+                        small2xHMargin,
+                        smallVPadding
+                      ]}
                     >
-                      <RuningWorkout
-                        item={item}
-                        index={index}
-                        todayDayStr={todayDayString}
+                      <Text
+                        style={styles.comingSoonWork}
+                        text="Custom Workouts"
                       />
-                    </TouchableOpacity>
-                  )
-                }
-              })
+                    </View>
+                    {sortedCustomData()?.map((item, index) => {
+                      const todayDayString = moment(item.created_date).format(
+                        "MM/DD/YYYY"
+                      )
+
+                      if (item?.workouts?.some(item => item?.done)) {
+                        return (
+                          <>
+                            <TouchableOpacity
+                              key={index}
+                              onPress={() =>
+                                navigation.navigate("WorkoutCard", {
+                                  summary: item?.workouts,
+                                  uppercard: item
+                                })
+                              }
+                            >
+                              <RuningWorkout
+                                item={item}
+                                index={index}
+                                todayDayStr={todayDayString}
+                              />
+                            </TouchableOpacity>
+                          </>
+                        )
+                      } else {
+                        return null
+                      }
+                    })}
+                  </>
+                ) : null}
+              </>
             ) : (
               <View style={[fill, center]}>
                 <Text
@@ -763,7 +910,7 @@ const CustomCalories = props => {
             onPress={() => setShowModalHistory(!showModalHistory)}
             style={smallBMargin}
           >
-            <Icon type="FontAwesome5" name="times" size={25} />
+            <Icon type="FontAwesome5" name="times" color="#626262" size={25} />
           </TouchableOpacity>
         </View>
         <MealHistory mealsByDate={meals} />
@@ -951,6 +1098,7 @@ const mapStateToProps = state => ({
   unreadCount: state.nutritionReducer.unreadCount,
   todaySessions: state.programReducer.todaySessions,
   getAllSessions: state.programReducer.getAllSessions,
+  getAllCustomSessions: state.programReducer.getAllCustomSessions,
   requesting: state.programReducer.requesting,
   loader: state.profileReducer.request,
   updateLoader: state.questionReducer.requesting,
@@ -958,6 +1106,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  swapCustomExercises: (data, all) => dispatch(swapCustomExercises(data, all)),
   getCustomCalRequest: data => dispatch(getCustomCalRequest(data)),
   getMealsHistoryRequest: () => dispatch(getMealsHistoryRequest()),
   getNotificationCount: () => dispatch(getNotificationCount()),

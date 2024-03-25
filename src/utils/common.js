@@ -1,61 +1,61 @@
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, Platform } from "react-native"
 
 export function isIphoneX() {
-  const { width, height } = Dimensions.get('window');
+  const { width, height } = Dimensions.get("window")
   return (
-    Platform.OS === 'ios' &&
+    Platform.OS === "ios" &&
     !Platform.isPad &&
     !Platform.isTVOS &&
     (height === 812 || width === 812 || height === 896 || width === 896)
-  );
+  )
 }
 
 export function getNumberOfDayByString(dateString) {
   switch (dateString) {
-    case 'Monday': {
+    case "Monday": {
       return {
         numberOfDayForBackend: 2,
-        numberOfDayForFrontend: 1,
-      };
+        numberOfDayForFrontend: 1
+      }
     }
-    case 'Tuesday': {
+    case "Tuesday": {
       return {
         numberOfDayForBackend: 3,
-        numberOfDayForFrontend: 2,
-      };
+        numberOfDayForFrontend: 2
+      }
     }
-    case 'Wednesday': {
+    case "Wednesday": {
       return {
         numberOfDayForBackend: 4,
-        numberOfDayForFrontend: 3,
-      };
+        numberOfDayForFrontend: 3
+      }
     }
-    case 'Thursday': {
+    case "Thursday": {
       return {
         numberOfDayForBackend: 5,
-        numberOfDayForFrontend: 4,
-      };
+        numberOfDayForFrontend: 4
+      }
     }
-    case 'Friday': {
+    case "Friday": {
       return {
         numberOfDayForBackend: 6,
-        numberOfDayForFrontend: 5,
-      };
+        numberOfDayForFrontend: 5
+      }
     }
-    case 'Saturday': {
+    case "Saturday": {
       return {
         numberOfDayForBackend: 7,
-        numberOfDayForFrontend: 6,
-      };
+        numberOfDayForFrontend: 6
+      }
     }
-    case 'Sunday': {
+    case "Sunday": {
       return {
         numberOfDayForBackend: 1,
-        numberOfDayForFrontend: 7,
-      };
+        numberOfDayForFrontend: 7
+      }
     }
     default:
-      return 0;
+      return 0
   }
 }
 
@@ -63,16 +63,16 @@ export function sortSessionBySets(arraySession) {
   return arraySession?.map(item => {
     const workouts = item.workouts
       .map(itemWorkout => {
-        const sortedSets = itemWorkout.sets.sort((a, b) => a.set_no - b.set_no);
+        const sortedSets = itemWorkout.sets.sort((a, b) => a.set_no - b.set_no)
         return {
           ...itemWorkout,
-          sets: sortedSets,
-        };
+          sets: sortedSets
+        }
       })
-      .sort((a, b) => a.order - b.order); // eslint-disable-line;
+      .sort((a, b) => a.order - b.order) // eslint-disable-line;
     return {
       ...item,
-      workouts,
-    };
-  });
+      workouts
+    }
+  })
 }

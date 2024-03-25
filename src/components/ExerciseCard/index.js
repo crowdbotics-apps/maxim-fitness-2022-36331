@@ -57,7 +57,7 @@ const ExerciseCard = ({ route }) => {
                     <View style={[fill2x, smallLMargin]}>
                       <Text
                         text={item.exercise.name}
-                        style={regularHPadding}
+                        style={[regularHPadding, { color: "#626262" }]}
                         large
                         bold
                       />
@@ -114,82 +114,88 @@ const ExerciseCard = ({ route }) => {
         : route.params.summary.map((item, i) => {
             return (
               <>
-                <View
-                  style={[
-                    row,
-                    border,
-                    borderR30,
-                    regularHMargin,
-                    regularVMargin,
-                    regularVPadding,
-                    smallHPadding,
-                    borderAlto,
-                    styles.mainWrapper
-                  ]}
-                >
+              {item?.exercises.length &&
+              item?.exercises?.map((exercise, i) => {
+                return(
                   <View
-                    style={[fill, center, secondaryBg, styles.mainInnerWrapper]}
+                style={[
+                  row,
+                  border,
+                  borderR30,
+                  regularHMargin,
+                  regularVMargin,
+                  regularVPadding,
+                  smallHPadding,
+                  borderAlto,
+                  styles.mainWrapper
+                ]}
+              >
+                <View
+                  style={[fill, center, secondaryBg, styles.mainInnerWrapper]}
+                >
+                  <Image
+                    source={{
+                      uri: exercise?.video_thumbnail
+                    }}
+                    style={styles.imageWrapper}
+                  />
+                </View>
+                <View style={[fill2x, smallLMargin]}>
+                  <Text
+                    text={exercise?.name}
+                    style={[regularHPadding, { color: "#626262" }]}
+                    large
+                    bold
+                  />
+                  <View
+                    style={[
+                      row,
+                      justifyContentBetween,
+                      regularHPadding,
+                      tinyVPadding
+                    ]}
                   >
-                    <Image
-                      source={{
-                        uri: item.exercise?.video_thumbnail
-                      }}
-                      style={styles.imageWrapper}
-                    />
+                    <View style={[fill, center]}>
+                      <Text text="Set" color="senary" />
+                    </View>
+                    <View style={[fill2x, center]}>
+                      <Text text="Reps" color="senary" />
+                    </View>
+                    <View style={[fill2x, center]}>
+                      <Text text="Weight" color="senary" />
+                    </View>
                   </View>
-                  <View style={[fill2x, smallLMargin]}>
-                    <Text
-                      text={item.exercise.name}
-                      style={regularHPadding}
-                      large
-                      bold
-                    />
+                  {exercise?.sets?.map(item => (
                     <View
                       style={[
                         row,
                         justifyContentBetween,
-                        regularHPadding,
-                        tinyVPadding
+                        smallHPadding,
+                        tinyVPadding,
+                        secondaryBg,
+                        tinyBMargin,
+                        styles.borderR10
                       ]}
                     >
                       <View style={[fill, center]}>
-                        <Text text="Set" color="senary" />
+                        <Text text={item.set_no} color="quinary" />
                       </View>
                       <View style={[fill2x, center]}>
-                        <Text text="Reps" color="senary" />
+                        <Text text={item.reps} color="quinary" />
                       </View>
                       <View style={[fill2x, center]}>
-                        <Text text="Weight" color="senary" />
+                        <Text
+                          text={item.weight === 0 ? 0 : item.weight}
+                          color="quinary"
+                        />
                       </View>
                     </View>
-                    {item.sets.map(item => (
-                      <View
-                        style={[
-                          row,
-                          justifyContentBetween,
-                          smallHPadding,
-                          tinyVPadding,
-                          secondaryBg,
-                          tinyBMargin,
-                          styles.borderR10
-                        ]}
-                      >
-                        <View style={[fill, center]}>
-                          <Text text={item.set_no} color="quinary" />
-                        </View>
-                        <View style={[fill2x, center]}>
-                          <Text text={item.reps} color="quinary" />
-                        </View>
-                        <View style={[fill2x, center]}>
-                          <Text
-                            text={item.weight === 0 ? 0 : item.weight}
-                            color="quinary"
-                          />
-                        </View>
-                      </View>
-                    ))}
-                  </View>
+                  ))}
                 </View>
+              </View>
+                )
+              })}
+               
               </>
             )
           })}

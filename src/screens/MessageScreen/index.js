@@ -8,7 +8,8 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  SectionList
+  SectionList,
+  ActivityIndicator
 } from "react-native"
 import { connect } from "react-redux"
 import { Images } from "src/theme"
@@ -16,9 +17,11 @@ import { Text } from "../../components"
 import { useFocusEffect } from "@react-navigation/native"
 import { usePubNub } from "pubnub-react"
 import {
+  fetchAndAddTimeTokens,
   fetchChannels,
   getByValue,
   makeChannelsList,
+  messageTimeTokene,
   timeSince,
   useStore
 } from "../../utils/chat"
@@ -52,21 +55,32 @@ const MessageScreen = props => {
           return { ...obj }
         })
 
-      dispatch({ channels })
-      setLoading(false)
+      fetchAndAddTimeTokens(channels, pubnub)
+        .then(updatedData => {
+          dispatch({ channels: updatedData })
+          setLoading(false)
+        })
+        .catch(error => {
+          setLoading(false)
+        })
     })
+
+    unreadMessage()
   }
 
   useEffect(() => {
-    if (!dispatch) {
-      return
-    }
     pubnub.addListener({
-      message: unreadMessage
+      message: () => {
+        unreadMessage()
+      }
     })
-
-    bootstrap()
   }, [])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      bootstrap()
+    }, [])
+  )
 
   useEffect(() => {
     if (state?.channels) {
@@ -84,23 +98,36 @@ const MessageScreen = props => {
       })
       .then(res => {
         let countData = []
-        res?.data?.map(item => {
+        res?.data?.forEach(item => {
           if (item?.channel?.id && item?.custom?.lastReadTimetoken) {
-            pubnub
-              .messageCounts({
+            pubnub.fetchMessages(
+              {
                 channels: [item?.channel?.id],
-                channelTimetokens: [item?.custom?.lastReadTimetoken]
-              })
-              .then(resMsg => {
-                Object.entries(resMsg?.channels)
-                  .map(([id, rest]) => ({
-                    id,
-                    rest
-                  }))
-                  .map(obj => {
-                    countData.push({ id: obj?.id, count: obj?.rest })
-                  })
-              })
+                count: 1
+              },
+              (_, response) => {
+                if (response?.channels) {
+                  const lastMessage = response.channels[item.channel.id][0]
+                  if (lastMessage?.message?.sender !== userProfile?.id) {
+                    pubnub
+                      .messageCounts({
+                        channels: [item?.channel?.id],
+                        channelTimetokens: [item?.custom?.lastReadTimetoken]
+                      })
+                      .then(resMsg => {
+                        Object.entries(resMsg?.channels)
+                          .map(([id, rest]) => ({
+                            id,
+                            rest
+                          }))
+                          .map(obj => {
+                            countData.push({ id: obj?.id, count: obj?.rest })
+                          })
+                      })
+                  }
+                }
+              }
+            )
           }
         })
         setTimeout(() => {
@@ -115,17 +142,19 @@ const MessageScreen = props => {
         id,
         ...rest
       }))
+
       const filterChannels = channels.filter(
         channel =>
-          channel.name
+          channel?.name
             .split("-")[1]
             .toLowerCase()
             .includes(search.toLowerCase()) ||
-          (channel?.custom?.firstLastName &&
-            channel?.custom?.firstLastName
-              .split("/")[1]
-              .toLowerCase()
-              .includes(search.toLowerCase()))
+          (channel?.custom?.owner === profile.id
+            ? channel?.custom?.otherUserName
+            : channel?.custom?.ownerName
+          )
+            .toLowerCase()
+            .includes(search.toLowerCase())
       )
       const DATA = makeChannelsList(filterChannels)
       setConversationList(DATA)
@@ -137,38 +166,22 @@ const MessageScreen = props => {
 
   const chatNavigate = item => {
     navigation.navigate("ChatScreen", { item: item })
-    pubnub.history({ channel: item?.id }).then(res => {
-      if (res?.endTimeToken) {
-        pubnub.objects
-          .setMemberships({
-            channels: [
-              {
-                id: item?.id,
-                custom: {
-                  lastReadTimetoken: res?.endTimeToken
-                }
+    pubnub.time()?.then(res =>
+      pubnub.objects
+        .setMemberships({
+          channels: [
+            {
+              id: item?.id,
+              custom: {
+                lastReadTimetoken: res?.timetoken
               }
-            ]
-          })
-          .then(res => {
-            unreadMessage()
-          })
-      }
-    })
-  }
-
-  const userProfileData = item => {
-    if (item?.custom?.userOne?.length) {
-      const userOne = JSON.parse(item?.custom?.userOne)
-      const userTwo = JSON.parse(item?.custom?.userTwo)
-      if (item?.custom?.owner === userOne.id) {
-        return userTwo
-      } else if (item?.custom?.owner === userTwo.id) {
-        return userOne
-      }
-    } else {
-      return null
-    }
+            }
+          ]
+        })
+        .then(res => {
+          unreadMessage()
+        })
+    )
   }
 
   const countUnRead = item => {
@@ -203,7 +216,13 @@ const MessageScreen = props => {
               borderRadius: (31 / 375) * width
             }}
           />
-          <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              alignItems: "center"
+            }}
+          >
             <View
               style={{
                 justifyContent: "center",
@@ -211,32 +230,56 @@ const MessageScreen = props => {
                 flex: 1
               }}
             >
-              <Text
-                text={
-                  userProfile?.id === item?.custom?.owner
-                    ? item?.custom?.otherUserName
-                    : item?.custom?.ownerName
-                }
-                bold
-                style={{ fontSize: 12 }}
-              />
-              <Text
-                text={
-                  item.name?.split("-")[
-                    userProfile?.id === item.custom.owner ? 1 : 0
-                  ]
-                }
-                style={{ color: "#D3D3D3", fontSize: 12 }}
-              />
-            </View>
-
-            {countUnRead(item) ? (
-              <View style={styles.countStyle}>
-                <Text style={{ fontSize: 15, color: "white" }}>
-                  {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
-                </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text
+                  text={
+                    userProfile?.id === item?.custom?.owner
+                      ? item?.custom?.otherUserName
+                      : item?.custom?.ownerName
+                  }
+                  bold
+                  numberOfLines={1}
+                  style={{ fontSize: 12, flex: 1, color: "#626262" }}
+                />
+                {item?.timeToken && (
+                  <Text style={styles.LastSeenText}>
+                    {messageTimeTokene(item?.timeToken)}
+                  </Text>
+                )}
               </View>
-            ) : null}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text
+                  text={
+                    item.name?.split("-")[
+                      userProfile?.id === item.custom.owner ? 1 : 0
+                    ]
+                  }
+                  style={{ color: "#D3D3D3", fontSize: 12 }}
+                />
+                {countUnRead(item) ? (
+                  <View style={styles.countStyle}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: "white"
+                      }}
+                    >
+                      {countUnRead(item) > 99 ? "99+" : countUnRead(item)}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -263,7 +306,7 @@ const MessageScreen = props => {
         >
           <Image source={backImage} style={{ height: 20, width: 30 }} />
         </TouchableOpacity>
-        <Text text="Messages" style={{ fontSize: 22 }} bold />
+        <Text text="Messages" style={{ fontSize: 22, color: "#626262" }} bold />
         <TouchableOpacity
           onPress={() => navigation.navigate("SearchProfile", { isFeed: true })}
         >
@@ -281,9 +324,11 @@ const MessageScreen = props => {
             borderWidth: 1,
             paddingHorizontal: 60,
             width: "100%",
-            position: "relative"
+            position: "relative",
+            color: "black"
           }}
           placeholder="Search People"
+          placeholderTextColor="#525252"
           onChangeText={e => setSearch(e)}
         />
         <View
@@ -298,8 +343,17 @@ const MessageScreen = props => {
           <Image source={searchImage} style={{ height: 30, width: 30 }} />
         </View>
       </View>
-
-      {!conversationList?.length && !loading ? (
+      {loading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <ActivityIndicator size={"large"} color={"black"} />
+        </View>
+      ) : conversationList?.[0]?.data?.length === 0 && !loading ? (
         <View
           style={{
             flex: 1,
@@ -311,7 +365,8 @@ const MessageScreen = props => {
             style={{
               fontSize: 20,
               fontWeight: "bold",
-              marginBottom: 10
+              marginBottom: 10,
+              color: "#626262"
             }}
           >
             No User Found
@@ -321,9 +376,9 @@ const MessageScreen = props => {
         <SectionList
           keyboardShouldPersistTaps="handled"
           refreshing={loading}
-          onRefresh={async () => {
+          onRefresh={() => {
             unreadMessage()
-            await bootstrap()
+            bootstrap()
           }}
           sections={conversationList}
           keyExtractor={(item, index) => item + index}
@@ -351,12 +406,16 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   countStyle: {
-    height: 30,
-    width: 30,
+    height: 25,
+    width: 25,
     backgroundColor: "red",
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center"
+  },
+  LastSeenText: {
+    alignItems: "flex-end",
+    color: "#626262"
   }
 })
 

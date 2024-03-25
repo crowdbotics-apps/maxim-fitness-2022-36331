@@ -16,9 +16,9 @@ import { Text, Header, FeedCard } from "../../components"
 import { Images } from "src/theme"
 import Video from "react-native-video"
 import { connect } from "react-redux"
-import ImagePicker from "react-native-image-crop-picker"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
+import { useFocusEffect } from "@react-navigation/native"
 
 //actions
 import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
@@ -27,7 +27,9 @@ import { postReportRequest } from "../../ScreenRedux/feedRedux"
 let deviceHeight = Dimensions.get("window").height
 
 const Feeds = props => {
-  const { feeds, requesting, navigation, profile, loadingReport } = props
+  const { feeds, requesting, navigation, profile, loadingReport, route } = props
+  const flatListRef = useRef(null)
+
   const [feedsState, setFeedsState] = useState([])
   const [page, setPage] = useState(1)
   const [visible, setIsVisible] = useState(false)
@@ -91,6 +93,10 @@ const Feeds = props => {
     // }, 500)
   }
 
+  const scrollToIndex = index => {
+    flatListRef?.current?.scrollToIndex({ animated: true, index: index })
+  }
+
   const renderItem = ({ item, index }) => {
     return (
       // <TouchableOpacity>
@@ -109,6 +115,7 @@ const Feeds = props => {
         setImageIndex={setImageIndex}
         setModalVisible={setModalVisible}
         setItemData={setItemData}
+        scrollToIndex={scrollToIndex}
       />
       // </TouchableOpacity>
     )
@@ -141,12 +148,12 @@ const Feeds = props => {
         </View>
       ) : feedsState.length > 0 ? (
         <FlatList
-          // ref={flatList}
+          ref={flatListRef}
           onRefresh={onPullToRefresh}
           data={feedsState}
           refreshing={refresh}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => index.toString()}
           extraData={feedsState}
           onEndReached={onEnd}
           windowSize={250}
@@ -188,54 +195,68 @@ const Feeds = props => {
       <Modal
         isVisible={showModal}
         onBackdropPress={() => setShowModal(false)}
-        style={{ flex: 1, margin: 0 }}
+        style={{ flex: 1, margin: 0, padding: 0 }}
       >
-        <View style={styles.imageModal}>
-          <TouchableOpacity
-            onPress={() => setShowModal(false)}
-            style={{
-              alignItems: "flex-end",
-              marginTop: Platform.OS === "android" ? 0 : 20
-            }}
-          >
-            <Image
-              source={Images.closeBtn}
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.imageModal}>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {loading && (
+                <View
+                  style={{
+                    alignSelf: "center",
+                    position: "absolute"
+                  }}
+                >
+                  <ActivityIndicator size="large" color="white" />
+                </View>
+              )}
+
+              <Video
+                source={{
+                  uri: videoUri?.video
+                }}
+                muted={false}
+                repeat={true}
+                resizeMode="contain"
+                style={styles.videoStyle}
+                rate={1}
+                posterResizeMode="stretch"
+                playInBackground={true}
+                playWhenInactive={true}
+                ignoreSilentSwitch="ignore"
+                disableFocus={true}
+                mixWithOthers={"mix"}
+                controls={true}
+                onLoadStart={() => setLoading(true)}
+                onLoad={() => setLoading(false)}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
               style={{
-                height: 35,
-                width: 35
+                justifyContent: "flex-end",
+                right: 20,
+                alignItems: "flex-end",
+                position: "absolute",
+                marginTop: 20
               }}
-            />
-          </TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            {loading && <ActivityIndicator size="large" color="white" />}
-            <Video
-              source={{
-                uri: videoUri?.video
-              }}
-              style={{ height: 300, width: "100%" }}
-              muted={false}
-              repeat={true}
-              // onEnd={() => setStart(false)}
-              resizeMode="cover"
-              rate={1}
-              posterResizeMode="cover"
-              playInBackground={true}
-              playWhenInactive={true}
-              ignoreSilentSwitch="ignore"
-              disableFocus={true}
-              mixWithOthers={"mix"}
-              controls={true}
-              onLoadStart={() => setLoading(true)}
-              onLoad={() => setLoading(false)}
-            />
+            >
+              <Image
+                source={Images.closeBtn}
+                style={{
+                  height: 35,
+                  width: 35
+                }}
+              />
+            </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
       <Modal
         isVisible={isModalVisible}
         animationIn="zoomIn"
         animationOut={"zoomOut"}
-        // onBackdropPress={() => toggleModal(false)}
+      // onBackdropPress={() => toggleModal(false)}
       >
         <View style={styles.modalStyle}>
           <View style={styles.reportStyle}>
@@ -245,6 +266,7 @@ const Feeds = props => {
               onChangeText={value => setReason(value)}
               style={styles.inputStyle}
               placeholder="Reason"
+              placeholderTextColor="#525252"
             />
 
             <View style={styles.btnStyles}>
@@ -252,7 +274,7 @@ const Feeds = props => {
                 style={[styles.smallBtnStyle, { backgroundColor: "yellow" }]}
                 onPress={callback}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "#626262" }}>Cancel</Text>
               </TouchableOpacity>
 
               <View style={{ paddingHorizontal: 5 }} />
@@ -310,14 +332,16 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 18,
     marginVertical: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "black"
   },
   inputStyle: {
     height: 53,
     borderRadius: 8,
     borderColor: "#C4C4C4",
     borderWidth: 1,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    color: "black"
   },
   btnStyles: {
     flexDirection: "row",
@@ -333,6 +357,11 @@ const styles = StyleSheet.create({
   reportStyle: {
     paddingHorizontal: 20,
     paddingVertical: 10
+  },
+  videoStyle: {
+    height: "100%",
+    resizeMode: "contain",
+    width: "100%"
   }
 })
 

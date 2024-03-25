@@ -142,7 +142,7 @@ const EditProfile = props => {
           await setChannelMetadata(pubnub, `${item?.id}`, {
             name: `${item?.name}`,
             custom: {
-              otherUserImage: item?.custom?.otherUserImage,
+              otherUserImage: item?.custom?.otherUserImage || "",
               otherUserName: item?.custom?.otherUserName,
               owner: item?.custom?.owner,
               ownerImage: userData?.profile_picture,
@@ -157,7 +157,7 @@ const EditProfile = props => {
               otherUserImage: userData?.profile_picture,
               otherUserName: userData?.first_name + " " + userData?.last_name,
               owner: item?.custom?.owner,
-              ownerImage: item?.custom?.ownerImage,
+              ownerImage: item?.custom?.ownerImage || "",
               ownerName: item?.custom?.ownerName,
               type: item?.custom?.type
             }
@@ -280,11 +280,13 @@ const EditProfile = props => {
             style={{
               borderBottomColor: "gray",
               borderBottomWidth: 1,
-              paddingTop: 10
+              paddingTop: 10,
+              color: "black"
             }}
             onChangeText={value => handleOnChange("firstName", value)}
             value={state.firstName.value}
             placeholder="First Name"
+            placeholderTextColor="#525252"
           />
           <Text style={{ color: "red" }} text={state.firstName.error} />
           <Text
@@ -300,11 +302,13 @@ const EditProfile = props => {
             style={{
               borderBottomColor: "gray",
               borderBottomWidth: 1,
-              paddingTop: 10
+              paddingTop: 10,
+              color: "black"
             }}
             onChangeText={value => handleOnChange("lastName", value)}
             value={state.lastName.value}
             placeholder="Last Name"
+            placeholderTextColor="#525252"
           />
           <Text style={{ color: "red" }} text={state.lastName.error} />
 
@@ -321,11 +325,13 @@ const EditProfile = props => {
             style={{
               borderBottomColor: "gray",
               borderBottomWidth: 1,
-              paddingTop: 10
+              paddingTop: 10,
+              color: "black"
             }}
             onChangeText={value => handleOnChange("userName", value)}
             value={state.userName.value}
             placeholder="User Name"
+            placeholderTextColor="#525252"
           />
           <Text style={{ color: "red" }} text={state.userName.error} />
           <Text
@@ -340,6 +346,7 @@ const EditProfile = props => {
           <TextInput
             style={{
               backgroundColor: "white",
+              color: "black",
               marginTop: 20,
               borderWidth: 0.5,
               borderColor: "gray",
@@ -360,6 +367,7 @@ const EditProfile = props => {
             multiline
             numberOfLines={10}
             placeholder="Type here..."
+            placeholderTextColor="#525252"
             onChangeText={value => handleOnChange("discription", value)}
             value={state.discription.value}
           />

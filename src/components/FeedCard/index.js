@@ -49,7 +49,9 @@ const FeedCard = props => {
     setVideoUri,
     setImageIndex,
     setModalVisible,
-    setItemData
+    setItemData,
+    scrollToIndex,
+    index
   } = props
 
   const [showMore, setShowMore] = useState(false)
@@ -161,7 +163,10 @@ const FeedCard = props => {
       <View style={styles.mainContainer}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate("ViewPost", item)}
+          onPress={() => {
+            navigation.navigate("ViewPost", item)
+            scrollToIndex(index)
+          }}
         >
           <View style={styles.cardHeader}>
             <Image
@@ -208,7 +213,13 @@ const FeedCard = props => {
                   </MenuOption>
                 ) : (
                   <MenuOption onSelect={() => action(item, "report")}>
-                    <Text style={{ paddingVertical: 6, textAlign: "center" }}>
+                    <Text
+                      style={{
+                        paddingVertical: 6,
+                        textAlign: "center",
+                        color: "#626262"
+                      }}
+                    >
                       Report post
                     </Text>
                   </MenuOption>
@@ -358,8 +369,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderRadius: 15
   },
-  text1: { fontSize: 15, marginLeft: 10 },
-  text2: { fontSize: 15, marginLeft: 10 },
+  text1: { fontSize: 15, marginLeft: 10, color: "#626262" },
+  text2: { fontSize: 15, marginLeft: 10, color: "#626262" },
   username: { flexDirection: "row", alignItems: "center", flex: 1 },
   socialIcons: {
     flexDirection: "row",
@@ -393,7 +404,13 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     color: "blue"
   },
-  contentStyle: { flex: 1, paddingVertical: 5, fontSize: 15, lineHeight: 16 },
+  contentStyle: {
+    flex: 1,
+    paddingVertical: 5,
+    fontSize: 15,
+    lineHeight: 16,
+    color: "#626262"
+  },
   modalStyle: {
     height: deviceHeight * 0.3,
     borderRadius: 20,

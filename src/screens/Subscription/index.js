@@ -2,47 +2,52 @@ import React, { useEffect, useState } from "react"
 
 // components
 import { View, Image, StyleSheet, TouchableOpacity } from "react-native"
-import { Content, Icon } from "native-base"
+import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
-import Card1 from "./component/Card1"
-import Card2 from "./component/Card2"
+import PremiumCard from "./component/PremiumCard"
 import { connect } from "react-redux"
 import {
   // getSubscriptionRequest,
   getPlanRequest,
-  getCustomerIdRequest
+  getCustomerIdRequest,
+  setPlanCardData
 } from "../../ScreenRedux/subscriptionRedux"
 
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
+import { ScrollView } from "react-native-gesture-handler"
+import { profileData } from "../../ScreenRedux/profileRedux"
 
 const SubscriptionScreen = props => {
-  const { navigation, getPlans, userDetail, subscriptionData } = props
+  const { navigation, getPlans, subscriptionData, setPlanCardData, profileData, profile } = props
+
+
   const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
 
   useEffect(() => {
+    profileData()
     props.getPlanRequest()
     props.getCustomerIdRequest()
   }, [])
 
   const card = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[0]?.id
-    let product = getPlans?.length > 0 && getPlans && getPlans[0]?.product
-    navigation.navigate("CreditCard", { plan_id, product })
+    let plan_id =
+      getPlans?.length > 0 && getPlans && getPlans?.[getPlans.length - 1]?.id
+    let product =
+      getPlans?.length > 0 &&
+      getPlans &&
+      getPlans?.[getPlans.length - 1]?.product
+    setPlanCardData({ plan_id, product, is_premium: false })
+    navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
   }
-  const card1 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans[1]?.id
-    let product = getPlans?.length > 0 && getPlans && getPlans[1]?.product
-    navigation.navigate("CreditCard", { plan_id, product })
-  }
-
-  const card2 = () => {
-    let plan_id = getPlans?.length > 0 && getPlans[2]?.id
-    let product = getPlans?.length > 0 && getPlans[2]?.product
-    navigation.navigate("CreditCard", { plan_id, product })
+  const premiumCardData = () => {
+    let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
+    let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
+    setPlanCardData({ plan_id, product, is_premium: true })
+    navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
   }
 
   const { largeHMargin, mediumTMargin } = Gutters
@@ -62,7 +67,9 @@ const SubscriptionScreen = props => {
     <>
       <TouchableOpacity
         style={styles.leftArrow}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          !profile?.is_survey ? navigation.navigate("Birthday") : navigation.goBack()
+        }}
       >
         <Image source={Images.backImage} style={styles.backArrowStyle} />
       </TouchableOpacity>
@@ -84,51 +91,37 @@ const SubscriptionScreen = props => {
           style={[center, alignItemsCenter, fill]}
         >
           <Text
-            text="Modal1"
+            text="Premium"
             style={curentTab === 1 && { fontWeight: "bold" }}
             smallTitle
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setCurentTab(2)}
-          style={[center, alignItemsCenter, fill]}
-        >
-          <Text
-            text="Modal2"
-            style={curentTab === 2 && { fontWeight: "bold" }}
-            smallTitle
-          />
-        </TouchableOpacity>
       </View>
-      <Content>
+      <ScrollView>
         {curentTab === 0 && (
           <Card
             onPress={card}
             setIsVisible={setIsVisible}
             navigation={navigation}
             getPlans={getPlans}
+            amount={
+              getPlans?.length &&
+              getPlans[getPlans?.length - 1]?.unit_amount
+            }
             subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
         {curentTab === 1 && (
-          <Card1
-            onPress={card1}
+          <PremiumCard
+            onPress={premiumCardData}
             setIsVisible={setIsVisible}
             navigation={navigation}
             getPlans={getPlans}
+            amount={getPlans?.length && getPlans[0]?.unit_amount / 100}
             subsucriptionId={subscriptionData?.plan?.id}
           />
         )}
-        {curentTab === 2 && (
-          <Card2
-            onPress={card2}
-            setIsVisible={setIsVisible}
-            navigation={navigation}
-            getPlans={getPlans}
-            subsucriptionId={subscriptionData?.plan?.id}
-          />
-        )}
-      </Content>
+      </ScrollView>
       <Modal
         isVisible={isVisible}
         animationOutTiming={1}
@@ -218,6 +211,7 @@ const SubscriptionScreen = props => {
       </Modal>
     </>
   )
+
 }
 const styles = StyleSheet.create({
   leftArrow: {
@@ -244,13 +238,15 @@ const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
   customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
-  requesting: state.subscriptionReducer.requesting,
-  userDetail: state.login.userDetail
+  requesting: state.subscriptionReducer.subRequesting,
+  profile: state.login.userDetail
   // subscription: state.subscription.subscription,
 })
 
 const mapDispatchToProps = dispatch => ({
+  profileData: () => dispatch(profileData()),
   getPlanRequest: () => dispatch(getPlanRequest()),
+  setPlanCardData: data => dispatch(setPlanCardData(data)),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
   getCustomerIdRequest: () => dispatch(getCustomerIdRequest())
 })
