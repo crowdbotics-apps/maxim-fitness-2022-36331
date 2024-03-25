@@ -166,8 +166,12 @@ const ExerciseScreen = props => {
   useEffect(() => {
     async function getAllData() {
       setParms(route?.params)
-      isCustom ? await getCustomWorkoutDataRequest(route?.params?.item?.id) : await props.repsWeightRequest(setId, null, null)
+      if (isCustom) {
 
+        await getCustomWorkoutDataRequest(route?.params?.item?.id)
+      } else {
+        await getCSVWorkoutDataRequest(route?.params?.item?.id)
+      }
       getData()
       setExerciseTitle('')
       setSelectedExercise(workoutData?.workouts?.[0])
