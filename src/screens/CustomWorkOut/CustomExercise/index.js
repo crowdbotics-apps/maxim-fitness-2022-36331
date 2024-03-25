@@ -1011,10 +1011,10 @@ const CustomExercise = props => {
                 {
                   flex: 1,
                   backgroundColor: "green",
-                  opacity: title === "" ||exerciseTitle===''|| !checkSets() ? 0.5 : 1
+                  opacity:( title === "" &&exerciseTitle==='')|| !checkSets() ? 0.5 : 1
                 }
               ]}
-              disabled={cRequesting || title === "" || exerciseTitle===''||!checkSets()}
+              disabled={cRequesting ||  (title === "" &&exerciseTitle==='')||!checkSets()}
               onPress={startCutomWorkout}
               loading={cRequesting}
 

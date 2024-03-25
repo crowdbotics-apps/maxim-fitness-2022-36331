@@ -1,6 +1,6 @@
 //import liraries
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image, ActivityIndicator } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image, ActivityIndicator,KeyboardAvoidingView } from 'react-native';
 import { CardField, createToken } from '@stripe/stripe-react-native';
 import { connect } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -37,6 +37,7 @@ const PaymentScreen = props => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <KeyboardAvoidingView>
             <TouchableOpacity
                 style={styles.leftArrow}
                 onPress={() => navigation.navigate('CreditCard')}
@@ -71,6 +72,7 @@ const PaymentScreen = props => {
                         <Text style={styles.buttonText}>Confirm</Text>}
                 </TouchableOpacity>
             </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
