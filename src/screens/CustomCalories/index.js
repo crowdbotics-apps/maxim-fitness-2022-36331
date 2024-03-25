@@ -482,32 +482,32 @@ const CustomCalories = props => {
                 )}
                 {checkValue() && sortedData()?.length
                   ? sortedData()?.map((item, index) => {
-                      const todayDayString = moment(item.date_time).format(
-                        "MM/DD/YYYY"
-                      )
+                    const todayDayString = moment(item.date_time).format(
+                      "MM/DD/YYYY"
+                    )
 
-                      if (item?.workouts?.some(item => item?.done)) {
-                        return (
-                          <TouchableOpacity
-                            key={index}
-                            onPress={() =>
-                              navigation.navigate("WorkoutCard", {
-                                summary: item.workouts,
-                                uppercard: item
-                              })
-                            }
-                          >
-                            <RuningWorkout
-                              item={item}
-                              index={index}
-                              todayDayStr={todayDayString}
-                            />
-                          </TouchableOpacity>
-                        )
-                      } else {
-                        return null
-                      }
-                    })
+                    if (item?.workouts?.some(item => item?.done)) {
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() =>
+                            navigation.navigate("WorkoutCard", {
+                              summary: item.workouts,
+                              uppercard: item
+                            })
+                          }
+                        >
+                          <RuningWorkout
+                            item={item}
+                            index={index}
+                            todayDayStr={todayDayString}
+                          />
+                        </TouchableOpacity>
+                      )
+                    } else {
+                      return null
+                    }
+                  })
                   : null}
 
                 {checkCustomValue() && sortedCustomData()?.length ? (
@@ -695,33 +695,33 @@ const CustomCalories = props => {
             <View>
               {true
                 ? [1, 2, 3].map((item, i) => {
-                    return (
-                      <TouchableOpacity
-                        key={i}
-                        // onPress={() => {
-                        //   if (item.message === 'Comment Post' || 'Like Post') {
-                        //     navigation.navigate('PostDetail', { item: item });
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        //   if (item.message === 'Started following you') {
-                        //     navigation.navigate('ProfileView', item);
-                        //   }
-                        //   if (item.message === 'Message') {
-                        //     navigation.navigate('ChatRoom');
-                        //     setIsVisible(!isVisible);
-                        //     countNotification(item);
-                        //   }
-                        // }}
-                      >
-                        <RuningCard
-                          item={item}
-                          Notification={item.message}
-                          Time={calculatePostTime(item)}
-                        />
-                      </TouchableOpacity>
-                    )
-                  })
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                    // onPress={() => {
+                    //   if (item.message === 'Comment Post' || 'Like Post') {
+                    //     navigation.navigate('PostDetail', { item: item });
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    //   if (item.message === 'Started following you') {
+                    //     navigation.navigate('ProfileView', item);
+                    //   }
+                    //   if (item.message === 'Message') {
+                    //     navigation.navigate('ChatRoom');
+                    //     setIsVisible(!isVisible);
+                    //     countNotification(item);
+                    //   }
+                    // }}
+                    >
+                      <RuningCard
+                        item={item}
+                        Notification={item.message}
+                        Time={calculatePostTime(item)}
+                      />
+                    </TouchableOpacity>
+                  )
+                })
                 : null}
             </View>
           </ScrollView>

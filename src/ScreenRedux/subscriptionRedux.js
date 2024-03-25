@@ -295,7 +295,12 @@ export const subscriptionReducer = (state = initialState, action) => {
     case RESET:
       return {
         ...state,
-        requesting: false
+        requesting: false,
+        subIdRequesting: false,
+        cardAddRequesting: false,
+        cardDeleteRequesting: false,
+        cardPayRequesting: false,
+        cancelRequesting: false
       }
 
     default:
