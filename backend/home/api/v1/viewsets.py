@@ -1072,27 +1072,27 @@ class SessionViewSet(ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def list_exercises(self, request):
-        # id = request.GET.get('id')
-        # if id:
-        #     workout = Workout.objects.filter(id=id).first()
-        #     if workout:
-        #         program = workout.session.program
-        #         exercises = workout.exercises.all().values_list('id', flat=True).distinct()
-        #         exercise = ProgramExercise.objects.filter(exercises__in=exercises, day__week__program=program).first()
-        #         replacements = []
-        #         if exercise:
-        #             for rep in exercise.replacements.all():
-        #                 replacements.append(rep.replacement)
-        #             serializer = ExerciseSerializer(replacements, many=True, context={'request': request})
-        #             return Response(serializer.data)
-        #         return Response("no exercise available")
-        #     return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
+        id = request.GET.get('id')
+        if id:
+            workout = Workout.objects.filter(id=id).first()
+            if workout:
+                program = workout.session.program
+                exercises = workout.exercises.all().values_list('id', flat=True).distinct()
+                exercise = ProgramExercise.objects.filter(exercises__in=exercises, day__week__program=program).first()
+                replacements = []
+                if exercise:
+                    for rep in exercise.replacements.all():
+                        replacements.append(rep.replacement)
+                    serializer = ExerciseSerializer(replacements, many=True, context={'request': request})
+                    return Response(serializer.data)
+                return Response("no exercise available")
+            return Response({'error': "Workout not found"}, status=status.HTTP_404_NOT_FOUND)
         # return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
-        exercise_type_id = request.GET.get('id')
-        if exercise_type_id:
-            exercises = Exercise.objects.filter(exercise_type_id=exercise_type_id)
-            serializer = ExerciseSerializer(exercises, many=True, context={'request': request})
-            return Response(serializer.data)
+        # exercise_type_id = request.GET.get('id')
+        # if exercise_type_id:
+        #     exercises = Exercise.objects.filter(exercise_type_id=exercise_type_id)
+        #     serializer = ExerciseSerializer(exercises, many=True, context={'request': request})
+        #     return Response(serializer.data)
         return Response({'error': {'id': 'id is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
