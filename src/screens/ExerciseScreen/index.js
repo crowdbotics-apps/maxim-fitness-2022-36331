@@ -396,7 +396,6 @@ const ExerciseScreen = props => {
    * Handles the swipe functionality.
    */
   const swipeFunc = () => {
-    console.log(workoutData?.workouts, 'workoutData');
     const exerciseTypeId =
       workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id
     if (isCustom) {
@@ -870,7 +869,6 @@ const ExerciseScreen = props => {
                             workoutData?.id,
                             screenNavigation
                           )
-                        console.log(workoutData?.id, 'workoutData?.id,');
                         setStartTimer(false)
                         setTimmer(false)
                       }}

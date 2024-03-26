@@ -54,14 +54,13 @@ const CustomExercise = props => {
     setCustom,
     postCustomExRequest,
     exerciseTitle,
-    setExerciseTitle
+    setExerciseTitle,
+    customExercisesList
   } = props
   const navigation = useNavigation()
   const route = useRoute()
   const { width, height } = Dimensions.get("window")
   const { exercises, activeSet } = route?.params
-  console.log(activeSet, 'activeSet');
-  console.log(props?.customExercise, 'props?.customExercise');
   const [reps, setReps] = useState("")
   const [title, setTitle] = useState('')
   const [minutes, setMinutes] = useState(0)
@@ -75,7 +74,7 @@ const CustomExercise = props => {
   const [dualSets, setDualSets] = useState([])
   const [dualSetState, setDualSetState] = useState(1)
 
-  const [currentIndex, setCurrentIndex] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [dualReps, setDualReps] = useState({})
   const [droupSet, setDroupSets] = useState({})
   const [checkedReps, setCheckedReps] = useState(false)
@@ -113,13 +112,12 @@ const CustomExercise = props => {
   }, [])
   const onFocus = useIsFocused()
   useEffect(() => {
-
-    setTitle(exerciseTitle)
+    exerciseTitle && setTitle(exerciseTitle)
 
   }, [onFocus])
 
   const findingData = () => {
-    const checkData = props?.customExercise[exerciseIndex]
+    const checkData = customExercisesList[exerciseIndex]
     return {
       activeSet: checkData?.activeSet,
       exercises: checkData?.exercises?.type,
@@ -128,7 +126,7 @@ const CustomExercise = props => {
   }
 
   const updateReducer = (type, updatedData) => {
-    const data = [...props?.customExercise]
+    const data = [...customExercisesList]
     const updatedObject = { ...data[exerciseIndex] }
 
     // Perform the deep update
@@ -147,20 +145,20 @@ const CustomExercise = props => {
   const setType = ["Super Set", "Giant Set"]
 
   const duplicateSet = item => {
-    const newData = [...props?.customExercise]
+    const newData = [...customExercisesList]
     newData.push(item)
     props?.addCustomExercise(newData)
     setCurrentIndex(false)
   }
 
   const deleteSet = () => {
-    const data = [...props?.customExercise]
+    const data = [...customExercisesList]
     data.splice(exerciseIndex, 1)
     props?.addCustomExercise(data)
     setSets(data)
     setDeleteModal(false)
-    setCurrentIndex(false)
-    setExerciseIndex(false)
+    setCurrentIndex(0)
+    setExerciseIndex(0)
   }
 
   const resetValues = () => {
@@ -202,7 +200,7 @@ const CustomExercise = props => {
     setDualReps(tempObj)
   }
   const clearNextPadValues = () => {
-    const data = [...props?.customExercise];
+    const data = [...customExercisesList];
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
@@ -254,7 +252,7 @@ const CustomExercise = props => {
 
 
   const remaingSameDualKeep = () => {
-    const data = [...props?.customExercise]
+    const data = [...customExercisesList]
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
@@ -331,7 +329,7 @@ const CustomExercise = props => {
   }
 
   const remaingRestSameDualKeep = () => {
-    const data = [...props?.customExercise]
+    const data = [...customExercisesList]
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
@@ -430,7 +428,7 @@ const CustomExercise = props => {
   }
 
   const clearNextIndexRestValue = () => {
-    const data = [...props?.customExercise];
+    const data = [...customExercisesList];
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
@@ -482,7 +480,7 @@ const CustomExercise = props => {
 
 
   const renderInputValue = key => {
-    const data = [...props?.customExercise]
+    const data = [...customExercisesList]
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
@@ -543,7 +541,7 @@ const CustomExercise = props => {
         name: title ? title : "title",
         user: profile?.id,
         created_date: pickedDate,
-        custom_exercises: transformData(props?.customExercise)
+        custom_exercises: transformData(customExercisesList)
         // adding_exercise_in_workout: true
       }
       setCustom(true)
@@ -571,7 +569,7 @@ const CustomExercise = props => {
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
   const checkSets = () => {
-    const jsonData = transformData(props?.customExercise)
+    const jsonData = transformData(customExercisesList)
 
     for (const entry of jsonData) {
       if (entry.custom_sets.length === 0) {
@@ -617,7 +615,7 @@ const CustomExercise = props => {
 
     const newObj = { type: exercises }
 
-    const newData = props?.customExercise.map((existingData, idx) => {
+    const newData = customExercisesList.map((existingData, idx) => {
       if (idx === activeCard.index) {
         return { ...existingData, exercises: newObj }
       } else {
@@ -631,11 +629,6 @@ const CustomExercise = props => {
   }
 
 
-  const goBackScreen = () => {
-    navigation.goBack()
-    setExerciseTitle(title)
-
-  }
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
@@ -651,7 +644,7 @@ const CustomExercise = props => {
             justifyContentBetween
           ]}
         >
-          <TouchableOpacity onPress={goBackScreen}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={Images.back2}
               style={{ width: 30, height: 25, resizeMode: "contain" }}
@@ -688,17 +681,19 @@ const CustomExercise = props => {
         >
           <InputField
             inputStyle={[Fonts.titleRegular, fill]}
-            value={title}
+            value={title || exerciseTitle}
             onChangeText={val => {
               setTitle(val)
+              setExerciseTitle(val)
+
             }}
             placeholder="Workout Title"
             autoCapitalize="none"
           />
         </View>
-
-        {props?.customExercise.length !== 0 ? (
-          props?.customExercise.map((item, index) => (
+        {console.log(customExercisesList, 'customExercisesList')}
+        {customExercisesList.length !== 0 ? (
+          customExercisesList.map((item, index) => (
             <View
               style={[
                 styles.tableView,
@@ -768,141 +763,146 @@ const CustomExercise = props => {
               </View>
               <View style={Gutters.smallTMargin}>
                 {item?.exercises?.type?.length === 1 &&
-                  item?.single?.map((items, i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        const data = {
-                          index: i,
-                          exerciseIndex: index
-                        }
-                        setExerciseIndex(index)
-                        setCurrentIndex(data)
-                      }}
-                      style={[
-                        row,
-                        Global.height35,
-                        Gutters.tinyTMargin,
-                        Gutters.largeHMargin,
-                        alignItemsCenter,
-                        justifyContentAround,
-                        {
-                          borderRadius: 6,
-                          backgroundColor:
-                            currentIndex?.index === i &&
-                              currentIndex?.exerciseIndex === index
-                              ? "#9cdaff"
-                              : "#f3f1f4"
-                        }
-                      ]}
-                    >
-                      <Text style={styles.setTextStyle} text={i + 1} />
-                      <Text
-                        style={[styles.setTextStyle, Gutters.mediumHMargin]}
-                        text={items.reps}
-                      />
-                      <Text
-                        style={styles.setTextStyle}
-                        text={!items.rest ? "-" : items.rest}
-                      />
-                    </TouchableOpacity>
-                  ))}
-
-                {item?.exercises?.type?.length > 1 &&
-                  item?.dualSets?.map((items, i) => (
-                    <TouchableOpacity
-                      style={[
-                        Global.borderR10,
-                        Gutters.largeHMargin,
-                        Gutters.smallBMargin,
-                        Gutters.regularBPadding,
-                        {
-                          backgroundColor:
-                            currentIndex?.index === i &&
-                              currentIndex?.exerciseIndex === index
-                              ? "#74ccff"
-                              : "#f1f1f1"
-                        }
-                      ]}
-                      onPress={() => {
-                        setExerciseIndex(index)
-                        const data = {
-                          index: i,
-                          exerciseIndex: index
-                        }
-                        setCurrentIndex(data)
-                      }}
-                    >
-                      <Text style={styles.dualSetsStyle} text={i + 1} />
-                      <View style={styles.dualSetsSecondView}>
-                        <Text
-                          style={styles.dualSetsName}
-                          text={"a. " + item?.exercises?.type?.[0]?.name}
-                        />
-                        <Text
-                          style={styles.dualSetRepsStyle}
-                          text={items?.exerciseA?.reps}
-                        />
-                        <Text
-                          style={styles.dualSetRestStyle}
-                          text={
-                            items?.exerciseA?.rest === 0
-                              ? "-"
-                              : items?.exerciseA?.rest
+                  item?.single?.map((items, i) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          const data = {
+                            index: i,
+                            exerciseIndex: index
                           }
-                        />
-                      </View>
-                      <View
+                          // setExerciseIndex(index)
+                          // setCurrentIndex(data)
+                        }}
                         style={[
-                          styles.dualSetsSecondView1,
-                          findingData()?.activeSet?.value === 4 &&
-                          styles.borderStyle
+                          row,
+                          Global.height35,
+                          Gutters.tinyTMargin,
+                          Gutters.largeHMargin,
+                          alignItemsCenter,
+                          justifyContentAround,
+                          {
+                            borderRadius: 6,
+                            backgroundColor:
+                              currentIndex?.index === i &&
+                                currentIndex?.exerciseIndex === index
+                                ? "#9cdaff"
+                                : "#f3f1f4"
+                          }
                         ]}
                       >
+                        <Text style={styles.setTextStyle} text={i + 1} />
                         <Text
-                          style={styles.dualSecondEx}
-                          text={"b. " + item?.exercises?.type?.[1]?.name}
+                          style={[styles.setTextStyle, Gutters.mediumHMargin]}
+                          text={items.reps}
                         />
                         <Text
-                          style={styles.dualSecondReps}
-                          text={items.exerciseB.reps}
+                          style={styles.setTextStyle}
+                          text={!items.rest ? "-" : items.rest}
                         />
-                        <Text
-                          style={styles.dualSecondRest}
-                          text={
-                            items?.exerciseB?.rest === 0
-                              ? "-"
-                              : items?.exerciseB?.rest
+                      </TouchableOpacity>
+                    )
+                  })}
+
+                {item?.exercises?.type?.length > 1 &&
+                  item?.dualSets?.map((items, i) => {
+
+                    return (
+                      <TouchableOpacity
+                        style={[
+                          Global.borderR10,
+                          Gutters.largeHMargin,
+                          Gutters.smallBMargin,
+                          Gutters.regularBPadding,
+                          {
+                            backgroundColor:
+                              currentIndex?.index === i &&
+                                currentIndex?.exerciseIndex === index
+                                ? "#74ccff"
+                                : "#f1f1f1"
                           }
-                        />
-                      </View>
-                      {findingData()?.activeSet?.value === 4 && (
-                        <View style={styles.dualSetsSecondView1}>
+                        ]}
+                        onPress={() => {
+                          setExerciseIndex(index)
+                          const data = {
+                            index: i,
+                            exerciseIndex: index
+                          }
+                          setCurrentIndex(data)
+                        }}
+                      >
+                        <Text style={styles.dualSetsStyle} text={i + 1} />
+                        <View style={styles.dualSetsSecondView}>
+                          <Text
+                            style={styles.dualSetsName}
+                            text={"a. " + item?.exercises?.type?.[0]?.name}
+                          />
+                          <Text
+                            style={styles.dualSetRepsStyle}
+                            text={items?.exerciseA?.reps}
+                          />
+                          <Text
+                            style={styles.dualSetRestStyle}
+                            text={
+                              items?.exerciseA?.rest === 0
+                                ? "-"
+                                : items?.exerciseA?.rest
+                            }
+                          />
+                        </View>
+                        <View
+                          style={[
+                            styles.dualSetsSecondView1,
+                            findingData()?.activeSet?.value === 4 &&
+                            styles.borderStyle
+                          ]}
+                        >
                           <Text
                             style={styles.dualSecondEx}
-                            text={"c. " + item?.exercises?.type?.[2]?.name}
+                            text={"b. " + item?.exercises?.type?.[1]?.name}
                           />
                           <Text
                             style={styles.dualSecondReps}
-                            text={items.exerciseC?.reps}
+                            text={items.exerciseB.reps}
                           />
                           <Text
                             style={styles.dualSecondRest}
                             text={
-                              items?.exerciseC?.rest === 0
+                              items?.exerciseB?.rest === 0
                                 ? "-"
-                                : items?.exerciseC?.rest
+                                : items?.exerciseB?.rest
                             }
                           />
                         </View>
-                      )}
-                    </TouchableOpacity>
-                  ))}
+                        {items.exerciseC &&
+                          findingData()?.activeSet?.value === 4 && (
+                            <View style={styles.dualSetsSecondView1}>
+                              <Text
+                                style={styles.dualSecondEx}
+                                text={"c. " + item?.exercises?.type?.[2]?.name}
+                              />
+                              <Text
+                                style={styles.dualSecondReps}
+                                text={items.exerciseC?.reps}
+                              />
+                              <Text
+                                style={styles.dualSecondRest}
+                                text={
+                                  items?.exerciseC?.rest === 0
+                                    ? "-"
+                                    : items?.exerciseC?.rest
+                                }
+                              />
+                            </View>
+                          )}
+                      </TouchableOpacity>
+                    )
+                  })}
               </View>
 
               <View style={Gutters.largeHMargin}>
                 <TouchableOpacity
                   onPress={() => {
-                    debugger
                     setCheckedReps(false)
                     setCheckedRest(false)
                     resetValues()
@@ -981,14 +981,14 @@ const CustomExercise = props => {
             <Text style={styles.exerciseFound} text={"No exercise found"} />
           </View>
         )}
-        {props?.customExercise?.length !== 0 ? (
+        {customExercisesList?.length !== 0 ? (
           <View style={{ marginHorizontal: 15 }}>
             <Button
               text={"Add Exercise"}
               textStyle={[{ color: "white" }]}
               style={[styles.btn]}
               // disabled={cRequesting || title === "" || !checkSets()}
-              onPress={goBackScreen}
+              onPress={() => navigation.goBack()}
 
             // disabled={
             //   activeSet?.id === 1
@@ -1001,7 +1001,7 @@ const CustomExercise = props => {
             />
           </View>
         ) : null}
-        {props?.customExercise?.length !== 0 ? (
+        {customExercisesList?.length !== 0 ? (
           <View style={{ marginHorizontal: 15 }}>
             <Button
               text={"Start Workout"}
@@ -1304,7 +1304,6 @@ const CustomExercise = props => {
                   opacity: reps === "" ? 0.5 : 1
                 }}
                 onPress={() => {
-                  debugger
                   if (
                     findingData()?.activeSet?.item === "Drop Set" ||
                     findingData()?.activeSet?.item === "Triple Set"
@@ -2386,10 +2385,10 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
+  customExercisesList: state.addExerciseReducer.customExercisesList,
   cRequesting: state.addExerciseReducer.cRequesting,
   getCustomExState: state.addExerciseReducer.getCustomExState,
   todaySessions: state.programReducer.todaySessions,
-  customExercise: state.addExerciseReducer.custom,
   profile: state.login.userDetail,
   getExerciseType: state.addExerciseReducer.getExerciseType,
   requesting: state.addExerciseReducer.requesting,
