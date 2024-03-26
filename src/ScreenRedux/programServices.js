@@ -1023,7 +1023,9 @@ function* getCustomWorkoutDetails({ data }) {
 
     const customData = yield getCustomExerciseAPI(data)
     yield put(getCustomWorkoutDataSuccess(customData.data))
+    yield put(repsCustomWeightRequest(customData?.data?.workouts?.[0]?.exercises?.[0]?.sets?.[0]?.id, null, null))
     yield put(pickSession(null, customData?.data?.workouts, null))
+
   } catch (e) {
     showMessage({ message: "Something went wrong", type: "danger" })
     yield put(getCustomWorkoutDataSuccess(false))
@@ -1051,6 +1053,7 @@ function* getWorkoutDetails({ data }) {
 
     const response = yield call(getsessionDetailsApi, data)
     yield put(getCustomWorkoutDataSuccess(response.data))
+    yield put(repsWeightRequest(response?.data?.workouts?.[0]?.exercises?.[0]?.sets?.[0]?.id, null, null))
     // yield put(pickSession(null, response?.data, null))
   } catch (e) {
     yield put(getCustomWorkoutDataSuccess(false))

@@ -53,8 +53,6 @@ const CustomExercise = props => {
     pickedDate,
     setCustom,
     postCustomExRequest,
-    customExercise,
-    addCustomExercise,
     exerciseTitle,
     setExerciseTitle
   } = props
@@ -62,6 +60,8 @@ const CustomExercise = props => {
   const route = useRoute()
   const { width, height } = Dimensions.get("window")
   const { exercises, activeSet } = route?.params
+  console.log(activeSet, 'activeSet');
+  console.log(props?.customExercise, 'props?.customExercise');
   const [reps, setReps] = useState("")
   const [title, setTitle] = useState('')
   const [minutes, setMinutes] = useState(0)
@@ -119,7 +119,7 @@ const CustomExercise = props => {
   }, [onFocus])
 
   const findingData = () => {
-    const checkData = customExercise[exerciseIndex]
+    const checkData = props?.customExercise[exerciseIndex]
     return {
       activeSet: checkData?.activeSet,
       exercises: checkData?.exercises?.type,
@@ -128,7 +128,7 @@ const CustomExercise = props => {
   }
 
   const updateReducer = (type, updatedData) => {
-    const data = [...customExercise]
+    const data = [...props?.customExercise]
     const updatedObject = { ...data[exerciseIndex] }
 
     // Perform the deep update
@@ -140,7 +140,7 @@ const CustomExercise = props => {
     data[exerciseIndex] = updatedObject
 
     // Update the state or props
-    addCustomExercise(data)
+    props?.addCustomExercise(data)
     setCurrentIndex(false)
   }
 
@@ -149,14 +149,14 @@ const CustomExercise = props => {
   const duplicateSet = item => {
     const newData = [...props?.customExercise]
     newData.push(item)
-    addCustomExercise(newData)
+    props?.addCustomExercise(newData)
     setCurrentIndex(false)
   }
 
   const deleteSet = () => {
     const data = [...props?.customExercise]
     data.splice(exerciseIndex, 1)
-    addCustomExercise(data)
+    props?.addCustomExercise(data)
     setSets(data)
     setDeleteModal(false)
     setCurrentIndex(false)
@@ -543,7 +543,7 @@ const CustomExercise = props => {
         name: title ? title : "title",
         user: profile?.id,
         created_date: pickedDate,
-        custom_exercises: transformData(customExercise)
+        custom_exercises: transformData(props?.customExercise)
         // adding_exercise_in_workout: true
       }
       setCustom(true)
@@ -571,7 +571,7 @@ const CustomExercise = props => {
 
   const list = ["a", "b", "c", "d", "e", "f", "g", "h"]
   const checkSets = () => {
-    const jsonData = transformData(customExercise)
+    const jsonData = transformData(props?.customExercise)
 
     for (const entry of jsonData) {
       if (entry.custom_sets.length === 0) {
@@ -606,7 +606,6 @@ const CustomExercise = props => {
     }
     setSelectedItem(array)
   }
-
   const updateDataParams = () => {
     const exercises = []
     getExerciseType &&
@@ -618,7 +617,7 @@ const CustomExercise = props => {
 
     const newObj = { type: exercises }
 
-    const newData = customExercise.map((existingData, idx) => {
+    const newData = props?.customExercise.map((existingData, idx) => {
       if (idx === activeCard.index) {
         return { ...existingData, exercises: newObj }
       } else {
@@ -626,7 +625,7 @@ const CustomExercise = props => {
       }
     })
 
-    addCustomExercise(newData)
+    props?.addCustomExercise(newData)
     replaceExercise.current.close()
     setActiveCard({ item: {}, index: 0 })
   }
@@ -903,6 +902,7 @@ const CustomExercise = props => {
               <View style={Gutters.largeHMargin}>
                 <TouchableOpacity
                   onPress={() => {
+                    debugger
                     setCheckedReps(false)
                     setCheckedRest(false)
                     resetValues()
@@ -1011,10 +1011,10 @@ const CustomExercise = props => {
                 {
                   flex: 1,
                   backgroundColor: "green",
-                  opacity:( title === "" &&exerciseTitle==='')|| !checkSets() ? 0.5 : 1
+                  opacity: (title === "" || exerciseTitle === '') || !checkSets() ? 0.5 : 1
                 }
               ]}
-              disabled={cRequesting ||  (title === "" &&exerciseTitle==='')||!checkSets()}
+              disabled={cRequesting || (title === "" || exerciseTitle === '') || !checkSets()}
               onPress={startCutomWorkout}
               loading={cRequesting}
 
@@ -1304,6 +1304,7 @@ const CustomExercise = props => {
                   opacity: reps === "" ? 0.5 : 1
                 }}
                 onPress={() => {
+                  debugger
                   if (
                     findingData()?.activeSet?.item === "Drop Set" ||
                     findingData()?.activeSet?.item === "Triple Set"
@@ -1673,6 +1674,7 @@ const CustomExercise = props => {
                   }
                 ]}
                 onPress={() => {
+
                   if (
                     dualSetState <
                     (findingData()?.activeSet?.value === 4 ? 3 : 2)

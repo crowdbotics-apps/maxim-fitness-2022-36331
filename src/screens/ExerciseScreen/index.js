@@ -164,6 +164,7 @@ const ExerciseScreen = props => {
   }
   const onFocus = useIsFocused()
   useEffect(() => {
+    setActiveSet(0)
     async function getAllData() {
       setParms(route?.params)
       if (isCustom) {
@@ -172,7 +173,7 @@ const ExerciseScreen = props => {
       } else {
         await getCSVWorkoutDataRequest(route?.params?.item?.id)
       }
-      getData()
+      await getData()
       setExerciseTitle('')
       setSelectedExercise(workoutData?.workouts?.[0])
     }
@@ -391,6 +392,9 @@ const ExerciseScreen = props => {
     }
   }
 
+  /**
+   * Handles the swipe functionality.
+   */
   const swipeFunc = () => {
     console.log(workoutData?.workouts, 'workoutData');
     const exerciseTypeId =
@@ -407,7 +411,8 @@ const ExerciseScreen = props => {
         }
       })
     } else {
-      props.allSwapExercise(workoutData?.workouts?.[active]?.id)
+      // props.allSwapExercise(workoutData?.workouts?.[active]?.id)
+      props.allSwapExercise(workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type?.id)
       navigation.navigate("SwapExerciseScreen", {
         ScreenData: {
           data: workoutData?.workouts?.[mainActive]?.exercises?.[active],
