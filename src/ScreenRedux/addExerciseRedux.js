@@ -102,7 +102,6 @@ export const addExerciseReducer = (state = initialState, action) => {
       }
 
     case ADD_CUSTOM_EXERCISE:
-      debugger
       return {
         ...state,
         customExercisesList: action.data

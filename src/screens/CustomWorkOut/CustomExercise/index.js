@@ -139,7 +139,7 @@ const CustomExercise = props => {
 
     // Update the state or props
     props?.addCustomExercise(data)
-    setCurrentIndex(false)
+    setCurrentIndex(0)
   }
 
   const setType = ["Super Set", "Giant Set"]
@@ -148,7 +148,7 @@ const CustomExercise = props => {
     const newData = [...customExercisesList]
     newData.push(item)
     props?.addCustomExercise(newData)
-    setCurrentIndex(false)
+    setCurrentIndex(0)
   }
 
   const deleteSet = () => {
@@ -691,7 +691,6 @@ const CustomExercise = props => {
             autoCapitalize="none"
           />
         </View>
-        {console.log(customExercisesList, 'customExercisesList')}
         {customExercisesList.length !== 0 ? (
           customExercisesList.map((item, index) => (
             <View
@@ -771,8 +770,8 @@ const CustomExercise = props => {
                             index: i,
                             exerciseIndex: index
                           }
-                          // setExerciseIndex(index)
-                          // setCurrentIndex(data)
+                          setExerciseIndex(index)
+                          setCurrentIndex(data)
                         }}
                         style={[
                           row,
