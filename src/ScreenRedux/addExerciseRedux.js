@@ -225,7 +225,6 @@ function* postCustomEx({ data, start }) {
       yield put(pickSession(null, response?.data?.workouts, null))
       if (response?.data?.workouts) {
         navigate("ExerciseScreen", {
-          workouts: response?.data?.workouts,
           item: response?.data,
         });
       }

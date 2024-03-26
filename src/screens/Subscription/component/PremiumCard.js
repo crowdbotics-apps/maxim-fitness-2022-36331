@@ -125,8 +125,8 @@ const PremiumCard = props => {
               style={{ fontSize: 16 }}
             />
           </View>
-          <View style={[row, alignItemsCenter]}>
-            <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5 }} />
+          <View style={[row,]}>
+            <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5, marginTop: 5 }} />
             <Text
               text={"User will have option to custom the Nutrition plan."}
               color="secondary"
@@ -146,7 +146,7 @@ const PremiumCard = props => {
             <Text text={'Data and analytics'} color="secondary" />
           </View> */}
         </View>
-        <Loader isLoading={!amount || !subIdRequesting} />
+        <Loader isLoading={!amount || subIdRequesting} />
         <View style={[row, center, fill, mediumTMargin]}>
           <Text
             text={`$ ${amount || "0"}`}

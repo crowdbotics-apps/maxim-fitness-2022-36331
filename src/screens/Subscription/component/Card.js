@@ -162,7 +162,7 @@ const Card = props => {
           ]}
           //onPress={getPlans[getPlans.length - 1]?.id !== subsucriptionId ? onPress : null}
           onPress={onPress}
-          disabled={profile?.is_premium_user}
+          disabled={profile?.is_premium_user || profile?.trial}
         />
       </View>
     </>

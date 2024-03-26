@@ -1,6 +1,6 @@
 //import liraries
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image, ActivityIndicator,KeyboardAvoidingView } from 'react-native';
 import { CardField, createToken } from '@stripe/stripe-react-native';
 import { connect } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -9,7 +9,7 @@ import { postSubscriptionRequest } from '../../ScreenRedux/subscriptionRedux';
 import { showMessage } from 'react-native-flash-message';
 
 const PaymentScreen = props => {
-    const { postSubscriptionRequest } = props;
+    const { postSubscriptionRequest, cardAddRequesting } = props;
     const navigation = useNavigation();
     const [cardInfo, setCardInfo] = useState(null);
 
@@ -26,7 +26,7 @@ const PaymentScreen = props => {
             try {
                 const res = await createToken({ ...cardInfo, type: 'Card' });
                 if (res?.token) {
-                    await postSubscriptionRequest({ card_token: res?.token?.id });
+                    await postSubscriptionRequest({ card_token: res?.token?.id, last4: res?.token?.card?.last4 });
                     navigation.navigate('CreditCard');
                 }
             } catch (error) {
@@ -37,9 +37,10 @@ const PaymentScreen = props => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <KeyboardAvoidingView>
             <TouchableOpacity
                 style={styles.leftArrow}
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.navigate('CreditCard')}
             >
                 <Image source={Images.backArrow} style={styles.backArrowStyle} />
             </TouchableOpacity>
@@ -49,8 +50,9 @@ const PaymentScreen = props => {
                 </Text>
                 <CardField
                     postalCodeEnabled={false}
+
                     placeholders={{
-                        number: '4242 4242 4242 4242',
+                        number: 'XXXX  XXXX XXXXX',
                     }}
                     cardStyle={{
                         backgroundColor: '#FFFFFF',
@@ -65,9 +67,12 @@ const PaymentScreen = props => {
                     onPress={saveData}
                     style={[styles.button, !cardInfo?.complete && styles.disabledButton]}
                 >
-                    <Text style={styles.buttonText}>Confirm</Text>
+                    {cardAddRequesting ?
+                        <ActivityIndicator size="small" color="blue" /> :
+                        <Text style={styles.buttonText}>Confirm</Text>}
                 </TouchableOpacity>
             </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
@@ -93,6 +98,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignSelf: 'center',
         marginTop: 50,
+        color: 'black',
     },
     cardField: {
         width: '100%',
@@ -124,6 +130,7 @@ const mapStateToProps = state => ({
     getCardData: state.subscriptionReducer.getCardData,
     cardRequesting: state.subscriptionReducer.cardRequesting,
     cardPlanData: state.subscriptionReducer.cardPlanData,
+    cardAddRequesting: state.subscriptionReducer.cardAddRequesting,
 
 });
 

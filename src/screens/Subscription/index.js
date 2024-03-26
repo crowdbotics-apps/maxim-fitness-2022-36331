@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native"
+import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native"
 import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
@@ -65,6 +65,7 @@ const SubscriptionScreen = props => {
   }
   return (
     <>
+    <SafeAreaView>
       <TouchableOpacity
         style={styles.leftArrow}
         onPress={() => {
@@ -209,6 +210,7 @@ const SubscriptionScreen = props => {
           </>
         </View>
       </Modal>
+      </SafeAreaView>
     </>
   )
 
