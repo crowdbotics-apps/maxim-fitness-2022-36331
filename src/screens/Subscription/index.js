@@ -65,131 +65,82 @@ const SubscriptionScreen = props => {
   }
   return (
     <>
-    <SafeAreaView>
-      <TouchableOpacity
-        style={styles.leftArrow}
-        onPress={() => {
-          !profile?.is_survey ? navigation.navigate("Birthday") : navigation.goBack()
-        }}
-      >
-        <Image source={Images.backImage} style={styles.backArrowStyle} />
-      </TouchableOpacity>
-      <View style={[row, largeHMargin, justifyContentBetween]}>
-        <Loader isLoading={props.requesting} />
+      <SafeAreaView>
+        <TouchableOpacity
+          style={styles.leftArrow}
+          onPress={() => {
+            !profile?.is_survey ? navigation.navigate("Birthday") : navigation.goBack()
+          }}
+        >
+          <Image source={Images.backImage} style={styles.backArrowStyle} />
+        </TouchableOpacity>
+        <View style={[row, largeHMargin, justifyContentBetween]}>
+          <Loader isLoading={props.requesting} />
 
-        <TouchableOpacity
-          onPress={() => setCurentTab(0)}
-          style={[center, alignItemsCenter, fill]}
+          <TouchableOpacity
+            onPress={() => setCurentTab(0)}
+            style={[center, alignItemsCenter, fill]}
+          >
+            <Text
+              text="Free"
+              style={{ fontWeight: curentTab === 0 ? "bold" : 'normal', color: 'black' }}
+
+              smallTitle
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setCurentTab(1)}
+            style={[center, alignItemsCenter, fill]}
+          >
+            <Text
+              text="Premium"
+              style={{ fontWeight: curentTab === 1 ? "bold" : 'normal', color: 'black' }}
+              smallTitle
+            />
+          </TouchableOpacity>
+        </View>
+        <ScrollView>
+          {curentTab === 0 && (
+            <Card
+              onPress={card}
+              setIsVisible={setIsVisible}
+              navigation={navigation}
+              getPlans={getPlans}
+              amount={
+                getPlans?.length &&
+                getPlans[getPlans?.length - 1]?.unit_amount
+              }
+              subsucriptionId={subscriptionData?.plan?.id}
+            />
+          )}
+          {curentTab === 1 && (
+            <PremiumCard
+              onPress={premiumCardData}
+              setIsVisible={setIsVisible}
+              navigation={navigation}
+              getPlans={getPlans}
+              amount={getPlans?.length && getPlans[0]?.unit_amount / 100}
+              subsucriptionId={subscriptionData?.plan?.id}
+            />
+          )}
+        </ScrollView>
+        <Modal
+          isVisible={isVisible}
+          animationOutTiming={1}
+          onBackButtonPress={() => setIsVisible(false)}
         >
-          <Text
-            text="Free"
-            style={curentTab === 0 && { fontWeight: "bold" }}
-            smallTitle
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setCurentTab(1)}
-          style={[center, alignItemsCenter, fill]}
-        >
-          <Text
-            text="Premium"
-            style={curentTab === 1 && { fontWeight: "bold" }}
-            smallTitle
-          />
-        </TouchableOpacity>
-      </View>
-      <ScrollView>
-        {curentTab === 0 && (
-          <Card
-            onPress={card}
-            setIsVisible={setIsVisible}
-            navigation={navigation}
-            getPlans={getPlans}
-            amount={
-              getPlans?.length &&
-              getPlans[getPlans?.length - 1]?.unit_amount
-            }
-            subsucriptionId={subscriptionData?.plan?.id}
-          />
-        )}
-        {curentTab === 1 && (
-          <PremiumCard
-            onPress={premiumCardData}
-            setIsVisible={setIsVisible}
-            navigation={navigation}
-            getPlans={getPlans}
-            amount={getPlans?.length && getPlans[0]?.unit_amount / 100}
-            subsucriptionId={subscriptionData?.plan?.id}
-          />
-        )}
-      </ScrollView>
-      <Modal
-        isVisible={isVisible}
-        animationOutTiming={1}
-        onBackButtonPress={() => setIsVisible(false)}
-      >
-        <View style={center}>
-          <Text
-            text="Do you have an Access Code?"
-            color="secondary"
-            smallTitle
-          />
-          <>
-            {active ? (
-              <View style={center}>
-                <Button
-                  color="primary"
-                  text={"Yes"}
-                  style={[
-                    border,
-                    center,
-                    mediumTMargin,
-                    {
-                      height: 40,
-                      width: 100,
-                      backgroundColor: "transparent",
-                      borderColor: "white"
-                    }
-                  ]}
-                  onPress={() => setData("Yes")}
-                />
-                <Button
-                  color="primary"
-                  text={"No"}
-                  style={[
-                    border,
-                    center,
-                    mediumTMargin,
-                    {
-                      height: 40,
-                      width: 100,
-                      backgroundColor: "transparent",
-                      borderColor: "white"
-                    }
-                  ]}
-                  onPress={() => setData("No")}
-                />
-              </View>
-            ) : (
-              <View style={alignItemsCenter}>
-                <View>
-                  <Button
-                    color="secondary"
-                    text={"Orum 50 off"}
-                    style={[
-                      border,
-                      center,
-                      mediumTMargin,
-                      { height: 40, width: 150 }
-                    ]}
-                    onPress={() => setIsVisible(false)}
-                    center
-                  />
-                </View>
-                <View>
+          <View style={center}>
+            <Text
+              text="Do you have an Access Code?"
+              color="secondary"
+              smallTitle
+            />
+            <>
+              {active ? (
+                <View style={center}>
                   <Button
                     color="primary"
-                    text={"Enter"}
+                    text={"Yes"}
                     style={[
                       border,
                       center,
@@ -201,15 +152,65 @@ const SubscriptionScreen = props => {
                         borderColor: "white"
                       }
                     ]}
-                    onPress={() => setIsVisible(false)}
-                    center
+                    onPress={() => setData("Yes")}
+                  />
+                  <Button
+                    color="primary"
+                    text={"No"}
+                    style={[
+                      border,
+                      center,
+                      mediumTMargin,
+                      {
+                        height: 40,
+                        width: 100,
+                        backgroundColor: "transparent",
+                        borderColor: "white"
+                      }
+                    ]}
+                    onPress={() => setData("No")}
                   />
                 </View>
-              </View>
-            )}
-          </>
-        </View>
-      </Modal>
+              ) : (
+                <View style={alignItemsCenter}>
+                  <View>
+                    <Button
+                      color="secondary"
+                      text={"Orum 50 off"}
+                      style={[
+                        border,
+                        center,
+                        mediumTMargin,
+                        { height: 40, width: 150 }
+                      ]}
+                      onPress={() => setIsVisible(false)}
+                      center
+                    />
+                  </View>
+                  <View>
+                    <Button
+                      color="primary"
+                      text={"Enter"}
+                      style={[
+                        border,
+                        center,
+                        mediumTMargin,
+                        {
+                          height: 40,
+                          width: 100,
+                          backgroundColor: "transparent",
+                          borderColor: "white"
+                        }
+                      ]}
+                      onPress={() => setIsVisible(false)}
+                      center
+                    />
+                  </View>
+                </View>
+              )}
+            </>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   )

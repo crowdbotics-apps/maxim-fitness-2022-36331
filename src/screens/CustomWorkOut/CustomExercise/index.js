@@ -2276,7 +2276,7 @@ const styles = StyleSheet.create({
     color: "#7e7e7e",
     marginTop: 2
   },
-  deleteText: { fontSize: 24, fontWeight: "700", textAlign: "center" },
+  deleteText: { fontSize: 24, fontWeight: "700", textAlign: "center", color: 'black' },
   yesNoButton: { fontWeight: "700", color: "#000" },
   setOneTextStyle: { color: "#636363", fontSize: 20, fontWeight: "700" },
 
