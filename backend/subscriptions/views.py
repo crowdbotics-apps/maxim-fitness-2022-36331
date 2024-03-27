@@ -209,8 +209,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
                 internal_customer.save()
                 djstripe.models.Customer.sync_from_stripe_data(customer)
-
+            card = stripe.Card.retrieve(card_id)
+            last4 = None
+            if card:
+                last4 = card.get('last4')
             response = stripe.Customer.delete_source(customer_id, card_id)
+            if last4:
+                DuplicateCard.objects.filter(user=request.user, card_number=last4).delete()
             return Response(response)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={
