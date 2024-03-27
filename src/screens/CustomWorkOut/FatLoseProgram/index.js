@@ -1148,14 +1148,14 @@ const FatLoseProgram = props => {
           setOpenDatePicker(false)
         }}
         minimumDate={new Date()}
-        maximumDate={
-          customWorkout &&
-          new Date(
-            getAllSessions?.query?.[
-              getAllSessions?.query?.length - 1
-            ]?.date_time
-          )
-        }
+      // maximumDate={
+      //   customWorkout ? null :
+      //     new Date(
+      //       getAllSessions?.query?.[
+      //         getAllSessions?.query?.length - 1
+      //       ]?.date_time
+      //     )
+      // }
       />
     </SafeAreaView >
   )
