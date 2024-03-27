@@ -222,6 +222,7 @@ const PremiumCard = props => {
           disabled={profile?.is_premium_user}
           onPress={!profile?.is_premium_user ? onPress : null}
 
+
         />
       </View>
     </>

@@ -37,7 +37,7 @@ const data = [
   { id: 4, value: 3, item: "Triple Set" }
 ]
 const AddExercies = props => {
-  const { navigation, getExerciseState, requesting, getExerciseType } = props
+  const { navigation, getExerciseState, requesting, getExerciseType, customExercisesList } = props
   let refDescription = useRef("")
   const [activeSet, setActiveSet] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
@@ -111,7 +111,7 @@ const AddExercies = props => {
     let newObj = {}
     newObj[`type`] = exercises
     const newData = [
-      ...props.customExercise,
+      ...customExercisesList,
       { exercises: newObj, activeSet: data }
     ]
     props.addCustomExercise(newData)
@@ -705,7 +705,7 @@ const mapStateToProps = state => ({
   request: state.addExerciseReducer.request,
   getExerciseState: state.addExerciseReducer.getExerciseState,
   getExerciseType: state.addExerciseReducer.getExerciseType,
-  customExercise: state.addExerciseReducer.custom
+  customExercisesList: state.addExerciseReducer.customExercisesList
 })
 
 const mapDispatchToProps = dispatch => ({

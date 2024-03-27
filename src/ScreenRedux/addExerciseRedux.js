@@ -89,7 +89,7 @@ const initialState = {
 
   cRequesting: false,
   getCustomExState: false,
-  custom: [],
+  customExercisesList: [],
   getCustomExerciseState: []
 }
 
@@ -104,7 +104,7 @@ export const addExerciseReducer = (state = initialState, action) => {
     case ADD_CUSTOM_EXERCISE:
       return {
         ...state,
-        custom: action.data
+        customExercisesList: action.data
       }
     case GET_EXERCISE_SUCCESS:
       return {

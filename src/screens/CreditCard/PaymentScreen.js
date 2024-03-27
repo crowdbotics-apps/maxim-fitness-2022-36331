@@ -1,10 +1,10 @@
 //import liraries
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image, ActivityIndicator,KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
 import { CardField, createToken } from '@stripe/stripe-react-native';
 import { connect } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { Images } from '../../theme';
+import { Images, Layout } from '../../theme';
 import { postSubscriptionRequest } from '../../ScreenRedux/subscriptionRedux';
 import { showMessage } from 'react-native-flash-message';
 
@@ -20,7 +20,16 @@ const PaymentScreen = props => {
             setCardInfo(null);
         }
     };
-
+    const {
+        row,
+        fill,
+        fill3x,
+        center,
+        alignItemsEnd,
+        alignItemsCenter,
+        justifyContentCenter,
+        justifyContentAround
+    } = Layout
     const saveData = async () => {
         if (cardInfo) {
             try {
@@ -36,42 +45,44 @@ const PaymentScreen = props => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView>
+        <SafeAreaView style={[styles.container]}>
             <TouchableOpacity
                 style={styles.leftArrow}
                 onPress={() => navigation.navigate('CreditCard')}
             >
                 <Image source={Images.backArrow} style={styles.backArrowStyle} />
             </TouchableOpacity>
-            <View style={styles.content}>
-                <Text style={styles.title}>
-                    Please Add Your Card Details
-                </Text>
-                <CardField
-                    postalCodeEnabled={false}
+            <KeyboardAvoidingView>
 
-                    placeholders={{
-                        number: 'XXXX  XXXX XXXXX',
-                    }}
-                    cardStyle={{
-                        backgroundColor: '#FFFFFF',
-                        textColor: '#000000',
-                    }}
-                    style={styles.cardField}
-                    onCardChange={fetchCardDetail}
+                <View style={styles.content}>
+                    <Text style={styles.title}>
+                        Please Add Your Card Details
+                    </Text>
+                    <CardField
+                        postalCodeEnabled={false}
 
-                />
-                <TouchableOpacity
-                    disabled={!cardInfo?.complete}
-                    onPress={saveData}
-                    style={[styles.button, !cardInfo?.complete && styles.disabledButton]}
-                >
-                    {cardAddRequesting ?
-                        <ActivityIndicator size="small" color="blue" /> :
-                        <Text style={styles.buttonText}>Confirm</Text>}
-                </TouchableOpacity>
-            </View>
+                        placeholders={{
+                            color: 'black',
+                            number: 'XXXX  XXXX XXXXX',
+                        }}
+                        cardStyle={{
+                            backgroundColor: '#FFFFFF',
+                            textColor: '#000000',
+                        }}
+                        style={styles.cardField}
+                        onCardChange={fetchCardDetail}
+
+                    />
+                    <TouchableOpacity
+                        disabled={!cardInfo?.complete}
+                        onPress={saveData}
+                        style={[styles.button, !cardInfo?.complete && styles.disabledButton]}
+                    >
+                        {cardAddRequesting ?
+                            <ActivityIndicator size="small" color="blue" /> :
+                            <Text style={styles.buttonText}>Confirm</Text>}
+                    </TouchableOpacity>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -90,8 +101,7 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 16,
-        flex: 1,
-        justifyContent: 'center',
+
     },
     title: {
         fontSize: 20,

@@ -735,11 +735,11 @@ const FatLoseProgram = props => {
               <ReactNativeCalendarStrip
                 calendarAnimation={{ type: 'sequence', duration: 30 }}
                 daySelectionAnimation={{ type: 'background', duration: 200, highlightColor: '#00a2ff' }}
-                style={{ height: 100, paddingTop: 20, paddingBottom: 10, marginHorizontal: 5 }}
-                calendarHeaderStyle={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}
+                style={{ height: 100, paddingTop: 20, paddingBottom: 10, marginHorizontal: 7 }}
+                calendarHeaderStyle={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginBottom: 20 }}
                 calendarColor={'white'}
                 dateNumberStyle={{ color: 'black' }}
-                dateNameStyle={{ color: 'blue' }}
+                dateNameStyle={{ color: 'blue', }}
                 highlightDateNumberStyle={{ color: 'white' }}
                 highlightDateNameStyle={{ color: 'white' }}
                 disabledDateNameStyle={{ color: 'grey' }}
@@ -1149,11 +1149,11 @@ const FatLoseProgram = props => {
         }}
         minimumDate={new Date()}
         maximumDate={
-          customWorkout &&
+          customWorkout ? new Date('2049-12-1') :
             new Date(
-              getAllSessions?.query?.[
-                getAllSessions?.query?.length - 1
-              ]?.date_time
+              getWeekSessions?.query?.[
+                getWeekSessions?.query?.length - 1
+              ]?.date_time || new Date('2049-12-1')
             )
         }
       />
