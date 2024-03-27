@@ -995,6 +995,7 @@ const CustomExercise = props => {
           ListEmptyComponent={() => {
             return (<View
               style={{
+                marginTop: 100,
                 flex: 1,
                 justifyContent: "center"
               }}
@@ -2118,7 +2119,7 @@ const CustomExercise = props => {
                 </TouchableOpacity>
               ))
             ) : (
-              <View style={styles.notFound}>
+              <View style={[styles.notFound,justifyContentCenter]}>
                 <Text bold>No exercise found</Text>
               </View>
             )}
