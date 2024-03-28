@@ -67,16 +67,7 @@ const FatLoseProgram = props => {
   const [expanded, setExpanded] = useState(false);
   const vacation = { key: "vacation", color: "red", selectedDotColor: "blue" }
   const massage = { key: "massage", color: "blue", selectedDotColor: "blue" }
-  useEffect(() => {
-    getWeekSessions?.query?.map((p, i) => {
-      if (p.date_time === moment(new Date()).format("YYYY-MM-DD")) {
-        !index && setIndex(p?.date_time)
-      }
-    })
-    if (getWeekSessions?.date_in_week_number) {
-      setActiveIndex(getWeekSessions?.date_in_week_number)
-    }
-  }, [getWeekSessions])
+
 
   const getWeek = date => {
     if (data) {
@@ -95,17 +86,29 @@ const FatLoseProgram = props => {
       return 2
     }
   }
-  const getInitialData = () => {
+  useEffect(() => {
+    getWeekSessions?.query?.map((p, i) => {
+      if (p.date_time === moment(new Date()).format("YYYY-MM-DD")) {
+        !index && setIndex(p?.date_time)
+      }
+    })
+    if (getWeekSessions?.date_in_week_number) {
+      setActiveIndex(getWeekSessions?.date_in_week_number)
+    }
+  }, [getWeekSessions, onFocus])
+
+  const getInitialData = async () => {
     const newDate = moment(new Date()).format("YYYY-MM-DD")
     profileData()
-    props.getAllSessionRequest(newDate)
-    props.getDaySessionRequest(newDate)
-    props.getCustomExerciseRequest(newDate)
-    setIndex(false)
+    await props.getAllSessionRequest("")
+    await props.getAllSessionRequest(newDate)
+    await props.getDaySessionRequest(newDate)
+    await props.getCustomExerciseRequest(newDate)
+    setIndex(newDate)
   }
   useEffect(() => {
     getInitialData()
-  }, [onFocus])
+  }, [onFocus, navigation])
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
