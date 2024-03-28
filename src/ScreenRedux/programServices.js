@@ -490,6 +490,7 @@ async function getAllSessionAPI(data) {
 function* getAllSessions({ data }) {
   try {
     if (data && data !== "all") {
+
       const response = yield call(getWeekSessionAPI, data)
       // const query = sortSessionBySets(response?.data?.query)
       const query = response?.data?.query

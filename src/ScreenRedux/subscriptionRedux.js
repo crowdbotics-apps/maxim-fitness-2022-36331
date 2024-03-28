@@ -44,8 +44,7 @@ const GET_SUBSCRIPTION_ID_REQUEST = "SUBSCRIPTION_SCREEN/GET_SUBSCRIPTION_ID_REQ
 const GET_SUBSCRIPTION_ID_SUCCESS = "SUBSCRIPTION_SCREEN/GET_SUBSCRIPTION_ID_SUCCESS"
 const SUBSCRIPTION_CANCELATION_REQUEST = "SUBSCRIPTION_SCREEN/SUBSCRIPTION_CANCELATION_REQUEST"
 const SUBSCRIPTION_CANCELATION_SUCCESS = "SUBSCRIPTION_SCREEN/SUBSCRIPTION_CANCELATION_SUCCESS"
-
-
+const SUBMIT_QUESTION = "SUBSCRIPTION_SCREEN/SUBMIT_QUESTION"
 
 
 const initialState = {
@@ -169,6 +168,13 @@ export const subscriptionCancelationSuccess = data => ({
   type: SUBSCRIPTION_CANCELATION_SUCCESS,
   data
 })
+export const submitQuestion = data => ({
+  type: SUBMIT_QUESTION,
+  data
+})
+
+
+
 
 //Reducers
 export const subscriptionReducer = (state = initialState, action) => {
@@ -413,25 +419,22 @@ async function paymentSubscriptionAPI(payload) {
   }
   return XHR(URL, options)
 }
-async function submitQuestionAPI() {
-  const token = await AsyncStorage.getItem("authToken")
-  const URL = `${API_URL}/form/set_program/`
-  const options = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`
-    },
-    method: "POST"
-  }
-  return XHR(URL, options)
-}
+
 //generator function
 function* paymentSubscription({ data }) {
+
   try {
     const response = yield call(paymentSubscriptionAPI, data)
-    if (data?.profile.is_survey) { navigate("BottomBar") } else { navigate("Birthday") }
     if (data?.profile.is_survey && response?.data?.is_premium_user) {
-      submitQuestionAPI()
+      // submitQuestionAPI()
+      Promise.all(
+        yield put(submitQuestion())).then(() => {
+          setTimeout(() => {
+            if (data?.profile.is_survey) { navigate("BottomBar") } else { navigate("Birthday") }
+
+          }, 5000)
+        })
+
     }
     yield put(postSubscriptionSuccess(response.data))
     showMessage({
@@ -439,13 +442,14 @@ function* paymentSubscription({ data }) {
       type: "success"
     })
   } catch (e) {
+    console.log("error", e);
     showMessage({
       message: e?.response?.data || "something went wrong",
       type: "danger"
     })
     const { response } = e
   } finally {
-    yield put(getAllSessionRequest(''))
+    // yield put(getAllSessionRequest(''))
     yield put(reset())
   }
 }
@@ -588,6 +592,30 @@ function* subscriptionCancelationRequest({ data }) {
 // <===================end========cancel subscription apis== ===============>
 
 
+async function submitQuestionAPI() {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/form/set_program/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST"
+  }
+  return XHR(URL, options)
+}
+function* submitQuestionFunc() {
+  try {
+    const response = yield call(submitQuestionAPI)
+
+  } catch (e) {
+
+    const { response } = e
+  } finally {
+    yield put(reset())
+  }
+}
+
 export default all([
   takeLatest(GET_PLAN_REQUEST, getFeeds),
   takeLatest(GET_CUSTOMERID_REQUEST, getCustomerId),
@@ -596,7 +624,10 @@ export default all([
   takeLatest(GET_CARD_REQUEST, getCardsData),
   takeLatest(DELETE_CARD_REQUEST, deleteCard),
   takeLatest(GET_SUBSCRIPTION_ID_REQUEST, getSubscriptionId),
-  takeLatest(SUBSCRIPTION_CANCELATION_REQUEST, subscriptionCancelationRequest)
+  takeLatest(SUBSCRIPTION_CANCELATION_REQUEST, subscriptionCancelationRequest),
+  takeLatest(SUBMIT_QUESTION, submitQuestionFunc)
+
+
 
 
 
