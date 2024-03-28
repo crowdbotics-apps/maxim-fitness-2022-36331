@@ -500,7 +500,6 @@ const FatLoseProgram = props => {
   };
 
   const checkDisabled = (data) => {
-    console.log(data, 'data');
     return data?.workouts?.some(workout =>
       workout?.exercises?.some(exercise =>
         exercise?.sets?.some(set => set.done)
