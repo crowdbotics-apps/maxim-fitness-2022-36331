@@ -10,7 +10,6 @@ import { showMessage } from "react-native-flash-message"
 // utils
 import XHR from "src/utils/XHR"
 import { getAllSessionRequest } from "./programServices"
-import moment from "moment"
 
 //Types
 const GET_PLAN_REQUEST = "SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST"
