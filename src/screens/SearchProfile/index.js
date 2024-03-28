@@ -145,7 +145,7 @@ const SearchProfile = props => {
           }
         }
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const movetoNextScreen = item => {
@@ -199,8 +199,8 @@ const SearchProfile = props => {
               text={
                 item?.user_detail?.first_name
                   ? letterCapitalize(item?.user_detail?.first_name) +
-                    " " +
-                    letterCapitalize(item?.user_detail?.last_name)
+                  " " +
+                  letterCapitalize(item?.user_detail?.last_name)
                   : letterCapitalize(item?.user_detail?.username)
               }
               bold
@@ -251,7 +251,7 @@ const SearchProfile = props => {
               onPress={() => {
                 route.params?.isFeed
                   ? navigation.goBack()
-                  : navigation.navigate("Feeds")
+                  : navigation.navigate("BottomBar")
               }}
             >
               <Image source={backImage} style={{ height: 20, width: 30 }} />

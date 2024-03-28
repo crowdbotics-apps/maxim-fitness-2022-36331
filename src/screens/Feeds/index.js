@@ -18,7 +18,7 @@ import Video from "react-native-video"
 import { connect } from "react-redux"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useIsFocused } from "@react-navigation/native"
 
 //actions
 import { getFeedsRequest, postLikeRequest } from "../../ScreenRedux/feedRedux"
@@ -44,10 +44,10 @@ const Feeds = props => {
   const [refresh, setRefresh] = useState(false)
 
   // const [uploadAvatar, setUploadAvatar] = useState('');
-
+  const onFocus = useIsFocused()
   useEffect(() => {
     props.getFeedsRequest(1)
-  }, [])
+  }, [onFocus])
 
   const renderImages = () => {
     if (images?.length) {

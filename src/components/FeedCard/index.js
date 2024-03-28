@@ -59,7 +59,7 @@ const FeedCard = props => {
   const addLikeAction = () => {
     let feedId = item.id
     filterData(feedId)
-    const callBack = status => {}
+    const callBack = status => { }
 
     const data = { feedId, callBack }
     props.postLikeRequest(data)
@@ -107,8 +107,8 @@ const FeedCard = props => {
       }
     })
     await Share.open(options)
-      .then(res => {})
-      .catch(err => {})
+      .then(res => { })
+      .catch(err => { })
   }
 
   const movetoNextScreen = item => {
@@ -232,17 +232,17 @@ const FeedCard = props => {
             <SliderBox
               images={
                 item &&
-                (item?.post_image?.length && item?.post_video?.length) > 0
+                  (item?.post_image?.length && item?.post_video?.length) > 0
                   ? [...item.post_image, ...item.post_video].map(item =>
-                      item.image ? item.image : item.video_thumbnail
-                    )
+                    item.image ? item.image : item.video_thumbnail
+                  )
                   : item?.post_image?.length > 0 &&
                     item.post_video?.length === 0
-                  ? item.post_image.map(item => item.image)
-                  : item?.post_video?.length > 0 &&
-                    item?.post_image?.length === 0
-                  ? item.post_video.map(item => item.video_thumbnail)
-                  : []
+                    ? item.post_image.map(item => item.image)
+                    : item?.post_video?.length > 0 &&
+                      item?.post_image?.length === 0
+                      ? item.post_video.map(item => item.video_thumbnail)
+                      : []
               }
               style={styles.foodImageStyle}
               sliderBoxHeight={260}
