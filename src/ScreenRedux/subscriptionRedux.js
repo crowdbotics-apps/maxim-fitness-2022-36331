@@ -445,7 +445,6 @@ function* paymentSubscription({ data }) {
       type: "danger"
     })
     const { response } = e
-    console.log(e, 'eeeee');
   } finally {
     yield put(getAllSessionRequest(''))
     yield put(reset())
