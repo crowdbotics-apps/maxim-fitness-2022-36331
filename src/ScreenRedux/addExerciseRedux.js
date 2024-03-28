@@ -281,7 +281,6 @@ function* rescheduleCustomWorkoutRequest({ id, date }) {
   try {
     const response = yield call(rescheduleCustomWorkoutAPI, id, date)
     showMessage({ message: response?.data?.success, type: "success" })
-    yield put(getCustomExerciseRequest(date))
   } catch (e) {
     showMessage({ message: "Something went wrong", type: "danger" })
 

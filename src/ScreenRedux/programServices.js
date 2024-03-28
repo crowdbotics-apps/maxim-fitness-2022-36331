@@ -494,6 +494,7 @@ function* getAllSessions({ data }) {
       // const query = sortSessionBySets(response?.data?.query)
       const query = response?.data?.query
       yield put(getWeekSessionSuccess({ ...response?.data, query }))
+
     } else {
       const response = yield call(getAllSessionAPI, data)
       // const query = sortSessionBySets(response?.data?.query)

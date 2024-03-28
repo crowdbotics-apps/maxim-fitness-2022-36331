@@ -40,6 +40,7 @@ import {
 } from "../../../ScreenRedux/programServices"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import ReactNativeCalendarStrip from "react-native-calendar-strip"
+import { useIsFocused } from "@react-navigation/native"
 
 const FatLoseProgram = props => {
   const {
@@ -54,6 +55,7 @@ const FatLoseProgram = props => {
     profileData,
     getAllSessionsRequesting,
   } = props
+  const onFocus = useIsFocused()
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
   const [index, setIndex] = useState(false)
@@ -93,6 +95,17 @@ const FatLoseProgram = props => {
       return 2
     }
   }
+  const getInitialData = () => {
+    const newDate = moment(new Date()).format("YYYY-MM-DD")
+    profileData()
+    props.getAllSessionRequest(newDate)
+    props.getDaySessionRequest(newDate)
+    props.getCustomExerciseRequest(newDate)
+    setIndex(false)
+  }
+  useEffect(() => {
+    getInitialData()
+  }, [onFocus])
 
   useEffect(() => {
     getAllSessions?.query?.map((d, i) => {
@@ -112,18 +125,6 @@ const FatLoseProgram = props => {
     })
   }, [getAllSessions])
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      const newDate = moment(new Date()).format("YYYY-MM-DD")
-      profileData()
-      props.getAllSessionRequest(newDate)
-      props.getDaySessionRequest(newDate)
-      props.getCustomExerciseRequest(newDate)
-      setIndex(false)
-    })
-    return unsubscribe
-
-  }, [navigation])
 
   const { etc, workout1, workout2, workout3, threeLine, circle } = Images
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
@@ -181,17 +182,21 @@ const FatLoseProgram = props => {
   //   }
   // }, [getWeekSessions])
 
-  const reScheduleWorkout = date => {
+  const reScheduleWorkout = (date) => {
     const resetDate = moment(date).format("YYYY-MM-DD")
     if (customWorkout) {
       props.customWorkoutRescheduleRequest(customWorkoutData?.id, resetDate)
+
     } else {
       getWeekSessions?.query?.map((item, index) => {
         if (todaySessions?.id === item.id) {
-          // props.workoutRescheduleRequest(item.id, resetDate) //make new action in reducer
+          //await  props.workoutRescheduleRequest(item.id, resetDate) //make new action in reducer if CSV program required to schedule
+
         }
       })
     }
+    getInitialData()
+
   }
   const selectExerciseObj = (data, id) => {
     if (id) {
@@ -493,6 +498,15 @@ const FatLoseProgram = props => {
       </View>
     );
   };
+
+  const checkDisabled = (data) => {
+    return data?.workouts?.some(workout =>
+      workout?.exercises?.some(exercise =>
+        exercise?.sets?.some(set => set.done)
+      )
+    );
+  }
+
 
   const showPromoCard =
     (todaySessions?.name !== "Rest" || todaySessions?.length > 1) && profile.is_premium_user
@@ -1112,8 +1126,11 @@ const FatLoseProgram = props => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[row, alignItemsCenter, { marginTop: 20 }]}
-              onPress={() => setOpenDatePicker(true)}
+              style={[row, alignItemsCenter, { marginTop: 20, }]}
+              onPress={() =>
+                setOpenDatePicker(true)
+              }
+              disabled={!customWorkout || checkDisabled(customWorkoutData)}
             >
               <Image source={circle} style={{ width: 50, height: 50 }} />
               <Text
@@ -1124,7 +1141,8 @@ const FatLoseProgram = props => {
                   fontWeight: "bold",
                   opacity: 0.7,
                   color: "black",
-                  marginLeft: 30
+                  marginLeft: 30,
+                  color: !customWorkout || checkDisabled(customWorkoutData) ? 'gray' : 'black'
                   // flex: 1
                 }}
               />

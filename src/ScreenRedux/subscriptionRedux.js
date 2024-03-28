@@ -9,6 +9,7 @@ import { showMessage } from "react-native-flash-message"
 
 // utils
 import XHR from "src/utils/XHR"
+import { getAllSessionRequest } from "./programServices"
 
 //Types
 const GET_PLAN_REQUEST = "SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST"
@@ -444,6 +445,7 @@ function* paymentSubscription({ data }) {
     })
     const { response } = e
   } finally {
+    yield put(getAllSessionRequest(''))
     yield put(reset())
   }
 }
@@ -495,9 +497,7 @@ async function deleteCardApi(data) {
 function* deleteCard({ data }) {
   try {
     const response = yield call(deleteCardApi, data)
-    yield put(getCardRequest())
     yield put(deleteCardSuccess(response?.data))
-
     showMessage({
       message: "Card deleted successfully",
       type: "success"
@@ -505,11 +505,12 @@ function* deleteCard({ data }) {
   } catch (e) {
     yield put(getCardRequestSuccess([]))
     showMessage({
-      message: "Something went wrong",
+      message: e?.response?.data?.detail || "Something went wrong",
       type: "danger"
     })
     const { response } = e
   } finally {
+    yield put(getCardRequest())
     yield put(reset())
   }
 }
