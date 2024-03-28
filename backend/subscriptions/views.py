@@ -209,7 +209,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
                 internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
                 internal_customer.save()
                 djstripe.models.Customer.sync_from_stripe_data(customer)
-            card = stripe.Card.retrieve(card_id)
+            card = stripe.Customer.retrieve_source(customer_id, card_id)
             last4 = None
             if card:
                 last4 = card.get('last4')
