@@ -9,6 +9,8 @@ import { showMessage } from "react-native-flash-message"
 
 // utils
 import XHR from "src/utils/XHR"
+import { getAllSessionRequest } from "./programServices"
+import moment from "moment"
 
 //Types
 const GET_PLAN_REQUEST = "SUBSCRIPTION_SCREEN/GET_PLAN_REQUEST"
@@ -443,7 +445,9 @@ function* paymentSubscription({ data }) {
       type: "danger"
     })
     const { response } = e
+    console.log(e, 'eeeee');
   } finally {
+    yield put(getAllSessionRequest(''))
     yield put(reset())
   }
 }

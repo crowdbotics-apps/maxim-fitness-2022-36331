@@ -40,6 +40,7 @@ import {
 } from "../../../ScreenRedux/programServices"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import ReactNativeCalendarStrip from "react-native-calendar-strip"
+import { useIsFocused } from "@react-navigation/native"
 
 const FatLoseProgram = props => {
   const {
@@ -54,6 +55,7 @@ const FatLoseProgram = props => {
     profileData,
     getAllSessionsRequesting,
   } = props
+  const onFocus = useIsFocused()
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
   const [index, setIndex] = useState(false)
@@ -111,7 +113,6 @@ const FatLoseProgram = props => {
       }))
     })
   }, [getAllSessions])
-
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       const newDate = moment(new Date()).format("YYYY-MM-DD")
@@ -123,7 +124,7 @@ const FatLoseProgram = props => {
     })
     return unsubscribe
 
-  }, [navigation])
+  }, [onFocus])
 
   const { etc, workout1, workout2, workout3, threeLine, circle } = Images
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
