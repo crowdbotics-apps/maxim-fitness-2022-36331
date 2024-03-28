@@ -430,12 +430,13 @@ function* paymentSubscription({ data }) {
       Promise.all(
         yield put(submitQuestion())).then(() => {
           setTimeout(() => {
-            if (data?.profile.is_survey) { navigate("BottomBar") } else { navigate("Birthday") }
+            if (data?.profile.is_survey) { navigate("BottomBar") }
 
           }, 5000)
         })
 
     }
+    if (!data?.profile.is_survey) { navigate("Birthday") }
     yield put(postSubscriptionSuccess(response.data))
     showMessage({
       message: "Bought subscription successfully",
