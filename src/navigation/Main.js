@@ -13,6 +13,8 @@ import AddPost from "../screens/AddPost"
 import Subscription from "../screens/Subscription"
 import CreditCard from "../screens/CreditCard"
 import PaymentScreen from "../screens/CreditCard/PaymentScreen"
+import ApplePay from "../screens/Subscription/ApplePay"
+
 
 
 import ProgramScreen from "../screens/ProgramScreen"
@@ -260,6 +262,7 @@ const MainNavigator = props => {
       <mainStack.Screen name="ViewPost" component={ViewPost} />
       <mainStack.Screen name="Subscription" component={Subscription} />
       <mainStack.Screen name="CreditCard" component={CreditCard} />
+      <mainStack.Screen name="ApplePay" component={ApplePay} />
       <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
       <mainStack.Screen name="Feeds" component={Feeds} />
       <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />

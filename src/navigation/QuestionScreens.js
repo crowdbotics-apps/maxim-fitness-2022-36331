@@ -20,6 +20,7 @@ import ThingsToKnow from '../screens/Questions/ThingsToKnow';
 const questionStack = createStackNavigator();
 import SubscriptionScreen from "../screens/Subscription"
 import CreditCard from '../screens/CreditCard';
+import ApplePay from "../screens/Subscription/ApplePay"
 import PaymentScreen from '../screens/CreditCard/PaymentScreen';
 import { connect } from 'react-redux';
 import { profileData } from '../ScreenRedux/profileRedux';
@@ -45,6 +46,12 @@ const QuestionStackScreen = props => {
         component={CreditCard}
         options={{ animationEnabled: false }}
       />
+      <questionStack.Screen
+        name="ApplePay"
+        component={ApplePay}
+        options={{ animationEnabled: false }}
+      />
+      
       <questionStack.Screen
         name="Birthday"
         component={Birthday}

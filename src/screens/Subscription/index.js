@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native"
+import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform } from "react-native"
 import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
@@ -18,6 +18,8 @@ import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
+import App from "../../../App"
+import ApplePay from "./ApplePay"
 
 const SubscriptionScreen = props => {
   const { navigation, getPlans, subscriptionData, setPlanCardData, profileData, profile } = props
@@ -41,13 +43,23 @@ const SubscriptionScreen = props => {
       getPlans &&
       getPlans?.[getPlans.length - 1]?.product
     setPlanCardData({ plan_id, product, is_premium: false })
+    if (Platform.OS === "ios") {
+      navigation.navigate("ApplePay", { plan_id, product, is_premium: true })
+      
+    }else{
     navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
+  }
   }
   const premiumCardData = () => {
     let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
     let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     setPlanCardData({ plan_id, product, is_premium: true })
-    navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
+    if (Platform.OS === "ios") {
+      navigation.navigate("ApplePay", { plan_id, product, is_premium: true })
+      
+    }
+    else{
+    navigation.navigate("CreditCard", { plan_id, product, is_premium: true })}
   }
 
   const { largeHMargin, mediumTMargin } = Gutters
