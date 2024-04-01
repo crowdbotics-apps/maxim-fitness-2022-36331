@@ -11,6 +11,7 @@ import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
 import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
 import { API_URL } from "../../../config/app"
+
 const PremiumCard = props => {
   const {
     onPress,
@@ -219,8 +220,9 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={profile?.is_premium_user}
-          onPress={!profile?.is_premium_user ? onPress : null}
+          // disabled={profile?.is_premium_user}
+          // onPress={!profile?.is_premium_user ? onPress : null}
+          onPress={onPress}
 
 
         />

@@ -13,7 +13,6 @@ import AddPost from "../screens/AddPost"
 import Subscription from "../screens/Subscription"
 import CreditCard from "../screens/CreditCard"
 import PaymentScreen from "../screens/CreditCard/PaymentScreen"
-import ApplePay from "../screens/Subscription/ApplePay"
 
 
 
@@ -255,14 +254,13 @@ const MainNavigator = props => {
   return (
     <mainStack.Navigator
       screenOptions={{ headerShown: false, animationEnabled: false }}
-      initialRouteName={profile?.is_premium_user || profile?.trial ? "BottomBar" : "Subscription"}
+      initialRouteName={ "BottomBar"}
     >
       <mainStack.Screen name="BottomBar" component={BottomNavigator} />
       <mainStack.Screen name="AddPost" component={AddPost} />
       <mainStack.Screen name="ViewPost" component={ViewPost} />
       <mainStack.Screen name="Subscription" component={Subscription} />
       <mainStack.Screen name="CreditCard" component={CreditCard} />
-      <mainStack.Screen name="ApplePay" component={ApplePay} />
       <mainStack.Screen name="ProgramScreen" component={ProgramScreen} />
       <mainStack.Screen name="Feeds" component={Feeds} />
       <mainStack.Screen name="ExerciseScreen" component={ExerciseScreen} />

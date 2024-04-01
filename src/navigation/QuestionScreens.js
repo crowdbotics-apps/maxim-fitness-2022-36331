@@ -19,9 +19,8 @@ import NutritionUnderstanding from '../screens/Questions/NutritionUnderstanding'
 import ThingsToKnow from '../screens/Questions/ThingsToKnow';
 const questionStack = createStackNavigator();
 import SubscriptionScreen from "../screens/Subscription"
-import CreditCard from '../screens/CreditCard';
-import ApplePay from "../screens/Subscription/ApplePay"
-import PaymentScreen from '../screens/CreditCard/PaymentScreen';
+// import CreditCard from '../screens/CreditCard';
+// import PaymentScreen from '../screens/CreditCard/PaymentScreen';
 import { connect } from 'react-redux';
 import { profileData } from '../ScreenRedux/profileRedux';
 import { BottomNavigator } from './Main';
@@ -31,26 +30,22 @@ const QuestionStackScreen = props => {
     profileData()
   }, [])
   return (
-    <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName={profile?.is_premium_user || profile?.trial ? 'Birthday' : "SubscriptionScreen"}>
+    <questionStack.Navigator screenOptions={{ headerShown: false }} initialRouteName= 'Birthday' >
       <questionStack.Screen
         name="SubscriptionScreen"
         component={SubscriptionScreen}
         options={{ animationEnabled: false }}
       />
-      <questionStack.Screen name="PaymentScreen" component={PaymentScreen} />
+      {/* <questionStack.Screen name="PaymentScreen" component={PaymentScreen} />
       {profile?.is_premium_user || profile?.trial &&
         <questionStack.Screen name="BottomBar" component={BottomNavigator} />
-      }
-      <questionStack.Screen
+      } */}
+      {/* <questionStack.Screen
         name="CreditCard"
         component={CreditCard}
         options={{ animationEnabled: false }}
-      />
-      <questionStack.Screen
-        name="ApplePay"
-        component={ApplePay}
-        options={{ animationEnabled: false }}
-      />
+      /> */}
+     
       
       <questionStack.Screen
         name="Birthday"

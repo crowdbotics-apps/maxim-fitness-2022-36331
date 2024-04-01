@@ -436,7 +436,7 @@ function* paymentSubscription({ data }) {
         })
 
     }
-    if (!data?.profile.is_survey) { navigate("Birthday") }
+    // if (!data?.profile.is_survey) { navigate("Birthday") }
     yield put(postSubscriptionSuccess(response.data))
     showMessage({
       message: "Bought subscription successfully",
