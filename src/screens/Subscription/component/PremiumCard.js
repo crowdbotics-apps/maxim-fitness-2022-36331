@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking, Platform } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
@@ -157,7 +157,9 @@ const PremiumCard = props => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {canceledButton().show ? (
+        {
+        Platform.OS!='ios'&&
+        canceledButton().show ? (
           <TouchableOpacity
             onPress={() => {
               canceledButton(true)
@@ -212,7 +214,7 @@ const PremiumCard = props => {
         <Button
           color="secondary"
           text={
-            profile?.is_premium_user ? "Already Bought" : "Buy Now"
+            Platform.OS!='ios'&&profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -220,9 +222,8 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          // disabled={profile?.is_premium_user}
-          // onPress={!profile?.is_premium_user ? onPress : null}
-          onPress={onPress}
+          disabled={  Platform.OS!='ios'?profile?.is_premium_user:false}
+          onPress={   (Platform.OS==='ios'||!profile?.is_premium_user )? onPress : null}
 
 
         />

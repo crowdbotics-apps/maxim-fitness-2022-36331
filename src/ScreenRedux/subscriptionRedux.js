@@ -426,7 +426,6 @@ function* paymentSubscription({ data }) {
   try {
     const response = yield call(paymentSubscriptionAPI, data)
     if (data?.profile.is_survey && response?.data?.is_premium_user) {
-      // submitQuestionAPI()
       Promise.all(
         yield put(submitQuestion())).then(() => {
           setTimeout(() => {
