@@ -158,16 +158,16 @@ const PremiumCard = props => {
           <Text text={" / month"} large color="secondary" />
         </View>
         {
-        Platform.OS!='ios'&&
-        canceledButton().show ? (
-          <TouchableOpacity
-            onPress={() => {
-              canceledButton(true)
-            }}
-            style={styles.cancelButton}>
-            <Text style={styles.text}>{canceledButton().text}</Text>
-          </TouchableOpacity>
-        ) : null}
+          Platform.OS != 'ios' &&
+            canceledButton().show ? (
+            <TouchableOpacity
+              onPress={() => {
+                canceledButton(true)
+              }}
+              style={styles.cancelButton}>
+              <Text style={styles.text}>{canceledButton().text}</Text>
+            </TouchableOpacity>
+          ) : null}
         <View
           style={[
             row,
@@ -214,7 +214,7 @@ const PremiumCard = props => {
         <Button
           color="secondary"
           text={
-            Platform.OS!='ios'&&profile?.is_premium_user ? "Already Bought" : "Buy Now"
+            Platform.OS != 'ios' && profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -222,8 +222,8 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={  Platform.OS!='ios'?profile?.is_premium_user:false}
-          onPress={   (Platform.OS==='ios'||!profile?.is_premium_user )? onPress : null}
+          disabled={Platform.OS != 'ios' ? profile?.is_premium_user : false}
+          onPress={(Platform.OS === 'ios' || !profile?.is_premium_user) ? onPress : null}
 
 
         />
