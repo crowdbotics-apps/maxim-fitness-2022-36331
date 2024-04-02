@@ -67,10 +67,8 @@ const SubscriptionScreen = props => {
   const connect = async () => {
     await initConnection()
     const productsData = await getProducts({ skus })
-    console.log(productsData, "Products")
     setProductsList(productsData)
     await handleGetSubscriptions()
-    console.log(productsData, "productsData")
     await endConnection()
   }
   const handleGetSubscriptions = async () => {
@@ -94,7 +92,7 @@ const SubscriptionScreen = props => {
         // paymentSubscriptionRequest(payload) //send data to BE
       }
     } catch (error) {
-      console.log("requestSubscription", error.message)
+      // console.log("requestSubscription", error.message)
       const message = error?.message
         ? error.message
         : "Failed to request subscription"

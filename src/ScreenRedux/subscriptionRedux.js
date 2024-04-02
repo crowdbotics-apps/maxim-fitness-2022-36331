@@ -442,7 +442,6 @@ function* paymentSubscription({ data }) {
       type: "success"
     })
   } catch (e) {
-    console.log("error", e);
     showMessage({
       message: e?.response?.data || "something went wrong",
       type: "danger"
