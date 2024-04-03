@@ -166,10 +166,7 @@ dependencies {
     implementation 'com.facebook.fresco:animated-gif:2.6.0'
     implementation 'com.facebook.fresco:animated-webp:2.0.0'
     implementation 'com.facebook.fresco:webpsupport:2.0.0'
-    //react-native-iap
     implementation project(':react-native-iap')
-    // google pay
-    implementation project(':react-native-google-pay')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
