@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 // components
-import {
-  View,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Platform
-} from "react-native"
+import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform } from "react-native"
 import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
@@ -19,37 +12,41 @@ import {
   getPlanRequest,
   getCustomerIdRequest,
   setPlanCardData,
+  postSubscriptionRequest,
   paymentSubscriptionRequest
 } from "../../ScreenRedux/subscriptionRedux"
-
 import {
   initConnection,
   getSubscriptions,
   getProducts,
-  requestPurchase,
   endConnection,
+  requestPurchase,
+  purchaseUpdatedListener,
+  purchaseErrorListener,
 } from "react-native-iap"
+import { GooglePay as GooglePayScreen } from 'react-native-google-pay';
+
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
-import { APP_SKU } from "@env"
+import { APP_SKU, SP_KEY } from "@env"
 import { showMessage } from "react-native-flash-message"
 
 const SubscriptionScreen = props => {
-  const {
-    navigation,
+  const { navigation,
     getPlans,
     subscriptionData,
     setPlanCardData,
     profileData,
     profile,
-    // paymentSubscriptionRequest
+    postSubscriptionRequest,
+    paymentSubscriptionRequest
   } = props
+  let purchaseUpdateSubscription = null;
+  let purchaseErrorSubscription = null;
+  const subscriptionSkus = [APP_SKU]
 
-  const skus = Platform.select({
-    ios: [APP_SKU]
-  })
   // const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
@@ -58,41 +55,79 @@ const SubscriptionScreen = props => {
     profileData()
     props.getPlanRequest()
     props.getCustomerIdRequest()
-    Platform.OS === "ios" && connect()
+    Platform.OS === 'ios' && connect()
   }, [])
-  // <===============ios apple pay ======start==========>
+  // <===============ios apple pay ==========start======>
   const [subscriptionId, setSubscriptionId] = useState([])
-  const [productsList, setProductsList] = useState([])
+  const [productsList, setProductsList] = useState([]);
 
   const connect = async () => {
+
+
+
     await initConnection()
-    const productsData = await getProducts({ skus })
+    if (purchaseUpdateSubscription) {
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove()
+        purchaseUpdateSubscription = null
+      }
+      purchaseUpdateSubscription = null
+    }
+
+    if (purchaseErrorSubscription) {
+      purchaseErrorSubscription.remove()
+      purchaseErrorSubscription = null
+    }
+    purchaseUpdateSubscription = purchaseUpdatedListener(async purchase => {
+      const receipt = purchase?.transactionReceipt
+
+      if (receipt) {
+        try {
+          await finishTransaction(purchase)
+        } catch (err) {
+          console.log(err);
+
+        } finally {
+          setLoading(false)
+        }
+      }
+    })
+
+    purchaseErrorSubscription = purchaseErrorListener(error => {
+      return error
+    })
+
+    const productsData = await getProducts({ skus: subscriptionSkus })
     setProductsList(productsData)
-    await handleGetSubscriptions()
+    const sub = await handleGetSubscriptions()
+    console.log(productsData, 'productsData', sub, 'sub');
     await endConnection()
+
   }
   const handleGetSubscriptions = async () => {
     try {
-      const res = await getSubscriptions({ skus })
+      const res = await getSubscriptions({ skus: subscriptionSkus });
       setSubscriptionId(res)
     } catch (error) {
-      showMessage({ message: "handleGetSubscriptions", error })
+      showMessage({ message: "handleGetSubscriptions", error });
     }
-  }
-  const purchasePlan = async (sku, newData) => {
+  };
+
+
+  const purchasePlan = async (selectedItem) => {
     try {
-      const purchasedResponse = await requestPurchase({
-        sku
-      })
-      if (purchasedResponse.transactionReceipt) {
-        const payload = {
-          ...newData,
-          token: purchasedResponse.transactionReceipt
+      const product = await requestPurchase({ sku: selectedItem?.id })
+      if (product.transactionReceipt) {
+        const data = {
+          scans: selectedItem?.metadata?.no_of_scans,
+          product_id: selectedItem?.id,
+          name: `${selectedItem?.metadata?.no_of_scans} scans`,
         }
-        // paymentSubscriptionRequest(payload) //send data to BE
+        console.log(data, 'data');
+        // purchaseSubscription(data)
       }
     } catch (error) {
-      // console.log("requestSubscription", error.message)
+      console.log("requestSubscription", error.message)
       const message = error?.message
         ? error.message
         : "Failed to request subscription"
@@ -100,7 +135,78 @@ const SubscriptionScreen = props => {
     } finally {
     }
   }
-  // <===============ios apple pay ====end============>
+  // <===============ios apple pay =========end=======>
+  // <===============android google pay ======start==========>
+
+  const allowedCardNetworks = ['VISA', 'MASTERCARD'];
+  const allowedCardAuthMethods = ['PAN_ONLY', 'CRYPTOGRAM_3DS'];
+  const requestData = {
+    cardPaymentMethod: {
+      tokenizationSpecification: {
+        type: 'PAYMENT_GATEWAY',
+        gateway: 'stripe',
+        stripe: {
+          publishableKey: SP_KEY,
+          version: '2018-11-08',
+        },
+      },
+      allowedCardNetworks,
+      allowedCardAuthMethods,
+    },
+    transaction: {
+      totalPrice: `${getPlans?.length && getPlans[0]?.unit_amount / 100}`,
+      totalPriceStatus: 'FINAL',
+      currencyCode: 'USD',
+    },
+  };
+  const initGooglePay = (data) => {
+    const environment = __DEV__ ? GooglePayScreen.ENVIRONMENT_TEST : GooglePayScreen.ENVIRONMENT_PRODUCTION;
+    GooglePayScreen.setEnvironment(environment);
+    GooglePayScreen.isReadyToPay(allowedCardNetworks, allowedCardAuthMethods)
+      .then((ready) => {
+        if (ready) {
+          handleGooglePayPress(data)
+        } else {
+          showMessage({
+            message: 'Google Pay Not Available',
+            description: 'Google Pay is not available on this device.',
+            type: 'danger',
+          });
+        }
+      })
+      .catch((error) => {
+        showMessage({
+          message: 'Error',
+          description: `Error checking Google Pay availability: ${error.message}`,
+          type: 'danger',
+        });
+      });
+
+  }
+
+  const handleGooglePayPress = async (data) => {
+    try {
+      const res = await GooglePayScreen.requestPayment(requestData)
+      const response = await JSON.parse(res);
+      if (response) {
+        const payload = { card_token: response?.id, last4: response?.card?.last4 }
+        await postSubscriptionRequest(payload);
+        const newData = {
+          ...data,
+          profile: profile
+        }
+        await paymentSubscriptionRequest(newData)
+      }
+    }
+    catch (error) {
+      showMessage({
+        message: 'Payment Error',
+        description: error.message || 'something went wrong',
+        type: 'danger',
+      });
+    };
+  };
+  // <===============android google pay ==========end======>
   // const card = () => {
   //   let plan_id =
   //     getPlans?.length > 0 && getPlans && getPlans?.[getPlans.length - 1]?.id
@@ -117,19 +223,17 @@ const SubscriptionScreen = props => {
 
   //   // navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
   // }
+  // }
   const premiumCardData = () => {
     let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
     let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     setPlanCardData({ plan_id, product, is_premium: true })
-    const newData = {
-      plan_id: plan_id,
-      premium_user: true,
-      profile: profile
-    }
     if (Platform.OS === "ios") {
-      purchasePlan(productsList?.[0]?.productId, newData)
-    } else if (Platform.OS === "android") {
-      navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
+      purchasePlan(productsList?.[0]?.id)
+    }
+    else if (Platform.OS === 'android') {
+      initGooglePay({ plan_id, product, is_premium: true })
+      // navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
     }
   }
   const { largeHMargin, mediumTMargin } = Gutters
@@ -155,13 +259,17 @@ const SubscriptionScreen = props => {
           >
             <Image source={Images.backImage} style={styles.backArrowStyle} />
           </TouchableOpacity>
-          <View style={[center, alignItemsCenter, fill]}>
+          <View
+
+            style={[center, alignItemsCenter, fill]}
+          >
             <Text
               text="Premium"
-              style={{ fontWeight: "bold", fontSize: 23, color: "black" }}
+              style={{ fontWeight: "bold", fontSize: 23, color: 'black' }}
               smallTitle
             />
           </View>
+
         </View>
         <View style={[row, largeHMargin, justifyContentBetween]}>
           <Loader isLoading={props.requesting} />
@@ -177,6 +285,7 @@ const SubscriptionScreen = props => {
               smallTitle
             />
           </TouchableOpacity> */}
+
         </View>
         <ScrollView>
           {/* {curentTab === 0 && (
@@ -293,6 +402,7 @@ const SubscriptionScreen = props => {
       </SafeAreaView>
     </>
   )
+
 }
 const styles = StyleSheet.create({
   leftArrow: {
@@ -325,13 +435,15 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  paymentSubscriptionRequest: data =>
-    dispatch(paymentSubscriptionRequest(data)),
   profileData: () => dispatch(profileData()),
   getPlanRequest: () => dispatch(getPlanRequest()),
   setPlanCardData: data => dispatch(setPlanCardData(data)),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
-  getCustomerIdRequest: () => dispatch(getCustomerIdRequest())
+  getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
+  postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
+  paymentSubscriptionRequest: data =>
+    dispatch(paymentSubscriptionRequest(data)),
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionScreen)
