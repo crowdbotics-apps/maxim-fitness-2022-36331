@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform } from "react-native"
+import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform, Alert } from "react-native"
 import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 import Card from "./component/Card"
@@ -24,14 +24,14 @@ import {
   purchaseUpdatedListener,
   purchaseErrorListener,
 } from "react-native-iap"
-import { GooglePay as GooglePayScreen } from 'react-native-google-pay';
-
+import { usePlatformPay } from '@stripe/stripe-react-native';
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
-import { APP_SKU, SP_KEY } from "@env"
+import { APP_SKU, SP_KEY, SP_SECRET, __DEV__ } from "@env"
 import { showMessage } from "react-native-flash-message"
+import axios from "axios"
 
 const SubscriptionScreen = props => {
   const { navigation,
@@ -43,6 +43,7 @@ const SubscriptionScreen = props => {
     postSubscriptionRequest,
     paymentSubscriptionRequest
   } = props
+  const DEV = __DEV__ === 'true';
   let purchaseUpdateSubscription = null;
   let purchaseErrorSubscription = null;
   const subscriptionSkus = [APP_SKU]
@@ -136,77 +137,73 @@ const SubscriptionScreen = props => {
     }
   }
   // <===============ios apple pay =========end=======>
-  // <===============android google pay ======start==========>
+  // <======google pay=  start==>
+  const {
+    isPlatformPaySupported,
+    confirmPlatformPayPayment,
+    createPlatformPayPaymentMethod
+  } = usePlatformPay();
 
-  const allowedCardNetworks = ['VISA', 'MASTERCARD'];
-  const allowedCardAuthMethods = ['PAN_ONLY', 'CRYPTOGRAM_3DS'];
-  const requestData = {
-    cardPaymentMethod: {
-      tokenizationSpecification: {
-        type: 'PAYMENT_GATEWAY',
-        gateway: 'stripe',
-        stripe: {
-          publishableKey: SP_KEY,
-          version: '2018-11-08',
-        },
-      },
-      allowedCardNetworks,
-      allowedCardAuthMethods,
-    },
-    transaction: {
-      totalPrice: `${getPlans?.length && getPlans[0]?.unit_amount / 100}`,
-      totalPriceStatus: 'FINAL',
-      currencyCode: 'USD',
-    },
-  };
-  const initGooglePay = (data) => {
-    const environment = __DEV__ ? GooglePayScreen.ENVIRONMENT_TEST : GooglePayScreen.ENVIRONMENT_PRODUCTION;
-    GooglePayScreen.setEnvironment(environment);
-    GooglePayScreen.isReadyToPay(allowedCardNetworks, allowedCardAuthMethods)
-      .then((ready) => {
-        if (ready) {
-          handleGooglePayPress(data)
-        } else {
-          showMessage({
-            message: 'Google Pay Not Available',
-            description: 'Google Pay is not available on this device.',
-            type: 'danger',
-          });
-        }
-      })
-      .catch((error) => {
-        showMessage({
-          message: 'Error',
-          description: `Error checking Google Pay availability: ${error.message}`,
-          type: 'danger',
-        });
-      });
-
-  }
-
-  const handleGooglePayPress = async (data) => {
-    try {
-      const res = await GooglePayScreen.requestPayment(requestData)
-      const response = await JSON.parse(res);
-      if (response) {
-        const payload = { card_token: response?.id, last4: response?.card?.last4 }
-        await postSubscriptionRequest(payload);
-        const newData = {
-          ...data,
-          profile: profile
-        }
-        await paymentSubscriptionRequest(newData)
+  useEffect(() => {
+    (async function () {
+      if (!(await isPlatformPaySupported({ googlePay: { testEnv: DEV } }))) {
+        Alert.alert('Google Pay is not supported.');
+        return;
       }
-    }
-    catch (error) {
-      showMessage({
-        message: 'Payment Error',
-        description: error.message || 'something went wrong',
-        type: 'danger',
+    })();
+  }, []);
+
+  const fetchPaymentIntent = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('payment_method_types[]', 'card');
+      params.append('amount', `${getPlans?.length && getPlans[0]?.unit_amount}`);
+      params.append('currency', 'usd');
+      const requestData = params.toString();
+      const response = await axios.post('https://api.stripe.com/v1/payment_intents', requestData, {
+        headers: {
+          'Authorization': `Bearer ${SP_SECRET}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
-    };
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   };
-  // <===============android google pay ==========end======>
+
+
+
+
+
+  const payWithGoogle = async () => {
+    try {
+      const intentData = await fetchPaymentIntent();
+      intentData && await confirmPlatformPayPayment(
+        intentData?.client_secret,
+        {
+          googlePay: {
+            testEnv: DEV,
+            merchantName: 'My merchant name',
+            merchantCountryCode: 'US',
+            currencyCode: 'USD',
+            billingAddressConfig: {
+              format: 'FULL',
+              isPhoneNumberRequired: true,
+              isRequired: true,
+            },
+          },
+        }
+      );
+      showMessage({ message: "Payment successful", type: "success" });
+    } catch (error) {
+      showMessage({ message: "Payment failed", description: error.message, type: "danger" });
+    }
+  };
+
+  // <======google pay== end=>
+
+
   // const card = () => {
   //   let plan_id =
   //     getPlans?.length > 0 && getPlans && getPlans?.[getPlans.length - 1]?.id
@@ -232,7 +229,7 @@ const SubscriptionScreen = props => {
       purchasePlan(productsList?.[0]?.id)
     }
     else if (Platform.OS === 'android') {
-      initGooglePay({ plan_id, product, is_premium: true })
+      payWithGoogle()
       // navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
     }
   }

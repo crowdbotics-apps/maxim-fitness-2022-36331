@@ -211,6 +211,7 @@ const PremiumCard = props => {
           { paddingBottom: 20, marginTop: -20, backgroundColor: "transparent" }
         ]}
       >
+
         <Button
           color="secondary"
           text={
@@ -222,9 +223,9 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={Platform.OS != 'ios' ? profile?.is_premium_user : false}
-          onPress={(Platform.OS === 'ios' || !profile?.is_premium_user) ? onPress : null}
-
+          // disabled={Platform.OS != 'ios' ? profile?.is_premium_user : false}
+          // onPress={(Platform.OS === 'ios' || !profile?.is_premium_user) ? onPress : null}
+          onPress={onPress}
 
         />
       </View>
