@@ -301,8 +301,8 @@ const FatLoseProgram = props => {
 
   const groupExerciseTypes = (data) => {
     const groupedExercises = {};
-    data.workouts.forEach(workout => {
-      workout.exercises.forEach(exercise => {
+    data?.workouts?.forEach(workout => {
+      workout.exercises?.forEach(exercise => {
         const exerciseTypeId = exercise.exercise_type.id;
 
         if (!groupedExercises[exerciseTypeId]) {
@@ -510,9 +510,8 @@ const FatLoseProgram = props => {
     );
   }
 
-
   const showPromoCard =
-    (todaySessions?.name !== "Rest" || todaySessions?.length > 1) && profile.is_premium_user
+    (todaySessions?.name !== "Rest" || todaySessions?.length > 1) && profile.is_premium_user && todaySessions?.name
   return (
     <SafeAreaView style={[fill, Global.secondaryBg]}>
       <ScrollView>
@@ -521,7 +520,7 @@ const FatLoseProgram = props => {
             {letterCapitalize(profile?.first_name || profile?.username)}'s{" "}
             {exerciseArray[profile?.fitness_goal - 1]?.heading + " Program"}
           </Text>
-          {profile?.is_premium_user ? (
+          {profile?.is_premium_user && (
             <>
               {/* <====================week calender==================start=> */}
               {!todayRequest && getWeekSessions?.query?.length > 0 && (
@@ -747,8 +746,9 @@ const FatLoseProgram = props => {
                   </View>
                 </>
               )}
-            </>) : (
-            <>
+            </>)}
+          <>
+            {!profile?.is_premium_user || getWeekSessions?.query?.length === 0 && (
               <ReactNativeCalendarStrip
                 calendarAnimation={{ type: 'sequence', duration: 30 }}
                 daySelectionAnimation={{ type: 'background', duration: 200, highlightColor: '#00a2ff' }}
@@ -770,7 +770,8 @@ const FatLoseProgram = props => {
                 }}
               />
 
-            </>)}
+            )}
+          </>
           {/* <====================week calender==================start=> */}
 
           {!profile?.is_premium_user && (
