@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform, Alert } from "react-native"
 import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
-import Card from "./component/Card"
+// import Card from "./component/Card"
 import PremiumCard from "./component/PremiumCard"
 import { connect } from "react-redux"
 import {
@@ -13,7 +13,8 @@ import {
   getCustomerIdRequest,
   setPlanCardData,
   postSubscriptionRequest,
-  paymentSubscriptionRequest
+  paymentSubscriptionRequest,
+  updateCustomerSource
 } from "../../ScreenRedux/subscriptionRedux"
 import {
   initConnection,
@@ -41,7 +42,8 @@ const SubscriptionScreen = props => {
     profileData,
     profile,
     postSubscriptionRequest,
-    paymentSubscriptionRequest
+    paymentSubscriptionRequest,
+    updateCustomerSource
   } = props
   const DEV = __DEV__ === 'true';
   let purchaseUpdateSubscription = null;
@@ -156,9 +158,14 @@ const SubscriptionScreen = props => {
   const fetchPaymentIntent = async () => {
     try {
       const params = new URLSearchParams();
-      params.append('payment_method_types[]', 'card');
+      // params.append('payment_method_types[]', 'card');
       params.append('amount', `${getPlans?.length && getPlans[0]?.unit_amount}`);
+      params.append('automatic_payment_methods[enabled]', 'false');
       params.append('currency', 'usd');
+      params.append('setup_future_usage', 'on_session');
+      // params.append('use_stripe_sdk', 'true');
+
+
       const requestData = params.toString();
       const response = await axios.post('https://api.stripe.com/v1/payment_intents', requestData, {
         headers: {
@@ -173,29 +180,30 @@ const SubscriptionScreen = props => {
   };
 
 
-
-
-
   const payWithGoogle = async () => {
     try {
       const intentData = await fetchPaymentIntent();
-      intentData && await confirmPlatformPayPayment(
-        intentData?.client_secret,
-        {
-          googlePay: {
-            testEnv: DEV,
-            merchantName: 'My merchant name',
-            merchantCountryCode: 'US',
-            currencyCode: 'USD',
-            billingAddressConfig: {
-              format: 'FULL',
-              isPhoneNumberRequired: true,
-              isRequired: true,
+      if (intentData) {
+        const response = await confirmPlatformPayPayment(
+          intentData?.client_secret,
+          {
+            googlePay: {
+              testEnv: DEV,
+              merchantName: 'My merchant name',
+              merchantCountryCode: 'US',
+              currencyCode: 'USD',
+              billingAddressConfig: {
+                format: 'FULL',
+                isPhoneNumberRequired: true,
+                isRequired: true,
+              },
             },
-          },
+          }
+        );
+        if (response?.paymentIntent?.status === 'Succeeded') {
+          await updateCustomerSource({ payment_method_id: response?.paymentIntent.paymentMethod.id, plan_id: getPlans?.[0]?.id, profile: profile })
         }
-      );
-      showMessage({ message: "Payment successful", type: "success" });
+      }
     } catch (error) {
       showMessage({ message: "Payment failed", description: error.message, type: "danger" });
     }
@@ -440,6 +448,10 @@ const mapDispatchToProps = dispatch => ({
   postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
   paymentSubscriptionRequest: data =>
     dispatch(paymentSubscriptionRequest(data)),
+  updateCustomerSource: data =>
+    dispatch(updateCustomerSource(data)),
+
+
 
 })
 

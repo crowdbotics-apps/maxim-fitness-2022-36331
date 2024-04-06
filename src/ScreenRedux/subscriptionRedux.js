@@ -30,6 +30,8 @@ const POST_SUBSCRIPTION_FAILURE =
   "SUBSCRIPTION_SCREEN/POST_SUBSCRIPTION_FAILURE"
 const PAYMENT_SUBSCRIPTION_REQUEST =
   "SUBSCRIPTION_SCREEN/PAYMENT_SUBSCRIPTION_REQUEST"
+const UPDATE_CUSTOMER_SOURCE =
+  "SUBSCRIPTION_SCREEN/UPDATE_CUSTOMER_SOURCE"
 
 const GET_CARD_REQUEST =
   "SUBSCRIPTION_SCREEN/GET_CARD_REQUEST"
@@ -130,6 +132,11 @@ export const paymentSubscriptionRequest = data => ({
   type: PAYMENT_SUBSCRIPTION_REQUEST,
   data
 })
+export const updateCustomerSource = data => ({
+  type: UPDATE_CUSTOMER_SOURCE,
+  data
+})
+
 export const getCardRequest = data => ({
   type: GET_CARD_REQUEST,
   data
@@ -261,6 +268,13 @@ export const subscriptionReducer = (state = initialState, action) => {
       return {
         ...state,
         cardAddRequesting: true
+      }
+
+
+    case UPDATE_CUSTOMER_SOURCE:
+      return {
+        ...state,
+        cardPayRequesting: true
       }
     case PAYMENT_SUBSCRIPTION_REQUEST:
       return {
@@ -406,7 +420,7 @@ function* addSubscriptionCard({ data }) {
 }
 //api call function
 async function paymentSubscriptionAPI(payload) {
-  const data = { price_id: payload.plan_id, premium_user: payload.premium_user }
+  const data = { price_id: payload.plan_id, premium_user: true }
   const URL = `${API_URL}/subscription/create_subscription/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
@@ -615,11 +629,46 @@ function* submitQuestionFunc() {
   }
 }
 
+
+
+
+//api call function for update source
+async function updateSourceApi(params) {
+  const data = { payment_method_id: params?.payment_method_id }
+  const URL = `${API_URL}/subscription/update_customer_source/`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token  ${token}`
+    },
+    method: "POST",
+    data
+  }
+  return XHR(URL, options)
+}
+
+function* updateCustomerSourceRequest({ data }) {
+  try {
+    const response = yield call(updateSourceApi, data)
+    yield put(paymentSubscriptionRequest(data))
+  } catch (e) {
+    showMessage({
+      message: e?.response?.data || "something went wrong",
+      type: "danger"
+    })
+    const { response } = e
+  } finally {
+    yield put(reset())
+  }
+}
+
 export default all([
   takeLatest(GET_PLAN_REQUEST, getFeeds),
   takeLatest(GET_CUSTOMERID_REQUEST, getCustomerId),
   takeLatest(POST_SUBSCRIPTION_REQUEST, addSubscriptionCard),
   takeLatest(PAYMENT_SUBSCRIPTION_REQUEST, paymentSubscription),
+  takeLatest(UPDATE_CUSTOMER_SOURCE, updateCustomerSourceRequest),
   takeLatest(GET_CARD_REQUEST, getCardsData),
   takeLatest(DELETE_CARD_REQUEST, deleteCard),
   takeLatest(GET_SUBSCRIPTION_ID_REQUEST, getSubscriptionId),

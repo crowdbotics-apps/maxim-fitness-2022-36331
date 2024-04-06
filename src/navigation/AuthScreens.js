@@ -26,7 +26,6 @@ const AuthStackScreen = () => (
     />
     <authStack.Screen name="SetForgetPassword" component={SetForgetPassword} />
     <authStack.Screen name="CreditCard" component={CreditCard} />
-    
   </authStack.Navigator>
 )
 

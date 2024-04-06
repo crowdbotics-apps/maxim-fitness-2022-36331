@@ -748,7 +748,7 @@ const FatLoseProgram = props => {
               )}
             </>)}
           <>
-            {!profile?.is_premium_user || getWeekSessions?.query?.length === 0 && (
+            {!profile?.is_premium_user || getWeekSessions?.query?.length === 0 ? (
               <ReactNativeCalendarStrip
                 calendarAnimation={{ type: 'sequence', duration: 30 }}
                 daySelectionAnimation={{ type: 'background', duration: 200, highlightColor: '#00a2ff' }}
@@ -770,7 +770,7 @@ const FatLoseProgram = props => {
                 }}
               />
 
-            )}
+            ) : <></>}
           </>
           {/* <====================week calender==================start=> */}
 
