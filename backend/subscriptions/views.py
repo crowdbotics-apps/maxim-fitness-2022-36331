@@ -625,6 +625,30 @@ class SubscriptionViewSet(viewsets.ViewSet):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
+    @action(detail=False, methods=['post'])
+    def update_customer_source(self, request):
+        try:
+            payment_method_id = request.data.get("payment_method_id")
+            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+            if internal_customer:
+                customer_id = internal_customer.stripe_id
+            else:
+                customer = stripe.Customer.create(email=request.user.email)
+                customer_id = customer.id
+                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+                internal_customer.save()
+            stripe.PaymentMethod.attach(
+                payment_method_id,
+                customer=customer_id,
+            )
+            stripe.Customer.modify(
+                customer_id,
+                invoice_settings={"default_payment_method": payment_method_id}
+            )
+        except Exception as e:
+            return Response({"eroror": str(e)}, status=500)
+        return Response({"success": True})
+
 
 @webhooks.handler("payment_intent.succeeded")
 def payment_success_handler(event, **kwargs):

@@ -1406,11 +1406,13 @@ class FormViewSet(ModelViewSet):
         user_program = UserProgram.objects.filter(user=request.user).first()
         if user_program:
             user_program.program.create_session(request.user)
+            return Response({"success": True})
         else:
             if program:
                 program.program.create_session(request.user)
-            return Response("program not assigned")
-        return Response({"Program assigned"})
+                return Response({"success": True})
+            else:
+                return Response({"success": False})
 
     # @action(detail=False, methods=['get'])
     # def get_initial_form(self, request):
