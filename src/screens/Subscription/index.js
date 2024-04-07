@@ -9,11 +9,11 @@ import PremiumCard from "./component/PremiumCard"
 import { connect } from "react-redux"
 import {
   // getSubscriptionRequest,
-  getPlanRequest,
   // getCustomerIdRequest,
-  setPlanCardData,
-  postSubscriptionRequest,
-  paymentSubscriptionRequest,
+  // setPlanCardData,
+  // paymentSubscriptionRequest,
+  getPlanRequest,
+  // postSubscriptionRequest,
   updateCustomerSource
 } from "../../ScreenRedux/subscriptionRedux"
 import {
@@ -38,11 +38,11 @@ const SubscriptionScreen = props => {
   const { navigation,
     getPlans,
     subscriptionData,
-    setPlanCardData,
+    // setPlanCardData,
     profileData,
     profile,
-    postSubscriptionRequest,
-    paymentSubscriptionRequest,
+    // postSubscriptionRequest,
+    // paymentSubscriptionRequest,
     updateCustomerSource
   } = props
   const DEV = __DEV__ === 'true';
@@ -230,9 +230,9 @@ const SubscriptionScreen = props => {
   // }
   // }
   const premiumCardData = () => {
-    let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
-    let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
-    setPlanCardData({ plan_id, product, is_premium: true })
+    // let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
+    // let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
+    // setPlanCardData({ plan_id, product, is_premium: true })
     if (Platform.OS === "ios") {
       purchasePlan(productsList?.[0]?.id)
     }
@@ -307,13 +307,14 @@ const SubscriptionScreen = props => {
             />
           )} */}
           {/* {curentTab === 1 && ( */}
+
           <PremiumCard
             onPress={premiumCardData}
             setIsVisible={setIsVisible}
             navigation={navigation}
-            getPlans={getPlans}
+            // getPlans={getPlans}
             amount={getPlans?.length && getPlans[0]?.unit_amount / 100}
-            subsucriptionId={subscriptionData?.plan?.id}
+          // subsucriptionId={subscriptionData?.plan?.id}
           />
           {/* )} */}
         </ScrollView>
@@ -432,22 +433,22 @@ const styles = StyleSheet.create({
 })
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
-  // customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.subRequesting,
   profile: state.login.userDetail
+  // customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
 })
 
 const mapDispatchToProps = dispatch => ({
-  profileData: () => dispatch(profileData()),
-  getPlanRequest: () => dispatch(getPlanRequest()),
-  setPlanCardData: data => dispatch(setPlanCardData(data)),
+  // setPlanCardData: data => dispatch(setPlanCardData(data)),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
   // getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
-  postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
-  paymentSubscriptionRequest: data =>
-    dispatch(paymentSubscriptionRequest(data)),
+  // postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
+  // paymentSubscriptionRequest: data =>
+  profileData: () => dispatch(profileData()),
+  getPlanRequest: () => dispatch(getPlanRequest()),
+  //   dispatch(paymentSubscriptionRequest(data)),
   updateCustomerSource: data =>
     dispatch(updateCustomerSource(data)),
 

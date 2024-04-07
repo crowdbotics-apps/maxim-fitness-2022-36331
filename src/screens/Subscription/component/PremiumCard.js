@@ -15,11 +15,11 @@ import { API_URL } from "../../../config/app"
 const PremiumCard = props => {
   const {
     onPress,
-    getPlans,
+    // getPlans,
     amount,
-    subsucriptionId,
+    // subsucriptionId,
     profile,
-    cardPlanData,
+    // cardPlanData,
     getSubscriptIdRequest,
     subscriptionIdData,
     subIdRequesting,
