@@ -654,7 +654,7 @@ function* updateCustomerSourceRequest({ data }) {
     yield put(paymentSubscriptionRequest(data))
   } catch (e) {
     showMessage({
-      message: e?.response?.data || "something went wrong",
+      message: "something went wrong",
       type: "danger"
     })
     const { response } = e

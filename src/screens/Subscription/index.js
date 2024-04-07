@@ -40,7 +40,7 @@ const SubscriptionScreen = props => {
     cardPayRequesting
   } = props
   const development = GPAY_TEST === 'true';
-  
+
 
   // const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -105,9 +105,9 @@ const SubscriptionScreen = props => {
               merchantCountryCode: 'US',
               currencyCode: 'USD',
               billingAddressConfig: {
-                format: 'FULL',
-                isPhoneNumberRequired: true,
-                isRequired: true,
+                format: 'MIN',
+                // isPhoneNumberRequired: true,
+                // isRequired: true,
               },
             },
           }
@@ -152,7 +152,7 @@ const SubscriptionScreen = props => {
         [
           {
             text: "OK",
-            onPress: () => {}
+            onPress: () => { }
           }
         ],
         { cancelable: false }
@@ -179,7 +179,7 @@ const SubscriptionScreen = props => {
   return (
     <>
       <SafeAreaView>
-      <Loader isLoading={!getPlans?.length && getPlans[0]?.unit_amount ||cardPayRequesting|| subIdRequesting} />
+        <Loader isLoading={!getPlans?.length && getPlans[0]?.unit_amount || cardPayRequesting || subIdRequesting} />
 
         <View style={[row]}>
           <TouchableOpacity
@@ -361,7 +361,7 @@ const mapStateToProps = state => ({
   requesting: state.subscriptionReducer.subRequesting,
   profile: state.login.userDetail,
   subIdRequesting: state.subscriptionReducer.subIdRequesting,
-  cardPayRequesting:state.subscriptionReducer.cardPayRequesting
+  cardPayRequesting: state.subscriptionReducer.cardPayRequesting
   // customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
 })
