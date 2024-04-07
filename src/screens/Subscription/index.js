@@ -142,8 +142,7 @@ const SubscriptionScreen = props => {
   // <======google pay=  start==>
   const {
     isPlatformPaySupported,
-    confirmPlatformPayPayment,
-    createPlatformPayPaymentMethod
+    confirmPlatformPayPayment
   } = usePlatformPay();
 
   useEffect(() => {
