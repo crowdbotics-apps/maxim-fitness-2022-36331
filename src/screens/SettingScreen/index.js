@@ -80,10 +80,10 @@ const SettingScreen = props => {
           <Text text="Subscription Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
         </TouchableOpacity>
-        <View style={[styles.mainHeading]}>
+        {/* <TouchableOpacity  onPress={()=>console.log('ggggg')} style={[styles.mainHeading]}>
           <Text text="Payment Plan" style={styles.mainText} bold />
           <Image source={Images.forwordIcon} style={styles.IconStyles} />
-        </View>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={[styles.mainHeading]}
           onPress={() => setShowModal(true)}
