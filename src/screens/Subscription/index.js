@@ -16,15 +16,7 @@ import {
   // postSubscriptionRequest,
   updateCustomerSource
 } from "../../ScreenRedux/subscriptionRedux"
-import {
-  initConnection,
-  getSubscriptions,
-  getProducts,
-  endConnection,
-  requestPurchase,
-  purchaseUpdatedListener,
-  purchaseErrorListener,
-} from "react-native-iap"
+
 import { usePlatformPay } from '@stripe/stripe-react-native';
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
@@ -58,85 +50,8 @@ const SubscriptionScreen = props => {
     profileData()
     props.getPlanRequest()
     // props.getCustomerIdRequest()
-    Platform.OS === 'ios' && connect()
   }, [])
-  // <===============ios apple pay ==========start======>
-  const [subscriptionId, setSubscriptionId] = useState([])
-  const [productsList, setProductsList] = useState([]);
 
-  const connect = async () => {
-
-
-
-    await initConnection()
-    if (purchaseUpdateSubscription) {
-      if (purchaseUpdateSubscription) {
-        purchaseUpdateSubscription.remove()
-        purchaseUpdateSubscription = null
-      }
-      purchaseUpdateSubscription = null
-    }
-
-    if (purchaseErrorSubscription) {
-      purchaseErrorSubscription.remove()
-      purchaseErrorSubscription = null
-    }
-    purchaseUpdateSubscription = purchaseUpdatedListener(async purchase => {
-      const receipt = purchase?.transactionReceipt
-
-      if (receipt) {
-        try {
-          await finishTransaction(purchase)
-        } catch (err) {
-          // console.log(err);
-
-        }
-      }
-    })
-
-    purchaseErrorSubscription = purchaseErrorListener(error => {
-      return error
-    })
-
-    const productsData = await getProducts({ skus: subscriptionSkus })
-    setProductsList(productsData)
-    const sub = await handleGetSubscriptions()
-    // console.log(productsData, 'productsData', sub, 'sub');
-    await endConnection()
-
-  }
-  const handleGetSubscriptions = async () => {
-    try {
-      const res = await getSubscriptions({ skus: subscriptionSkus });
-      setSubscriptionId(res)
-    } catch (error) {
-      showMessage({ message: "handleGetSubscriptions", error });
-    }
-  };
-
-
-  const purchasePlan = async (selectedItem) => {
-    try {
-      const product = await requestPurchase({ sku: selectedItem?.id })
-      if (product.transactionReceipt) {
-        const data = {
-          scans: selectedItem?.metadata?.no_of_scans,
-          product_id: selectedItem?.id,
-          name: `${selectedItem?.metadata?.no_of_scans} scans`,
-        }
-        // console.log(data, 'data');
-        // purchaseSubscription(data)
-      }
-    } catch (error) {
-      // console.log("requestSubscription", error.message)
-      const message = error?.message
-        ? error.message
-        : "Failed to request subscription"
-      showMessage({ type: "danger", message })
-    } finally {
-    }
-  }
-  // <===============ios apple pay =========end=======>
   // <======google pay=  start==>
   const {
     isPlatformPaySupported,
@@ -231,7 +146,7 @@ const SubscriptionScreen = props => {
     // let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     // setPlanCardData({ plan_id, product, is_premium: true })
     if (Platform.OS === "ios") {
-      purchasePlan(productsList?.[0]?.id)
+      // purchasePlan(productsList?.[0]?.id)
     }
     else if (Platform.OS === 'android') {
       payWithGoogle()
