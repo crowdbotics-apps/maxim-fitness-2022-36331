@@ -30,7 +30,7 @@ import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
-import { APP_SKU, SP_KEY, SP_SECRET, __DEV__ } from "@env"
+import { APP_SKU, S_SECRET, __DEV__ } from "@env"
 import { showMessage } from "react-native-flash-message"
 import axios from "axios"
 
@@ -168,7 +168,7 @@ const SubscriptionScreen = props => {
       const requestData = params.toString();
       const response = await axios.post('https://api.stripe.com/v1/payment_intents', requestData, {
         headers: {
-          'Authorization': `Bearer ${SP_SECRET}`,
+          'Authorization': `Bearer ${S_SECRET}`,
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
