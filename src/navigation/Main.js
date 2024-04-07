@@ -15,6 +15,7 @@ import CreditCard from "../screens/CreditCard"
 import PaymentScreen from "../screens/CreditCard/PaymentScreen"
 
 
+
 import ProgramScreen from "../screens/ProgramScreen"
 import ExerciseScreen from "../screens/ExerciseScreen"
 import ProfileScreen from "../screens/ProfileScreen"
@@ -253,7 +254,7 @@ const MainNavigator = props => {
   return (
     <mainStack.Navigator
       screenOptions={{ headerShown: false, animationEnabled: false }}
-      initialRouteName={profile?.is_premium_user || profile?.trial ? "BottomBar" : "Subscription"}
+      initialRouteName={ "BottomBar"}
     >
       <mainStack.Screen name="BottomBar" component={BottomNavigator} />
       <mainStack.Screen name="AddPost" component={AddPost} />

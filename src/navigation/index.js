@@ -95,7 +95,6 @@ const Navigation = props => {
             <authStack.Screen name="AuthStack" component={AuthStackScreen} />
             //<questionStack.Screen name="QuestionStack" component={QuestionStackScreen} />
           )}
-          <mainStack.Screen name="BottomBar" component={BottomNavigator} />
 
         </authStack.Navigator>
       </NavigationContainer>

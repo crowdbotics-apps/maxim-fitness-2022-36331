@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Alert, Linking, Platform } from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
@@ -11,14 +11,15 @@ import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
 import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
 import { API_URL } from "../../../config/app"
+
 const PremiumCard = props => {
   const {
     onPress,
-    getPlans,
+    // getPlans,
     amount,
-    subsucriptionId,
+    // subsucriptionId,
     profile,
-    cardPlanData,
+    // cardPlanData,
     getSubscriptIdRequest,
     subscriptionIdData,
     subIdRequesting,
@@ -156,15 +157,17 @@ const PremiumCard = props => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {canceledButton().show ? (
-          <TouchableOpacity
-            onPress={() => {
-              canceledButton(true)
-            }}
-            style={styles.cancelButton}>
-            <Text style={styles.text}>{canceledButton().text}</Text>
-          </TouchableOpacity>
-        ) : null}
+        {
+          Platform.OS != 'ios' &&
+            canceledButton().show ? (
+            <TouchableOpacity
+              onPress={() => {
+                canceledButton(true)
+              }}
+              style={styles.cancelButton}>
+              <Text style={styles.text}>{canceledButton().text}</Text>
+            </TouchableOpacity>
+          ) : null}
         <View
           style={[
             row,
@@ -208,10 +211,11 @@ const PremiumCard = props => {
           { paddingBottom: 20, marginTop: -20, backgroundColor: "transparent" }
         ]}
       >
+
         <Button
           color="secondary"
           text={
-            profile?.is_premium_user ? "Already Bought" : "Buy Now"
+            Platform.OS != 'ios' && profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -219,9 +223,8 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={profile?.is_premium_user}
-          onPress={!profile?.is_premium_user ? onPress : null}
-
+          disabled={Platform.OS != 'ios' ? profile?.is_premium_user : false}
+          onPress={(Platform.OS === 'ios' || !profile?.is_premium_user) ? onPress : null}
 
         />
       </View>
