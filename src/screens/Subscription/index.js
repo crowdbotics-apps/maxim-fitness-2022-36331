@@ -30,7 +30,7 @@ import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
 import { profileData } from "../../ScreenRedux/profileRedux"
-import { APP_SKU, S_SECRET, __DEV__ } from "@env"
+import { APP_SKU, S_SECRET, GPAY_TEST } from "@env"
 import { showMessage } from "react-native-flash-message"
 import axios from "axios"
 
@@ -45,7 +45,7 @@ const SubscriptionScreen = props => {
     // paymentSubscriptionRequest,
     updateCustomerSource
   } = props
-  const DEV = __DEV__ === 'true';
+  const development = GPAY_TEST === 'true';
   let purchaseUpdateSubscription = null;
   let purchaseErrorSubscription = null;
   const subscriptionSkus = [APP_SKU]
@@ -147,7 +147,7 @@ const SubscriptionScreen = props => {
 
   useEffect(() => {
     (async function () {
-      if (!(await isPlatformPaySupported({ googlePay: { testEnv: DEV } }))) {
+      if (!(await isPlatformPaySupported({ googlePay: { testEnv: development } }))) {
         Alert.alert('Google Pay is not supported.');
         return;
       }
@@ -187,7 +187,7 @@ const SubscriptionScreen = props => {
           intentData?.client_secret,
           {
             googlePay: {
-              testEnv: DEV,
+              testEnv: development,
               merchantName: 'My merchant name',
               merchantCountryCode: 'US',
               currencyCode: 'USD',
