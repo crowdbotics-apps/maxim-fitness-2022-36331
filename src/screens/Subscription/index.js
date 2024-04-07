@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 // components
 import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform, Alert } from "react-native"
-import { Icon } from "native-base"
+// import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 // import Card from "./component/Card"
 import PremiumCard from "./component/PremiumCard"
@@ -10,7 +10,7 @@ import { connect } from "react-redux"
 import {
   // getSubscriptionRequest,
   getPlanRequest,
-  getCustomerIdRequest,
+  // getCustomerIdRequest,
   setPlanCardData,
   postSubscriptionRequest,
   paymentSubscriptionRequest,
@@ -57,7 +57,7 @@ const SubscriptionScreen = props => {
   useEffect(() => {
     profileData()
     props.getPlanRequest()
-    props.getCustomerIdRequest()
+    // props.getCustomerIdRequest()
     Platform.OS === 'ios' && connect()
   }, [])
   // <===============ios apple pay ==========start======>
@@ -88,7 +88,7 @@ const SubscriptionScreen = props => {
         try {
           await finishTransaction(purchase)
         } catch (err) {
-          console.log(err);
+          // console.log(err);
 
         } finally {
           setLoading(false)
@@ -103,7 +103,7 @@ const SubscriptionScreen = props => {
     const productsData = await getProducts({ skus: subscriptionSkus })
     setProductsList(productsData)
     const sub = await handleGetSubscriptions()
-    console.log(productsData, 'productsData', sub, 'sub');
+    // console.log(productsData, 'productsData', sub, 'sub');
     await endConnection()
 
   }
@@ -126,11 +126,11 @@ const SubscriptionScreen = props => {
           product_id: selectedItem?.id,
           name: `${selectedItem?.metadata?.no_of_scans} scans`,
         }
-        console.log(data, 'data');
+        // console.log(data, 'data');
         // purchaseSubscription(data)
       }
     } catch (error) {
-      console.log("requestSubscription", error.message)
+      // console.log("requestSubscription", error.message)
       const message = error?.message
         ? error.message
         : "Failed to request subscription"
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
 })
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
-  customerId: state.subscriptionReducer.getCISuccess,
+  // customerId: state.subscriptionReducer.getCISuccess,
   subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.subRequesting,
   profile: state.login.userDetail
@@ -444,7 +444,7 @@ const mapDispatchToProps = dispatch => ({
   getPlanRequest: () => dispatch(getPlanRequest()),
   setPlanCardData: data => dispatch(setPlanCardData(data)),
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
-  getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
+  // getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
   postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
   paymentSubscriptionRequest: data =>
     dispatch(paymentSubscriptionRequest(data)),
