@@ -22,7 +22,7 @@ import { connect } from "react-redux"
 import useForm from "../../utils/useForm"
 import validator from "../../utils/validation"
 import { useIsFocused } from "@react-navigation/native"
-import { GOOGLE_ANDROID_CLIENT_ID_DEBUG, GOOGLE_ANDROID_CLIENT_ID_Live, __DEV__ } from "@env";
+import { GOOGLE_ANDROID_CLIENT_ID_DEBUG, GOOGLE_ANDROID_CLIENT_ID_Live, IOS_CLIENT_ID, __DEV__ } from "@env";
 //actions
 import {
   loginUser,
@@ -84,7 +84,7 @@ const SignIn = props => {
     GoogleSignin.configure({
       scopes: ["https://www.googleapis.com/auth/userinfo.profile"], // what API you want to access on behalf of the user, default is email and profile
       forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-      iosClientId: DEV ? GOOGLE_ANDROID_CLIENT_ID_DEBUG : GOOGLE_ANDROID_CLIENT_ID_Live,// [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+      iosClientId: IOS_CLIENT_ID,// [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
       androidClientId: DEV ? GOOGLE_ANDROID_CLIENT_ID_DEBUG : GOOGLE_ANDROID_CLIENT_ID_Live
 
 
