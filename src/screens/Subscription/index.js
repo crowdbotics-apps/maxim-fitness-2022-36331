@@ -29,18 +29,18 @@ import axios from "axios"
 const SubscriptionScreen = props => {
   const { navigation,
     getPlans,
-    subscriptionData,
+    // subscriptionData,
     // setPlanCardData,
     profileData,
     profile,
     // postSubscriptionRequest,
     // paymentSubscriptionRequest,
-    updateCustomerSource
+    updateCustomerSource,
+    subIdRequesting,
+    cardPayRequesting
   } = props
   const development = GPAY_TEST === 'true';
-  let purchaseUpdateSubscription = null;
-  let purchaseErrorSubscription = null;
-  const subscriptionSkus = [APP_SKU]
+
 
   // const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -101,13 +101,13 @@ const SubscriptionScreen = props => {
           {
             googlePay: {
               testEnv: development,
-              merchantName: 'My merchant name',
+              merchantName: `${profile?.username}`,
               merchantCountryCode: 'US',
               currencyCode: 'USD',
               billingAddressConfig: {
-                format: 'FULL',
-                isPhoneNumberRequired: true,
-                isRequired: true,
+                format: 'MIN',
+                // isPhoneNumberRequired: true,
+                // isRequired: true,
               },
             },
           }
@@ -146,9 +146,19 @@ const SubscriptionScreen = props => {
     // let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     // setPlanCardData({ plan_id, product, is_premium: true })
     if (Platform.OS === "ios") {
-      // purchasePlan(productsList?.[0]?.id)
+      Alert.alert(
+        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
+        "We will be here soon with Apple Pay Functionality",
+        [
+          {
+            text: "OK",
+            onPress: () => { }
+          }
+        ],
+        { cancelable: false }
+      )
     }
-    else if (Platform.OS === 'android') {
+    else {
       payWithGoogle()
       // navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
     }
@@ -169,6 +179,8 @@ const SubscriptionScreen = props => {
   return (
     <>
       <SafeAreaView>
+        <Loader isLoading={!getPlans?.length && getPlans[0]?.unit_amount || cardPayRequesting || subIdRequesting} />
+
         <View style={[row]}>
           <TouchableOpacity
             style={styles.leftArrow}
@@ -345,9 +357,11 @@ const styles = StyleSheet.create({
 })
 const mapStateToProps = state => ({
   getPlans: state.subscriptionReducer.getPlanSuccess,
-  subscriptionData: state.subscriptionReducer.subscriptionData,
+  // subscriptionData: state.subscriptionReducer.subscriptionData,
   requesting: state.subscriptionReducer.subRequesting,
-  profile: state.login.userDetail
+  profile: state.login.userDetail,
+  subIdRequesting: state.subscriptionReducer.subIdRequesting,
+  cardPayRequesting: state.subscriptionReducer.cardPayRequesting
   // customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
 })
