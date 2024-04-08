@@ -5,6 +5,8 @@ import Icon from "react-native-vector-icons/FontAwesome5"
 
 import { Layout, Gutters, Colors, Images } from "../../theme"
 import ProfileHeaderFeed from "../ProfileHeaderFeed"
+import { useNavigation } from '@react-navigation/native';
+
 
 const ProfileComponent = ({
   currentTab,
@@ -28,6 +30,7 @@ const ProfileComponent = ({
     justifyContentBetween
   } = Layout
   const { regularLMargin, smallVPadding, regularHMargin } = Gutters
+  const navigation = useNavigation()
   return (
     <View
       style={[
@@ -44,6 +47,7 @@ const ProfileComponent = ({
             ? { uri: profile?.profile_picture }
             : Images.profile
         }
+        onAvatarChange={() => navigation.navigate("SettingScreen")}
         style={[fill, justifyContentStart, alignItemsStart]}
       />
       <View style={[row, justifyContentCenter, styles.currentTabStyle]}>
@@ -53,9 +57,9 @@ const ProfileComponent = ({
             center,
             Platform.OS === "ios" && currentTab === 0
               ? {
-                  borderBottomWidth: 2,
-                  borderBottomColor: Colors.azureradiance
-                }
+                borderBottomWidth: 2,
+                borderBottomColor: Colors.azureradiance
+              }
               : { borderBottomWidth: 2, borderBottomColor: "white" }
           ]}
           onPress={() => setCurrentTab(0)}
@@ -76,9 +80,9 @@ const ProfileComponent = ({
             center,
             Platform.OS === "ios" && currentTab === 1
               ? {
-                  borderBottomWidth: 2,
-                  borderBottomColor: Colors.azureradiance
-                }
+                borderBottomWidth: 2,
+                borderBottomColor: Colors.azureradiance
+              }
               : { borderBottomWidth: 2, borderBottomColor: "white" }
           ]}
           onPress={onPressSocial}
