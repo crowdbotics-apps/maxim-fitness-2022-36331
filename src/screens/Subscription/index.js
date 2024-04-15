@@ -8,6 +8,15 @@ import { Text, Button, Loader } from "../../components"
 import PremiumCard from "./component/PremiumCard"
 import { connect } from "react-redux"
 import {
+  purchaseUpdatedListener,
+  purchaseErrorListener,
+  requestSubscription,
+  endConnection,
+  initConnection,
+  finishTransaction,
+  getSubscriptions
+} from "react-native-iap"
+import {
   // getSubscriptionRequest,
   // getCustomerIdRequest,
   // setPlanCardData,
@@ -45,12 +54,59 @@ const SubscriptionScreen = props => {
   // const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
+  const [loading, setLoading] = useState(false)
+
+  const purchases = [
+    "prod_MVCgIpAZzbJh5J",
+  ]
+
+  let purchaseUpdateSubscription
+  let purchaseErrorSubscription
 
   useEffect(() => {
     profileData()
     props.getPlanRequest()
-    // props.getCustomerIdRequest()
+
+    Platform.OS === "ios" && initializedIAP()
+    return () => {
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove()
+        purchaseUpdateSubscription = null
+      }
+
+      if (purchaseErrorSubscription) {
+        purchaseErrorSubscription.remove()
+        purchaseErrorSubscription = null
+      }
+      endConnection()
+    }
+
   }, [])
+
+  const initializedIAP = async () => {
+    try {
+      await initConnection()
+      const products = await getSubscriptions({skus: purchases})
+    } catch (err) {}
+
+    purchaseUpdateSubscription = purchaseUpdatedListener(async purchase => {
+      const receipt = purchase?.transactionReceipt
+
+      if (receipt) {
+        try {
+          await finishTransaction(purchase)
+        } catch (err) {
+        } finally {
+          setLoading(false)
+        }
+      }
+    })
+
+    purchaseErrorSubscription = purchaseErrorListener(error => {
+      setLoading(false)
+      return error
+    })
+  }
 
   // <======google pay=  start==>
   const {
@@ -141,22 +197,16 @@ const SubscriptionScreen = props => {
   //   // navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
   // }
   // }
-  const premiumCardData = () => {
+  const premiumCardData = async () => {
     // let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
     // let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     // setPlanCardData({ plan_id, product, is_premium: true })
     if (Platform.OS === "ios") {
-      Alert.alert(
-        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
-        "We will be here soon with Apple Pay Functionality",
-        [
-          {
-            text: "OK",
-            onPress: () => { }
-          }
-        ],
-        { cancelable: false }
-      )
+      const product = await requestSubscription({ sku: purchases[0] })
+      if (product.transactionReceipt) {
+        // paymentSubscriptionRequest({ plan_id: getPlans?.[0]?.id, product: getPlans?.[0]?.product, is_premium: true })
+        console.log('transaction successful', product);
+      }
     }
     else {
       payWithGoogle()
