@@ -287,7 +287,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
         prices = []
-        for price in stripe.Price.list().get('data', []):
+        for price in stripe.Price.list(status='active').get('data', []):
             price['product_details'] = stripe.Product.retrieve(price['product'])
             prices.append(price)
         return Response(status=status.HTTP_200_OK, data=prices)
