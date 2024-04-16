@@ -115,6 +115,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
             else:
                 user.trial = True
                 user.save()
+            return Response({"is_premium_user": user.is_premium_user})
         else:
             return Response("invalid platform", status=400)
 
