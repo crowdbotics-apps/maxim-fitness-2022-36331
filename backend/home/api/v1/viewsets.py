@@ -1958,6 +1958,11 @@ class UserSubscriptionVerifyViewSet(ModelViewSet):
                 app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
                 if app_store_status.get("success"):
                     return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                else:
+                    user.is_premium_user = False
+                    user.transaction_id = None
+                    user.save()
+                    return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
             else:
                 user.is_premium_user = False
                 user.transaction_id = None

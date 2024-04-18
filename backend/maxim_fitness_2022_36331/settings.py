@@ -356,7 +356,14 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-APPLE_APP_STORE_PRIVATE_KEY=BASE_DIR + '/' + 'maxim_fitness_2022_36331/' + env.str("AUTH_KEY_NAME", "")
-APPLE_APP_STORE_KEY_ID=env.str("APPLE_APP_STORE_KEY_ID")
-APPLE_APP_STORE_ISSUER_ID=env.str("APPLE_APP_STORE_ISSUER_ID")
-APPLE_STORE_LIVE_MODE = env.bool("APPLE_STORE_LIVE_MODE")
+
+
+def decode_apple_store_private_key():
+    key_string = env.str("ENCODED_APPLE_APP_STORE_PRIVATE_KEY", "")
+    return base64.b64decode(key_string).decode()
+
+
+APPLE_APP_STORE_PRIVATE_KEY= decode_apple_store_private_key()
+APPLE_APP_STORE_KEY_ID=env.str("APPLE_APP_STORE_KEY_ID", "")
+APPLE_APP_STORE_ISSUER_ID=env.str("APPLE_APP_STORE_ISSUER_ID", "")
+APPLE_STORE_LIVE_MODE = env.bool("APPLE_STORE_LIVE_MODE", False)

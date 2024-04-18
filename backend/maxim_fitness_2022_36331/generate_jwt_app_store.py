@@ -24,12 +24,9 @@ def get_app_store_jwt_token():
             "bid": "com.orumtraining"
         }
 
-        with open(settings.APPLE_APP_STORE_PRIVATE_KEY, "rb") as fh: # Add your file
-            signing_key = fh.read()
 
-        gen_jwt = jwt.encode(payload, signing_key, algorithm="ES256", headers=headers)
+        gen_jwt = jwt.encode(payload, settings.APPLE_APP_STORE_PRIVATE_KEY, algorithm="ES256", headers=headers)
 
-        print(f"[JWT] {gen_jwt}")
         return gen_jwt.decode()
     except Exception as e:
         print(str(e))
