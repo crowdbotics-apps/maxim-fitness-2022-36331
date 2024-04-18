@@ -208,7 +208,6 @@ function* login({ data }) {
     //   })
     // }
   } catch (e) {
-    console.log(e,'e');
     const { response } = e
     showMessage({
       message: "Unable to log in with provided credentials.",
