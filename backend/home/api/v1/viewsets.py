@@ -984,8 +984,8 @@ class SessionViewSet(ModelViewSet):
                 order=order
             )
             # for exe_id in exercise_ids:
-                # exercise = Exercise.objects.get(id=exe_id)
-                # order = order + 1
+            # exercise = Exercise.objects.get(id=exe_id)
+            # order = order + 1
             for set in sets:
                 s_ = Set.objects.create(
                     workout=workout,
@@ -1099,7 +1099,7 @@ class SessionViewSet(ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def swap_exercise(self, request):
-        workout_id = request.data.get('custom_workouts_exercise_id') # workout id
+        workout_id = request.data.get('custom_workouts_exercise_id')  # workout id
         exercise_id = request.data.get('exercise_id')
         rest_of_program = request.data.get('rest_of_program')
 
@@ -1479,7 +1479,8 @@ class ConsumeCaloriesViewSet(ModelViewSet):
         if queryset.exists():
             meal_times = MealTime.objects.filter(meal__user=self.request.user).order_by('-date_time')
             meals_serializer = MealTimeSerializer(meal_times, many=True,
-                                        context={'current_date': timezone.now().date(), "current_time": timezone.now()})
+                                                  context={'current_date': timezone.now().date(),
+                                                           "current_time": timezone.now()})
             cal_data = meals_serializer.data
             for food_items in cal_data:
                 for food_item in food_items['food_items']:
@@ -1816,7 +1817,6 @@ class CustomWorkoutViewSet(ModelViewSet):
                     custom_set.exercises.set([i])
         return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
 
-
     @action(detail=False, methods=['post'])
     def mark_workout_done(self, request):
         id = request.data.get('id')  # workout  id
@@ -1899,13 +1899,15 @@ class CustomWorkoutViewSet(ModelViewSet):
             if custom_workout and exercise:
                 if rest_of_program:
                     workouts = CustomExercise.objects.filter(id=custom_workouts_exercise_id,
-                        custom_workout=custom_workout, exercises__id__in=[exercise.id])
+                                                             custom_workout=custom_workout,
+                                                             exercises__id__in=[exercise.id])
                     for workout in workouts:
                         rest = Exercise.objects.filter(id=rest_of_program).first()
                         workout.exercises.remove(exercise)  # Remove the matched exercise
                         workout.exercises.add(rest)
                         workout.save()
-                        for custom_set in CustomSet.objects.filter(custom_exercise=workout, exercises__id__in=[exercise.id]):
+                        for custom_set in CustomSet.objects.filter(custom_exercise=workout,
+                                                                   exercises__id__in=[exercise.id]):
                             custom_set.exercises.remove(exercise)
                             custom_set.exercises.add(rest)
                 return Response("Exercise swapped")
@@ -1926,50 +1928,57 @@ class UserSubscriptionVerifyViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication]
 
     def list(self, request, *args, **kwargs):
-        user = request.user
-        subscription_id = user.subscription_id
-        transaction_id = user.transaction_id
-        if user.is_premium_user:
-            if subscription_id and transaction_id:
-                stripe_subscription_status = check_subscription_status(subscription_id)
-                jwt_token = get_app_store_jwt_token()
-                app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
-                if app_store_status.get("success") or stripe_subscription_status.get("success"):
-                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
-                else:
-                    user.is_premium_user = False
-                    user.subscription_id = None
-                    user.transaction_id = None
-                    user.save()
-                    return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+        try:
+            user = request.user
+            subscription_id = user.subscription_id
+            transaction_id = user.transaction_id
+            if user.is_premium_user:
+                if subscription_id and transaction_id:
+                    stripe_subscription_status = check_subscription_status(subscription_id)
+                    jwt_token = get_app_store_jwt_token()
+                    app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
+                    if app_store_status.get("success") or stripe_subscription_status.get("success"):
+                        return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                    else:
+                        if not app_store_status.get("error"):
+                            user.transaction_id = None
+                        if not stripe_subscription_status.get("error"):
+                            user.subscription_id = None
+                        user.is_premium_user = False
+                        user.save()
+                        return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
 
-            elif subscription_id and not transaction_id:
-                stripe_subscription_status = check_subscription_status(subscription_id)
-                if stripe_subscription_status.get("success"):
-                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
-                else:
-                    user.is_premium_user = False
-                    user.subscription_id = None
-                    user.save()
-                    return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+                elif subscription_id and not transaction_id:
+                    stripe_subscription_status = check_subscription_status(subscription_id)
+                    if stripe_subscription_status.get("success"):
+                        return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                    else:
+                        if not stripe_subscription_status.get("error"):
+                            user.is_premium_user = False
+                            user.subscription_id = None
+                            user.save()
+                        return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
 
-            elif transaction_id and not subscription_id:
-                jwt_token = get_app_store_jwt_token()
-                app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
-                if app_store_status.get("success"):
-                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                elif transaction_id and not subscription_id:
+                    jwt_token = get_app_store_jwt_token()
+                    app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
+                    if app_store_status.get("success"):
+                        return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                    else:
+                        if not app_store_status.get("error"):
+                            user.is_premium_user = False
+                            user.transaction_id = None
+                            user.save()
+                            return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
                 else:
                     user.is_premium_user = False
                     user.transaction_id = None
                     user.save()
                     return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
             else:
-                user.is_premium_user = False
+                user.subscription_id = None
                 user.transaction_id = None
                 user.save()
                 return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
-        else:
-            user.subscription_id = None
-            user.transaction_id = None
-            user.save()
-            return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+        except Exception as e:
+            return Response({"status": False, "error": str(e)}, status=500)
