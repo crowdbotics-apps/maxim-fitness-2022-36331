@@ -227,7 +227,7 @@ class UserSerializer(serializers.ModelSerializer):
                   "exercise_level", "activity_level",
                   "understanding_level", "number_of_meal", "number_of_training_days",
                   "fitness_goal", "settings", 'stripe_customer_id', "is_survey", "is_superuser", 'request_user',
-                  'block_user', 'is_premium_user', 'user_subscription'
+                  'block_user', 'is_premium_user', 'user_subscription', 'transaction_id', 'subscription_id'
                   ]
 
     def _get_request(self):

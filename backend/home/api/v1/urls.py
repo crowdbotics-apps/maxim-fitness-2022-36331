@@ -31,6 +31,7 @@ from home.api.v1.viewsets import (
     BlockedUserViewSet, ChatViewSet, PostImageVideoViewSet, CommentReplyViewSet, CommentLikeViewSet, UpdateProfile,
     ReportAUserViewSet, UserSearchViewSet, ExerciseTypeViewSet, UserPhotoViewSet, UserVideoViewSet, LogOutViewSet,
     ReportACommentViewSet, ReportCommentReplyViewSet, CustomWorkoutViewSet, CustomSetViewSet,
+    UserSubscriptionVerifyViewSet,
 )
 
 from rest_framework import permissions
@@ -99,6 +100,7 @@ router.register("chat", ChatViewSet, basename="chat")
 
 router.register("subscription", SubscriptionViewSet, basename="subscription")
 router.register("new_custom_workout", CustomWorkoutViewSet, basename="new_custom_workout")
+router.register("verify_subscription_status", UserSubscriptionVerifyViewSet, basename="verify_subscription_status")
 
 
 urlpatterns = [

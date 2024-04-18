@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 
-from home.models import CancelSubscription, DuplicateCard
+from home.models import CancelSubscription, DuplicateCard, User
 from maxim_fitness_2022_36331.settings import BASE_DIR
 from drf_yasg import openapi
 from rest_framework import viewsets, status
@@ -58,50 +58,76 @@ class SubscriptionViewSet(viewsets.ViewSet):
     )
     @action(detail=False, methods=['post'])
     def create_subscription(self, request):
-        internal_customer = InternalCustomer.objects.filter(user=request.user).first()
-        if internal_customer:
-            customer_id = internal_customer.stripe_id
+        platform = request.data.get('platform')
+        if platform == 'android':
+            internal_customer = InternalCustomer.objects.filter(user=request.user).first()
+            if internal_customer:
+                customer_id = internal_customer.stripe_id
+            else:
+                customer = stripe.Customer.create(email=request.user.email)
+                customer_id = customer.id
+                internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
+                internal_customer.save()
+                djstripe.models.Customer.sync_from_stripe_data(customer)
+
+            active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
+            if request.user.trial and request.data.get('premium_user') and active_subscriptions.get('data'):
+                for subscription in active_subscriptions.get("data"):
+                    stripe.Subscription.cancel(subscription['id'])
+            active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
+            if active_subscriptions.get('data'):
+                return Response('User already has active subscription.', status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                subscription = stripe.Subscription.create(
+                    customer=customer_id,
+                    items=[
+                        {"price": request.data['price_id']},
+                    ],
+                )
+
+            except Exception as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            premium_user = request.data.get("premium_user")
+            user = request.user
+
+            if premium_user:
+                user.is_premium_user = True
+                user.subscription_id = subscription.id
+                user.save()
+                current_date = timezone.now().date()
+                end_date = datetime.fromtimestamp(subscription.current_period_end).date()
+                CancelSubscription.objects.filter(user=user).delete()
+                CancelSubscription.objects.create(user=user, subscription_id=subscription.id,
+                                                  is_current=True, subscription_end_date=end_date)
+
+            else:
+                user.trial = True
+                user.save()
+            return Response({"subscription": subscription, "is_premium_user": user.is_premium_user})
+        elif platform == 'ios':
+            premium_user = request.data.get("premium_user")
+            user = request.user
+
+            if premium_user:
+                user.is_premium_user = True
+                apple_user = User.objects.filter(transaction_id=request.data.get("transactionId"))
+                if apple_user.exists():
+                    both_platform_user = apple_user.filter(subscription_id__isnull=False)
+                    if both_platform_user.exists():
+                        apple_user.exclude(id__in=both_platform_user.values_list("id", flat=True)).update(
+                            transaction_id=None, is_premium_user=False)
+                    else:
+                        apple_user.update(
+                            transaction_id=None, is_premium_user=False)
+                user.transaction_id = request.data.get("transactionId")
+                user.save()
+            else:
+                user.trial = True
+                user.save()
+            return Response({"is_premium_user": user.is_premium_user})
         else:
-            customer = stripe.Customer.create(email=request.user.email)
-            customer_id = customer.id
-            internal_customer = InternalCustomer.objects.create(user=request.user, stripe_id=customer_id)
-            internal_customer.save()
-            djstripe.models.Customer.sync_from_stripe_data(customer)
-
-        active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
-        if request.user.trial and request.data.get('premium_user') and active_subscriptions.get('data'):
-            for subscription in active_subscriptions.get("data"):
-                stripe.Subscription.cancel(subscription['id'])
-        active_subscriptions = stripe.Subscription.list(status='active', customer=customer_id)
-        if active_subscriptions.get('data'):
-            return Response('User already has active subscription.', status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            subscription = stripe.Subscription.create(
-                customer=customer_id,
-                items=[
-                    {"price": request.data['price_id']},
-                ],
-            )
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-        premium_user = request.data.get("premium_user")
-        user = request.user
-
-        if premium_user:
-            user.is_premium_user = True
-            user.save()
-            current_date = timezone.now().date()
-            end_date = datetime.fromtimestamp(subscription.current_period_end).date()
-            CancelSubscription.objects.filter(user=user).delete()
-            CancelSubscription.objects.create(user=user, subscription_id=subscription.id,
-                                              is_current=True, subscription_end_date=end_date)
-
-        else:
-            user.trial = True
-            user.save()
-        return Response({"subscription": subscription, "is_premium_user": user.is_premium_user})
+            return Response("invalid platform", status=400)
 
     @swagger_auto_schema(
         method='POST',
@@ -287,10 +313,17 @@ class SubscriptionViewSet(viewsets.ViewSet):
     def plans(self, request, *args, **kwargs):
         # call stripe ap to get the prices for each plan
         prices = []
-        for price in stripe.Price.list().get('data', []):
-            price['product_details'] = stripe.Product.retrieve(price['product'])
-            prices.append(price)
-        return Response(status=status.HTTP_200_OK, data=prices)
+        product_list = stripe.Product.list(active=True, limit=1).get('data', [])
+        product_id = None
+        if product_list:
+            product_id = product_list[0].id
+        if product_id:
+            for price in stripe.Price.list(product=product_id).get('data', []):
+                price['product_details'] = stripe.Product.retrieve(price['product'])
+                prices.append(price)
+            return Response(status=status.HTTP_200_OK, data=prices)
+        else:
+            return Response(status=status.HTTP_200_OK, data=[])
 
     @swagger_auto_schema(
         method='POST',
