@@ -87,3 +87,20 @@ export const checkAndRequestMicrophonePermission = async () => {
     return false
   }
 }
+//check if any purchase exist agaist this user apple id
+export const isUserSubscriptionActive = async (subscriptionId='prod_MVCgIpAZzbJh5J') =>{
+  // Get all the items that the user has
+  const availablePurchases = await getAvailablePurchases();
+  if(availablePurchases !== null && availablePurchases.length > 0){
+     console.log(availablePurchases,'availablePurchases')
+    const subscription = availablePurchases.find((element)=>{
+          return subscriptionId === element.productId;
+          
+      });
+      if(subscription){
+        return true;
+          }
+      }else{
+          return false;
+      }
+  }

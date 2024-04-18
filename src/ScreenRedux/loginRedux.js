@@ -11,6 +11,7 @@ import { API_URL } from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
+import { Platform } from "react-native"
 // import { errorAlert } from "src/utils/alerts"
 
 //Types
@@ -44,6 +45,8 @@ export const loginUser = data => ({
   type: LOGIN,
   data
 })
+
+
 
 export const facebookLoginUser = data => ({
   type: FACEBOOK_LOGIN,
@@ -169,13 +172,26 @@ function loginAPI(data) {
 
   return XHR(URL, options)
 }
+//verification api
+function verificationAPI(token) {
+  const URL = `${API_URL}/verify_subscription_status/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET",
+  }
 
+  return XHR(URL, options)
+}
 function* login({ data }) {
   try {
     const response = yield call(loginAPI, data)
     AsyncStorage.setItem("authToken", response.data.token)
     yield put(setAccessToken(response.data.token))
     yield put(setUserDetail(response.data.user))
+    yield call(verificationAPI, response.data.token)
     RemotePushController(response.data.token, response.data.user?.id)
     // navigate("Feed")
     // if(response?.data?.subscription){
@@ -192,6 +208,7 @@ function* login({ data }) {
     //   })
     // }
   } catch (e) {
+    console.log(e,'e');
     const { response } = e
     showMessage({
       message: "Unable to log in with provided credentials.",
@@ -285,6 +302,10 @@ function* appleLogin({ data }) {
     })
   } catch (e) {
     const { response } = e
+    showMessage({
+      message: "Something went wrong",
+      type: "danger"
+    })
   } finally {
     yield put(reset())
   }
@@ -375,6 +396,9 @@ function* forgetPassWordConfirmRequest({ data }) {
   }
 }
 
+
+
+
 export default all([
   takeLatest(LOGIN, login),
   takeLatest(FACEBOOK_LOGIN, facebookLogin),
@@ -382,5 +406,5 @@ export default all([
   takeLatest(APPLE_LOGIN, appleLogin),
   takeLatest(LOGOUT_USER, logoutUser),
   takeLatest(FORGOT_PASSWORD, forgetPassWordRequest),
-  takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest)
+  takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest),
 ])
