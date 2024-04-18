@@ -50,6 +50,7 @@ class User(AbstractUser):
     is_survey = models.BooleanField(default=False)
     consultations = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=255, null=True, blank=True)
+    subscription_id = models.CharField(max_length=255, null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})

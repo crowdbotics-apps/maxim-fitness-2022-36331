@@ -34,6 +34,8 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from home.models import UserProgram, CaloriesRequired, Chat, PostImage, PostCommentReply, PostCommentLike, \
     PostVideo, ReportAUser, ReportAComment, ReportCommentReply, MealTime, MealHistory
+from maxim_fitness_2022_36331.generate_jwt_app_store import get_app_store_jwt_token, get_app_store_subscription_status, \
+    check_subscription_status
 from users.models import Settings, UserPhoto, UserVideo
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -1916,3 +1918,53 @@ class CustomSetViewSet(ModelViewSet):
 
     def get_queryset(self):
         return CustomSet.objects.all().order_by('-id')
+
+
+class UserSubscriptionVerifyViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        subscription_id = user.subscription_id
+        transaction_id = user.transaction_id
+        if user.is_premium_user:
+            if subscription_id and transaction_id:
+                stripe_subscription_status = check_subscription_status(subscription_id)
+                jwt_token = get_app_store_jwt_token()
+                app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
+                if app_store_status.get("success") or stripe_subscription_status.get("success"):
+                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                else:
+                    user.is_premium_user = False
+                    user.subscription_id = None
+                    user.transaction_id = None
+                    user.save()
+                    return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+
+            elif subscription_id and not transaction_id:
+                stripe_subscription_status = check_subscription_status(subscription_id)
+                if stripe_subscription_status.get("success"):
+                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+                else:
+                    user.is_premium_user = False
+                    user.subscription_id = None
+                    user.save()
+                    return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+
+            elif transaction_id and not subscription_id:
+                jwt_token = get_app_store_jwt_token()
+                app_store_status = get_app_store_subscription_status(int(transaction_id), jwt_token)
+                if app_store_status.get("success"):
+                    return Response({"status": True, "is_premium_user": user.is_premium_user}, status=200)
+            else:
+                user.is_premium_user = False
+                user.transaction_id = None
+                user.save()
+                return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)
+        else:
+            user.subscription_id = None
+            user.transaction_id = None
+            user.save()
+            return Response({"status": False, "is_premium_user": user.is_premium_user}, status=200)

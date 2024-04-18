@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 
-from home.models import CancelSubscription, DuplicateCard
+from home.models import CancelSubscription, DuplicateCard, User
 from maxim_fitness_2022_36331.settings import BASE_DIR
 from drf_yasg import openapi
 from rest_framework import viewsets, status
@@ -93,6 +93,7 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
             if premium_user:
                 user.is_premium_user = True
+                user.subscription_id = subscription.id
                 user.save()
                 current_date = timezone.now().date()
                 end_date = datetime.fromtimestamp(subscription.current_period_end).date()
@@ -110,6 +111,15 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
             if premium_user:
                 user.is_premium_user = True
+                apple_user = User.objects.filter(transaction_id=request.data.get("transactionId"))
+                if apple_user.exists():
+                    both_platform_user = apple_user.filter(subscription_id__isnull=False)
+                    if both_platform_user.exists():
+                        apple_user.exclude(id__in=both_platform_user.values_list("id", flat=True)).update(
+                            transaction_id=None, is_premium_user=False)
+                    else:
+                        apple_user.update(
+                            transaction_id=None, is_premium_user=False)
                 user.transaction_id = request.data.get("transactionId")
                 user.save()
             else:
