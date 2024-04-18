@@ -4,6 +4,7 @@ import jwt
 import requests
 import stripe
 from django.conf import settings
+from djstripe.settings import STRIPE_SECRET_KEY
 
 
 def get_app_store_jwt_token():
@@ -53,12 +54,12 @@ def get_app_store_subscription_status(transaction_id, jwt_token):
                 return {"success":  True}
         return {"success": False}
     except Exception as e:
-        return {"success": False}
+        return {"success": False, "error": str(e)}
 
 
 def check_subscription_status(subscription_id):
     try:
-        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.api_key = STRIPE_SECRET_KEY
         status = stripe.Subscription.retrieve(subscription_id).status
 
         # Extract and return the status
@@ -67,4 +68,4 @@ def check_subscription_status(subscription_id):
         else:
             return {"success": False}
     except Exception as e:
-        return {"success": False}
+        return {"success": False, "error": str(e)}
