@@ -61,7 +61,7 @@ const FatLoseProgram = props => {
   const onFocus = useIsFocused()
   let refDescription = useRef("")
   const [activeIndex, setActiveIndex] = useState(1)
-  const [index, setIndex] = useState(false)
+  const [index, setIndex] = useState(moment().format('YYYY-MM-DD'))
   const [isModal, setIsModal] = useState(false)
   const [customWorkout, setCustomWorkout] = useState(false)
   const [customWorkoutData, setCustomWorkoutData] = useState([])
@@ -205,7 +205,7 @@ const FatLoseProgram = props => {
     getInitialData()
 
   }
-  const selectExerciseObj = (data, id) => {
+  const selectExerciseObj = async (data, id) => {
     if (id) {
       const [itemWorkoutUndone, nextWorkout] = data.workouts.filter(
         workoutItem => !workoutItem.done
@@ -765,8 +765,8 @@ const FatLoseProgram = props => {
                 highlightDateNameStyle={{ color: 'white' }}
                 disabledDateNameStyle={{ color: 'grey' }}
                 disabledDateNumberStyle={{ color: 'grey' }}
-                minDate={moment().format('YYYY-MM-DD')}
-                selectedDate={moment().format('YYYY-MM-DD')}
+                minDate={moment(index).format('YYYY-MM-DD')}
+                selectedDate={index ?? moment().format('YYYY-MM-DD')}
                 onDateSelected={date => {
                   const newDate = moment(date).format("YYYY-MM-DD")
                   setIndex(newDate)
