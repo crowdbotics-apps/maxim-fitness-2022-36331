@@ -1,7 +1,14 @@
-import React, { useEffect } from "react"
+import React from "react"
 
 // components
-import { View, StyleSheet, TouchableOpacity, Alert, Linking, Platform } from "react-native"
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Linking,
+  Platform
+} from "react-native"
 import { Text, Loader } from "../../../components"
 import Button from "../../../components/Button"
 import LinearGradient from "react-native-linear-gradient"
@@ -9,9 +16,11 @@ import LinearGradient from "react-native-linear-gradient"
 import { Gutters, Layout, Global } from "../../../theme"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
-import { getSubscriptIdRequest, subscriptionCancelation } from "../../../ScreenRedux/subscriptionRedux"
+import {
+  // getSubscriptIdRequest,
+  subscriptionCancelation
+} from "../../../ScreenRedux/subscriptionRedux"
 import { API_URL } from "../../../config/app"
-
 const PremiumCard = props => {
   const {
     onPress,
@@ -20,7 +29,7 @@ const PremiumCard = props => {
     // subsucriptionId,
     profile,
     // cardPlanData,
-    getSubscriptIdRequest,
+    // getSubscriptIdRequest,
     subscriptionIdData,
     subIdRequesting,
     subscriptionCancelation
@@ -50,32 +59,40 @@ const PremiumCard = props => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
-  useEffect(() => {
-    getSubscriptIdRequest()
-  }, [])
+  // useEffect(() => {
+  //   getSubscriptIdRequest()
+  // }, [])
   const canceledButton = (call) => {
     profile?.user_subscription?.is_subscription_canceled
     profile?.user_subscription?.is_subscription_days_remaining
     profile?.is_premium_user
 
-    if (profile?.is_premium_user && profile?.user_subscription?.is_subscription_days_remaining && profile?.user_subscription?.is_subscription_canceled) {
-      call && Alert.alert(
-        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
-        "Are you sure you want to reactivate your current  subscription?",
-        [
-          {
-            text: "NO",
-            style: "cancel"
-          },
-          {
-            text: "YES",
-            onPress: () => {
-              subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id, reactivate_subscription: true })
+    if (profile?.is_premium_user &&
+      profile?.user_subscription?.is_subscription_days_remaining &&
+      profile?.user_subscription?.is_subscription_canceled
+    ) {
+      call &&
+        Alert.alert(
+          `Hi ${profile.first_name + " " + profile.last_name || "User"}`,
+          "Are you sure you want to reactivate your current  subscription?",
+          [
+            {
+              text: "NO",
+              style: "cancel"
+            },
+            {
+              text: "YES",
+              onPress: () => {
+                subscriptionIdData &&
+                  subscriptionCancelation({
+                    subscription_id: subscriptionIdData?.id,
+                    reactivate_subscription: true
+                  })
+              }
             }
-          }
-        ],
-        { cancelable: false }
-      )
+          ],
+          { cancelable: false }
+        )
 
       return { text: "Reactivate Subscription", show: true }
     } else
@@ -91,15 +108,19 @@ const PremiumCard = props => {
             {
               text: "YES",
               onPress: () => {
-                subscriptionIdData && subscriptionCancelation({ subscription_id: subscriptionIdData?.id })
+                Platform.OS != "ios" ?
+                  subscriptionIdData &&
+                  subscriptionCancelation({
+                    subscription_id: subscriptionIdData?.id
+                  })
+                  : Linking.openURL('https://apps.apple.com/account/subscriptions');
               }
             }
           ],
           { cancelable: false }
         )
         return { text: "Cancel", show: true }
-      }
-      else {
+      } else {
         return { text: "Cancel", show: false }
       }
   }
@@ -126,8 +147,11 @@ const PremiumCard = props => {
               style={{ fontSize: 16 }}
             />
           </View>
-          <View style={[row,]}>
-            <Text text={"⚪"} style={{ fontSize: 8, marginRight: 5, marginTop: 5 }} />
+          <View style={[row]}>
+            <Text
+              text={"⚪"}
+              style={{ fontSize: 8, marginRight: 5, marginTop: 5 }}
+            />
             <Text
               text={"User will have option to custom the Nutrition plan."}
               color="secondary"
@@ -157,17 +181,16 @@ const PremiumCard = props => {
           />
           <Text text={" / month"} large color="secondary" />
         </View>
-        {
-          Platform.OS != 'ios' &&
-            canceledButton().show ? (
-            <TouchableOpacity
-              onPress={() => {
-                canceledButton(true)
-              }}
-              style={styles.cancelButton}>
-              <Text style={styles.text}>{canceledButton().text}</Text>
-            </TouchableOpacity>
-          ) : null}
+        {/* {  canceledButton().show ? (
+          <TouchableOpacity
+            onPress={() => {
+              canceledButton(true)
+            }}
+            style={styles.cancelButton}
+          >
+            <Text style={styles.text}>{canceledButton().text}</Text>
+          </TouchableOpacity>
+        ) : null} */}
         <View
           style={[
             row,
@@ -198,10 +221,8 @@ const PremiumCard = props => {
                 center
                 underlined
               />
-
             </TouchableOpacity>
           </Text>
-
         </View>
       </LinearGradient>
       <View
@@ -211,11 +232,10 @@ const PremiumCard = props => {
           { paddingBottom: 20, marginTop: -20, backgroundColor: "transparent" }
         ]}
       >
-
         <Button
           color="secondary"
           text={
-            Platform.OS != 'ios' && profile?.is_premium_user ? "Already Bought" : "Buy Now"
+            profile?.is_premium_user ? "Already Bought" : "Buy Now"
           }
           style={[
             border,
@@ -223,8 +243,8 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={Platform.OS != 'ios' ? profile?.is_premium_user : false}
-          onPress={(Platform.OS === 'ios' || !profile?.is_premium_user) ? onPress : null}
+          disabled={profile?.is_premium_user}
+          onPress={!profile?.is_premium_user ? onPress : null}
 
         />
       </View>
@@ -277,7 +297,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   profileData: () => dispatch(profileData()),
-  getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
+  // getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
   subscriptionCancelation: (data) => dispatch(subscriptionCancelation(data))
 
 

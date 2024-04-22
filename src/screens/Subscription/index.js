@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react"
 
 // components
-import { View, Image, StyleSheet, TouchableOpacity, SafeAreaView, Platform, Alert } from "react-native"
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  Platform,
+  Alert
+} from "react-native"
 // import { Icon } from "native-base"
 import { Text, Button, Loader } from "../../components"
 // import Card from "./component/Card"
 import PremiumCard from "./component/PremiumCard"
 import { connect } from "react-redux"
 import {
+  purchaseUpdatedListener,
+  purchaseErrorListener,
+  requestSubscription,
+  endConnection,
+  initConnection,
+  finishTransaction,
+  getSubscriptions
+} from "react-native-iap"
+import {
   // getSubscriptionRequest,
   // getCustomerIdRequest,
   // setPlanCardData,
-  // paymentSubscriptionRequest,
+  paymentSubscriptionRequest,
   getPlanRequest,
   // postSubscriptionRequest,
   updateCustomerSource
 } from "../../ScreenRedux/subscriptionRedux"
 
-import { usePlatformPay } from '@stripe/stripe-react-native';
+import { usePlatformPay } from "@stripe/stripe-react-native"
 import { Gutters, Layout, Global, Images } from "../../theme"
 import Modal from "react-native-modal"
 import { ScrollView } from "react-native-gesture-handler"
@@ -25,76 +42,139 @@ import { profileData } from "../../ScreenRedux/profileRedux"
 import { APP_SKU, S_SECRET, GPAY_TEST } from "@env"
 import { showMessage } from "react-native-flash-message"
 import axios from "axios"
+import { verificationRequest } from "../../ScreenRedux/loginRedux"
 
 const SubscriptionScreen = props => {
-  const { navigation,
+  const {
+    navigation,
     getPlans,
     // subscriptionData,
     // setPlanCardData,
     profileData,
     profile,
     // postSubscriptionRequest,
-    // paymentSubscriptionRequest,
+    paymentSubscriptionRequest,
     updateCustomerSource,
     subIdRequesting,
-    cardPayRequesting
+    cardPayRequesting,
+    getPlanRequest,
+    requesting,
+    verificationRequest,
+    verifyRequesting
   } = props
-  const development = GPAY_TEST === 'true';
-
+  const development = GPAY_TEST === "true"
 
   // const [curentTab, setCurentTab] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [active, setActive] = useState(true)
 
+  const purchases = ["prod_MVCgIpAZzbJh5J"]
+
+  let purchaseUpdateSubscription
+  let purchaseErrorSubscription
+
   useEffect(() => {
+    verificationRequest()
     profileData()
-    props.getPlanRequest()
-    // props.getCustomerIdRequest()
+    getPlanRequest()
+    Platform.OS === "ios" ? initializedIAP() : checkPlatformSupport()
+    return () => {
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove()
+        purchaseUpdateSubscription = null
+      }
+
+      if (purchaseErrorSubscription) {
+        purchaseErrorSubscription.remove()
+        purchaseErrorSubscription = null
+      }
+      endConnection()
+    }
   }, [])
 
-  // <======google pay=  start==>
-  const {
-    isPlatformPaySupported,
-    confirmPlatformPayPayment
-  } = usePlatformPay();
+  const initializedIAP = async () => {
+    try {
+      await initConnection()
+      const products = await getSubscriptions({ skus: purchases })
+    } catch (err) { }
 
-  useEffect(() => {
-    (async function () {
-      if (!(await isPlatformPaySupported({ googlePay: { testEnv: development } }))) {
-        Alert.alert('Google Pay is not supported.');
-        return;
+    purchaseUpdateSubscription = purchaseUpdatedListener(async purchase => {
+      const receipt = purchase?.transactionReceipt
+
+      if (receipt) {
+        try {
+          await finishTransaction(purchase)
+        } catch (err) { }
       }
-    })();
-  }, []);
+    })
+
+    purchaseErrorSubscription = purchaseErrorListener(error => {
+      return error
+    })
+  }
+  const applePurchase = async () => {
+    try {
+      const product = await requestSubscription({ sku: purchases[0] })
+      if (product.transactionReceipt) {
+        paymentSubscriptionRequest({
+          plan_id: getPlans?.[0]?.id,
+          product: getPlans?.[0]?.product,
+          is_premium: true,
+          platform: "ios",
+          transactionId: product?.transactionId,
+          profile: profile
+        })
+      }
+    } catch (error) {
+      showMessage({
+        message: "Payment failed",
+        type: "danger"
+      })
+    }
+  }
+
+  // <======google pay=  start==>
+  const { isPlatformPaySupported, confirmPlatformPayPayment } = usePlatformPay()
+
+  async function checkPlatformSupport() {
+    if (
+      !(await isPlatformPaySupported({ googlePay: { testEnv: development } }))
+    ) {
+      Alert.alert("Google Pay is not supported.")
+      return
+    }
+  }
 
   const fetchPaymentIntent = async () => {
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams()
       // params.append('payment_method_types[]', 'card');
-      params.append('amount', `${getPlans?.length && getPlans[0]?.unit_amount}`);
-      params.append('automatic_payment_methods[enabled]', 'false');
-      params.append('currency', 'usd');
-      params.append('setup_future_usage', 'on_session');
+      params.append("amount", `${getPlans?.length && getPlans[0]?.unit_amount}`)
+      params.append("automatic_payment_methods[enabled]", "false")
+      params.append("currency", "usd")
+      params.append("setup_future_usage", "on_session")
       // params.append('use_stripe_sdk', 'true');
 
-
-      const requestData = params.toString();
-      const response = await axios.post('https://api.stripe.com/v1/payment_intents', requestData, {
-        headers: {
-          'Authorization': `Bearer ${S_SECRET}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
+      const requestData = params.toString()
+      const response = await axios.post(
+        "https://api.stripe.com/v1/payment_intents",
+        requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${S_SECRET}`,
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
         }
-      });
-      return response.data;
+      )
+      return response.data
     } catch (error) {
-      throw error;
+      throw error
     }
-  };
-
+  }
 
   const payWithGoogle = async () => {
     try {
-      const intentData = await fetchPaymentIntent();
+      const intentData = await fetchPaymentIntent()
       if (intentData) {
         const response = await confirmPlatformPayPayment(
           intentData?.client_secret,
@@ -102,27 +182,36 @@ const SubscriptionScreen = props => {
             googlePay: {
               testEnv: development,
               merchantName: `${profile?.username}`,
-              merchantCountryCode: 'US',
-              currencyCode: 'USD',
+              merchantCountryCode: "US",
+              currencyCode: "USD",
               billingAddressConfig: {
-                format: 'MIN',
+                format: "MIN"
                 // isPhoneNumberRequired: true,
                 // isRequired: true,
-              },
-            },
+              }
+            }
           }
-        );
-        if (response?.paymentIntent?.status === 'Succeeded') {
-          await updateCustomerSource({ payment_method_id: response?.paymentIntent.paymentMethod.id, plan_id: getPlans?.[0]?.id, profile: profile })
+        )
+        if (response?.paymentIntent?.status === "Succeeded") {
+          await updateCustomerSource({
+            payment_method_id: response?.paymentIntent.paymentMethod.id,
+            plan_id: getPlans?.[0]?.id,
+            profile: profile,
+            platform: "android",
+            transactionId: null
+          })
         }
       }
     } catch (error) {
-      showMessage({ message: "Payment failed", description: error.message, type: "danger" });
+      showMessage({
+        message: "Payment failed",
+        description: error.message,
+        type: "danger"
+      })
     }
-  };
+  }
 
   // <======google pay== end=>
-
 
   // const card = () => {
   //   let plan_id =
@@ -141,24 +230,13 @@ const SubscriptionScreen = props => {
   //   // navigation.navigate("CreditCard", { plan_id, product, is_premium: false })
   // }
   // }
-  const premiumCardData = () => {
+  const premiumCardData = async () => {
     // let plan_id = getPlans?.length > 0 && getPlans && getPlans?.[0]?.id
     // let product = getPlans?.length > 0 && getPlans && getPlans?.[0]?.product
     // setPlanCardData({ plan_id, product, is_premium: true })
     if (Platform.OS === "ios") {
-      Alert.alert(
-        `Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`,
-        "We will be here soon with Apple Pay Functionality",
-        [
-          {
-            text: "OK",
-            onPress: () => { }
-          }
-        ],
-        { cancelable: false }
-      )
-    }
-    else {
+      applePurchase()
+    } else {
       payWithGoogle()
       // navigation.navigate("CreditCard", { plan_id, product, is_premium: true })
     }
@@ -166,7 +244,6 @@ const SubscriptionScreen = props => {
   const { largeHMargin, mediumTMargin } = Gutters
   const { row, fill, center, alignItemsCenter, justifyContentBetween } = Layout
   const { border } = Global
-  const { leftArrow, iconWrapper } = styles
 
   const setData = item => {
     if (item === "No") {
@@ -179,8 +256,13 @@ const SubscriptionScreen = props => {
   return (
     <>
       <SafeAreaView>
-        <Loader isLoading={!getPlans?.length && getPlans[0]?.unit_amount || cardPayRequesting || subIdRequesting} />
-
+        <Loader
+          isLoading={
+            (!getPlans?.length && getPlans[0]?.unit_amount) ||
+            cardPayRequesting ||
+            subIdRequesting || verifyRequesting
+          }
+        />
         <View style={[row]}>
           <TouchableOpacity
             style={styles.leftArrow}
@@ -188,20 +270,16 @@ const SubscriptionScreen = props => {
           >
             <Image source={Images.backImage} style={styles.backArrowStyle} />
           </TouchableOpacity>
-          <View
-
-            style={[center, alignItemsCenter, fill]}
-          >
+          <View style={[center, alignItemsCenter, fill]}>
             <Text
               text="Premium"
-              style={{ fontWeight: "bold", fontSize: 23, color: 'black' }}
+              style={{ fontWeight: "bold", fontSize: 23, color: "black" }}
               smallTitle
             />
           </View>
-
         </View>
         <View style={[row, largeHMargin, justifyContentBetween]}>
-          <Loader isLoading={props.requesting} />
+          <Loader isLoading={requesting} />
 
           {/* <TouchableOpacity
             onPress={() => setCurentTab(0)}
@@ -214,7 +292,6 @@ const SubscriptionScreen = props => {
               smallTitle
             />
           </TouchableOpacity> */}
-
         </View>
         <ScrollView>
           {/* {curentTab === 0 && (
@@ -332,7 +409,6 @@ const SubscriptionScreen = props => {
       </SafeAreaView>
     </>
   )
-
 }
 const styles = StyleSheet.create({
   leftArrow: {
@@ -361,9 +437,11 @@ const mapStateToProps = state => ({
   requesting: state.subscriptionReducer.subRequesting,
   profile: state.login.userDetail,
   subIdRequesting: state.subscriptionReducer.subIdRequesting,
-  cardPayRequesting: state.subscriptionReducer.cardPayRequesting
+  cardPayRequesting: state.subscriptionReducer.cardPayRequesting,
   // customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
+  verifyRequesting: state.login.verifyRequesting
+
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -371,14 +449,12 @@ const mapDispatchToProps = dispatch => ({
   // getSubscriptionRequest: plan_id => dispatch(getSubscriptionRequest(plan_id)),
   // getCustomerIdRequest: () => dispatch(getCustomerIdRequest()),
   // postSubscriptionRequest: data => dispatch(postSubscriptionRequest(data)),
-  // paymentSubscriptionRequest: data =>
+  paymentSubscriptionRequest: data =>
+    dispatch(paymentSubscriptionRequest(data)),
   profileData: () => dispatch(profileData()),
   getPlanRequest: () => dispatch(getPlanRequest()),
-  //   dispatch(paymentSubscriptionRequest(data)),
-  updateCustomerSource: data =>
-    dispatch(updateCustomerSource(data)),
-
-
+  updateCustomerSource: data => dispatch(updateCustomerSource(data)),
+  verificationRequest: () => dispatch(verificationRequest())
 
 })
 

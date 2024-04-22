@@ -11,10 +11,10 @@ import { API_URL } from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
-// import { errorAlert } from "src/utils/alerts"
 
 //Types
 const LOGIN = "SCREEN/LOGIN"
+const VERIFICATION = "SCREEN/VERIFICATION"
 const FACEBOOK_LOGIN = "SCREEN/FACEBOOK_LOGIN"
 const GOOGLE_LOGIN = "SCREEN/GOOGLE_LOGIN"
 const APPLE_LOGIN = "SCREEN/APPLE_LOGIN"
@@ -36,13 +36,17 @@ const initialState = {
   faceBookRequesting: false,
   subscriptionData: false,
   forgotRequest: false,
-  appleRequesting: false
+  appleRequesting: false,
+  verifyRequesting: false
 }
 
 //Actions
 export const loginUser = data => ({
   type: LOGIN,
   data
+})
+export const verificationRequest = () => ({
+  type: VERIFICATION,
 })
 
 export const facebookLoginUser = data => ({
@@ -102,6 +106,11 @@ export const loginReducer = (state = initialState, action) => {
         ...state,
         requesting: true
       }
+    case VERIFICATION:
+      return {
+        ...state,
+        verifyRequesting: true
+      }
     case GOOGLE_LOGIN:
       return {
         ...state,
@@ -151,7 +160,8 @@ export const loginReducer = (state = initialState, action) => {
         googleRequesting: false,
         faceBookRequesting: false,
         forgotRequest: false,
-        appleRequesting: false
+        appleRequesting: false,
+        verifyRequesting: false
       }
 
     default:
@@ -192,11 +202,11 @@ function* login({ data }) {
     //   })
     // }
   } catch (e) {
-    const { response } = e
     showMessage({
-      message: "Unable to log in with provided credentials.",
+      message: e.code === 'ERR_NETWORK' ? 'Network Error' : "Unable to log in with provided credentials.",
       type: "danger"
     })
+    const { response } = e
   } finally {
     yield put(reset())
   }
@@ -227,7 +237,7 @@ function* facebookLogin({ data }) {
     const { response } = e
     yield put(reset())
     showMessage({
-      message: "Something want wronge",
+      message: "Something want wrong",
       type: "danger"
     })
   }
@@ -285,6 +295,10 @@ function* appleLogin({ data }) {
     })
   } catch (e) {
     const { response } = e
+    showMessage({
+      message: "Something went wrong",
+      type: "danger"
+    })
   } finally {
     yield put(reset())
   }
@@ -375,12 +389,40 @@ function* forgetPassWordConfirmRequest({ data }) {
   }
 }
 
+//verification api
+async function verificationAPI() {
+  const URL = `${API_URL}/verify_subscription_status/`
+  const token = await AsyncStorage.getItem("authToken")
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "GET",
+  }
+
+  return XHR(URL, options)
+}
+function* verification() {
+  try {
+    const res = yield call(verificationAPI)
+  } catch (e) {
+    showMessage({
+      message: "Something went wrong while user subscription's verification.",
+      type: "danger"
+    })
+  } finally {
+    yield put(reset())
+  }
+}
+
 export default all([
   takeLatest(LOGIN, login),
+  takeLatest(VERIFICATION, verification),
   takeLatest(FACEBOOK_LOGIN, facebookLogin),
   takeLatest(GOOGLE_LOGIN, googleLogin),
   takeLatest(APPLE_LOGIN, appleLogin),
   takeLatest(LOGOUT_USER, logoutUser),
   takeLatest(FORGOT_PASSWORD, forgetPassWordRequest),
-  takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest)
+  takeLatest(FORGOT_PASSWORD_CONFIRM, forgetPassWordConfirmRequest),
 ])
