@@ -42,6 +42,7 @@ import { profileData } from "../../ScreenRedux/profileRedux"
 import { APP_SKU, S_SECRET, GPAY_TEST } from "@env"
 import { showMessage } from "react-native-flash-message"
 import axios from "axios"
+import { verificationRequest } from "../../ScreenRedux/loginRedux"
 
 const SubscriptionScreen = props => {
   const {
@@ -55,7 +56,11 @@ const SubscriptionScreen = props => {
     paymentSubscriptionRequest,
     updateCustomerSource,
     subIdRequesting,
-    cardPayRequesting
+    cardPayRequesting,
+    getPlanRequest,
+    requesting,
+    verificationRequest,
+    verifyRequesting
   } = props
   const development = GPAY_TEST === "true"
 
@@ -69,9 +74,9 @@ const SubscriptionScreen = props => {
   let purchaseErrorSubscription
 
   useEffect(() => {
+    verificationRequest()
     profileData()
-    props.getPlanRequest()
-
+    getPlanRequest()
     Platform.OS === "ios" ? initializedIAP() : checkPlatformSupport()
     return () => {
       if (purchaseUpdateSubscription) {
@@ -91,7 +96,7 @@ const SubscriptionScreen = props => {
     try {
       await initConnection()
       const products = await getSubscriptions({ skus: purchases })
-    } catch (err) {}
+    } catch (err) { }
 
     purchaseUpdateSubscription = purchaseUpdatedListener(async purchase => {
       const receipt = purchase?.transactionReceipt
@@ -99,7 +104,7 @@ const SubscriptionScreen = props => {
       if (receipt) {
         try {
           await finishTransaction(purchase)
-        } catch (err) {}
+        } catch (err) { }
       }
     })
 
@@ -255,10 +260,9 @@ const SubscriptionScreen = props => {
           isLoading={
             (!getPlans?.length && getPlans[0]?.unit_amount) ||
             cardPayRequesting ||
-            subIdRequesting
+            subIdRequesting || verifyRequesting
           }
         />
-
         <View style={[row]}>
           <TouchableOpacity
             style={styles.leftArrow}
@@ -275,7 +279,7 @@ const SubscriptionScreen = props => {
           </View>
         </View>
         <View style={[row, largeHMargin, justifyContentBetween]}>
-          <Loader isLoading={props.requesting} />
+          <Loader isLoading={requesting} />
 
           {/* <TouchableOpacity
             onPress={() => setCurentTab(0)}
@@ -311,7 +315,7 @@ const SubscriptionScreen = props => {
             navigation={navigation}
             // getPlans={getPlans}
             amount={getPlans?.length && getPlans[0]?.unit_amount / 100}
-            // subsucriptionId={subscriptionData?.plan?.id}
+          // subsucriptionId={subscriptionData?.plan?.id}
           />
           {/* )} */}
         </ScrollView>
@@ -433,9 +437,11 @@ const mapStateToProps = state => ({
   requesting: state.subscriptionReducer.subRequesting,
   profile: state.login.userDetail,
   subIdRequesting: state.subscriptionReducer.subIdRequesting,
-  cardPayRequesting: state.subscriptionReducer.cardPayRequesting
+  cardPayRequesting: state.subscriptionReducer.cardPayRequesting,
   // customerId: state.subscriptionReducer.getCISuccess,
   // subscription: state.subscription.subscription,
+  verifyRequesting: state.login.verifyRequesting
+
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -447,7 +453,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(paymentSubscriptionRequest(data)),
   profileData: () => dispatch(profileData()),
   getPlanRequest: () => dispatch(getPlanRequest()),
-  updateCustomerSource: data => dispatch(updateCustomerSource(data))
+  updateCustomerSource: data => dispatch(updateCustomerSource(data)),
+  verificationRequest: () => dispatch(verificationRequest())
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionScreen)

@@ -34,13 +34,14 @@ import {
 import {
   getDaySessionRequest,
   getAllSessionRequest,
-  pickSession,
+  // pickSession,
   setCustom,
   setPickedDate
 } from "../../../ScreenRedux/programServices"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import ReactNativeCalendarStrip from "react-native-calendar-strip"
 import { useIsFocused } from "@react-navigation/native"
+import { verificationRequest } from "../../../ScreenRedux/loginRedux"
 
 const FatLoseProgram = props => {
   const {
@@ -54,6 +55,8 @@ const FatLoseProgram = props => {
     getCustomExerciseState,
     profileData,
     getAllSessionsRequesting,
+    verificationRequest,
+    verifyRequesting
   } = props
   const onFocus = useIsFocused()
   let refDescription = useRef("")
@@ -108,6 +111,7 @@ const FatLoseProgram = props => {
   }
   useEffect(() => {
     getInitialData()
+    verificationRequest()
   }, [onFocus, navigation])
 
   useEffect(() => {
@@ -783,7 +787,7 @@ const FatLoseProgram = props => {
               />
             </>
           )}
-          {todayRequest || cRequesting || getAllSessionsRequesting ? (
+          {todayRequest || cRequesting || getAllSessionsRequesting || verifyRequesting ? (
             <View style={[Layout.center, { height: 280 }]}>
               <ActivityIndicator size="large" color="green" />
             </View>
@@ -1273,6 +1277,7 @@ const mapStateToProps = state => ({
   getAllSessionsRequesting: state.addExerciseReducer.getAllSessionsRequesting,
   cRequesting: state.addExerciseReducer.cRequesting,
   getCustomExerciseState: state.addExerciseReducer.getCustomExerciseState,
+  verifyRequesting: state.login.verifyRequesting
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1285,6 +1290,7 @@ const mapDispatchToProps = dispatch => ({
   addCustomExercise: () => dispatch(addCustomExercise([])),
   customWorkoutRescheduleRequest: (id, date) =>
     dispatch(customWorkoutRescheduleRequest(id, date)),
+  verificationRequest: () => dispatch(verificationRequest())
 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(FatLoseProgram)

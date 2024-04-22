@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react"
+import React from "react"
 
 // components
 import {
@@ -17,13 +17,10 @@ import { Gutters, Layout, Global } from "../../../theme"
 import { profileData } from "../../../ScreenRedux/profileRedux"
 import { connect } from "react-redux"
 import {
-  getSubscriptIdRequest,
+  // getSubscriptIdRequest,
   subscriptionCancelation
 } from "../../../ScreenRedux/subscriptionRedux"
 import { API_URL } from "../../../config/app"
-import {isUserSubscriptionActive} from "../../../utils/functions"
-import { useIsFocused } from "@react-navigation/native"
-
 const PremiumCard = props => {
   const {
     onPress,
@@ -32,7 +29,7 @@ const PremiumCard = props => {
     // subsucriptionId,
     profile,
     // cardPlanData,
-    getSubscriptIdRequest,
+    // getSubscriptIdRequest,
     subscriptionIdData,
     subIdRequesting,
     subscriptionCancelation
@@ -62,9 +59,9 @@ const PremiumCard = props => {
   const { border } = Global
   const start = { x: 0, y: 0 }
   const end = { x: 1, y: 1 }
-  useEffect(() => {
-    getSubscriptIdRequest()
-  }, [])
+  // useEffect(() => {
+  //   getSubscriptIdRequest()
+  // }, [])
   const canceledButton = (call) => {
     profile?.user_subscription?.is_subscription_canceled
     profile?.user_subscription?.is_subscription_days_remaining
@@ -86,7 +83,6 @@ const PremiumCard = props => {
             {
               text: "YES",
               onPress: () => {
-               
                 subscriptionIdData &&
                   subscriptionCancelation({
                     subscription_id: subscriptionIdData?.id,
@@ -113,20 +109,20 @@ const PremiumCard = props => {
               text: "YES",
               onPress: () => {
                 Platform.OS != "ios" ?
-                subscriptionIdData &&
+                  subscriptionIdData &&
                   subscriptionCancelation({
                     subscription_id: subscriptionIdData?.id
                   })
-                 : Linking.openURL('https://apps.apple.com/account/subscriptions');
+                  : Linking.openURL('https://apps.apple.com/account/subscriptions');
               }
             }
           ],
           { cancelable: false }
         )
-      return { text: "Cancel", show: true }
-    } else {
-      return { text: "Cancel", show: false }
-    }
+        return { text: "Cancel", show: true }
+      } else {
+        return { text: "Cancel", show: false }
+      }
   }
   return (
     <>
@@ -247,9 +243,8 @@ const PremiumCard = props => {
             regularHPadding,
             { height: 43, borderRadius: 30 }
           ]}
-          disabled={ profile?.is_premium_user}
+          disabled={profile?.is_premium_user}
           onPress={!profile?.is_premium_user ? onPress : null}
-          // onPress={onPress}
 
         />
       </View>
@@ -302,7 +297,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   profileData: () => dispatch(profileData()),
-  getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
+  // getSubscriptIdRequest: () => dispatch(getSubscriptIdRequest()),
   subscriptionCancelation: (data) => dispatch(subscriptionCancelation(data))
 
 
