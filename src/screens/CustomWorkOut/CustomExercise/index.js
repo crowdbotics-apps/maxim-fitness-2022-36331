@@ -596,11 +596,11 @@ const CustomExercise = props => {
     if (array.includes(i)) {
       array = array.filter(index => index !== i)
     } else {
-      if (activeSet?.id === 1) {
+      if (activeCard?.item?.activeSet?.id === 1) {
         if (selectedItem.length < 2) {
           array.push(i)
         }
-      } else if (activeSet?.value === 4) {
+      } else if (activeCard?.item?.activeSet?.value === 4) {
         if (selectedItem.length < 3) {
           array.push(i)
         }
@@ -632,6 +632,7 @@ const CustomExercise = props => {
     props?.addCustomExercise(newData)
     replaceExercise.current.close()
     setActiveCard({ item: {}, index: 0 })
+    setSelectedItem([])
   }
   const renderSets = item => {
     return (
@@ -804,7 +805,6 @@ const CustomExercise = props => {
                   <TouchableOpacity
                     onPress={() => {
                       getExerciseTypeRequest(exe?.exercise_type?.id, "")
-
                       setActiveCard({ item: item, index: index })
                       replaceExercise.current.open()
                     }}
@@ -2049,13 +2049,13 @@ const CustomExercise = props => {
             backgroundColor: "red"
           }
         }}
-        onClose={() => setActiveCard({ item: {}, index: 0 })}
+        onClose={() => { setActiveCard({ item: {}, index: 0 }), setSelectedItem([]) }}
       >
         <View
           style={[
             row,
             justifyContentBetween,
-            { marginTop: 25, marginHorizontal: 25 }
+            { marginVertical: 20, marginHorizontal: 25 }
           ]}
         >
           <Text
@@ -2064,16 +2064,28 @@ const CustomExercise = props => {
           />
           <TouchableOpacity
             disabled={
-              activeSet?.id === 1
+              activeCard?.item?.activeSet?.id === 1
                 ? selectedItem?.length < 2
-                : activeSet?.value === 4
+                : activeCard?.item?.activeSet?.value === 4
                   ? selectedItem?.length < 3
                   : selectedItem?.length < 1
             }
             onPress={updateDataParams}
-            style={[styles.addSetsButton]}
+            style={[styles.doneButton, justifyContentCenter, alignItemsCenter, {
+              backgroundColor: activeCard?.item?.activeSet?.id === 1
+                ? selectedItem?.length < 2
+                : activeCard?.item?.activeSet?.value === 4
+                  ? selectedItem?.length < 3
+                  : selectedItem?.length < 1 ? 'gray' : '#00a1ff',
+
+
+            }]}
           >
-            <Text>Done</Text>
+            <Text style={[{
+
+              fontSize: 19,
+              fontWeight: "bold",
+            }]}>Done</Text>
           </TouchableOpacity>
         </View>
         <ScrollView>
@@ -2119,7 +2131,7 @@ const CustomExercise = props => {
                 </TouchableOpacity>
               ))
             ) : (
-              <View style={[styles.notFound,justifyContentCenter]}>
+              <View style={[styles.notFound, justifyContentCenter]}>
                 <Text bold>No exercise found</Text>
               </View>
             )}
@@ -2271,6 +2283,11 @@ const styles = StyleSheet.create({
     height: 22,
     width: 80,
     alignItems: "center"
+  },
+  doneButton: {
+    borderRadius: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
   },
   addSetsText: {
     fontWeight: "500",
