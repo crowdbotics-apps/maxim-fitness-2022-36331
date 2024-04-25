@@ -2072,11 +2072,7 @@ const CustomExercise = props => {
             }
             onPress={updateDataParams}
             style={[styles.doneButton, justifyContentCenter, alignItemsCenter, {
-              backgroundColor: activeCard?.item?.activeSet?.id === 1
-                ? selectedItem?.length < 2
-                : activeCard?.item?.activeSet?.value === 4
-                  ? selectedItem?.length < 3
-                  : selectedItem?.length < 1 ? 'gray' : '#00a1ff',
+              backgroundColor: '#00a1ff',
 
 
             }]}
