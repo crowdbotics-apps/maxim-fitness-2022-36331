@@ -222,7 +222,7 @@ const CustomCalories = props => {
     const data =
       getAllCustomSessions?.length &&
       getAllCustomSessions?.map((item, index) => {
-        if (item?.done) {
+        if (item?.workouts?.some(item => item?.done) || item.done) {
           return true
         } else {
           return false
