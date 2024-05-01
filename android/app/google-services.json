@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "750002418089-pg70r29mmgmlsg4m074f32jqf7123af5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.maxim_fitness_2022_36331",
+            "certificate_hash": "514aaf131ee8ffe719db5dc772e2aeb09432dcbb"
+          }
+        },
+        {
           "client_id": "750002418089-37ld7o7spro39do9m0mf42j8i6hs6ufq.apps.googleusercontent.com",
           "client_type": 3
         }
