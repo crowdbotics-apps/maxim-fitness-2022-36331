@@ -91,7 +91,7 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Home</Text>
+              <Text style={styles.text}>Meals</Text>
               <View
                 style={[
                   styles.bottom,
@@ -254,7 +254,7 @@ const MainNavigator = props => {
   return (
     <mainStack.Navigator
       screenOptions={{ headerShown: false, animationEnabled: false }}
-      initialRouteName={ "BottomBar"}
+      initialRouteName={"BottomBar"}
     >
       <mainStack.Screen name="BottomBar" component={BottomNavigator} />
       <mainStack.Screen name="AddPost" component={AddPost} />

@@ -81,7 +81,7 @@ const HomeScreen = props => {
   return (
     <SafeAreaView style={[secondaryBg, fill]}>
       <HeaderForDrawer hideHamburger />
-      <View style={[row, styles.wrapper, smallHMargin]}>
+      {/* <View style={[row, styles.wrapper, smallHMargin]}>
         <LinearGradient
           start={start}
           end={end}
@@ -176,7 +176,7 @@ const HomeScreen = props => {
             />
           </View>
         </LinearGradient>
-      </View>
+      </View> */}
       <View style={smallHMargin}>
         {todaySessions?.workouts?.length > 0 ? (
           <View style={[row, styles.wrapper, small2xTMargin]}>

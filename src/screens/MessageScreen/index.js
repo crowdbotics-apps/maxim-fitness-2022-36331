@@ -25,6 +25,7 @@ import {
   timeSince,
   useStore
 } from "../../utils/chat"
+import Icon from "react-native-vector-icons/Ionicons"
 
 const { backImage, searchImage, profile, followingButton, messageImage } =
   Images
@@ -203,12 +204,12 @@ const MessageScreen = props => {
           <Image
             source={
               userProfile?.id === item?.custom?.owner &&
-              item?.custom?.otherUserImage
+                item?.custom?.otherUserImage
                 ? { uri: item?.custom?.otherUserImage }
                 : userProfile?.id !== item?.custom?.owner &&
                   item?.custom?.ownerImage
-                ? { uri: item?.custom?.ownerImage }
-                : profile
+                  ? { uri: item?.custom?.ownerImage }
+                  : profile
             }
             style={{
               height: (61 / 375) * width,
@@ -261,7 +262,7 @@ const MessageScreen = props => {
                 <Text
                   text={
                     item.name?.split("-")[
-                      userProfile?.id === item.custom.owner ? 1 : 0
+                    userProfile?.id === item.custom.owner ? 1 : 0
                     ]
                   }
                   style={{ color: "#D3D3D3", fontSize: 12 }}
@@ -340,7 +341,9 @@ const MessageScreen = props => {
             alignItems: "center"
           }}
         >
-          <Image source={searchImage} style={{ height: 30, width: 30 }} />
+          <Icon name="search-outline" size={26} color="black" />
+
+          {/* <Image source={searchImage} style={{ height: 30, width: 30 }} /> */}
         </View>
       </View>
       {loading ? (

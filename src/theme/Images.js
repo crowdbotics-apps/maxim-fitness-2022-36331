@@ -51,7 +51,7 @@ export default {
   detailIcon: require("src/assets/images/icon_details_ex.png"),
   backIcon: require("src/assets/images/backIcon.png"),
   forwardIcon: require("src/assets/images/forwardIcon.png"),
-  profileBackGround: require("src/assets/images/profileBackgroung.png"),
+  profileBackGround: require("src/assets/images/profile_background.jpeg"),
   whiteBackArrow: require("src/assets/images/whitebackArrow.png"),
   whiteDots: require("src/assets/images/whitedots.png"),
   followButton: require("src/assets/images/followButton.png"),
@@ -95,6 +95,6 @@ export default {
   sendIcon: require("src/assets/images/sendIcon.png"),
   emoji: require("src/assets/images/emoji.png"),
   high_amplitude: require("src/assets/images/high_amplitude_code.gif"),
-  low_amplitude: require("src/assets/images/low_amplitude_code.gif")
-  
+  low_amplitude: require("src/assets/images/low_amplitude_code.gif"),
+  videoThumbnail: require("src/assets/images/videoThumbnail.jpg")
 }
