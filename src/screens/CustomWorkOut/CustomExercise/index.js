@@ -858,7 +858,7 @@ const CustomExercise = props => {
                 setCheckedReps(false)
                 setCheckedRest(false)
                 resetValues()
-                setExerciseIndex(index) //issue start from here
+                setExerciseIndex(index)
                 if (item?.exercises?.type?.length === 1) {
                   refRBSheet.current.open()
                 } else {
@@ -1900,7 +1900,7 @@ const CustomExercise = props => {
                         }
                       }
                       const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
-                      anyRestIsZero ? Alert.alert('please enter Rest Time') : (updateReducer("dualSets", newData), refRBSheetDual.current.close())
+                      anyRestIsZero ? Alert.alert('Please enter rest time') : (updateReducer("dualSets", newData), refRBSheetDual.current.close())
 
                     } else {
                       setDualSets(prevValues => [
@@ -2019,7 +2019,7 @@ const CustomExercise = props => {
                         }
                       }
                       const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
-                      anyRestIsZero ? Alert.alert('please enter Rest Time') : (
+                      anyRestIsZero ? Alert.alert('Please enter rest time') : (
                         updateReducer("dualSets", newData),
                         refRBSheetDual.current.close()
                       )

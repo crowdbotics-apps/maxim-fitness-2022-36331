@@ -305,7 +305,7 @@ function* blockUserData({ data }) {
       message: response.data?.id ? "Blocked user Successfully" : "Unblocked user Successfully",
       type: "success"
     })
-    navigate("SearchProfile")
+    response.data?.id ? navigate("Feed") : navigate("SearchProfile")
   } catch (e) {
     const { response } = e
     showMessage({

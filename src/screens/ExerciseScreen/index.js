@@ -510,12 +510,12 @@ const ExerciseScreen = props => {
                           selectExercise(item?.exercises?.[0], 0)
                         }
                         setTimeout(() => {
-                          if (item?.exercises?.length == 1) {
-                            refModal
-                              ?.current?.close()
-                          } else {
-                            refModal.current?.open()
-                          }
+                          // if (item?.exercises?.length == 1) {
+                          //   refModal
+                          //     ?.current?.close()
+                          // } else {
+                          refModal.current?.open()
+                          // }
                         }, 800)
                       }}
                       style={[
