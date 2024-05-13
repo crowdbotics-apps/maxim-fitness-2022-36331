@@ -226,6 +226,11 @@ export const BottomNavigator = () => {
         options={{ header: () => null }}
       />
       <Tab.Screen
+        name="ViewPost"
+        component={ViewPost}
+        options={{ header: () => null }}
+      />
+      <Tab.Screen
         name="FatLoseProgram"
         component={FatLoseProgram}
         options={{ header: () => null }}
