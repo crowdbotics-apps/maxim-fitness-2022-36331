@@ -11,7 +11,8 @@ import {
   TextInput,
   Pressable,
   ActivityIndicator,
-  FlatList
+  FlatList,
+  Alert
 } from "react-native"
 import { connect } from "react-redux"
 import { showMessage } from "react-native-flash-message"
@@ -941,11 +942,12 @@ const CustomExercise = props => {
             justifyContentBetween
           ]}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            {/* <Image
               source={Images.back2}
               style={{ width: 30, height: 25, resizeMode: "contain" }}
-            />
+            /> */}
+            <Text style={styles.backButtonText}>Add More</Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
             disabled={cRequesting || title === "" || !checkSets()}
@@ -1379,10 +1381,14 @@ const CustomExercise = props => {
                             minutes * 60 + parseFloat(seconds ? seconds : 0)
                         }
                       ])
-                      updateReducer("single", myData)
-
-                      refRBSheet.current.close()
-                      resetValues()
+                      if (myData.rest != 0) {
+                        updateReducer("single", myData)
+                        refRBSheet.current.close()
+                        resetValues()
+                      }
+                      else {
+                        Alert.alert("Please enter rest time")
+                      }
                     }
                     renderInputValue(selectIndex + 1)
                     renderRestInputValue(selectIndex + 1)
@@ -1396,10 +1402,15 @@ const CustomExercise = props => {
                       rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
                       timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
                     }
+                    if (myData.rest != 0) {
+                      updateReducer("single", myData)
+                      refRBSheet.current.close()
+                      resetValues()
+                    }
+                    else {
+                      Alert.alert("Please enter rest time")
 
-                    updateReducer("single", myData)
-                    refRBSheet.current.close()
-                    resetValues()
+                    }
                   }
                 }}
                 disabled={reps !== "" ? false : true}
@@ -1714,7 +1725,7 @@ const CustomExercise = props => {
                     // resetValues();
                     // setTemporaryReps();
                   } else {
-                    refRBSheetDual.current.close()
+
                     setDualSetState(1)
                     setReps("")
 
@@ -1888,8 +1899,9 @@ const CustomExercise = props => {
                             )
                         }
                       }
+                      const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
+                      anyRestIsZero ? Alert.alert('please enter Rest Time') : (updateReducer("dualSets", newData), refRBSheetDual.current.close())
 
-                      updateReducer("dualSets", newData)
                     } else {
                       setDualSets(prevValues => [
                         ...prevValues,
@@ -2006,7 +2018,11 @@ const CustomExercise = props => {
                             )
                         }
                       }
-                      updateReducer("dualSets", newData)
+                      const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
+                      anyRestIsZero ? Alert.alert('please enter Rest Time') : (
+                        updateReducer("dualSets", newData),
+                        refRBSheetDual.current.close()
+                      )
                     }
 
                     resetValues()
@@ -2424,7 +2440,17 @@ const styles = StyleSheet.create({
     width: 90,
     height: 60,
     borderRadius: 10
-  }
+  },
+  backButton: {
+    flexDirection: 'row', // Align items horizontally
+    alignItems: 'center', // Center items vertically
+    padding: 10, // Add some padding
+    backgroundColor: '#f0f0f0', // Background color
+    borderRadius: 5, // Rounded corners
+  },
+  backButtonText: {
+    marginLeft: 5, // Add some space between text and icon
+  },
 })
 
 const mapStateToProps = state => ({

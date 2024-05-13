@@ -658,7 +658,9 @@ const ExerciseScreen = props => {
                       }}
                       resizeMode="stretch"
                       thumbnail={{ uri: item?.video_thumbnail }}
-                      disableFullscreen={false}
+                      disablFullscreen={false}
+                      repeat={true}
+                      controls={false}
                     />
                   ) : (
                     <View
