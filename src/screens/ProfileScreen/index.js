@@ -633,7 +633,7 @@ const ProfileScreen = props => {
               />
               <Text
                 style={[styles.mainTextStyle, { marginLeft: 30 }]}
-                text={"Block User"}
+                text={profileData?.user_detail?.block_user?.length ? "Unblock User" : "Block User"}
               />
             </TouchableOpacity>
           </View>
