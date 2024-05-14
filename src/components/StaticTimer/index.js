@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react"
-import Text from "../Text"
-import { View } from "react-native"
+import React, { useEffect, useState } from "react";
+import Text from "../Text";
+import { Platform, View } from "react-native";
+import BackgroundTimer from "react-native-background-timer";
 
 const StaticTimer = ({
   startTimer,
@@ -9,35 +10,39 @@ const StaticTimer = ({
   seconds,
   setSeconds,
   hours,
-  setHours
+  setHours,
 }) => {
   useEffect(() => {
+    if (Platform.OS === 'ios') {
+      BackgroundTimer.start();
+    }
     if (!startTimer) {
-      const myInterval = setInterval(() => {
+      const myInterval = BackgroundTimer.setInterval(() => {
         if (seconds >= 0) {
           if (minutes === 60) {
-            setMinutes(0)
-            setHours(prevState => prevState + 1)
+            setMinutes(0);
+            setHours((prevState) => prevState + 1);
           } else {
             if (seconds === 60) {
-              setSeconds(0)
-              setMinutes(prevState => prevState + 1)
+              setSeconds(0);
+              setMinutes((prevState) => prevState + 1);
             } else {
-              setSeconds(prevState => prevState + 1)
+              setSeconds((prevState) => prevState + 1);
             }
           }
         }
-      }, 1000)
+      }, 1000);
       return () => {
-        clearInterval(myInterval)
-      }
+        BackgroundTimer.clearInterval(myInterval);
+        if (Platform.OS === 'ios') BackgroundTimer.stopBackgroundTimer()
+      };
     } else {
-      clearInterval()
-      setHours(0)
-      setMinutes(0)
-      setSeconds(0)
+      BackgroundTimer.stopBackgroundTimer();
+      setHours(0);
+      setMinutes(0);
+      setSeconds(0);
     }
-  }, [seconds, minutes, hours])
+  }, [seconds, minutes, hours, startTimer]);
 
   return (
     <View>
@@ -49,7 +54,7 @@ const StaticTimer = ({
         bold
       />
     </View>
-  )
-}
+  );
+};
 
-export default StaticTimer
+export default StaticTimer;

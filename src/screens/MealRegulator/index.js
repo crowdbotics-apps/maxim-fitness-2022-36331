@@ -38,7 +38,7 @@ const MealRegulator = props => {
     Voice.destroy().then(Voice.removeAllListeners)
     try {
       await Voice.stop()
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onSpeechPartialResults = e => {
@@ -49,7 +49,7 @@ const MealRegulator = props => {
     try {
       await Voice.start("en-US")
       setPartialResults([])
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onStart = async () => {
@@ -85,7 +85,7 @@ const MealRegulator = props => {
     Voice.destroy().then(Voice.removeAllListeners)
     try {
       await Voice.stop()
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const reviewFood = () => {
