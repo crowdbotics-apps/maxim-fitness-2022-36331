@@ -750,6 +750,7 @@ class CustomExercisesSerializer(serializers.ModelSerializer):
 
 class CustomWorkoutSerializer(serializers.ModelSerializer):
     workouts = CustomExercisesSerializer(many=True, source="custom_exercises_workouts", read_only=True)
+    created_date = serializers.DateTimeField(input_formats=["%Y-%m-%d"])
 
     class Meta:
         model = CustomWorkout

@@ -1803,7 +1803,12 @@ class CustomWorkoutViewSet(ModelViewSet):
 
             custom_exercise_data['name'] = name
             custom_sets_data = custom_exercise_data.pop('custom_sets', [])
-            custom_exercise = CustomExercise.objects.create(custom_workout=custom_workout, name=name)
+            exercise_json = []
+            for index, exercise in enumerate(custom_exercise_data['exercises'], start=1):
+                exercise_json.append({"order": index, "exercise": exercise})
+            # exercises_order = json.dumps(exercise_json)
+            custom_exercise = CustomExercise.objects.create(custom_workout=custom_workout, name=name,
+                                                            exercises_order=exercise_json)
             custom_exercise.exercises.set(custom_exercise_data['exercises'])
 
             # Create custom sets
@@ -1813,8 +1818,10 @@ class CustomWorkoutViewSet(ModelViewSet):
                         del custom_set_data['rest']
                     except:
                         pass
-                    custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
-                    custom_set.exercises.set([i])
+                    if custom_set_data.get('ex_id') == i:
+                        del custom_set_data['ex_id']
+                        custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
+                        custom_set.exercises.set([i])
         return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
