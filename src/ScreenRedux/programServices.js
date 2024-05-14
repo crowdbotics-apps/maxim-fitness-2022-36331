@@ -12,6 +12,7 @@ import moment from "moment"
 import { sortSessionBySets } from "../utils/common"
 import { goBack } from "../navigation/NavigationService"
 import { showMessage } from "react-native-flash-message"
+import { sortExercises } from "../utils/utils"
 
 const ALL_SESSIONS_REQUEST = "ProgramScreen/ALL_SESSIONS_REQUEST"
 const ALL_SESSIONS_SUCCESS = "ProgramScreen/ALL_SESSIONS_SUCCESS"
@@ -1025,7 +1026,8 @@ function* getCustomWorkoutDetails({ data }) {
 
     const customData = yield getCustomExerciseAPI(data)
     yield put(getCustomWorkoutDataSuccess(customData.data))
-    yield put(repsCustomWeightRequest(customData?.data?.workouts?.[0]?.exercises?.[0]?.sets?.[0]?.id, null, null))
+    const setId = yield sortExercises(customData?.data?.workouts?.[0]?.exercises, customData?.data?.workouts?.[0]?.exercises_order ? customData?.data?.workouts?.[0]?.exercises_order : null)?.[0]?.sets?.[0]?.id
+    yield put(repsCustomWeightRequest(setId, null, null))
     yield put(pickSession(null, customData?.data?.workouts, null))
 
   } catch (e) {

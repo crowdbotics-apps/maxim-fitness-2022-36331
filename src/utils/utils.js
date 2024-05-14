@@ -31,9 +31,15 @@ export const transformData = jsonData => {
       const arrayList = entry?.dualSets.map(item => {
         return Object.values(item).map(exercise => ({ ...exercise }))
       })
-      sets = arrayList.flat()
+      sets = arrayList.flat().map((set, index) => ({
+        ...set,
+        ex_id: exercises[index % exercises.length] // Assign sequential exercise ID
+      }))
     } else if (entry?.single && entry?.single) {
-      sets = entry.single
+      sets = entry.single.map((set, index) => ({
+        ...set,
+        ex_id: exercises[index % exercises.length] // Assign sequential exercise ID
+      }))
     }
     const transformedEntry = {
       exercises,
@@ -43,6 +49,26 @@ export const transformData = jsonData => {
   })
   return transformedData
 }
+
+export const sortExercises = (exercises, exercisesOrder) => {
+  if (exercisesOrder?.length) {
+    const orderMap = new Map();
+    exercisesOrder.forEach(item => {
+      orderMap.set(item.exercise, item.order);
+    });
+
+    exercises.sort((a, b) => {
+      const orderA = orderMap.get(a.id);
+      const orderB = orderMap.get(b.id);
+      return orderA - orderB;
+    });
+    return exercises
+  }
+  else {
+    return exercises
+  }
+}
+
 
 export const exerciseArray = [
   {
