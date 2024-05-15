@@ -11,6 +11,7 @@ import Navigation from "src/navigation"
 import { MenuProvider } from "react-native-popup-menu"
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { SP_KEY } from '@env'
+import SplashScreen from 'react-native-splash-screen';
 LogBox.ignoreLogs(["Warning: ..."])
 LogBox.ignoreAllLogs()
 
@@ -18,7 +19,9 @@ import { store } from "src/redux/store"
 
 const App = () => {
   const persistor = persistStore(store)
-
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
   return (
     <ReduxProvider store={store}>
       <PersistGate loading={null} persistor={persistor}>
