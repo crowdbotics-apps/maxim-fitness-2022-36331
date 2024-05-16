@@ -25,7 +25,7 @@ import {
   timeSince,
   useStore
 } from "../../utils/chat"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "react-native-vector-icons/FontAwesome5"
 
 const { backImage, searchImage, profile, followingButton, messageImage } =
   Images
@@ -341,7 +341,7 @@ const MessageScreen = props => {
             alignItems: "center"
           }}
         >
-          <Icon name="search-outline" size={26} color="black" />
+          <Icon name="search" size={26} color="gray" />
 
           {/* <Image source={searchImage} style={{ height: 30, width: 30 }} /> */}
         </View>

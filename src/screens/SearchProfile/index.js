@@ -21,7 +21,7 @@ import { createDirectChannel, useStore, ChannelType } from "../../utils/chat"
 import { letterCapitalize } from "../../utils/functions"
 import { routeData } from "../../ScreenRedux/profileRedux"
 import SkeletonPlaceholder from "react-native-skeleton-placeholder"
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "react-native-vector-icons/FontAwesome5"
 
 //action
 import { getUserProfile, userChat } from "../../ScreenRedux/searchProfileRedux"
@@ -302,7 +302,7 @@ const SearchProfile = props => {
               alignContent: 'center'
             }}
           >
-            <Icon name="search-outline" size={26} color="black" />
+            <Icon name="search" size={26} color="gray" />
 
             {/* <Image source={searchImage} style={{ height: 30, width: 30 }} /> */}
           </View>

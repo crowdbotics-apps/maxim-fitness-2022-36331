@@ -433,7 +433,7 @@ const ProfileScreen = props => {
                   <Text style={styles.subTextStyle} text="Likes" />
                 </View>
                 <View style={{ alignItems: "center" }}>
-                  <Text style={styles.mainTextStyle} text={profileData?.post} />
+                  <Text style={styles.mainTextStyle} text={profileData?.post?.toString()} />
                   <Text style={styles.subTextStyle} text="Posts" />
                 </View>
               </View>

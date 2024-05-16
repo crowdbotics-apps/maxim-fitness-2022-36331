@@ -177,7 +177,7 @@ const HomeScreen = props => {
           </View>
         </LinearGradient>
       </View> */}
-      <View style={smallHMargin}>
+      {/* <View style={smallHMargin}>
         {todaySessions?.workouts?.length > 0 ? (
           <View style={[row, styles.wrapper, small2xTMargin]}>
             <LinearGradient
@@ -211,7 +211,7 @@ const HomeScreen = props => {
             />
           </View>
         ) : null}
-      </View>
+      </View> */}
       <View style={[fill, small2xTMargin, styles.lastContainer]}>
         {mealRequesting ? (
           <View style={styles.loaderStyle}>

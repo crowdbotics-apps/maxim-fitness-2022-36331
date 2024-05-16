@@ -273,7 +273,7 @@ const TabThree = ({
           ]}
         >
           <Text
-            text="Meal per Day"
+            text="Meals per Day"
             style={{
               fontSize: 20,
               opacity: 0.7,
