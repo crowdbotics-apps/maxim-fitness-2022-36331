@@ -15,7 +15,7 @@ import {
 import { Text, BottomSheet, Loader } from "../../components"
 import { Images, Colors } from "src/theme"
 import { connect } from "react-redux"
-import { useIsFocused } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import Video from "react-native-video"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
@@ -34,7 +34,6 @@ import {
 
 const ProfileScreen = props => {
   const {
-    navigation,
     route,
     profileData,
     userDetail,
@@ -42,6 +41,7 @@ const ProfileScreen = props => {
     routeDetail,
     backScreenName
   } = props
+  const navigation = useNavigation()
   const [follow, setFollow] = useState(profileData?.follow)
   const [showVideo, setShowVideo] = useState(false)
   const [showLoader, setShowLoader] = useState(false)
@@ -306,12 +306,13 @@ const ProfileScreen = props => {
                             onPress={() => {
                               props.routeData(false)
                               navigation.navigate({
-                                name: route?.params?.backScreenName
-                                  ? route?.params?.backScreenName
-                                  : "Feeds"
+                                name: route?.params?.backScreenName === 'SearchProfile'
+                                  ? 'SearchProfile'
+                                  : "Feed"
                               })
                             }}
                           >
+
                             <Image
                               source={whiteBackArrow}
                               style={{ height: 20, width: 25 }}

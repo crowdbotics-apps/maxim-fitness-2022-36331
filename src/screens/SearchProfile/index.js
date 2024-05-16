@@ -250,9 +250,7 @@ const SearchProfile = props => {
                 width: "30%"
               }}
               onPress={() => {
-                route.params?.isFeed
-                  ? navigation.goBack()
-                  : navigation.navigate("BottomBar")
+                navigation.navigate("Feed")
               }}
             >
               <Image source={backImage} style={{ height: 20, width: 30 }} />

@@ -1387,7 +1387,9 @@ const CustomExercise = props => {
                         resetValues()
                       }
                       else {
-                        Alert.alert("Please enter rest time")
+                        Alert.alert(
+                          'Rest Time',
+                          "Please enter rest time")
                       }
                     }
                     renderInputValue(selectIndex + 1)
@@ -1408,7 +1410,9 @@ const CustomExercise = props => {
                       resetValues()
                     }
                     else {
-                      Alert.alert("Please enter rest time")
+                      Alert.alert(
+                        'Rest Time',
+                        "Please enter rest time")
 
                     }
                   }
@@ -1900,7 +1904,13 @@ const CustomExercise = props => {
                         }
                       }
                       const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
-                      anyRestIsZero ? Alert.alert('Please enter rest time') : (updateReducer("dualSets", newData), refRBSheetDual.current.close())
+                      anyRestIsZero
+                        ? Alert.alert(
+                          'Rest Time',
+                          "Please enter rest time"
+                        ) : (
+                          updateReducer("dualSets", newData), refRBSheetDual.current.close()
+                        )
 
                     } else {
                       setDualSets(prevValues => [
@@ -2019,7 +2029,9 @@ const CustomExercise = props => {
                         }
                       }
                       const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
-                      anyRestIsZero ? Alert.alert('Please enter rest time') : (
+                      anyRestIsZero ? Alert.alert(
+                        'Rest Time',
+                        "Please enter rest time") : (
                         updateReducer("dualSets", newData),
                         refRBSheetDual.current.close()
                       )
