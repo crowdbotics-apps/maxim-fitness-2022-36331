@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { goBack, navigate } from "../navigation/NavigationService"
 import { showMessage } from "react-native-flash-message"
+import { NIX_APP_ID, NIX_API_KEY } from '@env'
 
 // config
 import { API_URL } from "../config/app"
@@ -21,6 +22,8 @@ const GET_FOODS_SEARCH_FAILURE = "NutritionScreen/GET_FOODS_SEARCH_FAILURE"
 const GET_COMMON_BRANDED_REQUEST = "NutritionScreen/GET_COMMON_BRANDED_REQUEST"
 const GET_COMMON_SUCCESS = "NutritionScreen/GET_COMMON_SUCCESS"
 const GET_BRANDED_SUCCESS = "NutritionScreen/GET_BRANDED_SUCCESS"
+const GET_COMMON_FAIL = "NutritionScreen/GET_COMMON_FAIL"
+const GET_BRANDED_FAIL = "NutritionScreen/GET_BRANDED_FAIL"
 
 const POST_LOG_FOOD_REQUEST = "NutritionScreen/POST_LOG_FOOD_REQUEST"
 const POST_LOG_FOOD_SUCCESS = "NutritionScreen/POST_LOG_FOOD_SUCCESS"
@@ -100,9 +103,10 @@ export const getFoodsSearchFailure = error => ({
 })
 // common branded action
 
-export const commonBrandedRequest = data => ({
+export const commonBrandedRequest = (common, branded) => ({
   type: GET_COMMON_BRANDED_REQUEST,
-  data
+  common,
+  branded
 })
 
 export const commonSuccess = data => ({
@@ -115,6 +119,14 @@ export const brandedSuccess = data => ({
   data
 })
 
+
+export const commonFail = () => ({
+  type: GET_COMMON_FAIL
+})
+
+export const brandedFail = () => ({
+  type: GET_BRANDED_FAIL
+})
 export const postLogFoodRequest = (id, data) => ({
   type: POST_LOG_FOOD_REQUEST,
   id,
@@ -251,10 +263,22 @@ export const nutritionReducer = (state = initialState, action) => {
         commonState: action.data,
         request: false
       }
+    case GET_COMMON_FAIL:
+      return {
+        ...state,
+        commonState: false,
+        request: false
+      }
     case GET_BRANDED_SUCCESS:
       return {
         ...state,
         brandedState: action.data,
+        request: false
+      }
+    case GET_BRANDED_FAIL:
+      return {
+        ...state,
+        brandedState: false,
         request: false
       }
 
@@ -306,24 +330,24 @@ export const nutritionReducer = (state = initialState, action) => {
 
 //SPEECH API
 async function getSpeechAPI(data) {
-  const URL = `${API_URL}/food/speech/`
+  const URL = `${API_URL}/food/search/?query=${data}`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
-    method: "POST",
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Token  ${token}`
     },
-    data: { query: data[0] }
   }
-
   return XHR(URL, options)
 }
 
 function* getSpeech({ data }) {
   try {
     const response = yield call(getSpeechAPI, data)
-    yield put(getSpeechSuccess(response.data.foods))
+    yield put(getFoodsSearchSuccess(response.data))
+    yield put(commonSuccess(response.data))
+    yield put(brandedSuccess(response.data))
   } catch (e) {
     yield put(getSpeechFailure(e))
   }
@@ -355,7 +379,7 @@ function* getFoodsSearch({ data }) {
 
 // common branded sagas
 async function commonAPI(name) {
-  const URL = `${API_URL}/food/speech/`
+  const URL = `${API_URL}/food/search_food/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
     method: "POST",
@@ -369,31 +393,40 @@ async function commonAPI(name) {
   return XHR(URL, options)
 }
 
+
 async function brandedAPI(id) {
-  const URL = `${API_URL}/products/code/?item_id=${id}`
+  const data = { item_id: id }
+  const URL = `${API_URL}/products/code/`
   const token = await AsyncStorage.getItem("authToken")
   const options = {
-    method: "GET",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Token  ${token}`
-    }
+    },
+    data: data
   }
 
   return XHR(URL, options)
 }
 
-function* commonBranded({ data }) {
+function* commonBranded({ common, branded }) {
   try {
-    if (data.item === "common") {
-      const response = yield call(commonAPI, data.name)
-      yield put(commonSuccess(response.data.foods))
-    } else {
-      const response = yield call(brandedAPI, data.id)
+
+    if (branded.item === 'branded') {
+      const response = yield call(brandedAPI, branded.id)
       yield put(brandedSuccess(response.data))
     }
+    if (common.item === 'common') {
+      const response = yield call(commonAPI, common.name)
+      yield put(commonSuccess(response.data))
+    }
+
   } catch (e) {
-    // yield put(commonBrandedFailure(e))
+    showMessage({
+      message: e.error.message || "Something want wrong",
+      type: "danger"
+    })
   }
 }
 
@@ -491,7 +524,7 @@ function* getUnreadNotifications() {
   try {
     const response = yield call(getUnreadNotificationsApi)
     yield put(getNotificationCountSuccess(response?.data?.unread_count))
-  } catch (e) {}
+  } catch (e) { }
 }
 
 async function productUnitAPI(itemId, value, data) {
@@ -531,29 +564,45 @@ async function productUnitAPI(itemId, value, data) {
 function* productUnitData({ itemId, value, data }) {
   try {
     const response = yield call(productUnitAPI, itemId, value, data)
-  } catch (e) {}
+  } catch (e) { }
 }
-
 async function getScanFoodAPI(barcode) {
-  const URL = `${API_URL}/products/code/?upc=${barcode}`
-  const token = await AsyncStorage.getItem("authToken")
+  const URL = `https://trackapi.nutritionix.com/v2/search/item/?upc=${barcode}`
   const options = {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Token  ${token}`
+      "x-app-id": NIX_APP_ID,
+      "x-app-key": NIX_API_KEY
     }
   }
 
   return XHR(URL, options)
 }
 
+// async function getScanFoodAPI(barcode) {
+//   const data = { upc: barcode }
+//   const URL = `${API_URL}/products/code/`
+//   const token = await AsyncStorage.getItem("authToken")
+//   const options = {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Token  ${token}`
+//     },
+//     data: data
+//   }
+
+//   return XHR(URL, options)
+// }
+
 function* getScanMealsFood({ data }) {
   try {
     const response = yield call(getScanFoodAPI, data)
-    navigate("LogFoods")
     yield put(getScanFoodsSuccess(response.data))
+    navigate("LogFoods")
   } catch (e) {
+    console.log(e, 'eee')
     goBack()
     yield put(getScanFoodsSuccess(false))
     if (e?.response?.data) {

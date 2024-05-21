@@ -90,8 +90,10 @@ const MealRegulator = props => {
 
   const reviewFood = () => {
     onStop()
-    props.getSpeechRequest(partialResults)
-    navigation.navigate("LogFoods")
+    // props.getSpeechRequest(partialResults.flatMap(item => item.split(' ')))
+    // navigation.navigate("LogFoods",)
+    navigation.navigate("SelectBrand", { items: partialResults || " " })
+
     setPartialResults([])
   }
 

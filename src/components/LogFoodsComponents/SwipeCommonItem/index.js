@@ -15,8 +15,8 @@ const SwipeCommonItem = ({
   updateNutritions,
   type
 }) => {
-  const [unitText, setUnitText] = useState(item.serving_unit)
-  const [calories, setCalories] = useState(item.nf_calories)
+  const [unitText, setUnitText] = useState(item?.serving_unit)
+  const [calories, setCalories] = useState(item?.nf_calories)
 
   const onSelect = (val, product) => {
     const seletecObj = item.alt_measures[val]

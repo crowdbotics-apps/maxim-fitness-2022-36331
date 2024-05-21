@@ -1,6 +1,7 @@
 import axios from 'axios'
 // config
 import { API_URL } from '../config/app'
+// import { showMessage } from 'react-native-flash-message';
 
 function parseJSON(response) {
   if (response.status === 204 || response.status === 205) {
@@ -19,5 +20,23 @@ function checkStatus(response) {
   error.status = response.status;
   throw error;
 }
+// const handleTokenExpiry = async () => {
+//   try {
+//     await AsyncStorage.clear();
+//     showMessage({
+//       message: 'Session expired. Please login again',
+//       type: 'danger',
+//     });
+//   } catch (err) {
+//     console.log(err)
+//   }
+// };
 
-export default (url, options) => axios(url, options).then(checkStatus).then(parseJSON);
+
+export default (url, options) => axios(url, options).then(checkStatus).then(parseJSON)
+// .catch(async (err) => {
+//   if (err.response && err.response.status === 401) {
+//     await handleTokenExpiry();
+//   }
+//   throw err;
+// });
