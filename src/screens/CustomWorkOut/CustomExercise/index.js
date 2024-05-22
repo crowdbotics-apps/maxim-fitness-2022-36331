@@ -32,7 +32,7 @@ import {
   addCustomExercise,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
-import { setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
+import { getRepsRangeRequest, setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
 import { transformData } from "../../../utils/utils"
 import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native"
 
@@ -57,7 +57,9 @@ const CustomExercise = props => {
     postCustomExRequest,
     exerciseTitle,
     setExerciseTitle,
-    customExercisesList
+    customExercisesList,
+    repsRangeState,
+    getRepsRangeRequest
   } = props
   const navigation = useNavigation()
   const route = useRoute()
@@ -92,6 +94,7 @@ const CustomExercise = props => {
     mints: {},
     seconds: {}
   })
+  const [repsData, setRepsData] = useState([])
   const {
     alignItemsEnd,
     row,
@@ -859,6 +862,7 @@ const CustomExercise = props => {
                 setCheckedRest(false)
                 resetValues()
                 setExerciseIndex(index)
+                getRepsRange(item)
                 if (item?.exercises?.type?.length === 1) {
                   refRBSheet.current.open()
                 } else {
@@ -926,6 +930,41 @@ const CustomExercise = props => {
       </>
     )
   }
+  const getRepsRange = async (data) => {
+    let setType;
+    switch (data.activeSet.item) {
+      case "Super Set":
+        setType = 'ss';
+        break;
+      case "Giant Set":
+        setType = 'gs';
+        break;
+      case "Drop Set":
+        setType = 'ds';
+        break;
+      case "Triple Drop Set":
+        setType = 'td';
+        break;
+      case "Circuit Training":
+        setType = 'ct';
+        break;
+      case "Single Set":
+        setType = 'r';
+        break;
+      default:
+        setType = 'r';
+        break;
+    }
+    const exerciseIds = data.exercises.type.map(exercise => exercise.exercise_id);
+    const payload = {
+      exercise_set: {
+        set_type: setType,
+        exercise_ids: exerciseIds
+      }
+    };
+    await getRepsRangeRequest(payload);
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1120,13 +1159,14 @@ const CustomExercise = props => {
                 <TextInput
                   style={{
                     fontSize: 20,
-                    fontWeight: "700",
+                    fontWeight: "400",
                     color: "#5e5e5e",
                     borderBottomColor: "black",
                     borderBottomWidth: 1,
                     paddingBottom: -1,
                     maxWidth: 70,
                     minWidth: 40,
+                    numberOfLines: 1,
                     marginTop:
                       findingData()?.activeSet &&
                         (findingData()?.activeSet?.item === "Drop Set" ||
@@ -1134,10 +1174,13 @@ const CustomExercise = props => {
                         ? 0
                         : 5
                   }}
+                  maxLength={4}
                   onChangeText={val => {
                     updateDroupSets(val)
                     setReps(val)
                   }}
+                  placeholder={repsRangeState?.[0] || '0-100'}
+                  placeholderTextColor={'gray'}
                   keyboardType="number-pad"
                   value={`${reps}`}
                 />
@@ -1203,6 +1246,7 @@ const CustomExercise = props => {
                         color: "#626262"
                       }}
                       keyboardType="number-pad"
+                      placeholder="00"
                       onChangeText={val => setMinutes(val)}
                       editable={
                         findingData()?.activeSet?.item === "Single Set"
@@ -1245,6 +1289,7 @@ const CustomExercise = props => {
                       }}
                       keyboardType="number-pad"
                       maxLength={3}
+                      placeholder="00"
                       onChangeText={val => setSeconds(val)}
                       editable={
                         findingData()?.activeSet?.item === "Single Set"
@@ -1540,8 +1585,8 @@ const CustomExercise = props => {
                   </Text>
                   <TextInput
                     style={{
-                      fontSize: 24,
-                      fontWeight: "700",
+                      fontSize: 20,
+                      fontWeight: "400",
                       color: "#626262",
                       marginTop: 5,
                       borderBottomWidth: 1,
@@ -1549,6 +1594,8 @@ const CustomExercise = props => {
                       minWidth: 40
                       // marginTop: 15
                     }}
+                    maxLength={4}
+                    placeholder={repsRangeState?.[dualSetState - 1] || '0-100'}
                     value={`${temporaryReps}`}
                     keyboardType="number-pad"
                     onChangeText={val => {
@@ -1620,6 +1667,7 @@ const CustomExercise = props => {
                           paddingBottom: -10,
                           color: "#626262"
                         }}
+                        placeholder="00"
                         onChangeText={val => {
                           updateMintsSets(val)
                           setMinutes(val)
@@ -1656,6 +1704,7 @@ const CustomExercise = props => {
                           marginTop: 14,
                           color: "#626262"
                         }}
+                        placeholder="00"
                         maxLength={3}
                         value={seconds}
                         // editable={dualSetState === 1 ? false : true}
@@ -2475,7 +2524,9 @@ const mapStateToProps = state => ({
   requesting: state.addExerciseReducer.requesting,
   pickedDate: state.programReducer.pickedDate,
   exerciseTitle: state.programReducer.exerciseTitle,
+  repsRangeState: state.programReducer.repsRangeState
 })
+
 
 const mapDispatchToProps = dispatch => ({
   postCustomExRequest: (data, start) =>
@@ -2484,6 +2535,7 @@ const mapDispatchToProps = dispatch => ({
   getExerciseTypeRequest: (data, search) =>
     dispatch(getExerciseTypeRequest(data, search)),
   setCustom: type => dispatch(setCustom(type)),
-  setExerciseTitle: type => dispatch(setExerciseTitle(type))
+  setExerciseTitle: type => dispatch(setExerciseTitle(type)),
+  getRepsRangeRequest: data => dispatch(getRepsRangeRequest(data))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)
