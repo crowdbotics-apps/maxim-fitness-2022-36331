@@ -72,8 +72,8 @@ const TabThree = ({
 
   const protein = consumeCalories[0]?.goals_values?.protein
     ? ((consumeCalories[0]?.goals_values?.protein / 20.45 / 100) * 100).toFixed(
-        0
-      )
+      0
+    )
     : 0
   const carbs = consumeCalories[0]?.goals_values?.carbs
     ? ((consumeCalories[0]?.goals_values?.carbs / 20.45 / 100) * 100).toFixed(0)
@@ -146,9 +146,8 @@ const TabThree = ({
               bold
             />
             <Text
-              text={` ${
-                Math.round(consumeCalories[0]?.goals_values?.protein / 4) || 0
-              }g`}
+              text={` ${Math.round(consumeCalories[0]?.goals_values?.protein) || 0
+                }g`}
               style={fontSize15TextCenter}
             />
           </View>
@@ -184,9 +183,8 @@ const TabThree = ({
               bold
             />
             <Text
-              text={` ${
-                Math.round(consumeCalories[0]?.goals_values?.carbs / 4) || 0
-              }g`}
+              text={` ${Math.round(consumeCalories[0]?.goals_values?.carbs) || 0
+                }g`}
               style={fontSize15TextCenter}
             />
           </View>
@@ -222,9 +220,8 @@ const TabThree = ({
               bold
             />
             <Text
-              text={` ${
-                Math.round(consumeCalories[0]?.goals_values?.fat / 9) || 0
-              }g`}
+              text={` ${Math.round(consumeCalories[0]?.goals_values?.fat) || 0
+                }g`}
               style={fontSize15TextCenter}
             />
           </View>

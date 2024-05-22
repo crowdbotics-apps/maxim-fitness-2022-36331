@@ -8,6 +8,7 @@ import { API_URL } from "../config/app"
 // utils
 import XHR from "src/utils/XHR"
 import moment from "moment"
+import { Alert } from "react-native"
 
 //Types
 const GET_CALORIES_REQUEST = "CUSTOM_CAL_SCREEN/GET_CALORIES_REQUEST"
@@ -268,6 +269,19 @@ function* postRequiredCal({ id, data }) {
     yield put(postRequiredCalSuccess(response.data))
     navigate("CustomCalories")
   } catch (e) {
+    Alert.alert(
+      "Error",
+      e.error.message || "Something went wrong",
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            navigate("EditCustomCal");
+          }
+        }
+      ]
+    );
+
     yield put(postRequiredCalFailure(false))
   }
 }
