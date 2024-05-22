@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import { connect } from "react-redux";
 import SwipeListSelectBrand from "../../components/SwipeListSelectBrand";
@@ -122,10 +123,11 @@ const SelectBrand = (props) => {
           {filterCommon.slice(0, 5).map((item, index) => (
             <TouchableOpacity
               key={index}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
+              style={{ flexDirection: 'row', alignItems: 'center'}}
               onPress={() => handleItemSelect(item, 'common')}
             >
               <CheckBox
+              style={{ margin:Platform.OS==='ios'?3:1  }}
                 disabled={false}
                 value={selectedItems?.length ? selectedItems.includes(item.food_name) : null}
               // onValueChange={() => handleItemSelect(item)}
