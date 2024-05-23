@@ -67,7 +67,7 @@ async function addPostAPI(data) {
 function* AddPost({ data }) {
   try {
     const response = yield call(addPostAPI, data)
-    navigate("Feeds")
+    navigate("BottomBar")
     yield put(reset())
     // yield put((getFeedsRequest(1)))
   } catch (e) {

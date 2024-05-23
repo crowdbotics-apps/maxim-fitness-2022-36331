@@ -18,7 +18,7 @@ import moment from "moment"
 import { launchImageLibrary } from "react-native-image-picker"
 import ImageView from "react-native-image-viewing"
 import EmojiPicker from "rn-emoji-keyboard"
-
+import Video from "react-native-video"
 import { Images } from "src/theme"
 import { Text, Header, Loader } from "../../components"
 import { usePubNub } from "pubnub-react"
@@ -31,14 +31,15 @@ import {
   messageTimeTokene,
   getPubNubTimetoken
 } from "../../utils/chat"
+import Modal from "react-native-modal"
 
 const { width } = Dimensions.get("window")
+let deviceHeight = Dimensions.get("window").height
 
-const { backImage, sendMessage, profile, uploadMedia, messageImage } = Images
+const { backImage, sendMessage, profile, uploadMedia, messageImage, videoThumbnail } = Images
 const ChatScreen = props => {
   const { navigation, profileUserData, requesting, userProfile, route } = props
   const pubnub = usePubNub()
-
   const { state, dispatch } = useStore()
   const { item } = route.params
   const scrollViewRef = useRef()
@@ -49,6 +50,7 @@ const ChatScreen = props => {
   const [isOpen, setIsOpen] = useState(false)
   const [isUpload, setIsUpload] = useState(false)
   const [currentlySelected, setCurrentlySelected] = useState([])
+  const [showModal, setShowModal] = useState(false)
 
   const [loading, setLoading] = useState(false)
 
@@ -73,7 +75,7 @@ const ChatScreen = props => {
               }
             ]
           })
-          .then(res => {})
+          .then(res => { })
       )
     }
   }
@@ -188,7 +190,7 @@ const ChatScreen = props => {
           }
         ]
       })
-      .then(res => {})
+      .then(res => { })
   }
   const fileUpload = async (item, res) => {
     try {
@@ -225,11 +227,11 @@ const ChatScreen = props => {
           ]
         })
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const pickImage = () => {
-    launchImageLibrary({ mediaType: "photo" }).then(res => {
+    launchImageLibrary({ mediaType: "mixed" }).then(res => {
       if (res?.didCancel) {
         return
       }
@@ -251,37 +253,81 @@ const ChatScreen = props => {
     else setCurrentlySelected(prev => [...prev, emoji.name])
   }
 
+  // const renderMessageImage = props => {
+  //   let result = ""
+  //   try {
+  //     result = props?.id
+  //       ? pubnub.getFileUrl({
+  //         channel: item.id,
+  //         id: props?.id,
+  //         name: "name" in props ? props?.name : props?.image
+  //       })
+  //       : props?.image
+  //   } catch (error) {
+  //     result = props.image
+  //   }
+
+  //   return (
+  //     <TouchableOpacity
+  //       style={styles.P5}
+  //       onPress={() => {
+  //         setImageUrl(result)
+  //         setIsVisible(true)
+  //       }}
+  //     >
+  //       <Image
+  //         style={styles.ImageContainer}
+  //         // resizeMode="cover"
+  //         source={{ uri: result }}
+  //       />
+  //     </TouchableOpacity>
+  //   )
+  // }
+
   const renderMessageImage = props => {
-    let result = ""
-    try {
-      result = props?.id
-        ? pubnub.getFileUrl({
-            channel: item.id,
-            id: props?.id,
-            name: "name" in props ? props?.name : props?.image
-          })
-        : props?.image
-    } catch (error) {
-      result = props.image
+
+    let mediaUrl = '';
+    let mediaType = 'image';
+
+    // Determine the media URL and type
+    if (props?.id && props?.name) {
+      mediaUrl = pubnub.getFileUrl({
+        channel: item.id,
+        id: props?.id,
+        name: "name" in props ? props?.name : props?.image
+      })
+      // Check the file extension to determine media type
+      const fileExtension = props?.name.split('.').pop().toLowerCase();
+      if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileExtension)) {
+        mediaType = 'video';
+      }
+    } else if (props?.image) {
+      mediaUrl = props?.image;
     }
 
     return (
       <TouchableOpacity
         style={styles.P5}
         onPress={() => {
-          setImageUrl(result)
-          setIsVisible(true)
+          mediaType === 'video' ? setShowModal(true) : setIsVisible(true);
+          setImageUrl(mediaUrl);
         }}
       >
-        <Image
-          style={styles.ImageContainer}
-          // resizeMode="cover"
-          source={{ uri: result }}
-        />
-      </TouchableOpacity>
-    )
-  }
+        {mediaType === 'video' ? (
+          <Image
+            style={styles.ImageContainer}
+            source={videoThumbnail}
+          />
+        ) : (
+          <Image
+            style={styles.ImageContainer}
+            source={{ uri: mediaUrl }}
+          />
 
+        )}
+      </TouchableOpacity>
+    );
+  };
   return (
     <>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -312,12 +358,12 @@ const ChatScreen = props => {
               <Image
                 source={
                   userProfile?.id === item?.custom?.owner &&
-                  item?.custom?.otherUserImage
+                    item?.custom?.otherUserImage
                     ? { uri: item?.custom?.otherUserImage }
                     : userProfile?.id !== item?.custom?.owner &&
                       item?.custom?.ownerImage
-                    ? { uri: item?.custom?.ownerImage }
-                    : profile
+                      ? { uri: item?.custom?.ownerImage }
+                      : profile
                 }
                 style={{
                   height: (61 / 375) * width,
@@ -350,7 +396,7 @@ const ChatScreen = props => {
               <Text
                 text={
                   item?.name?.split("-")[
-                    userProfile?.id === item.custom.owner ? 1 : 0
+                  userProfile?.id === item.custom.owner ? 1 : 0
                   ]
                 }
                 style={{
@@ -379,27 +425,52 @@ const ChatScreen = props => {
                 </View>
               ) : (
                 messages &&
-                messages?.map(items => (
-                  <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                    {(items?.message?.sender ||
-                      items?.message?.message?.sender) === userProfile.id ? (
-                      <>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "flex-end",
-                            flex: 1
-                          }}
-                        >
-                          <View style={[styles.senderStyle]}>
-                            {items?.message?.file ? (
-                              <>
-                                {renderMessageImage(items?.message?.file)}
+                messages?.map(items => {
+                  return (
+                    <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                      {(items?.message?.sender ||
+                        items?.message?.message?.sender) === userProfile.id ? (
+                        <>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "flex-end",
+                              flex: 1
+                            }}
+                          >
+                            <View style={[styles.senderStyle]}>
+                              {items?.message?.file ? (
+                                <>
+                                  {renderMessageImage(items?.message?.file)}
+                                  <View
+                                    style={{
+                                      alignItems: "flex-end"
+                                    }}
+                                  >
+                                    <Text
+                                      text={`${messageTimeTokene(
+                                        items?.timetoken
+                                      )}`}
+                                      bold
+                                      style={{
+                                        fontSize: 12,
+                                        opacity: 0.6,
+                                        color: "#626262"
+                                      }}
+                                    />
+                                  </View>
+                                </>
+                              ) : (
                                 <View
                                   style={{
                                     alignItems: "flex-end"
                                   }}
                                 >
+                                  <Text
+                                    text={items?.message?.message}
+                                    bold
+                                    style={{ fontSize: 14, color: "#626262" }}
+                                  />
                                   <Text
                                     text={`${messageTimeTokene(
                                       items?.timetoken
@@ -412,22 +483,59 @@ const ChatScreen = props => {
                                     }}
                                   />
                                 </View>
+                              )}
+                            </View>
+                            <Image
+                              source={
+                                userProfile?.profile_picture
+                                  ? { uri: userProfile?.profile_picture }
+                                  : profile
+                              }
+                              style={styles.imageStyle}
+                            />
+                          </View>
+                        </>
+                      ) : (
+                        <View
+                          style={{
+                            flexDirection: "row"
+                          }}
+                        >
+                          <Image
+                            source={
+                              userProfile?.id === item?.custom?.owner &&
+                                item?.custom?.otherUserImage
+                                ? { uri: item?.custom?.otherUserImage }
+                                : userProfile?.id !== item?.custom?.owner &&
+                                  item?.custom?.ownerImage
+                                  ? { uri: item?.custom?.ownerImage }
+                                  : profile
+                            }
+                            style={styles.imageStyle}
+                          />
+                          <View style={styles.receiverStyle}>
+                            {items?.message?.file ? (
+                              <>
+                                {renderMessageImage(items?.message?.file)}
+                                <Text
+                                  text={`${messageTimeTokene(items?.timetoken)}`}
+                                  bold
+                                  style={{
+                                    fontSize: 12,
+                                    opacity: 0.6,
+                                    color: "#626262"
+                                  }}
+                                />
                               </>
                             ) : (
-                              <View
-                                style={{
-                                  alignItems: "flex-end"
-                                }}
-                              >
+                              <View>
                                 <Text
                                   text={items?.message?.message}
                                   bold
                                   style={{ fontSize: 14, color: "#626262" }}
                                 />
                                 <Text
-                                  text={`${messageTimeTokene(
-                                    items?.timetoken
-                                  )}`}
+                                  text={`${messageTimeTokene(items?.timetoken)}`}
                                   bold
                                   style={{
                                     fontSize: 12,
@@ -438,71 +546,11 @@ const ChatScreen = props => {
                               </View>
                             )}
                           </View>
-                          <Image
-                            source={
-                              userProfile?.profile_picture
-                                ? { uri: userProfile?.profile_picture }
-                                : profile
-                            }
-                            style={styles.imageStyle}
-                          />
                         </View>
-                      </>
-                    ) : (
-                      <View
-                        style={{
-                          flexDirection: "row"
-                        }}
-                      >
-                        <Image
-                          source={
-                            userProfile?.id === item?.custom?.owner &&
-                            item?.custom?.otherUserImage
-                              ? { uri: item?.custom?.otherUserImage }
-                              : userProfile?.id !== item?.custom?.owner &&
-                                item?.custom?.ownerImage
-                              ? { uri: item?.custom?.ownerImage }
-                              : profile
-                          }
-                          style={styles.imageStyle}
-                        />
-                        <View style={styles.receiverStyle}>
-                          {items?.message?.file ? (
-                            <>
-                              {renderMessageImage(items?.message?.file)}
-                              <Text
-                                text={`${messageTimeTokene(items?.timetoken)}`}
-                                bold
-                                style={{
-                                  fontSize: 12,
-                                  opacity: 0.6,
-                                  color: "#626262"
-                                }}
-                              />
-                            </>
-                          ) : (
-                            <View>
-                              <Text
-                                text={items?.message?.message}
-                                bold
-                                style={{ fontSize: 14, color: "#626262" }}
-                              />
-                              <Text
-                                text={`${messageTimeTokene(items?.timetoken)}`}
-                                bold
-                                style={{
-                                  fontSize: 12,
-                                  opacity: 0.6,
-                                  color: "#626262"
-                                }}
-                              />
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                ))
+                      )}
+                    </View>
+                  )
+                })
               )}
             </View>
           </ScrollView>
@@ -535,12 +583,12 @@ const ChatScreen = props => {
               style={{
                 flexDirection: "row",
                 flex: 1,
-                justifyContent: "space-between",
+                justifyContent: "space-evenly",
                 alignItems: "center",
                 marginHorizontal: 5
               }}
             >
-              <TouchableOpacity onPress={() => setIsOpen(true)}>
+              {/* <TouchableOpacity onPress={() => setIsOpen(true)}>
                 <Image
                   source={Images.emoji}
                   style={{
@@ -548,7 +596,7 @@ const ChatScreen = props => {
                     width: (25 / 375) * width
                   }}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity onPress={pickImage}>
                 <Image
                   source={uploadMedia}
@@ -590,6 +638,65 @@ const ChatScreen = props => {
               )}
             />
           )}
+          <Modal
+            isVisible={showModal}
+            onBackdropPress={() => setShowModal(false)}
+            style={{ flex: 1, margin: 0, padding: 0 }}
+          >
+            <SafeAreaView style={{ flex: 1 }}>
+              <View style={styles.imageModal}>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                  {loading && (
+                    <View
+                      style={{
+                        alignSelf: "center",
+                        position: "absolute"
+                      }}
+                    >
+                      <ActivityIndicator size="large" color="white" />
+                    </View>
+                  )}
+                  <Video
+                    source={{
+                      uri: imageUrl
+                    }}
+                    muted={false}
+                    repeat={true}
+                    resizeMode="contain"
+                    style={styles.videoStyle}
+                    rate={1}
+                    posterResizeMode="stretch"
+                    playInBackground={true}
+                    playWhenInactive={true}
+                    ignoreSilentSwitch="ignore"
+                    disableFocus={true}
+                    mixWithOthers={"mix"}
+                    controls={true}
+                    onLoadStart={() => setLoading(true)}
+                    onLoad={() => setLoading(false)}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => setShowModal(false)}
+                  style={{
+                    justifyContent: "flex-end",
+                    right: 20,
+                    alignItems: "flex-end",
+                    position: "absolute",
+                    marginTop: 20
+                  }}
+                >
+                  <Image
+                    source={Images.closeBtn}
+                    style={{
+                      height: 35,
+                      width: 35
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </SafeAreaView>
+          </Modal>
           <EmojiPicker
             onEmojiSelected={handleOnEmojiSelected}
             open={isOpen}
@@ -646,7 +753,23 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: 10,
     marginTop: Platform.OS === "android" ? 0 : 30
-  }
+  },
+  videoStyle: {
+    height: "100%",
+    resizeMode: "contain",
+    width: "100%"
+  },
+  imageModal: {
+    backgroundColor: "black",
+    paddingHorizontal: 5,
+    flex: 1,
+    paddingTop: 20
+  },
+  modalStyle: {
+    height: deviceHeight * 0.3,
+    borderRadius: 20,
+    backgroundColor: "white"
+  },
 })
 
 const mapStateToProps = state => ({

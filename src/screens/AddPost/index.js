@@ -115,7 +115,7 @@ const AddPost = props => {
                     item["thumbnail"] = thumbnail
                     setImageData(previous => [...previous, item])
                   })
-                  .catch(err => {})
+                  .catch(err => { })
               } else {
                 setImageData(previous => [...previous, item])
               }
@@ -175,6 +175,7 @@ const AddPost = props => {
             }}
             placeholder="Enter post title"
             placeholderTextColor="#525252"
+            multiline={true}
           />
         ) : (
           <TouchableOpacity

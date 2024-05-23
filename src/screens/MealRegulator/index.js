@@ -38,7 +38,7 @@ const MealRegulator = props => {
     Voice.destroy().then(Voice.removeAllListeners)
     try {
       await Voice.stop()
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onSpeechPartialResults = e => {
@@ -49,16 +49,16 @@ const MealRegulator = props => {
     try {
       await Voice.start("en-US")
       setPartialResults([])
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onStart = async () => {
     const hasPermission = await checkAndRequestMicrophonePermission()
     if (hasPermission) {
       setIsRecording(true)
-      setTimeout(() => {
-        startRecognizing()
-      }, 400)
+      // setTimeout(() => {   
+      startRecognizing()
+      // }, 400)
     } else {
       Alert.alert(
         "Permission Required",
@@ -85,13 +85,15 @@ const MealRegulator = props => {
     Voice.destroy().then(Voice.removeAllListeners)
     try {
       await Voice.stop()
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const reviewFood = () => {
     onStop()
-    props.getSpeechRequest(partialResults)
-    navigation.navigate("LogFoods")
+    // props.getSpeechRequest(partialResults.flatMap(item => item.split(' ')))
+    // navigation.navigate("LogFoods",)
+    navigation.navigate("SelectBrand", { items: partialResults || " " })
+
     setPartialResults([])
   }
 

@@ -50,7 +50,23 @@ import { modules } from "@modules"
 import SubscriptionScreen from "../screens/Subscription"
 import { connect } from "react-redux"
 import { profileData } from "../ScreenRedux/profileRedux"
-const { home, profileTab, feed, nutrition, exercise } = Images
+const { home,
+  profileTab,
+  feed,
+  nutrition,
+  exercise,
+  mealsBlue,
+  feedBlue,
+  dashboardBlue,
+  exerciseBlue,
+  profileBlue,
+  mealsGray,
+  feedGray,
+  dashboardGray,
+  exerciseGray,
+  profileGray
+} = Images
+
 
 // const Chat = modules[0].value.navigator;
 const mainStack = createStackNavigator()
@@ -63,6 +79,7 @@ export const BottomNavigator = () => {
       initialRouteName="Feed"
       screenOptions={({ route }) => ({
         tabBarStyle: {
+          backgroundColor: "white",
           shadowColor: "#000",
           shadowOffset: {
             width: 0,
@@ -91,18 +108,19 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Home</Text>
+              <Text style={[styles.text, { color: focused ? "#0460BB" : "gray" }]}>Meals</Text>
               <View
                 style={[
                   styles.bottom,
-                  { borderBottomColor: focused ? "#0460BB" : "white" }
+                  { borderBottomColor: "white" }
+
                 ]}
               />
             </View>
           ),
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View style={styles.tabIcon}>
-              <Image source={home} style={styles.iconStyle1} />
+              <Image source={focused ? mealsBlue : mealsGray} style={styles.iconStyle1} />
             </View>
           ),
           header: () => null
@@ -115,18 +133,18 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Profile</Text>
+              <Text style={[styles.text, { color: focused ? "#0460BB" : "gray" }]}>Profile</Text>
               <View
                 style={[
                   styles.bottom,
-                  { borderBottomColor: focused ? "#0460BB" : "white" }
+                  { borderBottomColor: "white" }
                 ]}
               />
             </View>
           ),
           tabBarIcon: ({ focused }) => (
             <View style={styles.tabIcon}>
-              <Image source={profileTab} style={styles.image1} />
+              <Image source={focused ? profileBlue : profileGray} style={styles.image1} />
             </View>
           ),
           header: () => null
@@ -139,18 +157,19 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Feed</Text>
+              <Text style={[styles.text, { color: focused ? "#0460BB" : "gray" }]}>Feed</Text>
               <View
                 style={[
                   styles.bottom,
-                  { borderBottomColor: focused ? "#0460BB" : "white" }
+                  { borderBottomColor: "white" }
+
                 ]}
               />
             </View>
           ),
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View style={styles.tabIcon}>
-              <Image source={feed} style={styles.iconStyle1} />
+              <Image source={focused ? feedBlue : feedGray} style={styles.iconStyle1} />
             </View>
           ),
           header: () => null
@@ -163,18 +182,19 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Dashboard</Text>
+              <Text style={[styles.text, { color: focused ? "#0460BB" : "gray" }]}>Dashboard</Text>
               <View
                 style={[
                   styles.bottom,
-                  { borderBottomColor: focused ? "#0460BB" : "white" }
+                  { borderBottomColor: "white" }
+
                 ]}
               />
             </View>
           ),
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View style={styles.tabIcon}>
-              <Image source={nutrition} style={styles.image2} />
+              <Image source={focused ? dashboardBlue : dashboardGray} style={styles.image2} />
             </View>
           ),
           header: () => null
@@ -187,18 +207,19 @@ export const BottomNavigator = () => {
         options={{
           tabBarLabel: ({ focused }) => (
             <View style={styles.textContainer}>
-              <Text style={styles.text}>Exercise</Text>
+              <Text style={[styles.text, { color: focused ? "#0460BB" : "gray" }]}>Exercise</Text>
               <View
                 style={[
                   styles.bottom,
-                  { borderBottomColor: focused ? "#0460BB" : "white" }
+                  { borderBottomColor: "white" }
+
                 ]}
               />
             </View>
           ),
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View style={styles.tabIcon}>
-              <Image source={exercise} style={styles.imageStyle} />
+              <Image source={focused ? exerciseBlue : exerciseGray} style={styles.imageStyle} />
             </View>
           ),
           header: () => null
@@ -226,6 +247,11 @@ export const BottomNavigator = () => {
         options={{ header: () => null }}
       />
       <Tab.Screen
+        name="ViewPost"
+        component={ViewPost}
+        options={{ header: () => null }}
+      />
+      <Tab.Screen
         name="FatLoseProgram"
         component={FatLoseProgram}
         options={{ header: () => null }}
@@ -239,10 +265,10 @@ const styles = StyleSheet.create({
   text: { fontSize: 12, color: "#0460BB" },
   bottom: { borderBottomWidth: 5, marginTop: 10, width: 33, borderRadius: 10 },
   tabIcon: { marginTop: Platform.OS === "ios" ? 5 : 18 },
-  imageStyle: { width: 26, height: 13, resizeMode: "contain" },
+  imageStyle: { width: 20, height: 20, resizeMode: "contain" },
   iconStyle1: { width: 20, height: 19, resizeMode: "contain" },
   image1: { width: 20, height: 21, resizeMode: "contain" },
-  image2: { width: 20, height: 21, resizeMode: "contain" }
+  image2: { width: 18, height: 18, resizeMode: "contain" }
 })
 
 const MainNavigator = props => {
@@ -254,7 +280,7 @@ const MainNavigator = props => {
   return (
     <mainStack.Navigator
       screenOptions={{ headerShown: false, animationEnabled: false }}
-      initialRouteName={ "BottomBar"}
+      initialRouteName={"BottomBar"}
     >
       <mainStack.Screen name="BottomBar" component={BottomNavigator} />
       <mainStack.Screen name="AddPost" component={AddPost} />

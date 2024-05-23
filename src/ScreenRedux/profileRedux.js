@@ -302,11 +302,16 @@ function* blockUserData({ data }) {
   try {
     const response = yield call(blockUserAPI, data)
     showMessage({
-      message: "Blocked user Successfully",
+      message: response.data?.id ? "Blocked user Successfully" : "Unblocked user Successfully",
       type: "success"
     })
+    response.data?.id ? navigate("Feed") : navigate("SearchProfile")
   } catch (e) {
     const { response } = e
+    showMessage({
+      message: "Something went wrong",
+      type: "success"
+    })
   }
 }
 

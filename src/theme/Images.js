@@ -51,7 +51,7 @@ export default {
   detailIcon: require("src/assets/images/icon_details_ex.png"),
   backIcon: require("src/assets/images/backIcon.png"),
   forwardIcon: require("src/assets/images/forwardIcon.png"),
-  profileBackGround: require("src/assets/images/profileBackgroung.png"),
+  profileBackGround: require("src/assets/images/profile_background.jpeg"),
   whiteBackArrow: require("src/assets/images/whitebackArrow.png"),
   whiteDots: require("src/assets/images/whitedots.png"),
   followButton: require("src/assets/images/followButton.png"),
@@ -95,6 +95,17 @@ export default {
   sendIcon: require("src/assets/images/sendIcon.png"),
   emoji: require("src/assets/images/emoji.png"),
   high_amplitude: require("src/assets/images/high_amplitude_code.gif"),
-  low_amplitude: require("src/assets/images/low_amplitude_code.gif")
-  
+  low_amplitude: require("src/assets/images/low_amplitude_code.gif"),
+  videoThumbnail: require("src/assets/images/videoThumbnail.jpg"),
+
+  mealsBlue: require("src/assets/images/Meals-blue.png"),
+  feedBlue: require("src/assets/images/Feed-blue.png"),
+  dashboardBlue: require("src/assets/images/Dashboard-blue.png"),
+  exerciseBlue: require("src/assets/images/Exercise-blue.png"),
+  profileBlue: require("src/assets/images/Profile-blue.png"),
+  mealsGray: require("src/assets/images/Meals-gray.png"),
+  feedGray: require("src/assets/images/Feed-gray.png"),
+  dashboardGray: require("src/assets/images/Dashboard-gray.png"),
+  exerciseGray: require("src/assets/images/Exercise-gray.png"),
+  profileGray: require("src/assets/images/Profile-gray.png"),
 }

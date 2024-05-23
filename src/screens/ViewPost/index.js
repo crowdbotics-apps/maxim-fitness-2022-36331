@@ -44,12 +44,12 @@ import {
   getFeedsSuccess
 } from "../../ScreenRedux/feedRedux"
 import Share from "react-native-share"
+import { useNavigation } from "@react-navigation/native"
 
 let deviceHeight = Dimensions.get("window").height
 
 const ViewPost = props => {
   const {
-    navigation: { goBack },
     route,
     requesting,
     postData,
@@ -58,6 +58,7 @@ const ViewPost = props => {
     loading,
     deleteLoading
   } = props
+  const navigation = useNavigation()
   let deviceWidth = Dimensions.get("window").width
   const [commentData, setCommentData] = useState(false)
   const [postComments, setPostComments] = useState([])
@@ -88,18 +89,18 @@ const ViewPost = props => {
     if (postData && postData?.comments?.length > 0) {
       let data = [
         postData &&
-          postData?.comments?.length &&
-          postData.comments.map(item => ({
-            image: item?.user?.profile_picture,
-            text: item.content,
-            userName: item.user.username,
-            id: item.id,
-            userId: item.user.id,
-            liked: item.liked,
-            likes: item.likes,
-            created_at: item.created,
-            subComment: item.sub_comment.length ? item.sub_comment : []
-          }))
+        postData?.comments?.length &&
+        postData.comments.map(item => ({
+          image: item?.user?.profile_picture,
+          text: item.content,
+          userName: item.user.username,
+          id: item.id,
+          userId: item.user.id,
+          liked: item.liked,
+          likes: item.likes,
+          created_at: item.created,
+          subComment: item.sub_comment.length ? item.sub_comment : []
+        }))
       ]
       setPostComments(data[0])
     } else {
@@ -226,8 +227,8 @@ const ViewPost = props => {
       }
     })
     await Share.open(options)
-      .then(res => {})
-      .catch(err => {})
+      .then(res => { })
+      .catch(err => { })
   }
 
   const likeSubComment = item => {
@@ -242,7 +243,7 @@ const ViewPost = props => {
   const addLikeAction = () => {
     let feedId = param?.id
     likeFilter(feedId)
-    const callBack = status => {}
+    const callBack = status => { }
 
     const data = { feedId, callBack }
     props.postLikeRequest(data)
@@ -342,11 +343,11 @@ const ViewPost = props => {
           <>
             <ScrollView
               contentContainerStyle={styles.mainContainer}
-              // keyboardShouldPersistTaps="handled"
+            // keyboardShouldPersistTaps="handled"
             >
               <TouchableOpacity
                 style={styles.leftArrow}
-                onPress={() => goBack()}
+                onPress={() => navigation.navigate('Feed')}
               >
                 <Image
                   source={Images.backArrow}
@@ -367,17 +368,17 @@ const ViewPost = props => {
                 <SliderBox
                   images={
                     param &&
-                    (param?.post_image?.length && param?.post_video?.length) > 0
+                      (param?.post_image?.length && param?.post_video?.length) > 0
                       ? [...param.post_image, ...param.post_video].map(item =>
-                          item?.image ? item?.image : item?.video_thumbnail
-                        )
+                        item?.image ? item?.image : item?.video_thumbnail
+                      )
                       : param?.post_image?.length > 0 &&
                         param?.post_video?.length === 0
-                      ? param?.post_image?.map(item => item?.image)
-                      : param?.post_video?.length > 0 &&
-                        param?.post_image?.length === 0
-                      ? param?.post_video.map(item => item?.video_thumbnail)
-                      : []
+                        ? param?.post_image?.map(item => item?.image)
+                        : param?.post_video?.length > 0 &&
+                          param?.post_image?.length === 0
+                          ? param?.post_video.map(item => item?.video_thumbnail)
+                          : []
                   }
                   style={styles.foodImageStyle}
                   sliderBoxHeight={260}
@@ -542,9 +543,9 @@ const ViewPost = props => {
                                 source={
                                   subComment?.user_detail?.profile_picture
                                     ? {
-                                        uri: subComment?.user_detail
-                                          ?.profile_picture
-                                      }
+                                      uri: subComment?.user_detail
+                                        ?.profile_picture
+                                    }
                                     : Images.profile
                                 }
                                 style={styles.profileImg}

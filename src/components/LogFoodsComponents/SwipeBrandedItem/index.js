@@ -40,7 +40,7 @@ const SwipeBrandedItem = ({ item, index, value, onChangeText, calories }) => {
             <View style={styles.inputWrapperContainer}>
               <TextInput
                 style={styles.quantityText}
-                onChangeText={onChangeText}
+                onChangeText={(e) => onChangeText(e, item)}
                 value={value}
               />
             </View>

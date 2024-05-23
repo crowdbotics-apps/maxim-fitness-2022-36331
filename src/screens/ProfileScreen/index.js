@@ -15,7 +15,7 @@ import {
 import { Text, BottomSheet, Loader } from "../../components"
 import { Images, Colors } from "src/theme"
 import { connect } from "react-redux"
-import { useIsFocused } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import Video from "react-native-video"
 import ImageView from "react-native-image-viewing"
 import Modal from "react-native-modal"
@@ -34,7 +34,6 @@ import {
 
 const ProfileScreen = props => {
   const {
-    navigation,
     route,
     profileData,
     userDetail,
@@ -42,6 +41,7 @@ const ProfileScreen = props => {
     routeDetail,
     backScreenName
   } = props
+  const navigation = useNavigation()
   const [follow, setFollow] = useState(profileData?.follow)
   const [showVideo, setShowVideo] = useState(false)
   const [showLoader, setShowLoader] = useState(false)
@@ -60,7 +60,8 @@ const ProfileScreen = props => {
     flagIcon,
     editProfileButton,
     followingButton,
-    circleClose
+    circleClose,
+    profile
   } = Images
 
   const isFocused = useIsFocused()
@@ -88,13 +89,13 @@ const ProfileScreen = props => {
     userDetail?.id === routeDetail?.user?.id || !routeDetail
       ? navigation.navigate("EditProfile")
       : follow
-      ? [
+        ? [
           setFollow(!follow),
           props.unFollowUser({
             id: routeDetail ? routeDetail?.user?.id : userDetail.id
           })
         ]
-      : [
+        : [
           setFollow(!follow),
           props.followUser({
             id: routeDetail ? routeDetail?.user?.id : userDetail.id
@@ -288,11 +289,11 @@ const ProfileScreen = props => {
                         userDetail?.background_picture
                         ? { uri: userDetail?.background_picture }
                         : routeDetail?.user?.background_picture
-                        ? { uri: routeDetail?.user?.background_picture }
-                        : profileBackGround
+                          ? { uri: routeDetail?.user?.background_picture }
+                          : profileBackGround
                       : !routeDetail && userDetail?.background_picture
-                      ? { uri: userDetail?.background_picture }
-                      : profileBackGround
+                        ? { uri: userDetail?.background_picture }
+                        : profileBackGround
                   }
                   style={{ height: (273 / 375) * width, width: "100%" }}
                 >
@@ -300,36 +301,37 @@ const ProfileScreen = props => {
                     {!(
                       userDetail?.id === routeDetail?.user?.id || !routeDetail
                     ) && (
-                      <View style={styles.backBtn}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            props.routeData(false)
-                            navigation.navigate({
-                              name: route?.params?.backScreenName
-                                ? route?.params?.backScreenName
-                                : "Feeds"
-                            })
-                          }}
-                        >
-                          <Image
-                            source={whiteBackArrow}
-                            style={{ height: 20, width: 25 }}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => refRBSheet.current.open()}
-                        >
-                          <Image
-                            source={whiteDots}
-                            style={{
-                              height: 15,
-                              width: 25,
-                              resizeMode: "contain"
+                        <View style={styles.backBtn}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              props.routeData(false)
+                              navigation.navigate({
+                                name: route?.params?.backScreenName === 'SearchProfile'
+                                  ? 'SearchProfile'
+                                  : "Feed"
+                              })
                             }}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    )}
+                          >
+
+                            <Image
+                              source={whiteBackArrow}
+                              style={{ height: 20, width: 25 }}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => refRBSheet.current.open()}
+                          >
+                            <Image
+                              source={whiteDots}
+                              style={{
+                                height: 15,
+                                width: 25,
+                                resizeMode: "contain"
+                              }}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      )}
                   </View>
                 </ImageBackground>
                 <View style={styles.profileImage}>
@@ -340,18 +342,18 @@ const ProfileScreen = props => {
                           userDetail?.profile_picture
                           ? { uri: userDetail?.profile_picture }
                           : routeDetail?.user?.profile_picture
-                          ? { uri: routeDetail?.user?.profile_picture }
-                          : profileBackGround
+                            ? { uri: routeDetail?.user?.profile_picture }
+                            : profile
                         : !routeDetail && userDetail?.profile_picture
-                        ? { uri: userDetail?.profile_picture }
-                        : profileBackGround
+                          ? { uri: userDetail?.profile_picture }
+                          : profile
                     }
                     style={{
                       height: 100,
                       width: 100,
                       borderRadius: 50,
                       borderWidth: 2,
-                      borderColor: "white"
+                      borderColor: "white",
                     }}
                   />
                 </View>
@@ -366,10 +368,10 @@ const ProfileScreen = props => {
                     text={
                       profileData?.user_detail?.first_name
                         ? letterCapitalize(
-                            profileData?.user_detail?.first_name
-                          ) +
-                          " " +
-                          letterCapitalize(profileData?.user_detail?.last_name)
+                          profileData?.user_detail?.first_name
+                        ) +
+                        " " +
+                        letterCapitalize(profileData?.user_detail?.last_name)
                         : letterCapitalize(profileData?.user_detail?.username)
                     }
                   />
@@ -386,8 +388,8 @@ const ProfileScreen = props => {
                       userDetail?.id === routeDetail?.user?.id || !routeDetail
                         ? editProfileButton
                         : follow
-                        ? followingButton
-                        : followButton
+                          ? followingButton
+                          : followButton
                     }
                     style={{
                       height: 60,
@@ -432,7 +434,7 @@ const ProfileScreen = props => {
                   <Text style={styles.subTextStyle} text="Likes" />
                 </View>
                 <View style={{ alignItems: "center" }}>
-                  <Text style={styles.mainTextStyle} text={profileData?.post} />
+                  <Text style={styles.mainTextStyle} text={profileData?.post?.toString()} />
                   <Text style={styles.subTextStyle} text="Posts" />
                 </View>
               </View>
@@ -632,7 +634,7 @@ const ProfileScreen = props => {
               />
               <Text
                 style={[styles.mainTextStyle, { marginLeft: 30 }]}
-                text={"Block User"}
+                text={profileData?.user_detail?.block_user?.length ? "Unblock User" : "Block User"}
               />
             </TouchableOpacity>
           </View>

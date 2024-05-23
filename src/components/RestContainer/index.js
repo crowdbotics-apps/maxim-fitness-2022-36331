@@ -5,9 +5,11 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
-  StyleSheet
+  StyleSheet,
+  Platform
 } from "react-native"
 import * as Progress from "react-native-progress"
+import BackgroundTimer from 'react-native-background-timer';
 
 const RestContainer = ({
   onPress,
@@ -23,7 +25,7 @@ const RestContainer = ({
 
   useEffect(() => {
     let intervalId
-
+    if (Platform.OS === 'ios') BackgroundTimer.start();
     if (startRest) {
       setRemainingTime(resetTime || 90)
       intervalId = startCountdown(
@@ -41,6 +43,7 @@ const RestContainer = ({
 
     return () => {
       clearInterval(intervalId)
+      if (Platform.OS === 'ios') BackgroundTimer.stopBackgroundTimer()
     }
   }, [startRest, resetTime])
 
@@ -93,22 +96,24 @@ const RestContainer = ({
   )
 }
 
-function startCountdown(seconds, onUpdate, onFinish) {
-  let remainingTime = seconds
 
-  const updateInterval = setInterval(() => {
-    onUpdate(remainingTime)
+function startCountdown(seconds, onUpdate, onFinish) {
+  let remainingTime = seconds;
+
+  const updateInterval = BackgroundTimer.setInterval(() => {
+    onUpdate(remainingTime);
 
     if (remainingTime <= 0) {
-      clearInterval(updateInterval)
-      onFinish()
+      BackgroundTimer.clearInterval(updateInterval);
+      onFinish();
     } else {
-      remainingTime--
+      remainingTime--;
     }
-  }, 1000)
+  }, 1000);
 
-  return updateInterval
+  return updateInterval;
 }
+
 
 const styles = StyleSheet.create({
   mainContainer: { marginTop: 20, marginHorizontal: 20 },

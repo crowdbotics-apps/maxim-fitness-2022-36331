@@ -11,7 +11,8 @@ import {
   TextInput,
   Pressable,
   ActivityIndicator,
-  FlatList
+  FlatList,
+  Alert
 } from "react-native"
 import { connect } from "react-redux"
 import { showMessage } from "react-native-flash-message"
@@ -31,7 +32,7 @@ import {
   addCustomExercise,
   getExerciseTypeRequest
 } from "../../../ScreenRedux/addExerciseRedux"
-import { setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
+import { getRepsRangeRequest, setCustom, setExerciseTitle } from "../../../ScreenRedux/programServices"
 import { transformData } from "../../../utils/utils"
 import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native"
 
@@ -56,7 +57,9 @@ const CustomExercise = props => {
     postCustomExRequest,
     exerciseTitle,
     setExerciseTitle,
-    customExercisesList
+    customExercisesList,
+    repsRangeState,
+    getRepsRangeRequest
   } = props
   const navigation = useNavigation()
   const route = useRoute()
@@ -91,6 +94,7 @@ const CustomExercise = props => {
     mints: {},
     seconds: {}
   })
+  const [repsData, setRepsData] = useState([])
   const {
     alignItemsEnd,
     row,
@@ -857,7 +861,8 @@ const CustomExercise = props => {
                 setCheckedReps(false)
                 setCheckedRest(false)
                 resetValues()
-                setExerciseIndex(index) //issue start from here
+                setExerciseIndex(index)
+                getRepsRange(item)
                 if (item?.exercises?.type?.length === 1) {
                   refRBSheet.current.open()
                 } else {
@@ -925,6 +930,18 @@ const CustomExercise = props => {
       </>
     )
   }
+  const setObject = { "Super Set": "ss", "Giant Set": "gs", "Drop Set": "ds", "Triple Drop Set": "td", "Circuit Training": "ct", "Single Set": "r" }
+  const getRepsRange = async (data) => {
+    const exerciseIds = data.exercises.type.map(exercise => exercise.exercise_id);
+    const payload = {
+      exercise_set: {
+        set_type: setObject[data?.activeSet?.item],
+        exercise_ids: exerciseIds
+      }
+    };
+    await getRepsRangeRequest(payload, true);
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -941,11 +958,12 @@ const CustomExercise = props => {
             justifyContentBetween
           ]}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            {/* <Image
               source={Images.back2}
               style={{ width: 30, height: 25, resizeMode: "contain" }}
-            />
+            /> */}
+            <Text style={styles.backButtonText}>Add More</Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
             disabled={cRequesting || title === "" || !checkSets()}
@@ -1118,13 +1136,14 @@ const CustomExercise = props => {
                 <TextInput
                   style={{
                     fontSize: 20,
-                    fontWeight: "700",
+                    fontWeight: "400",
                     color: "#5e5e5e",
                     borderBottomColor: "black",
                     borderBottomWidth: 1,
                     paddingBottom: -1,
                     maxWidth: 70,
                     minWidth: 40,
+                    numberOfLines: 1,
                     marginTop:
                       findingData()?.activeSet &&
                         (findingData()?.activeSet?.item === "Drop Set" ||
@@ -1132,10 +1151,13 @@ const CustomExercise = props => {
                         ? 0
                         : 5
                   }}
+                  maxLength={4}
                   onChangeText={val => {
                     updateDroupSets(val)
                     setReps(val)
                   }}
+                  placeholder={repsRangeState?.[0] || '0-100'}
+                  placeholderTextColor={'gray'}
                   keyboardType="number-pad"
                   value={`${reps}`}
                 />
@@ -1201,6 +1223,7 @@ const CustomExercise = props => {
                         color: "#626262"
                       }}
                       keyboardType="number-pad"
+                      placeholder="00"
                       onChangeText={val => setMinutes(val)}
                       editable={
                         findingData()?.activeSet?.item === "Single Set"
@@ -1243,6 +1266,7 @@ const CustomExercise = props => {
                       }}
                       keyboardType="number-pad"
                       maxLength={3}
+                      placeholder="00"
                       onChangeText={val => setSeconds(val)}
                       editable={
                         findingData()?.activeSet?.item === "Single Set"
@@ -1379,10 +1403,16 @@ const CustomExercise = props => {
                             minutes * 60 + parseFloat(seconds ? seconds : 0)
                         }
                       ])
-                      updateReducer("single", myData)
-
-                      refRBSheet.current.close()
-                      resetValues()
+                      if (myData.rest != 0) {
+                        updateReducer("single", myData)
+                        refRBSheet.current.close()
+                        resetValues()
+                      }
+                      else {
+                        Alert.alert(
+                          'Rest Time',
+                          "Please enter rest time")
+                      }
                     }
                     renderInputValue(selectIndex + 1)
                     renderRestInputValue(selectIndex + 1)
@@ -1396,10 +1426,17 @@ const CustomExercise = props => {
                       rest: minutes * 60 + parseFloat(seconds ? seconds : 0),
                       timer: minutes * 60 + parseFloat(seconds ? seconds : 0)
                     }
+                    if (myData.rest != 0) {
+                      updateReducer("single", myData)
+                      refRBSheet.current.close()
+                      resetValues()
+                    }
+                    else {
+                      Alert.alert(
+                        'Rest Time',
+                        "Please enter rest time")
 
-                    updateReducer("single", myData)
-                    refRBSheet.current.close()
-                    resetValues()
+                    }
                   }
                 }}
                 disabled={reps !== "" ? false : true}
@@ -1525,8 +1562,8 @@ const CustomExercise = props => {
                   </Text>
                   <TextInput
                     style={{
-                      fontSize: 24,
-                      fontWeight: "700",
+                      fontSize: 20,
+                      fontWeight: "400",
                       color: "#626262",
                       marginTop: 5,
                       borderBottomWidth: 1,
@@ -1534,6 +1571,8 @@ const CustomExercise = props => {
                       minWidth: 40
                       // marginTop: 15
                     }}
+                    maxLength={4}
+                    placeholder={repsRangeState?.[dualSetState - 1] || '0-100'}
                     value={`${temporaryReps}`}
                     keyboardType="number-pad"
                     onChangeText={val => {
@@ -1605,6 +1644,7 @@ const CustomExercise = props => {
                           paddingBottom: -10,
                           color: "#626262"
                         }}
+                        placeholder="00"
                         onChangeText={val => {
                           updateMintsSets(val)
                           setMinutes(val)
@@ -1641,6 +1681,7 @@ const CustomExercise = props => {
                           marginTop: 14,
                           color: "#626262"
                         }}
+                        placeholder="00"
                         maxLength={3}
                         value={seconds}
                         // editable={dualSetState === 1 ? false : true}
@@ -1714,7 +1755,7 @@ const CustomExercise = props => {
                     // resetValues();
                     // setTemporaryReps();
                   } else {
-                    refRBSheetDual.current.close()
+
                     setDualSetState(1)
                     setReps("")
 
@@ -1888,8 +1929,15 @@ const CustomExercise = props => {
                             )
                         }
                       }
+                      const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
+                      anyRestIsZero
+                        ? Alert.alert(
+                          'Rest Time',
+                          "Please enter rest time"
+                        ) : (
+                          updateReducer("dualSets", newData), refRBSheetDual.current.close()
+                        )
 
-                      updateReducer("dualSets", newData)
                     } else {
                       setDualSets(prevValues => [
                         ...prevValues,
@@ -2006,7 +2054,13 @@ const CustomExercise = props => {
                             )
                         }
                       }
-                      updateReducer("dualSets", newData)
+                      const anyRestIsZero = Object.values(newData).some(exercise => exercise.rest === 0);
+                      anyRestIsZero ? Alert.alert(
+                        'Rest Time',
+                        "Please enter rest time") : (
+                        updateReducer("dualSets", newData),
+                        refRBSheetDual.current.close()
+                      )
                     }
 
                     resetValues()
@@ -2424,7 +2478,17 @@ const styles = StyleSheet.create({
     width: 90,
     height: 60,
     borderRadius: 10
-  }
+  },
+  backButton: {
+    flexDirection: 'row', // Align items horizontally
+    alignItems: 'center', // Center items vertically
+    padding: 10, // Add some padding
+    backgroundColor: '#f0f0f0', // Background color
+    borderRadius: 5, // Rounded corners
+  },
+  backButtonText: {
+    marginLeft: 5, // Add some space between text and icon
+  },
 })
 
 const mapStateToProps = state => ({
@@ -2437,7 +2501,9 @@ const mapStateToProps = state => ({
   requesting: state.addExerciseReducer.requesting,
   pickedDate: state.programReducer.pickedDate,
   exerciseTitle: state.programReducer.exerciseTitle,
+  repsRangeState: state.programReducer.repsRangeState
 })
+
 
 const mapDispatchToProps = dispatch => ({
   postCustomExRequest: (data, start) =>
@@ -2446,6 +2512,7 @@ const mapDispatchToProps = dispatch => ({
   getExerciseTypeRequest: (data, search) =>
     dispatch(getExerciseTypeRequest(data, search)),
   setCustom: type => dispatch(setCustom(type)),
-  setExerciseTitle: type => dispatch(setExerciseTitle(type))
+  setExerciseTitle: type => dispatch(setExerciseTitle(type)),
+  getRepsRangeRequest: (data, request) => dispatch(getRepsRangeRequest(data, request))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

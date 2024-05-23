@@ -31,7 +31,7 @@ import validator from "../../utils/validation"
 
 const EditProfile = props => {
   const { dispatch } = useStore()
-  const { profileBackGround, cameraIcon, backArrow } = Images
+  const { profileBackGround, cameraIcon, backArrow, profile } = Images
   const { navigation, userDetail, editRequesting } = props
   const { width, height } = Dimensions.get("window")
   const pubnub = usePubNub()
@@ -216,8 +216,8 @@ const EditProfile = props => {
               state?.backgroundImage?.value?.path
                 ? { uri: state.backgroundImage.value.path }
                 : state?.backgroundImage?.value
-                ? { uri: state.backgroundImage.value }
-                : profileBackGround
+                  ? { uri: state.backgroundImage.value }
+                  : profileBackGround
             }
             style={{ height: (273 / 375) * width, width: "100%" }}
           >
@@ -251,8 +251,8 @@ const EditProfile = props => {
                 state?.profileImage?.value?.path
                   ? { uri: state.profileImage.value.path }
                   : state?.profileImage?.value
-                  ? { uri: state.profileImage.value }
-                  : profileBackGround
+                    ? { uri: state.profileImage.value }
+                    : profile
               }
               style={{
                 height: 100,

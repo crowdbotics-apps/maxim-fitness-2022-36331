@@ -56,7 +56,8 @@ const LogFoods = props => {
 
     getMealsFood,
     removeSelectedProductsAction,
-    productUnitAction
+    productUnitAction,
+    requesting
   } = props
   const [loading, setLoading] = useState(false)
   const [value, setValue] = useState("")
@@ -104,9 +105,9 @@ const LogFoods = props => {
   }, [isFocused, speechData, commonData, brandedData, scanData, mealsFood])
 
   useEffect(() => {
-    isFocused && setLoader(true)
-    setTimeout(() => setLoader(false), 3000)
-  }, [isFocused])
+    (isFocused) && setLoader(true)
+    !requesting && setTimeout(() => setLoader(false), 3000)
+  }, [isFocused, requesting])
 
   const clearAllData = () => {
     resetFoodItems()
@@ -158,31 +159,112 @@ const LogFoods = props => {
       setSpeechData(newArray)
     }
   }, [speechState])
+  // useEffect(() => {
+  //   if (brandedState) {
+  //     brandedState["total_quantity"] = brandedState.serving_qty
+  //     brandedState["localCal"] = brandedState.nf_calories
+  //     setBrandedData([brandedState])
+  //   }
+  // }, [brandedState])
   useEffect(() => {
     if (brandedState) {
-      brandedState["total_quantity"] = brandedState.serving_qty
-      brandedState["localCal"] = brandedState.nf_calories
-      setBrandedData([brandedState])
+      if (Array.isArray(brandedState)) {
+        // Handle brandedState as an array
+        const updatedBrandedState = brandedState.map((item) => {
+          if (item.foods && Array.isArray(item.foods)) {
+            const updatedFoods = item.foods.map((foodItem) => ({
+              ...foodItem,
+              total_quantity: foodItem.serving_qty,
+              localCal: foodItem.nf_calories
+            }));
+
+            return {
+              ...item,
+              foods: updatedFoods
+            };
+          }
+          return item;
+        });
+        setBrandedData(updatedBrandedState);
+      } else if (brandedState.foods && Array.isArray(brandedState.foods)) {
+        // Handle brandedState as an object
+        const updatedFoods = brandedState.foods.map((foodItem) => ({
+          ...foodItem,
+          total_quantity: foodItem.serving_qty,
+          localCal: foodItem.nf_calories
+        }));
+
+        const updatedBrandedState = {
+          ...brandedState,
+          foods: updatedFoods
+        };
+
+        setBrandedData(updatedBrandedState);
+      }
     }
-  }, [brandedState])
+  }, [brandedState]);
+
+
 
   useEffect(() => {
-    if (commonState && commonState) {
-      commonState["total_quantity"] = commonState?.serving_qty
-      commonState["localCal"] = commonState.nf_calories
+    if (commonState) {
+      if (Array.isArray(commonState)) {
+        // Handle commonState as an array
+        const updatedCommonState = commonState.map((item) => {
+          if (item.foods && Array.isArray(item.foods)) {
+            const updatedFoods = item.foods.map((foodItem) => ({
+              ...foodItem,
+              total_quantity: foodItem.serving_qty,
+              localCal: foodItem.nf_calories
+            }));
 
-      setCommonData(commonState)
+            return {
+              ...item,
+              foods: updatedFoods
+            };
+          }
+          return item;
+        });
+
+        setCommonData(updatedCommonState);
+      } else if (commonState.foods && Array.isArray(commonState.foods)) {
+        // Handle commonState as an object
+        const updatedFoods = commonState.foods.map((foodItem) => ({
+          ...foodItem,
+          total_quantity: foodItem.serving_qty,
+          localCal: foodItem.nf_calories
+        }));
+
+        const updatedCommonState = {
+          ...commonState,
+          foods: updatedFoods
+        };
+
+        setCommonData(updatedCommonState);
+      }
     }
-  }, [commonState])
+  }, [commonState]);
 
+
+
+  // useEffect(() => {
+  //   if (scannedProduct) {
+  //     scannedProduct["total_quantity"] = scannedProduct.serving_qty
+  //     scannedProduct["localCal"] = scannedProduct.nf_calories
+  //     setScanData([scannedProduct])
+  //   }
+  // }, [scannedProduct])
   useEffect(() => {
     if (scannedProduct) {
-      scannedProduct["total_quantity"] = scannedProduct.serving_qty
-      scannedProduct["localCal"] = scannedProduct.nf_calories
-      setScanData([scannedProduct])
-    }
-  }, [scannedProduct])
+      const updatedFoods = scannedProduct.foods?.map(food => ({
+        ...food,
+        total_quantity: food?.serving_qty,
+        localCal: food?.nf_calories
+      }));
 
+      setScanData([{ foods: updatedFoods }]);
+    }
+  }, [scannedProduct]);
   useEffect(() => {
     if (mealsFood.length) {
       let array = [...mealsFood]
@@ -205,7 +287,7 @@ const LogFoods = props => {
         )
         totalCarbsCalc += Math.round(
           (item?.food?.carbohydrate / item?.unit?.quantity) *
-            item.total_quantity
+          item.total_quantity
         )
         totalFatCalc += Math.round(
           (item?.food?.fat / item?.unit?.quantity) * item.total_quantity
@@ -230,32 +312,38 @@ const LogFoods = props => {
     }
   }, [speechData, commonData, brandedData, scanData])
 
-  const calProteinCarbsFat = data => {
-    let totalCalc = 0
-    let totalProteinCalc = 0
-    let totalCarbsCalc = 0
-    let totalFatCalc = 0
-    if (data && data.length) {
-      data.forEach(item => {
-        totalCalc += Math.round(
-          (item?.nf_calories / item.serving_qty) * item.total_quantity
-        )
-        totalProteinCalc += Math.round(
-          (item.nf_protein / item.serving_qty) * item.total_quantity
-        )
-        totalCarbsCalc += Math.round(
-          item.nf_total_carbohydrate * item.total_quantity
-        )
-        totalFatCalc += Math.round(
-          (item.nf_total_fat / item.serving_qty) * item.total_quantity
-        )
-      })
-    }
-    setTotalCal(totalCalc || 0)
-    setTotalProtein(totalProteinCalc || 0)
-    setTotalCarbs(totalCarbsCalc || 0)
-    setTotalFat(totalFatCalc || 0)
-  }
+
+  const calProteinCarbsFat = value => {
+    let totalCalc = 0;
+    let totalProteinCalc = 0;
+    let totalCarbsCalc = 0;
+    let totalFatCalc = 0;
+
+    value?.forEach(data => {
+      if (data && data.foods?.length) {
+        data.foods.forEach(item => {
+          totalCalc += Math.round(
+            (item?.nf_calories / item.serving_qty) * item.total_quantity
+          );
+          totalProteinCalc += Math.round(
+            (item?.nf_protein / item.serving_qty) * item.total_quantity
+          );
+          totalCarbsCalc += Math.round(
+            item.nf_total_carbohydrate * item.total_quantity
+          );
+          totalFatCalc += Math.round(
+            (item.nf_total_fat / item.serving_qty) * item.total_quantity
+          );
+        });
+      }
+    });
+
+    setTotalCal(totalCalc || 0);
+    setTotalProtein(totalProteinCalc || 0);
+    setTotalCarbs(totalCarbsCalc || 0);
+    setTotalFat(totalFatCalc || 0);
+  };
+
 
   const onDeleteSelectedProduct = item => {
     let newData = mealsFood && mealsFood?.filter(c => c.id !== item.id)
@@ -286,6 +374,7 @@ const LogFoods = props => {
     setMealsFood([])
     setCommonData([])
     setBrandedData([])
+    setScanData([])
     if (mealsFood) {
       let newData = mealsFood && mealsFood?.map(c => c.id)
       const data = {
@@ -307,10 +396,9 @@ const LogFoods = props => {
     setTotalFatFirst(0)
   }
 
-  const onDeleteVoice = item => {
+  const onDeleteVoice = (item, index) => {
     let newData = speechData.filter(c => c.food_name !== item.food_name)
     setSpeechData(newData)
-    // updateFoodItems(newData)
 
     resetFoodItems()
     setValue("")
@@ -329,46 +417,50 @@ const LogFoods = props => {
     }
   }
 
-  const onDeleteCommon = item => {
-    let newData = commonData.filter(c => c.food_name !== item.food_name)
-    setCommonData(newData)
-    // updateFoodItems(newData)
+  const onDeleteCommon = (item, index) => {
+    let newData = commonData.filter((_, i) => i !== index);
+    setCommonData(newData);
 
-    resetFoodItems()
-    setValue("")
+    resetFoodItems();
+    setValue("");
 
-    setTotalCal(0)
-    setTotalProtein(0)
-    setTotalCarbs(0)
-    setTotalFat(0)
-    setTotalCalFirst(0)
-    setTotalProteinFirst(0)
-    setTotalCarbsFirst(0)
-    setTotalFatFirst(0)
+    setTotalCal(0);
+    setTotalProtein(0);
+    setTotalCarbs(0);
+    setTotalFat(0);
+    setTotalCalFirst(0);
+    setTotalProteinFirst(0);
+    setTotalCarbsFirst(0);
+    setTotalFatFirst(0);
+
     if (mealsFood?.length) {
-      let array = [...mealsFood]
-      calcCalProteinCarbsFat(array)
+      let array = [...mealsFood];
+      calcCalProteinCarbsFat(array);
     }
   }
 
-  const onDeleteBranded = () => {
-    setBrandedData([])
-    resetFoodItems()
-    setValue("")
 
-    setTotalCal(0)
-    setTotalProtein(0)
-    setTotalCarbs(0)
-    setTotalFat(0)
-    setTotalCalFirst(0)
-    setTotalProteinFirst(0)
-    setTotalCarbsFirst(0)
-    setTotalFatFirst(0)
+  const onDeleteBranded = (item, index) => {
+    setBrandedData(prevBrandedData => prevBrandedData.filter((_, i) => i !== index));
+
+    resetFoodItems();
+    setValue("");
+
+    setTotalCal(0);
+    setTotalProtein(0);
+    setTotalCarbs(0);
+    setTotalFat(0);
+    setTotalCalFirst(0);
+    setTotalProteinFirst(0);
+    setTotalCarbsFirst(0);
+    setTotalFatFirst(0);
+
     if (mealsFood?.length) {
-      let array = [...mealsFood]
-      calcCalProteinCarbsFat(array)
+      let array = [...mealsFood];
+      calcCalProteinCarbsFat(array);
     }
   }
+
 
   const onDeleteScan = () => {
     setScanData([])
@@ -418,76 +510,76 @@ const LogFoods = props => {
     let speakVoice =
       speechData.length > 0
         ? speechData.map(item => ({
-            food_name: item.food_name,
-            nf_calories: item.nf_calories || 0,
-            nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
-            nf_protein: item.nf_protein || 0,
-            nf_total_fat: item.nf_total_fat || 0,
-            nix_item_id: item.nix_item_id || "",
-            weight: item.serving_weight_grams || 1,
-            thumb: item.photo.thumb,
-            serving_unit: item.serving_unit,
-            serving_qty: item.total_quantity,
-            created: formatedDate,
-            alt_measures: item?.alt_measures
-          }))
+          food_name: item.food_name,
+          nf_calories: item.nf_calories || 0,
+          nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
+          nf_protein: item.nf_protein || 0,
+          nf_total_fat: item.nf_total_fat || 0,
+          nix_item_id: item.nix_item_id || "",
+          weight: item.serving_weight_grams || 1,
+          thumb: item.photo.thumb,
+          serving_unit: item.serving_unit,
+          serving_qty: item.total_quantity,
+          created: formatedDate,
+          alt_measures: item?.alt_measures
+        }))
         : []
     let common =
       commonData.length > 0
         ? commonData.map(item => ({
-            food_name: item.food_name,
-            nf_calories: item.nf_calories || 0,
-            nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
-            nf_protein: item.nf_protein || 0,
-            nf_total_fat: item.nf_total_fat || 0,
-            nix_item_id: item.nix_item_id || "",
-            weight: item.serving_weight_grams || 1,
-            thumb: item.photo.thumb,
-            serving_unit: item.serving_unit,
-            serving_qty: item.total_quantity,
-            created: formatedDate,
-            alt_measures: item?.alt_measures
-          }))
+          food_name: item?.foods?.[0]?.food_name,
+          nf_calories: item?.foods?.[0]?.nf_calories || 0,
+          nf_total_carbohydrate: item?.foods?.[0]?.nf_total_carbohydrate || 0,
+          nf_protein: item?.foods?.[0]?.nf_protein || 0,
+          nf_total_fat: item?.foods?.[0]?.nf_total_fat || 0,
+          nix_item_id: item?.foods?.[0]?.nix_item_id || "",
+          weight: item?.foods?.[0]?.serving_weight_grams || 1,
+          thumb: item?.foods?.[0]?.photo.thumb,
+          serving_unit: item?.foods?.[0]?.serving_unit,
+          serving_qty: item?.foods?.[0]?.total_quantity,
+          created: formatedDate,
+          alt_measures: item?.foods?.[0]?.alt_measures
+        }))
         : []
     let branded =
       brandedData.length > 0
         ? brandedData.map(item => ({
-            food_name: item.food_name,
-            nf_calories: calculateCalories(item) || 0,
-            nf_total_carbohydrate:
-              Math.round(item?.nf_total_carbohydrate / item.serving_qty) *
-                item.total_quantity || 0,
-            nf_protein:
-              Math.round(item?.nf_protein / item.serving_qty) *
-                item.total_quantity || 0,
-            nf_total_fat:
-              Math.round(item?.nf_total_fat / item.serving_qty) *
-                item.total_quantity || 0,
-            nix_item_id: item.nix_item_id || "",
-            weight: item.serving_weight_grams || 1,
-            thumb: item.photo.thumb,
-            serving_unit: item.serving_unit,
-            serving_qty: item?.total_quantity,
-            created: formatedDate,
-            alt_measures: item?.alt_measures
-          }))
+          food_name: item?.foods?.[0]?.food_name,
+          nf_calories: calculateCalories(item?.foods?.[0]) || 0,
+          nf_total_carbohydrate:
+            Math.round(item?.foods?.[0]?.nf_total_carbohydrate / item.serving_qty) *
+            item.total_quantity || 0,
+          nf_protein:
+            Math.round(item?.foods?.[0]?.nf_protein / item?.foods?.[0].serving_qty) *
+            item?.foods?.[0].total_quantity || 0,
+          nf_total_fat:
+            Math.round(item?.foods?.[0]?.nf_total_fat / item.serving_qty) *
+            item?.foods?.[0]?.total_quantity || 0,
+          nix_item_id: item?.foods?.[0]?.nix_item_id || "",
+          weight: item?.foods?.[0]?.serving_weight_grams || 1,
+          thumb: item?.foods?.[0]?.photo.thumb,
+          serving_unit: item?.foods?.[0]?.serving_unit,
+          serving_qty: item?.foods?.[0]?.total_quantity,
+          created: formatedDate,
+          alt_measures: item?.foods?.[0]?.alt_measures
+        }))
         : []
     let scan =
       scanData.length > 0
         ? scanData.map(item => ({
-            food_name: item.food_name,
-            nf_calories: item.nf_calories || 0,
-            nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
-            nf_protein: item.nf_protein || 0,
-            nf_total_fat: item.nf_total_fat || 0,
-            nix_item_id: item.nix_item_id || "",
-            weight: item.serving_weight_grams || 1,
-            thumb: item.photo.thumb,
-            serving_unit: item.serving_unit,
-            serving_qty: item?.total_quantity,
-            created: formatedDate,
-            alt_measures: item?.alt_measures
-          }))
+          food_name: item?.foods?.[0].food_name,
+          nf_calories: item?.foods?.[0].nf_calories || 0,
+          nf_total_carbohydrate: item?.foods?.[0].nf_total_carbohydrate || 0,
+          nf_protein: item?.foods?.[0].nf_protein || 0,
+          nf_total_fat: item?.foods?.[0].nf_total_fat || 0,
+          nix_item_id: item?.foods?.[0].nix_item_id || "",
+          weight: item?.foods?.[0].serving_weight_grams || 1,
+          thumb: item?.foods?.[0].photo.thumb,
+          serving_unit: item?.foods?.[0].serving_unit,
+          serving_qty: item?.foods?.[0]?.total_quantity,
+          created: formatedDate,
+          alt_measures: item?.foods?.[0]?.alt_measures
+        }))
         : []
 
     const data = [
@@ -505,68 +597,70 @@ const LogFoods = props => {
   }
 
   const updateNutritions = async (value, item, type, index) => {
-    const query = `${
-      item?.total_quantity ? item?.total_quantity : 1
-    } ${value} ${item?.food?.name ? item?.food?.name : item.food_name}`
+    const query = `${item?.total_quantity ? item?.total_quantity : 1} ${value} ${item?.food?.name ? item?.food?.name : item.food_name}`;
 
-    const selectedData = item.alt_measures.find(
-      items => items.measure === value
-    )
+    const selectedData = item.alt_measures.find(items => items.measure === value);
 
     try {
-      const data = await getNutritions(query)
+      const data = await getNutritions(query);
 
       let foodData =
         type === "all"
           ? [...mealsFood]
           : type === "speech"
-          ? [...speechData]
-          : [...commonData]
+            ? [...speechData]
+            : [...commonData];
 
-      foodData[index] = data?.foods[0]
-      foodData[index]["alt_measures"] = item?.alt_measures
-      foodData[index]["serving_unit"] = selectedData?.measure
-      foodData[index]["total_quantity"] = item?.total_quantity
-        ? item?.total_quantity
-        : 1
-      if (item?.id) {
-        foodData[index]["id"] = item?.id
-      }
+      const updatedFood = {
+        ...data.foods[0],
+        alt_measures: item?.alt_measures,
+        serving_unit: selectedData?.measure,
+        total_quantity: item?.total_quantity ? item?.total_quantity : 1,
+        id: item?.id ? item?.id : data.foods[0]?.id,
+      };
 
-      foodData[index]["food"] = {
-        calories: data?.foods[0].nf_calories,
-        carbohydrate: data?.foods[0].nf_total_carbohydrate,
-        fat: data?.foods[0].nf_total_fat,
-        name: data?.foods[0].food_name,
-        proteins: data?.foods[0]?.nf_protein,
-        thumb: data?.foods[0]?.photo?.thumb,
-        weight: data?.foods[0]?.serving_weight_grams
-      }
+      const updatedItem = {
+        food: {
+          calories: data.foods[0].nf_calories,
+          carbohydrate: data.foods[0].nf_total_carbohydrate,
+          fat: data.foods[0].nf_total_fat,
+          name: data.foods[0].food_name,
+          proteins: data.foods[0]?.nf_protein,
+          thumb: data.foods[0]?.photo?.thumb,
+          weight: data.foods[0]?.serving_weight_grams,
+        },
+        unit: {
+          id: item?.unit?.id,
+          name: selectedData?.measure,
+          product: selectedData.product,
+          quantity: item?.total_quantity,
+          weight: selectedData?.serving_weight,
+        },
+      };
 
-      foodData[index]["unit"] = {
-        id: item?.unit?.id,
-        name: selectedData?.measure,
-        product: selectedData.product,
-        quantity: item?.total_quantity,
-        weight: selectedData?.serving_weight
+      if (type === "branded" || type === "common") {
+        foodData[index] = { foods: [updatedFood], ...updatedItem };
+      } else {
+        foodData[index] = { ...updatedFood, ...updatedItem };
       }
 
       if (type === "all") {
-        setMealsFood(foodData)
-        const itemData = foodData[index]
+        setMealsFood(foodData);
+        const itemData = foodData[index];
 
         if (itemData?.total_quantity > 0) {
-          productUnitAction(item?.unit?.id, itemData?.total_quantity, itemData)
+          productUnitAction(item?.unit?.id, itemData?.total_quantity, itemData);
         }
+      } else if (type === "speech") {
+        setSpeechData(foodData);
       } else {
-        if (type === "speech") {
-          setSpeechData(foodData)
-        } else {
-          setCommonData(foodData)
-        }
+        setCommonData(foodData);
       }
-    } catch (err) {}
-  }
+
+    } catch (err) { }
+  };
+
+
   const selectedCalories = f => {
     const data = (f?.food.calories / f?.unit?.quantity) * f.total_quantity
     return data
@@ -586,28 +680,36 @@ const LogFoods = props => {
     setSpeechData(arr)
   }
 
+
+
   const onChangeCommon = (e, index) => {
-    let arr = [...commonData]
-    let objToUpdate = arr[index]
-    objToUpdate.total_quantity = e
-    arr[index] = objToUpdate
-    setQtyCommon(e)
-    setCommonData(arr)
-  }
+    let arr = [...commonData];
+    let objToUpdate = { ...arr[index] };
+    if (objToUpdate?.foods?.[0]) {
+      objToUpdate.foods[0].total_quantity = e;
+    }
+    arr[index] = objToUpdate;
+    setQtyCommon(e);
+    setCommonData(arr);
+  };
 
   const onChangeBranded = (e, index) => {
-    let arr = [...brandedData]
-    let objToUpdate = arr[index]
-    objToUpdate.total_quantity = e
-    arr[index] = objToUpdate
-    setQtyBranded(e)
-    setBrandedData(arr)
-  }
+    let arr = [...brandedData];
+    let objToUpdate = { ...arr[index] };
+    if (objToUpdate?.foods?.[0]) {
+      objToUpdate.foods[0].total_quantity = e;
+    }
+    arr[index] = objToUpdate;
+    setQtyBranded(e);
+    setBrandedData(arr);
+  };
 
   const onChangeScan = (e, index) => {
     let arr = [...scanData]
     let objToUpdate = arr[index]
-    objToUpdate.total_quantity = e
+    if (objToUpdate?.foods?.[0]) {
+      objToUpdate.foods[0].total_quantity = e;
+    }
     arr[index] = objToUpdate
     setQtyScan(e)
     setScanData(arr)
@@ -825,13 +927,13 @@ const LogFoods = props => {
                         renderItem={({ item, index }) => {
                           return (
                             <SwipeScanItem
-                              item={item}
+                              item={item.foods[0]}
                               value={
-                                item?.total_quantity?.toString() ||
+                                item.foods[0]?.total_quantity?.toString() ||
                                 qtyScan.toString()
                               }
                               onChangeText={e => onChangeScan(e, index)}
-                              calories={calculateCalories(item)}
+                              calories={calculateCalories(item.foods[0])}
                             />
                           )
                         }}
@@ -867,13 +969,13 @@ const LogFoods = props => {
                         renderItem={({ item, index }) => {
                           return (
                             <SwipeBrandedItem
-                              item={item}
+                              item={item?.foods?.[0]}
                               value={
-                                item?.total_quantity?.toString() ||
+                                item?.foods?.[0]?.total_quantity?.toString() ||
                                 qtyBranded.toString()
                               }
                               onChangeText={e => onChangeBranded(e, index)}
-                              calories={calculateCalories(item)}
+                              calories={calculateCalories(item?.foods?.[0])}
                             />
                           )
                         }}
@@ -882,7 +984,7 @@ const LogFoods = props => {
                             <SwipeDeleteButton
                               onDeleteClicked={() => {
                                 rowMap[index].closeRow()
-                                onDeleteBranded(item)
+                                onDeleteBranded(item, index)
                               }}
                             />
                           )
@@ -908,16 +1010,16 @@ const LogFoods = props => {
                             <SwipeCommonItem
                               commonData={commonData}
                               setCommonData={setCommonData}
-                              item={item}
+                              item={item?.foods?.[0]}
                               index={index}
                               type="common"
                               updateNutritions={updateNutritions}
                               value={
-                                item?.total_quantity?.toString() ||
+                                item?.foods?.[0]?.total_quantity?.toString() ||
                                 qtyCommon.toString()
                               }
                               onChangeText={e => onChangeCommon(e, index)}
-                              caloriesCalc={calculateCalories(item)}
+                              caloriesCalc={calculateCalories(item?.foods?.[0])}
                             />
                           )
                         }}
@@ -926,7 +1028,7 @@ const LogFoods = props => {
                             <SwipeDeleteButton
                               onDeleteClicked={() => {
                                 rowMap[index].closeRow()
-                                onDeleteCommon(item)
+                                onDeleteCommon(item, index)
                               }}
                             />
                           )
@@ -970,7 +1072,7 @@ const LogFoods = props => {
                             <SwipeDeleteButton
                               onDeleteClicked={() => {
                                 rowMap[index].closeRow()
-                                onDeleteVoice(item)
+                                onDeleteVoice(item, index)
                               }}
                             />
                           )
@@ -1167,8 +1269,11 @@ const mapStateToProps = state => ({
   scannedProduct: state.nutritionReducer.scannedProduct,
   meals: state.customCalReducer.meals,
   loaderLogFood: state.nutritionReducer.loader,
-  getMealsFood: state.nutritionReducer.getMealsFoodState
+  getMealsFood: state.nutritionReducer.getMealsFoodState,
+  requesting: state.nutritionReducer.request,
+
 })
+
 
 const mapDispatchToProps = dispatch => ({
   postLogFoodRequest: (id, data) => dispatch(postLogFoodRequest(id, data)),

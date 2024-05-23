@@ -46,6 +46,7 @@ import {
 } from "../../ScreenRedux/programServices"
 import { connect } from "react-redux"
 import { useIsFocused, useRoute } from "@react-navigation/native"
+import { sortExercises } from "../../utils/utils"
 
 const ExerciseScreen = props => {
   const {
@@ -189,7 +190,7 @@ const ExerciseScreen = props => {
 
     if (isCustom) {
       await getCustomWorkoutDataRequest(route?.params?.item?.id)
-      const setId = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.sets?.[activeSet]?.id
+      const setId = await sortExercises(workoutData?.workouts?.[mainActive]?.exercises, workoutData?.workouts?.[mainActive]?.exercises_order ? selectedExercise?.exercises_order : null)?.[active]?.sets?.[activeSet]?.id
       await props.repsCustomWeightRequest(setId, null, null)
     } else {
       await getCSVWorkoutDataRequest(route?.params?.item?.id)
@@ -510,12 +511,12 @@ const ExerciseScreen = props => {
                           selectExercise(item?.exercises?.[0], 0)
                         }
                         setTimeout(() => {
-                          if (item?.exercises?.length == 1) {
-                            refModal
-                              ?.current?.close()
-                          } else {
-                            refModal.current?.open()
-                          }
+                          // if (item?.exercises?.length == 1) {
+                          //   refModal
+                          //     ?.current?.close()
+                          // } else {
+                          refModal.current?.open()
+                          // }
                         }, 800)
                       }}
                       style={[
@@ -574,8 +575,8 @@ const ExerciseScreen = props => {
         </ScrollView>
       </View>
       {selectedExercise?.length !== 0 &&
-        (selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "ss" ||
-          selectedExercise?.exercises?.[0]?.sets?.[0]?.set_type === "gs") && (
+        (sortExercises(selectedExercise?.exercises, selectedExercise?.exercises_order ? selectedExercise?.exercises_order : null)?.[0]?.sets?.[0]?.set_type === "ss" ||
+          sortExercises(selectedExercise?.exercises, selectedExercise?.exercises_order ? selectedExercise?.exercises_order : null)?.[0]?.sets?.[0]?.set_type === "gs") && (
           <View style={[row, center, secondaryBg]}>
             <ScrollView
               horizontal
@@ -591,7 +592,7 @@ const ExerciseScreen = props => {
                 style={[row, alignItemsCenter, secondaryBg, { height: 70 }]}
               >
                 {selectedExercise?.length !== 0
-                  ? selectedExercise?.exercises?.map((list, i) => (
+                  ? sortExercises(selectedExercise?.exercises, selectedExercise?.exercises_order ? selectedExercise?.exercises_order : null)?.map((list, i) => (
                     <TouchableOpacity
                       // disabled={timmer}
                       onPress={() => selectExercise(list, i)}
@@ -658,7 +659,9 @@ const ExerciseScreen = props => {
                       }}
                       resizeMode="stretch"
                       thumbnail={{ uri: item?.video_thumbnail }}
-                      disableFullscreen={false}
+                      disablFullscreen={false}
+                      repeat={true}
+                      controls={false}
                     />
                   ) : (
                     <View

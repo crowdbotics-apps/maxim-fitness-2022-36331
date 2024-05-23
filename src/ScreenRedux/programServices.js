@@ -12,6 +12,7 @@ import moment from "moment"
 import { sortSessionBySets } from "../utils/common"
 import { goBack } from "../navigation/NavigationService"
 import { showMessage } from "react-native-flash-message"
+import { sortExercises } from "../utils/utils"
 
 const ALL_SESSIONS_REQUEST = "ProgramScreen/ALL_SESSIONS_REQUEST"
 const ALL_SESSIONS_SUCCESS = "ProgramScreen/ALL_SESSIONS_SUCCESS"
@@ -70,9 +71,24 @@ const GET_WORKOUT_DETAILS_REQUEST = "ProgramScreen/GET_WORKOUT_DETAILS_REQUEST"
 const GET_CUSTOM_WORKOUT_DETAILS_SUCCESS = "ProgramScreen/GET_CUSTOM_WORKOUT_DETAILS_SUCCESS"
 
 const GET_CUSTOM_WORKOUT_DETAILS_REQUEST = "ProgramScreen/GET_CUSTOM_WORKOUT_DETAILS_REQUEST"
+const GET_REPS_RANGE_REQUEST = "ProgramScreen/GET_REPS_RANGE_REQUEST"
+const GET_REPS_RANGE_SUCCESS = "ProgramScreen/GET_REPS_RANGE_SUCCESS"
 
 
 
+
+
+
+export const getRepsRangeRequest = (data, request) => ({
+  type: GET_REPS_RANGE_REQUEST,
+  data,
+  request
+})
+
+export const getRepsRangeSuccess = data => ({
+  type: GET_REPS_RANGE_SUCCESS,
+  data
+})
 
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
@@ -280,11 +296,27 @@ const initialState = {
   allExerciseSwapped: false,
   workoutLoading: false,
   workoutData: false,
-  setDoneSuccess: false
+  setDoneSuccess: false,
+  repsRangeState: false,
+  repsRangeRequesting: false
 }
+
 
 export const programReducer = (state = initialState, action) => {
   switch (action.type) {
+
+    case GET_REPS_RANGE_REQUEST:
+      return {
+        ...state,
+        repsRangeRequesting: action.request
+      }
+    case GET_REPS_RANGE_SUCCESS:
+      return {
+        ...state,
+        repsRangeState: action.data,
+        repsRangeRequesting: false
+      }
+
     case ALL_SESSIONS_REQUEST:
       return {
         ...state,
@@ -1025,7 +1057,8 @@ function* getCustomWorkoutDetails({ data }) {
 
     const customData = yield getCustomExerciseAPI(data)
     yield put(getCustomWorkoutDataSuccess(customData.data))
-    yield put(repsCustomWeightRequest(customData?.data?.workouts?.[0]?.exercises?.[0]?.sets?.[0]?.id, null, null))
+    const setId = yield sortExercises(customData?.data?.workouts?.[0]?.exercises, customData?.data?.workouts?.[0]?.exercises_order ? customData?.data?.workouts?.[0]?.exercises_order : null)?.[0]?.sets?.[0]?.id
+    yield put(repsCustomWeightRequest(setId, null, null))
     yield put(pickSession(null, customData?.data?.workouts, null))
 
   } catch (e) {
@@ -1064,6 +1097,35 @@ function* getWorkoutDetails({ data }) {
 }
 // <============end=====workout details   ====== CSV workouts===========>
 
+// <============start====get Exercise Reps Range   ====== =========>
+
+async function getRepsRangeApi(data) {
+  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${API_URL}/exercise/exercise_reps_range/`
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`
+    },
+    method: "POST",
+    data: data
+  }
+  return XHR(URL, options)
+}
+
+function* getRepsRange({ data }) {
+  try {
+
+    const response = yield call(getRepsRangeApi, data)
+    yield put(getRepsRangeSuccess(response.data))
+  } catch (e) {
+    yield put(getRepsRangeRequest(null, false))
+
+  }
+}
+// <============end=====get Exercise Reps Range   ===========>
+
+
 
 export default all([
   takeLatest(ALL_SESSIONS_REQUEST, getAllSessions),
@@ -1080,8 +1142,6 @@ export default all([
   takeLatest(ALL_SWAP_EXERCISE, allSwapExerciseData),
   takeLatest(ALL_SWAP_CUSTOM_EXERCISE, allSwapCustomExerciseData),
   takeLatest(GET_CUSTOM_WORKOUT_DETAILS_REQUEST, getCustomWorkoutDetails),
-  takeLatest(GET_WORKOUT_DETAILS_REQUEST, getWorkoutDetails)
-
-
-
+  takeLatest(GET_WORKOUT_DETAILS_REQUEST, getWorkoutDetails),
+  takeLatest(GET_REPS_RANGE_REQUEST, getRepsRange)
 ])
