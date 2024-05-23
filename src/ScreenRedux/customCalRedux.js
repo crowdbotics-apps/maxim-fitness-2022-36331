@@ -8,7 +8,6 @@ import { API_URL } from "../config/app"
 // utils
 import XHR from "src/utils/XHR"
 import moment from "moment"
-import { Alert } from "react-native"
 
 //Types
 const GET_CALORIES_REQUEST = "CUSTOM_CAL_SCREEN/GET_CALORIES_REQUEST"
@@ -25,7 +24,6 @@ const GET_MEALS_HISTORY_SUCCESS = "CUSTOM_CAL_SCREEN/GET_MEALS_HISTORY_SUCCESS"
 const REQUIRED_CALORIES_REQUEST = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_REQUEST"
 const REQUIRED_CALORIES_SUCCESS = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_SUCCESS"
 const REQUIRED_CALORIES_FAILURE = "CUSTOM_CAL_SCREEN/REQUIRED_CALORIES_FAILURE"
-
 const initialState = {
   requesting: false,
   getCalories: false,
@@ -75,9 +73,8 @@ export const getMealsHistorySuccess = data => ({
   data
 })
 
-export const postRequiredCalRequest = (id, data) => ({
+export const postRequiredCalRequest = (data) => ({
   type: REQUIRED_CALORIES_REQUEST,
-  id,
   data
 })
 
@@ -263,26 +260,14 @@ async function postRequiredCalAPI(id, data) {
   return XHR(URL, options)
 }
 
-function* postRequiredCal({ id, data }) {
+function* postRequiredCal({ data }) {
   try {
-    const response = yield call(postRequiredCalAPI, id, data)
+    const response = yield call(postRequiredCalAPI, data.id, data.param)
     yield put(postRequiredCalSuccess(response.data))
     navigate("CustomCalories")
   } catch (e) {
-    Alert.alert(
-      "Error",
-      e.error.message || "Something went wrong",
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            navigate("EditCustomCal");
-          }
-        }
-      ]
-    );
-
-    yield put(postRequiredCalFailure(false))
+    data.callBackAction(e?.response?.data || "Something went wrong")
+    yield put(postRequiredCalFailure(e))
   }
 }
 

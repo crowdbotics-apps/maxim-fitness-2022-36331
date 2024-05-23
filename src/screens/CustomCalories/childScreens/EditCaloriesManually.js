@@ -5,24 +5,39 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView
+  SafeAreaView,
+  Modal
 } from "react-native"
 import { Text, Button } from "../../../components"
 import { Layout, Gutters, Colors, Global, Images } from "../../../theme"
 import { connect } from "react-redux"
 import { postRequiredCalRequest } from "../../../ScreenRedux/customCalRedux"
+import { navigate } from "../../../navigation/NavigationService"
+import { useNavigation } from "@react-navigation/native"
+
 
 const EditCaloriesManually = props => {
-  const { profile, consumeCalories, route } = props
+  const { profile, consumeCalories, route, rCalRequest, postRequiredCalRequest } = props
   const [param, setParam] = useState(false)
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalText, setModalText] = useState('')
   useEffect(() => {
     route && route.params && setParam(route.params)
   }, [route])
-
-  const postEditCal = () => {
-    props.postRequiredCalRequest(consumeCalories[0]?.goals_values?.id, param)
+  const navigation = useNavigation()
+  const callBackAction = (data) => {
+    setModalText(data)
+    setModalVisible(true)
   }
+  const postEditCal = () => {
+    const data = {
+      id: consumeCalories[0]?.goals_values?.id,
+      param: param,
+      callBackAction: callBackAction
+    }
+    postRequiredCalRequest(data)
+  }
+
 
   const {
     row,
@@ -61,7 +76,7 @@ const EditCaloriesManually = props => {
               { backgroundColor: Colors.primary, height: 70 }
             ]}
           >
-            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={Images.whiteBackArrow}
                 style={{ width: 30, height: 20, resizeMode: "contain" }}
@@ -284,6 +299,7 @@ const EditCaloriesManually = props => {
               }
             ]}
           >
+
             <Button
               color="primary"
               text="Save"
@@ -297,11 +313,43 @@ const EditCaloriesManually = props => {
               ]}
               loaderColor="#FFFF"
               onPress={postEditCal}
-              loading={props.rCalRequest}
+              loading={rCalRequest}
             />
           </View>
         </ScrollView>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{`Hi ${profile.first_name + ' ' + profile.last_name || 'User'}`}</Text>
+            <View style={styles.checkboxContainer}>
+
+              <Text
+                style={styles.termsText}
+              >
+                {modalText}
+              </Text>
+            </View>
+            <View style={styles.buttonContainer}>
+
+              <TouchableOpacity
+                style={[styles.button, styles.confirmButton]}
+                onPress={() => navigate("Custom")}
+
+              >
+                <Text style={styles.buttonText}>OK</Text>
+              </TouchableOpacity>
+
+
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -340,7 +388,65 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     backgroundColor: Colors.alto
-  }
+  },
+  // modal style
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxIcon: {
+    width: 18,
+    height: 18,
+  },
+  termsText: {
+    color: 'black',
+  },
+  buttonContainer: {
+    alignItems: 'flex-end',
+  },
+  button: {
+    borderRadius: 5,
+    paddingVertical: 10,
+
+  },
+  confirmButton: {
+    width: 60,
+    marginLeft: 10,
+    backgroundColor: '#0460BB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
 })
 
 const mapStateToProps = state => ({
@@ -351,8 +457,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  postRequiredCalRequest: (id, data) =>
-    dispatch(postRequiredCalRequest(id, data))
+  postRequiredCalRequest: (data) =>
+    dispatch(postRequiredCalRequest(data))
   // getMealsRequest: () => dispatch(getMealsRequest()),
 })
 export default connect(

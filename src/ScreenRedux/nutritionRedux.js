@@ -5,7 +5,7 @@ import { showMessage } from "react-native-flash-message"
 import { NIX_APP_ID, NIX_API_KEY } from '@env'
 
 // config
-import { API_URL } from "../config/app"
+import { API_URL, NUTRITIONIX_SEARCH_URL } from "../config/app"
 
 // utils
 import XHR from "src/utils/XHR"
@@ -22,8 +22,7 @@ const GET_FOODS_SEARCH_FAILURE = "NutritionScreen/GET_FOODS_SEARCH_FAILURE"
 const GET_COMMON_BRANDED_REQUEST = "NutritionScreen/GET_COMMON_BRANDED_REQUEST"
 const GET_COMMON_SUCCESS = "NutritionScreen/GET_COMMON_SUCCESS"
 const GET_BRANDED_SUCCESS = "NutritionScreen/GET_BRANDED_SUCCESS"
-const GET_COMMON_FAIL = "NutritionScreen/GET_COMMON_FAIL"
-const GET_BRANDED_FAIL = "NutritionScreen/GET_BRANDED_FAIL"
+const GET_COMMON_BRANDED_FAIL = "NutritionScreen/GET_BRANDED_FAIL"
 
 const POST_LOG_FOOD_REQUEST = "NutritionScreen/POST_LOG_FOOD_REQUEST"
 const POST_LOG_FOOD_SUCCESS = "NutritionScreen/POST_LOG_FOOD_SUCCESS"
@@ -119,13 +118,8 @@ export const brandedSuccess = data => ({
   data
 })
 
-
-export const commonFail = () => ({
-  type: GET_COMMON_FAIL
-})
-
-export const brandedFail = () => ({
-  type: GET_BRANDED_FAIL
+export const commonBrandedFail = () => ({
+  type: GET_COMMON_BRANDED_FAIL
 })
 export const postLogFoodRequest = (id, data) => ({
   type: POST_LOG_FOOD_REQUEST,
@@ -263,21 +257,17 @@ export const nutritionReducer = (state = initialState, action) => {
         commonState: action.data,
         request: false
       }
-    case GET_COMMON_FAIL:
-      return {
-        ...state,
-        commonState: false,
-        request: false
-      }
+
     case GET_BRANDED_SUCCESS:
       return {
         ...state,
         brandedState: action.data,
         request: false
       }
-    case GET_BRANDED_FAIL:
+    case GET_COMMON_BRANDED_FAIL:
       return {
         ...state,
+        commonState: false,
         brandedState: false,
         request: false
       }
@@ -355,13 +345,12 @@ function* getSpeech({ data }) {
 
 //FOODS SEARCH API
 async function getFoodsSearchAPI(data) {
-  const URL = `${API_URL}/food/search/?query=${data}`
-  const token = await AsyncStorage.getItem("authToken")
+  const URL = `${NUTRITIONIX_SEARCH_URL}/instant/?query=${data}`
   const options = {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token  ${token}`
+      "x-app-id": NIX_APP_ID,
+      "x-app-key": NIX_API_KEY
     }
   }
 
@@ -427,6 +416,7 @@ function* commonBranded({ common, branded }) {
       message: e.error.message || "Something want wrong",
       type: "danger"
     })
+    commonBrandedFail()
   }
 }
 
@@ -567,7 +557,7 @@ function* productUnitData({ itemId, value, data }) {
   } catch (e) { }
 }
 async function getScanFoodAPI(barcode) {
-  const URL = `https://trackapi.nutritionix.com/v2/search/item/?upc=${barcode}`
+  const URL = `${NUTRITIONIX_SEARCH_URL}/item/?upc=${barcode}`
   const options = {
     method: "GET",
     headers: {
@@ -580,29 +570,12 @@ async function getScanFoodAPI(barcode) {
   return XHR(URL, options)
 }
 
-// async function getScanFoodAPI(barcode) {
-//   const data = { upc: barcode }
-//   const URL = `${API_URL}/products/code/`
-//   const token = await AsyncStorage.getItem("authToken")
-//   const options = {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Token  ${token}`
-//     },
-//     data: data
-//   }
-
-//   return XHR(URL, options)
-// }
-
 function* getScanMealsFood({ data }) {
   try {
     const response = yield call(getScanFoodAPI, data)
     yield put(getScanFoodsSuccess(response.data))
     navigate("LogFoods")
   } catch (e) {
-    console.log(e, 'eee')
     goBack()
     yield put(getScanFoodsSuccess(false))
     if (e?.response?.data) {

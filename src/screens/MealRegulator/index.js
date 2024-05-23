@@ -56,9 +56,9 @@ const MealRegulator = props => {
     const hasPermission = await checkAndRequestMicrophonePermission()
     if (hasPermission) {
       setIsRecording(true)
-      setTimeout(() => {
-        startRecognizing()
-      }, 400)
+      // setTimeout(() => {   
+      startRecognizing()
+      // }, 400)
     } else {
       Alert.alert(
         "Permission Required",

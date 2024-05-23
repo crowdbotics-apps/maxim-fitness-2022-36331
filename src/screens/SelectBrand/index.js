@@ -38,7 +38,6 @@ const SelectBrand = (props) => {
   const [selectedBrandedItems, setSelectedBrandedItems] = useState([]);
   const [brandedData, setBrandedData] = useState([]);
   const [commonData, setCommonData] = useState([]);
-  console.log(route?.params?.items[0])
 
   useEffect(() => {
     value && props.getFoodsSearchRequest(value);

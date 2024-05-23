@@ -36,7 +36,7 @@ const BarCodeScreen = props => {
   })
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       const status = await Camera.requestCameraPermission()
       if (status === "authorized" || status === "granted") {
         setHasPermission(status === "authorized" || status === "granted")
