@@ -487,24 +487,34 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def code(self, request, pk=None):
-        item_id = request.GET.get('item_id')
-        upc = request.GET.get('upc')
-        item = None
+        item_id = request.data.get('item_id')
+        upc = request.data.get('upc')
         if upc:
-            item = nix.item_detail(upc=upc)
+            try:
+                response = []
+                for q in upc:
+                    result = nix.item_detail(upc=q)
+                    if not result.get("message"):
+                        response.append(result)
+                    else:
+                        return Response(result.get("message"), status=400)
+                return Response(response)
+            except Exception as e:
+                return Response({'error': str(e)}, status=500)
         elif item_id:
-            item = nix.item_detail(item_id=item_id)
-
-        if item:
-            if item.get('message'):
-                return Response(item['message'], status=status.HTTP_404_NOT_FOUND)
-            elif item.get('foods'):
-                return Response(item['foods'][0])
-                # product = Product.get_or_add_product_from_nix(item['foods'][0])
-                # serializer = self.serializer_class(product)
-                # return Response(serializer.data)
+            try:
+                response = []
+                for q in item_id:
+                    result = nix.item_detail(item_id=q)
+                    if not result.get("message"):
+                        response.append(result)
+                    else:
+                        return Response(result.get("message"), status=400)
+                return Response(response)
+            except Exception as e:
+                return Response({'error': str(e)}, status=500)
 
         return Response({'error': {'code': 'Code is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -584,18 +594,28 @@ class FoodViewSet(ViewSet):
             return Response(nix.search(query))
         return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], url_path="speech")
-    def speech_text(self, request):
-        query = request.data.get('query')
-        if query:
-            return Response(nix.food_detail(query))
-        return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
+    # @action(detail=False, methods=['post'], url_path="speech")
+    # def speech_text(self, request):
+    #     query = request.data.get('query')
+    #     if query:
+    #         return Response(nix.food_detail(query))
+    #     return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], url_path="speech")
+    @action(detail=False, methods=['post'])
     def search_food(self, request):
         query = request.data.get('query')
         if query:
-            return Response(nix.food_detail(query))
+            try:
+                response = []
+                for q in query:
+                    result = nix.food_detail(q)
+                    if not result.get("message"):
+                        response.append(result)
+                    else:
+                        return Response(result.get("message"), status=400)
+                return Response(response)
+            except Exception as e:
+                return Response({'error': str(e)}, status=500)
         return Response({'error': {'query': 'query is required'}}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -863,7 +883,7 @@ class ExerciseViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
 
     def get_queryset(self):
         queryset = self.queryset
@@ -874,6 +894,41 @@ class ExerciseViewSet(ModelViewSet):
         if exercise_type_name:
             queryset = queryset.filter(name__icontains=exercise_type_name)
         return queryset
+
+    @action(detail=False, methods=['post'])
+    def exercise_reps_range(self, request, pk=None):
+        try:
+            exercise_set = request.data.get('exercise_set')
+            set_type = exercise_set.get('set_type')
+            exercise_ids = exercise_set.get('exercise_ids', [])
+            reps_range = []
+            for exercise_id in exercise_ids:
+                min_reps = 0
+                max_reps = 100
+                program_exercises = ProgramExercise.objects.filter(exercises__exercise_id=exercise_id)
+                program_exercises = program_exercises.prefetch_related("program_exercie_sets").filter(
+                    program_exercie_sets__set_type=set_type)
+                if program_exercises.exists():
+                    all_reps = []
+                    reps_values = program_exercises.values_list('program_exercie_sets__reps', flat=True)
+                    if '/' in reps_values:
+                        for item in reps_values:
+                            # Split the 'reps' string by '/' to separate repetitions
+                            reps = item['program_exercie_sets__reps'].split('/')
+
+                            # Convert each repetition string to integer and extend to all_reps list
+                            all_reps.extend([int(r) for r in reps])
+                    else:
+                        all_reps.extend([int(r) for r in reps_values])
+                    if all_reps:
+                        min_reps = min(all_reps)
+                        max_reps = max(all_reps)
+                reps_range.append(f"{min_reps} - {max_reps}")
+            return Response(reps_range, status=200)
+        except:
+            return Response([])
+
+
 
 
 class SessionViewSet(ModelViewSet):
@@ -1803,7 +1858,12 @@ class CustomWorkoutViewSet(ModelViewSet):
 
             custom_exercise_data['name'] = name
             custom_sets_data = custom_exercise_data.pop('custom_sets', [])
-            custom_exercise = CustomExercise.objects.create(custom_workout=custom_workout, name=name)
+            exercise_json = []
+            for index, exercise in enumerate(custom_exercise_data['exercises'], start=1):
+                exercise_json.append({"order": index, "exercise": exercise})
+            # exercises_order = json.dumps(exercise_json)
+            custom_exercise = CustomExercise.objects.create(custom_workout=custom_workout, name=name,
+                                                            exercises_order=exercise_json)
             custom_exercise.exercises.set(custom_exercise_data['exercises'])
 
             # Create custom sets
@@ -1813,8 +1873,10 @@ class CustomWorkoutViewSet(ModelViewSet):
                         del custom_set_data['rest']
                     except:
                         pass
-                    custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
-                    custom_set.exercises.set([i])
+                    if custom_set_data.get('ex_id') == i:
+                        del custom_set_data['ex_id']
+                        custom_set = CustomSet.objects.create(custom_exercise=custom_exercise, **custom_set_data)
+                        custom_set.exercises.set([i])
         return Response(custom_workout_serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])

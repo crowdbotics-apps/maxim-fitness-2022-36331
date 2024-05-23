@@ -1,5 +1,7 @@
 import wget
 import os
+
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save, post_delete
@@ -314,7 +316,7 @@ class CustomWorkout(models.Model):
     user = models.ForeignKey(User, related_name='custom_workouts_users', on_delete=models.CASCADE)
     name = models.CharField(max_length=500, null=True)
     done = models.BooleanField(default=False)
-    created_date = models.DateField(null=True, blank=True, default=timezone.now)
+    created_date = models.DateTimeField(null=True, blank=True, default=timezone.now)
 
     def mark_done_completely(self):
         self.done = True
@@ -327,6 +329,7 @@ class CustomExercise(models.Model):
     custom_workout = models.ForeignKey('CustomWorkout', related_name='custom_exercises_workouts',
                                        on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=500, null=True, blank=True)
+    exercises_order = JSONField(null=True, blank=True)
 
 
 class CustomSet(models.Model):
