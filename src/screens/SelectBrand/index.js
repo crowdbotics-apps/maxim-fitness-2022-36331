@@ -126,7 +126,7 @@ const SelectBrand = (props) => {
               onPress={() => handleItemSelect(item, 'common')}
             >
               <CheckBox
-                style={{ margin: Platform.OS === 'ios' ? 3 : 1 }}
+                style={{ margin: Platform.OS === 'ios' ? 4 : 1 }}
                 disabled={false}
                 value={selectedItems?.length ? selectedItems.includes(item.food_name) : null}
               // onValueChange={() => handleItemSelect(item)}
@@ -169,6 +169,7 @@ const SelectBrand = (props) => {
               <CheckBox
                 disabled={false}
                 value={selectedItems?.length ? selectedItems.includes(item.food_name) : null}
+                style={{ margin: Platform.OS === 'ios' ? 4 : 1 }}
               // value={selectedItems.includes(item.food_name)}
               // onValueChange={() => handleItemSelect(item)}
               />

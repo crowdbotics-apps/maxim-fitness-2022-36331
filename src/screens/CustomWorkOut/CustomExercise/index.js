@@ -930,39 +930,16 @@ const CustomExercise = props => {
       </>
     )
   }
+  const setObject = { "Super Set": "ss", "Giant Set": "gs", "Drop Set": "ds", "Triple Drop Set": "td", "Circuit Training": "ct", "Single Set": "r" }
   const getRepsRange = async (data) => {
-    let setType;
-    switch (data.activeSet.item) {
-      case "Super Set":
-        setType = 'ss';
-        break;
-      case "Giant Set":
-        setType = 'gs';
-        break;
-      case "Drop Set":
-        setType = 'ds';
-        break;
-      case "Triple Drop Set":
-        setType = 'td';
-        break;
-      case "Circuit Training":
-        setType = 'ct';
-        break;
-      case "Single Set":
-        setType = 'r';
-        break;
-      default:
-        setType = 'r';
-        break;
-    }
     const exerciseIds = data.exercises.type.map(exercise => exercise.exercise_id);
     const payload = {
       exercise_set: {
-        set_type: setType,
+        set_type: setObject[data?.activeSet?.item],
         exercise_ids: exerciseIds
       }
     };
-    await getRepsRangeRequest(payload);
+    await getRepsRangeRequest(payload, true);
   };
 
 
@@ -2536,6 +2513,6 @@ const mapDispatchToProps = dispatch => ({
     dispatch(getExerciseTypeRequest(data, search)),
   setCustom: type => dispatch(setCustom(type)),
   setExerciseTitle: type => dispatch(setExerciseTitle(type)),
-  getRepsRangeRequest: data => dispatch(getRepsRangeRequest(data))
+  getRepsRangeRequest: (data, request) => dispatch(getRepsRangeRequest(data, request))
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CustomExercise)

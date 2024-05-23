@@ -73,26 +73,23 @@ const GET_CUSTOM_WORKOUT_DETAILS_SUCCESS = "ProgramScreen/GET_CUSTOM_WORKOUT_DET
 const GET_CUSTOM_WORKOUT_DETAILS_REQUEST = "ProgramScreen/GET_CUSTOM_WORKOUT_DETAILS_REQUEST"
 const GET_REPS_RANGE_REQUEST = "ProgramScreen/GET_REPS_RANGE_REQUEST"
 const GET_REPS_RANGE_SUCCESS = "ProgramScreen/GET_REPS_RANGE_SUCCESS"
-const GET_REPS_RANGE_FAILURE = "ProgramScreen/GET_REPS_RANGE_FAILURE"
 
 
 
 
 
 
-export const getRepsRangeRequest = data => ({
+export const getRepsRangeRequest = (data, request) => ({
   type: GET_REPS_RANGE_REQUEST,
-  data
+  data,
+  request
 })
 
 export const getRepsRangeSuccess = data => ({
   type: GET_REPS_RANGE_SUCCESS,
   data
 })
-export const getRepsRangeFailure = data => ({
-  type: GET_REPS_RANGE_FAILURE,
-  data
-})
+
 export const getAllSessionRequest = data => ({
   type: ALL_SESSIONS_REQUEST,
   data
@@ -311,17 +308,13 @@ export const programReducer = (state = initialState, action) => {
     case GET_REPS_RANGE_REQUEST:
       return {
         ...state,
-        repsRangeRequesting: true
+        repsRangeRequesting: action.request
       }
     case GET_REPS_RANGE_SUCCESS:
       return {
         ...state,
-        repsRangeState: action.data
-      }
-    case GET_REPS_RANGE_FAILURE:
-      return {
-        ...state,
-        repsRangeState: false
+        repsRangeState: action.data,
+        repsRangeRequesting: false
       }
 
     case ALL_SESSIONS_REQUEST:
@@ -1126,7 +1119,7 @@ function* getRepsRange({ data }) {
     const response = yield call(getRepsRangeApi, data)
     yield put(getRepsRangeSuccess(response.data))
   } catch (e) {
-    yield put(getRepsRangeFailure(false))
+    yield put(getRepsRangeRequest(null, false))
 
   }
 }
