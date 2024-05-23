@@ -156,9 +156,9 @@ def create_calories(calories, date, user):
 
 
 def calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user):
-    current_date = datetime.now().strftime('%Y-%m-%d')
-    d2 = datetime.strptime(current_date, "%Y-%m-%d")
-    age = relativedelta(d2, dob).years
+    dob = datetime.strptime(str(dob), "%Y-%m-%d")
+    current_date = datetime.now()
+    age = relativedelta(current_date, dob).years
     if u == 'Feet':
         weight = float(weight) * 0.453592
         feet_inch = height.split(".")
@@ -361,7 +361,7 @@ class ProfileViewSet(ModelViewSet):
                 activity_level = obj.activity_level
                 u = obj.unit.split("/")
                 u = u[0]
-            calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, obj)
+            calories_bmr_formula_calculation(u, weight, height, gender, activity_level, obj.dob, fitness_goal, obj)
             return Response("data updated")
 
     @action(methods=['get'], detail=True, url_path='follower', url_name='follower')
@@ -1524,7 +1524,7 @@ class CaloriesRequiredViewSet(ModelViewSet):
         activity_level = user.activity_level
         dob = user.dob
         fitness_goal = user.fitness_goal
-        required_values = calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user)
+        required_values = calories_bmr_formula_calculation(u, weight, height, gender, activity_level, str(dob), fitness_goal, user)
         exceeded = None
 
         for key, value in required_values.items():
