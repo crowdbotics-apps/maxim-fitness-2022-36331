@@ -236,8 +236,11 @@ export default class VideoPlayer extends Component {
     }
 
     this.setState({ progress: 1 })
-
-    if (!this.props.loop) {
+    if (this.props.repeat || this.props.loop) {
+      this.player.seek(0)
+      this.setState({ isPlaying: true, hasEnded: false })
+    } 
+    else if (!this.props.loop) {
       this.setState(
         { isPlaying: false },
         () => this.player && this.player.seek(0)
@@ -579,6 +582,7 @@ export default class VideoPlayer extends Component {
       pauseOnPress,
       fullScreenOnLongPress,
       customStyles,
+      repeat,
       ...props
     } = this.props
     return (
@@ -605,6 +609,7 @@ export default class VideoPlayer extends Component {
           onLoad={this.onLoad}
           source={video}
           resizeMode={resizeMode}
+          repeat={repeat}
           onSeek={this.onSeekEvent}
         />
         <View
@@ -711,7 +716,8 @@ VideoPlayer.propTypes = {
   onHideControls: PropTypes.func,
   onShowControls: PropTypes.func,
   onMutePress: PropTypes.func,
-  showDuration: PropTypes.bool
+  showDuration: PropTypes.bool,
+  repeat: PropTypes.bool
 }
 
 VideoPlayer.defaultProps = {
@@ -725,5 +731,6 @@ VideoPlayer.defaultProps = {
   pauseOnPress: false,
   fullScreenOnLongPress: false,
   customStyles: {},
-  showDuration: false
+  showDuration: false,
+  repeat: false
 }
