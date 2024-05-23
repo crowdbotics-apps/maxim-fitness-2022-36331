@@ -126,6 +126,71 @@ class LoginViewSet(ViewSet):
         return Response({'token': token.key, 'user': user_serializer.data, "subscription": subscription})
 
 
+def create_calories(calories, date, user):
+
+    carbs = (calories * 40 / 100) / 4
+    protein = (calories * 40 / 100) / 4
+
+    # Calculate grams of fat (20% of total calories, divided by 9 calories per gram)
+    fat = (calories * 20 / 100) / 9
+
+    new_values = {
+        'calories': round(calories),
+        'carbs': round(carbs),
+        'protein': round(protein),
+        'fat': round(fat)
+    }
+    object, created = CaloriesRequired.objects.update_or_create(
+        user=user,
+        created=date,
+        defaults=new_values
+    )
+    consume_cal = ConsumeCalories.objects.filter(user=user, created=timezone.now().date())
+    if consume_cal.exists():
+        ConsumeCalories.objects.update(goals_values=object)
+    else:
+        ConsumeCalories.objects.create(goals_values=object, user=user, carbs=0, fat=0, protein=0,
+                                       calories=0)
+
+    return  new_values
+
+
+def calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user):
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    d2 = datetime.strptime(current_date, "%Y-%m-%d")
+    age = relativedelta(d2, dob).years
+    if u == 'Feet':
+        weight = float(weight) * 0.453592
+        feet_inch = height.split(".")
+        total_inch = (float(feet_inch[0]) * 12) + float(feet_inch[1])
+        height = total_inch * 2.54
+    else:
+        weight = float(weight)  # Convert to float here
+        height = float(height) * 100
+    bmr = 1
+    if gender == 'Male':
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
+    if gender == 'Female':
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
+
+    if activity_level == 1:
+        rma = bmr * 1.2
+    if activity_level == 2:
+        rma = bmr * 1.375
+    if activity_level == 3:
+        rma = bmr * 1.55
+    if activity_level == 4:
+        rma = bmr * 1.725
+
+    calories = rma
+    if fitness_goal == 1:
+        calories = rma - 500
+    elif fitness_goal == 2:
+        calories = rma + 500
+
+    return create_calories(calories, current_date, user)
+
+
 class ProfileViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -139,29 +204,7 @@ class ProfileViewSet(ModelViewSet):
 
         return queryset
 
-    def create_calories(self, calories, date):
 
-        carbs = ((calories * 40) / 100) / 4
-        protein = ((calories * 40) / 100) / 4
-        fat = ((calories * 20) / 100) / 9
-
-        new_values = {
-            'calories': round(calories),
-            'carbs': carbs,
-            'protein': protein,
-            'fat': fat
-        }
-        object, created = CaloriesRequired.objects.update_or_create(
-            user=self.request.user,
-            created=date,
-            defaults=new_values
-        )
-        consume_cal = ConsumeCalories.objects.filter(user=self.request.user, created=timezone.now().date())
-        if consume_cal.exists():
-            ConsumeCalories.objects.update(goals_values=object)
-        else:
-            ConsumeCalories.objects.create(goals_values=object, user=self.request.user, carbs=0, fat=0, protein=0,
-                                           calories=0)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
@@ -318,36 +361,7 @@ class ProfileViewSet(ModelViewSet):
                 activity_level = obj.activity_level
                 u = obj.unit.split("/")
                 u = u[0]
-            if u == 'Feet':
-                weight = float(weight) * 0.453592
-                feet_inch = height.split(".")
-                total_inch = (float(feet_inch[0]) * 12) + float(feet_inch[1])
-                height = total_inch * 2.54
-            else:
-                weight = float(weight)  # Convert to float here
-                height = float(height) * 100
-            bmr = 1
-            if gender == 'Male':
-                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
-            if gender == 'Female':
-                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
-
-            if activity_level == 1:
-                rma = bmr * 1.2
-            if activity_level == 2:
-                rma = bmr * 1.375
-            if activity_level == 3:
-                rma = bmr * 1.55
-            if activity_level == 4:
-                rma = bmr * 1.725
-
-            calories = rma
-            if fitness_goal == 1:
-                calories = rma - 500
-            elif fitness_goal == 2:
-                calories = rma + 500
-            self.create_calories(calories, current_date)
-
+            calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, obj)
             return Response("data updated")
 
     @action(methods=['get'], detail=True, url_path='follower', url_name='follower')
@@ -1502,6 +1516,26 @@ class CaloriesRequiredViewSet(ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        user = instance.user
+        u = user.unit.split('/')[0]
+        weight = user.weight
+        height = user.height
+        gender = user.gender
+        activity_level = user.activity_level
+        dob = user.dob
+        fitness_goal = user.fitness_goal
+        required_values = calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user)
+        exceeded = None
+
+        for key, value in required_values.items():
+            if key == 'calories':
+                if value is not None and request.data.get(key) > value:
+                    exceeded = key
+                    break
+
+        if exceeded:
+            return Response(f"The amount of {exceeded} exceeds your required limit."
+                            f" Please, update your goal.", status=402)
         req_calories = serializer.save()
         a = ConsumeCalories.objects.filter(user=self.request.user, created=date.today())
         if a.exists():

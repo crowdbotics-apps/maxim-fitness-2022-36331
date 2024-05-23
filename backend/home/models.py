@@ -542,10 +542,10 @@ class UserProgram(models.Model):
 
 class CaloriesRequired(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_calories')
-    calories = models.IntegerField()
-    protein = models.IntegerField()
-    carbs = models.IntegerField()
-    fat = models.IntegerField()
+    calories = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True, default=0.0)
+    protein = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True, default=0.0)
+    carbs = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True, default=0.0)
+    fat = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True, default=0.0)
     created = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
