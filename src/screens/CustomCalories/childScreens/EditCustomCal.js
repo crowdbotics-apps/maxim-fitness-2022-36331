@@ -41,20 +41,34 @@ const EditCustomCal = props => {
     color: "#626262"
   }
   const data = consumeCalories[0]?.goals_values?.protein / 100
-
+  // initial values calculation of calories based on 40/40/20 rule
   useEffect(() => {
     if (consumeCalories[0]?.goals_values) {
-      consumeCalories[0]?.goals_values?.protein &&
-        setProtein(consumeCalories[0]?.goals_values?.protein / 100 / 40)
-      consumeCalories[0]?.goals_values?.carbs &&
-        setCarbs(consumeCalories[0]?.goals_values?.carbs / 40 / 100)
-      consumeCalories[0]?.goals_values?.fat &&
-        setFat(consumeCalories[0]?.goals_values?.fat / 90 / 100)
-      consumeCalories[0]?.goals_values?.calories &&
-        setCalories(consumeCalories[0]?.goals_values?.calories)
+      const { calories } = consumeCalories[0]?.goals_values;
+      if (calories) {
+        const protein = ((0.4 * calories / 1000)/4).toFixed(4);
+        const carbs = ((0.4 * calories / 1000)/4).toFixed(4);
+        const fat = ((0.2 * calories / 1000)/9).toFixed(4);
+        setProtein(Number(protein));
+        setCarbs(Number(carbs));
+        setFat(Number(fat));
+        setCalories(calories);
+      }
     }
-  }, [])
+  }, [consumeCalories]);
 
+  // useEffect(() => {
+  //   if (consumeCalories[0]?.goals_values) {
+  //     consumeCalories[0]?.goals_values?.protein &&
+  //       setProtein(consumeCalories[0]?.goals_values?.protein / 100 / 40)
+  //     consumeCalories[0]?.goals_values?.carbs &&
+  //       setCarbs(consumeCalories[0]?.goals_values?.carbs / 40 / 100)
+  //     consumeCalories[0]?.goals_values?.fat &&
+  //       setFat(consumeCalories[0]?.goals_values?.fat / 90 / 100)
+  //     consumeCalories[0]?.goals_values?.calories &&
+  //       setCalories(consumeCalories[0]?.goals_values?.calories)
+  //   }
+  // }, [])
   const postEditCal = () => {
     if (Number(countCalories()).toFixed(0) < 10) {
       showMessage({
