@@ -32,7 +32,15 @@ const EditCaloriesManually = props => {
   const postEditCal = () => {
     const data = {
       id: consumeCalories[0]?.goals_values?.id,
-      param: param,
+      param: {
+        id: consumeCalories[0]?.goals_values?.id,
+        calories: param.calories,
+        protein: param.protein / 4,
+        carbs: param.carbs / 4,
+        fat: param.fat / 9,
+        created: param.created,
+        user: param.user
+      },
       callBackAction: callBackAction
     }
     postRequiredCalRequest(data)
