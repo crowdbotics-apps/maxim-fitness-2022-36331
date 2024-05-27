@@ -135,10 +135,10 @@ def create_calories(calories, date, user):
     fat = (calories * 20 / 100) / 9
 
     new_values = {
-        'calories': round(calories),
+        'calories': (round(carbs) * 4) + (round(protein) * 4) + (round(fat) * 9),
         'carbs': round(carbs),
         'protein': round(protein),
-        'fat': round(fat)
+        'fat': round(fat),
     }
     object, created = CaloriesRequired.objects.update_or_create(
         user=user,
@@ -1528,10 +1528,9 @@ class CaloriesRequiredViewSet(ModelViewSet):
         exceeded = None
 
         for key, value in required_values.items():
-            if key == 'calories':
-                if value is not None and request.data.get(key) > value:
-                    exceeded = key
-                    break
+            if value is not None and request.data.get(key) > value:
+                exceeded = key
+                break
 
         if exceeded:
             return Response(f"The amount of {exceeded} exceeds your required limit."
