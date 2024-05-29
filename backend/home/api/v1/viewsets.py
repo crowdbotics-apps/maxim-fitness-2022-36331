@@ -126,7 +126,7 @@ class LoginViewSet(ViewSet):
         return Response({'token': token.key, 'user': user_serializer.data, "subscription": subscription})
 
 
-def create_calories(calories, date, user):
+def create_calories(calories, date, user, call_by):
 
     carbs = (calories * 40 / 100) / 4
     protein = (calories * 40 / 100) / 4
@@ -135,27 +135,28 @@ def create_calories(calories, date, user):
     fat = (calories * 20 / 100) / 9
 
     new_values = {
-        'calories': round(calories),
+        'calories': (round(carbs) * 4) + (round(protein) * 4) + (round(fat) * 9),
         'carbs': round(carbs),
         'protein': round(protein),
-        'fat': round(fat)
+        'fat': round(fat),
     }
-    object, created = CaloriesRequired.objects.update_or_create(
-        user=user,
-        created=date,
-        defaults=new_values
-    )
-    consume_cal = ConsumeCalories.objects.filter(user=user, created=timezone.now().date())
-    if consume_cal.exists():
-        ConsumeCalories.objects.update(goals_values=object)
-    else:
-        ConsumeCalories.objects.create(goals_values=object, user=user, carbs=0, fat=0, protein=0,
-                                       calories=0)
+    if call_by == 'profile':
+        object, created = CaloriesRequired.objects.update_or_create(
+            user=user,
+            created=date,
+            defaults=new_values
+        )
+        consume_cal = ConsumeCalories.objects.filter(user=user, created=timezone.now().date())
+        if consume_cal.exists():
+            ConsumeCalories.objects.update(goals_values=object)
+        else:
+            ConsumeCalories.objects.create(goals_values=object, user=user, carbs=0, fat=0, protein=0,
+                                           calories=0)
 
     return  new_values
 
 
-def calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user):
+def calories_bmr_formula_calculation(u, weight, height, gender, activity_level, dob, fitness_goal, user,call_by='profile'):
     dob = datetime.strptime(str(dob), "%Y-%m-%d")
     current_date = datetime.now()
     age = relativedelta(current_date, dob).years
@@ -188,7 +189,7 @@ def calories_bmr_formula_calculation(u, weight, height, gender, activity_level, 
     elif fitness_goal == 2:
         calories = rma + 500
 
-    return create_calories(calories, current_date, user)
+    return create_calories(calories, current_date, user, call_by)
 
 
 class ProfileViewSet(ModelViewSet):
@@ -1524,14 +1525,13 @@ class CaloriesRequiredViewSet(ModelViewSet):
         activity_level = user.activity_level
         dob = user.dob
         fitness_goal = user.fitness_goal
-        required_values = calories_bmr_formula_calculation(u, weight, height, gender, activity_level, str(dob), fitness_goal, user)
+        required_values = calories_bmr_formula_calculation(u, weight, height, gender, activity_level, str(dob), fitness_goal, user, call_by='consume_cal')
         exceeded = None
 
         for key, value in required_values.items():
-            if key == 'calories':
-                if value is not None and request.data.get(key) > value:
-                    exceeded = key
-                    break
+            if value is not None and request.data.get(key) > value:
+                exceeded = key
+                break
 
         if exceeded:
             return Response(f"The amount of {exceeded} exceeds your required limit."
