@@ -3,7 +3,7 @@ import json
 from collections import OrderedDict
 
 from django.db import transaction
-from django.db.models import Prefetch, Q, Exists, OuterRef
+from django.db.models import Prefetch, Q, Exists, OuterRef, Sum
 from django.utils import timezone
 import boto3
 from drf_yasg import openapi
@@ -369,7 +369,7 @@ class ProfileViewSet(ModelViewSet):
     def get_follower(self, request, pk):
         # instance = self.get_object()
         instance = User.objects.filter(id=pk).first()
-        likes = Post.objects.filter(user=self.request.user).aggregate(total_likes=Count('likes__id')).get('total_likes',
+        likes = Post.objects.filter(user=instance).aggregate(total_likes=Count('likes__id')).get('total_likes',
                                                                                                           0)
         post_ids = []
         follower = UserSerializer(Follow.objects.followers(instance), context={"request": request}, many=True)
@@ -473,7 +473,7 @@ class UserSearchViewSet(ModelViewSet):
         if page is not None:
             data = []
             for i in page:
-                a = Follow.objects.followers(i)
+                a = Follow.objects.follows(request.user, i)
                 f = True if a else False
                 serializer = UserSerializer(i, context={"request": request})
                 data_dic = {"user_detail": serializer.data, "follow": f}
@@ -483,7 +483,7 @@ class UserSearchViewSet(ModelViewSet):
         # If pagination is not applied
         data = []
         for i in queryset:
-            a = Follow.objects.followers(i)
+            a = Follow.objects.follows(request.user, i)
             f = True if a else False
             serializer = UserSerializer(i, context={"request": request})
             data_dic = {"user_detail": serializer.data, "follow": f}
