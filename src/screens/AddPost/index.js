@@ -51,7 +51,7 @@ const AddPost = props => {
     //   uri: videoThumbnail.path,
     //   type: videoThumbnail.mime,
     //   name: videoThumbnail.path,
-    // });
+    // })
     imageData.map((item, index) => {
       const fileExtension = item?.uri?.split(".").pop().toLowerCase()
       if (
