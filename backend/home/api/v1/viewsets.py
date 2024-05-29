@@ -473,7 +473,7 @@ class UserSearchViewSet(ModelViewSet):
         if page is not None:
             data = []
             for i in page:
-                a = Follow.objects.followers(i)
+                a = Follow.objects.follows(request.user, i)
                 f = True if a else False
                 serializer = UserSerializer(i, context={"request": request})
                 data_dic = {"user_detail": serializer.data, "follow": f}
@@ -483,7 +483,7 @@ class UserSearchViewSet(ModelViewSet):
         # If pagination is not applied
         data = []
         for i in queryset:
-            a = Follow.objects.followers(i)
+            a = Follow.objects.follows(request.user, i)
             f = True if a else False
             serializer = UserSerializer(i, context={"request": request})
             data_dic = {"user_detail": serializer.data, "follow": f}

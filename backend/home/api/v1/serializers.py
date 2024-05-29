@@ -250,7 +250,7 @@ class UserSerializer(serializers.ModelSerializer):
                         user_subscription.save()
                         obj.is_premium_user = False
                         obj.save()
-                elif user_subscription.subscription_end_date < current_date:
+                elif user_subscription.subscription_end_date and user_subscription.subscription_end_date < current_date:
                     user_subscription.subscription_end_date = None
                     user_subscription.is_subscription_days_remaining = False
                     user_subscription.save()
