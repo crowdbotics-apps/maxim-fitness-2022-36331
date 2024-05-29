@@ -118,8 +118,10 @@ export const brandedSuccess = data => ({
   data
 })
 
-export const commonBrandedFail = () => ({
-  type: GET_COMMON_BRANDED_FAIL
+export const commonBrandedFail = (common, branded) => ({
+  type: GET_COMMON_BRANDED_FAIL,
+  common,
+  branded
 })
 export const postLogFoodRequest = (id, data) => ({
   type: POST_LOG_FOOD_REQUEST,
@@ -267,8 +269,8 @@ export const nutritionReducer = (state = initialState, action) => {
     case GET_COMMON_BRANDED_FAIL:
       return {
         ...state,
-        commonState: false,
-        brandedState: false,
+        commonState: action.common && false,
+        brandedState: action.branded && false,
         request: false
       }
 
@@ -406,19 +408,31 @@ function* commonBranded({ common, branded }) {
       const response = yield call(brandedAPI, branded.id)
       yield put(brandedSuccess(response.data))
     }
+  } catch (e) {
+    yield put(commonBrandedFail(false, true))
+    showMessage({
+      message: e ? `${e.response.data} for branded foods search items` : "Something want wrong",
+      type: "danger"
+    })
+  }
+
+
+  try {
     if (common.item === 'common') {
       const response = yield call(commonAPI, common.name)
       yield put(commonSuccess(response.data))
     }
 
   } catch (e) {
+    yield put(commonBrandedFail(true, false))
     showMessage({
-      message: e.error.message || "Something want wrong",
+      message: e.response.data ? `${e.response.data} for common foods search items` : "Something want wrong",
       type: "danger"
     })
-    commonBrandedFail()
   }
 }
+
+
 
 async function postLogFoodAPI(id, data) {
   const URL = `${API_URL}/meal/${id}/add_log_food/`
