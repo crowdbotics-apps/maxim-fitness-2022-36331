@@ -80,7 +80,7 @@ const ProfileScreen = props => {
   }, [isFocused])
 
   useEffect(() => {
-    if (profileData?.follow) {
+    if (profileData) {
       setFollow(profileData?.follow)
     }
   }, [profileData?.follow])
