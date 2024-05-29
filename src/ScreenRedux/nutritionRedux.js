@@ -432,8 +432,6 @@ function* commonBranded({ common, branded }) {
   }
 }
 
-
-
 async function postLogFoodAPI(id, data) {
   const URL = `${API_URL}/meal/${id}/add_log_food/`
   const token = await AsyncStorage.getItem("authToken")
