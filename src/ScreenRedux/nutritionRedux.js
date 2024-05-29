@@ -579,7 +579,7 @@ function* getScanMealsFood({ data }) {
     goBack()
     yield put(getScanFoodsSuccess(false))
     if (e?.response?.data) {
-      showMessage({ message: e?.response?.data, type: "danger" })
+      showMessage({ message: e?.response?.data?.message || 'Something went wrong', type: "danger" })
     }
 
     // yield put(getMealsFoodFailure(e))
