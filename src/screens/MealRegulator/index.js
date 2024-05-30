@@ -252,7 +252,8 @@ const styles = StyleSheet.create({
   textStyle: {
     textAlign: "center",
     fontSize: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "gray"
   },
   linearGradient: {
     flexDirection: "row",
