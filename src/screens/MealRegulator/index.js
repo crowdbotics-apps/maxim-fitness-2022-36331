@@ -25,15 +25,18 @@ const MealRegulator = props => {
   const [isRecording, setIsRecording] = useState(false)
 
   useEffect(() => {
-    Voice.onSpeechEnd = onSpeechEnd
-    Voice.onSpeechPartialResults = onSpeechPartialResults
-
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
+    Voice.onSpeechPartialResults = onSpeechResultsHandler;
     return () => {
       Voice.destroy().then(Voice.removeAllListeners)
     }
   }, [])
-
-  const onSpeechEnd = async e => {
+  const onSpeechStartHandler = (e) => {
+    e.error && setIsRecording(false)
+  }
+  const onSpeechEndHandler = async e => {
     setIsRecording(false)
     Voice.destroy().then(Voice.removeAllListeners)
     try {
@@ -41,7 +44,7 @@ const MealRegulator = props => {
     } catch (e) { }
   }
 
-  const onSpeechPartialResults = e => {
+  const onSpeechResultsHandler = e => {
     setPartialResults(e.value)
   }
 
@@ -56,7 +59,7 @@ const MealRegulator = props => {
     const hasPermission = await checkAndRequestMicrophonePermission()
     if (hasPermission) {
       setIsRecording(true)
-      // setTimeout(() => {   
+      // setTimeout(() => {
       startRecognizing()
       // }, 400)
     } else {
@@ -252,7 +255,8 @@ const styles = StyleSheet.create({
   textStyle: {
     textAlign: "center",
     fontSize: 20,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    color: "gray"
   },
   linearGradient: {
     flexDirection: "row",

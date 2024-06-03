@@ -45,13 +45,13 @@ const AddPost = props => {
 
   const aa = () => {
     let formData = new FormData()
-    formData.append("content", content)
+    content && formData.append("content", content)
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"]
     // formData.append('video_thumbnail', {
     //   uri: videoThumbnail.path,
     //   type: videoThumbnail.mime,
     //   name: videoThumbnail.path,
-    // });
+    // })
     imageData.map((item, index) => {
       const fileExtension = item?.uri?.split(".").pop().toLowerCase()
       if (
@@ -243,12 +243,12 @@ const AddPost = props => {
           <Image source={colorAddIcon} style={{ height: 31, width: 31 }} />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => content && imageData.length && addData()}
+          onPress={() => (content || imageData.length) && addData()}
           style={{
             height: 44,
             width: 81,
             borderRadius: 10,
-            backgroundColor: content && imageData.length ? "#4194cb" : "gray",
+            backgroundColor: (content || imageData.length) ? "#4194cb" : "gray",
             justifyContent: "center"
           }}
         >

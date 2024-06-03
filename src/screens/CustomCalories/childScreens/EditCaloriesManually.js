@@ -414,6 +414,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'black',
   },
   checkboxContainer: {
     flexDirection: 'row',

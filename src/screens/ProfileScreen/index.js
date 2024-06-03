@@ -80,7 +80,7 @@ const ProfileScreen = props => {
   }, [isFocused])
 
   useEffect(() => {
-    if (profileData?.follow) {
+    if (profileData) {
       setFollow(profileData?.follow)
     }
   }, [profileData?.follow])
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row"
   },
-  mainTextStyle: { fontSize: 20, fontWeight: "bold" },
+  mainTextStyle: { fontSize: 20, fontWeight: "bold", color: 'gray' },
   subTextStyle: { fontSize: 16, color: "gray" },
   backBtn: {
     justifyContent: "space-between",
