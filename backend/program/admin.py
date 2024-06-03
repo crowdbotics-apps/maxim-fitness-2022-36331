@@ -146,93 +146,108 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
         if request.method == "POST":
             csv_file = TextIOWrapper(request.FILES["csv_file"], encoding='utf-8-sig')
             reader = csv.reader(csv_file, delimiter=",")
-            previous_exercise_ids = ''
-            is_previous_exercise = False
-            for row in reader:
-                print(row)
-                program_name = row[0].lower()
-                week_number = int(row[1])
-                day_numeber = int(row[2])
-                strength = True if row[3] == 'TRUE' else False
-                cardio = True if row[4] == 'TRUE' else False
-                cardio_length = int(row[5])
-                cardio_frequency = 1 # row[6]
-                location = row[7]
-                day_name = row[8]
-                exercise_ids = row[9]
-                exercises = []
-                try:
-                    if exercise_ids == '':
-                        exercise_ids = previous_exercise_ids
-                        is_previous_exercise = True
-                    else:
-                        previous_exercise_ids = exercise_ids
-                    exercise_ids = exercise_ids.split('/')
-                    for exercise_id in exercise_ids:
-                        try:
-                            exercises.append(Exercise.objects.get(exercise_id__iexact=exercise_id))
-                        except Exercise.DoesNotExist:
-                            print("exercise id not found", exercise_id)
-                except:
-                    exercise_id = exercise_ids
-                    exercises.append(Exercise.objects.get(exercise_id=exercise_id))
-                try:
-                    set_no = row[10]
-                    reps = row[11]
-                    weight = '1' # row[12]
-                    timer = float(row[13])
-                    set_type = row[14]
-                except:
-                    set_no = row[10]
-                    reps = row[11]
-                    weight = '1'  # row[12]
-                    timer = 0
-                    set_type = row[14]
-                program, created = Program.objects.get_or_create(name=program_name, description="program_description")
-                week, created = Week.objects.get_or_create(program=program, week=week_number)
-                day, created = Day.objects.get_or_create(cardio_length=cardio_length, cardio_frequency=cardio_frequency,
-                                                         week=week, week__program=program, cardio=cardio,day=day_numeber,
-                                                         strength=strength, location=location, name=day_name,
-                                                         carb=0, protein=0, carb_casual=0, heart_rate=0)
-                program_exercise_name = ''
-                if len(exercises) == 3:
-                    program_exercise_name = "GiantSet"
-                elif len(exercises) == 2:
-                    program_exercise_name = "SuperSet"
-                else:
-                    program_exercise_name = exercises[0].name
-                if not day.name == 'Rest':
-                    program_exercise, created = ProgramExercise.objects.get_or_create(day=day, name=program_exercise_name)
-                    if not is_previous_exercise and created:
-                        program_exercise.exercises.set(exercises)
-                    elif is_previous_exercise and not created:
-                        pass
-                    program_set, created = ProgramSet.objects.get_or_create(exercise=program_exercise, set_no=set_no,
-                                                                            reps=reps, timer=timer, set_type=set_type)
-                is_previous_exercise = False
-                # program = ProgramAdmin.add_program(next(reader))
-            # blank = 0
-            # day = None
-            # for row in reader:
-            #     if row[0] == "":
-            #         blank = blank + 1
-            #
-            #         if blank == 3:
-            #             break
-            #         exercise, blank = ProgramAdmin.add_exercise(day, next(reader), blank)
-            #     else:
-            #         if blank == 2:
-            #             day = ProgramAdmin.add_day(row, program)
-            #             blank = 0
-            #             continue
-            #         blank = 0
-            #         self.add_set(exercise, row)
-            #         print('SET', row)
+            previous_row = [None] * 15  # Adjust the size according to the number of columns
+            header_skipped = False
 
-            print("reched here bro")
-            self.message_user(request, "Your csv file has been imported")
+            try:
+                for row in reader:
+                    if not header_skipped:  # Skip the header row
+                        header_skipped = True
+                        continue
+
+                    # Fill in missing values with previous row's values
+                    for i in range(len(row)):
+                        if row[i].strip() == '':
+                            row[i] = previous_row[i]
+                        else:
+                            previous_row[i] = row[i]
+
+                    try:
+                        # Extract data from the row
+                        program_name = row[0].lower()
+                        week_number = int(row[1])
+                        day_number = int(row[2])
+                        strength = row[3] == 'TRUE'
+                        cardio = row[4] == 'TRUE'
+                        cardio_length = int(row[5]) if row[5] else 0
+                        cardio_frequency = int(row[6]) if row[6] else 1
+                        location = row[7]
+                        day_name = row[8]
+                        exercise_ids = row[9]
+                        set_no = int(row[10])
+                        reps = row[11]
+                        weight = int(row[12]) if row[12] else 1
+                        timer = float(row[13]) if row[13] else 0
+                        set_type = row[14]
+                    except ValueError as e:
+                        self.message_user(request, f"Data conversion error in row {reader.line_num}: {e}",
+                                          level='error')
+                        continue
+
+                    try:
+                        # Create or get program, week, and day
+                        program, _ = Program.objects.get_or_create(name=program_name, description="program_description")
+                        week, _ = Week.objects.get_or_create(program=program, week=week_number)
+                        day, _ = Day.objects.get_or_create(
+                            week=week,
+                            day=day_number,
+                            cardio_length=cardio_length,
+                            cardio_frequency=cardio_frequency,
+                            cardio=cardio,
+                            strength=strength,
+                            location=location,
+                            name=day_name,
+                            carb=0, protein=0, carb_casual=0, heart_rate=0
+                        )
+                    except Exception as e:
+                        self.message_user(request,
+                                          f"Error creating program, week, or day in row {reader.line_num}: {e}",
+                                          level='error')
+                        continue
+
+                    try:
+                        # Get exercises
+                        exercises = []
+                        if exercise_ids:
+                            for exercise_id in exercise_ids.split('/'):
+                                try:
+                                    exercises.append(Exercise.objects.get(exercise_id__iexact=exercise_id))
+                                except Exercise.DoesNotExist:
+                                    self.message_user(request, f"Exercise ID not found: {exercise_id}", level='error')
+                    except Exception as e:
+                        self.message_user(request, f"Error retrieving exercises in row {reader.line_num}: {e}",
+                                          level='error')
+                        continue
+
+                    try:
+                        # Determine program exercise name
+                        program_exercise_name = 'Rest' if day_name.lower() == 'rest' else (
+                            exercises[0].name if len(exercises) == 1 else (
+                                'SuperSet' if len(exercises) == 2 else 'GiantSet'))
+
+                        # Create or get program exercise and set
+                        if day_name.lower() != 'rest':
+                            program_exercise, _ = ProgramExercise.objects.get_or_create(day=day,
+                                                                                        name=program_exercise_name)
+                            program_exercise.exercises.set(exercises)
+                            ProgramSet.objects.get_or_create(
+                                exercise=program_exercise,
+                                set_no=set_no,
+                                reps=reps,
+                                weight=weight,
+                                timer=timer,
+                                set_type=set_type
+                            )
+                    except Exception as e:
+                        self.message_user(request, f"Error creating exercise or set in row {reader.line_num}: {e}",
+                                          level='error')
+                        continue
+
+                self.message_user(request, "Your CSV file has been imported successfully")
+            except Exception as e:
+                self.message_user(request, f"Unexpected error: {e}", level='error')
             return redirect("..")
-        if request.method == "GET":
+        elif request.method == "GET":
             form = CsvImportForm()
             payload = {"form": form}
             return render(request, "admin/csv_form.html", payload)
