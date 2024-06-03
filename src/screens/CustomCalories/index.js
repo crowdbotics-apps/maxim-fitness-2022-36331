@@ -751,7 +751,7 @@ const CustomCalories = props => {
                   weight: value,
                   request_type: "weightUpdate"
                 }
-                props.submitQuestionRequest(profile, data)
+                props.submitQuestionRequest(profile, data,'weight')
                 setValue("")
                 refWeight.current.close()
               }}

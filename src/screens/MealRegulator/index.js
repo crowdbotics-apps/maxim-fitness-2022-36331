@@ -34,7 +34,7 @@ const MealRegulator = props => {
     }
   }, [])
   const onSpeechStartHandler = (e) => {
-    e.error && setIsRecording(false)
+    e && setIsRecording(false)
   }
   const onSpeechEndHandler = async e => {
     setIsRecording(false)
