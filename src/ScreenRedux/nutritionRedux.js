@@ -410,8 +410,9 @@ function* commonBranded({ common, branded }) {
     }
   } catch (e) {
     yield put(commonBrandedFail(false, true))
+    const { data } = e?.response
     showMessage({
-      message: e ? `${e.response.data} for branded foods search items` : "Something want wrong",
+      message: data ? `${data} for branded foods search items` : "Something want wrong",
       type: "danger"
     })
   }
@@ -425,8 +426,9 @@ function* commonBranded({ common, branded }) {
 
   } catch (e) {
     yield put(commonBrandedFail(true, false))
+    const { data } = e?.response
     showMessage({
-      message: e.response.data ? `${e.response.data} for common foods search items` : "Something want wrong",
+      message: data ? `${data} for common foods search items` : "Something want wrong",
       type: "danger"
     })
   }
@@ -590,8 +592,9 @@ function* getScanMealsFood({ data }) {
   } catch (e) {
     goBack()
     yield put(getScanFoodsSuccess(false))
+    const { message } = e?.response?.data
     if (e?.response?.data) {
-      showMessage({ message: e?.response?.data?.message || 'Something went wrong', type: "danger" })
+      showMessage({ message: message || 'Something went wrong', type: "danger" })
     }
 
     // yield put(getMealsFoodFailure(e))
