@@ -99,70 +99,37 @@ const ExerciseScreen = props => {
 
   let deviceHeight = Dimensions.get("window").height
 
+  const setTypeToModal = {
+    ss: "ss",
+    gs: "gs",
+    ds: "ds",
+    tds: "tds",
+    ct: "ct",
+    r: "r"
+  };
   useEffect(() => {
-    setActiveSet(0)
+    setActiveSet(0);
     setTimeout(() => {
-      if (repsWeightState?.set_type?.toLowerCase() === "ss") {
-        setModal("ss")
+      const setType = repsWeightState?.set_type?.toLowerCase();
+      if (setType && setTypeToModal[setType]) {
+        setModal(setTypeToModal[setType]);
       }
-      if (repsWeightState?.set_type?.toLowerCase() === "gs") {
-        setModal("gs")
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === "ds") {
-        setModal("ds")
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === "tds") {
-        setModal("tds")
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === "ct") {
-        setModal("ct")
-      }
-      if (repsWeightState?.set_type?.toLowerCase() === "r") {
-        setModal('r')
-      }
-    }, 500)
-  }, [])
+    }, 500);
+  }, []);
 
+  const types = {
+    ss: { colors: ["#f19a38", "#f7df58"], text: "Super Sets" },
+    gs: { colors: ["#60d937", "#60d937"], text: "Giant Sets" },
+    ds: { colors: ["#60d937", "#60d937"], text: "Drop Sets" },
+    tds: { colors: ["#ed220d", "#ed220d"], text: "Triple Drop Sets" },
+    ct: { colors: ["#f19a38", "#f7df58"], text: "Circuit Training" },
+    r: { colors: ["#60d937", "#60d937"], text: "Single Sets" }
+  };
   const checkModalType = param => {
+    const type = types[param];
+    return type ? <SetsComponents {...type} /> : null;
+  };
 
-    switch (param) {
-      case "ss":
-        return (
-          <SetsComponents colors={["#f19a38", "#f7df58"]} text={"Super Sets"} />
-        )
-      case "gs":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Giant Sets"} />
-        )
-      case "ds":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Drop Sets"} />
-        )
-      case "tds":
-        return (
-          <SetsComponents
-            colors={["#ed220d", "#ed220d"]}
-            text={"Triple Drop Sets"}
-          />
-        )
-      case "ct":
-        return (
-          <SetsComponents
-            colors={["#f19a38", "#f7df58"]}
-            text={"Circuit Training"}
-          />
-        )
-      case "r":
-        return (
-          <SetsComponents
-            colors={["#60d937", "#60d937"]}
-            text={"Single Sets"}
-          />
-        )
-      default:
-        break
-    }
-  }
   const onFocus = useIsFocused()
   useEffect(() => {
     setActiveSet(0)

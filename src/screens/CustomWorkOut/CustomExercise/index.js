@@ -152,7 +152,7 @@ const CustomExercise = props => {
     setCurrentIndex(0)
   }
 
-  const setType = ["Super Set", "Giant Set"]
+  const setType = ["Super Set", "Circuit Training", "Giant Set"]
 
   const duplicateSet = item => {
     const newData = [...customExercisesList]
@@ -1957,7 +1957,7 @@ const CustomExercise = props => {
                             // ex_id: findingData()?.exercises?.[0]?.id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ss",
+                            set_type: findingData()?.activeSet?.id === 5 ? "ct" : "ss",
                             timer:
                               (timeData?.mints?.mint1
                                 ? timeData?.mints?.mint1
@@ -1984,7 +1984,7 @@ const CustomExercise = props => {
                             // ex_id: findingData()?.exercises?.[1].id,
                             set_no: dualSets?.length + 1,
                             weight: "",
-                            set_type: "ss",
+                            set_type: findingData()?.activeSet?.id === 5 ? "ct" : "ss",
                             timer:
                               (timeData?.mints?.mint2
                                 ? timeData?.mints?.mint2
@@ -2014,7 +2014,7 @@ const CustomExercise = props => {
                           // ex_id: findingData()?.exercises?.[0]?.id,
                           set_no: dualSets?.length + 1,
                           weight: "",
-                          set_type: "ss",
+                          set_type: findingData()?.activeSet?.id === 5 ? "ct" : "ss",
                           timer:
                             (timeData?.mints?.mint1
                               ? timeData?.mints?.mint1
@@ -2041,7 +2041,7 @@ const CustomExercise = props => {
                           // ex_id: findingData()?.exercises?.[1].id,
                           set_no: dualSets?.length + 1,
                           weight: "",
-                          set_type: "ss",
+                          set_type: findingData()?.activeSet?.id === 5 ? "ct" : "ss",
                           timer:
                             (timeData?.mints?.mint2
                               ? timeData?.mints?.mint2
@@ -2070,7 +2070,7 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                    dualSetState < (findingData()?.activeSet?.value === 4 ? 3 : 2)
+                    dualSetState < (findingData()?.activeSet?.id === 2 ? 3 : 2)
                     ? "Next"
                     : "Done"}
                 </Text>

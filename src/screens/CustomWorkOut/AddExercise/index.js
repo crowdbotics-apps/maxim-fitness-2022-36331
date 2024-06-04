@@ -34,7 +34,9 @@ const data = [
   { id: 1, value: 1, item: "Super Set" },
   { id: 2, value: 4, item: "Giant Set" },
   { id: 3, value: 2, item: "Drop Set" },
-  { id: 4, value: 3, item: "Triple Set" }
+  { id: 4, value: 3, item: "Triple Set" },
+  { id: 5, value: 1, item: "Circuit Training" }
+
 ]
 const AddExercies = props => {
   const { navigation, getExerciseState, requesting, getExerciseType, customExercisesList } = props
@@ -76,12 +78,12 @@ const AddExercies = props => {
       array = array.filter(index => index !== i)
       setSelectedItem(array)
     } else {
-      if (activeSet?.id === 1) {
+      if (activeSet?.id === 1 || activeSet?.id === 5) {
         if (selectedItem.length < 2) {
           array.push(i)
           setSelectedItem(array)
         }
-      } else if (activeSet?.value === 4) {
+      } else if (activeSet?.id === 2) {
         if (selectedItem.length < 3) {
           array.push(i)
           setSelectedItem(array)
