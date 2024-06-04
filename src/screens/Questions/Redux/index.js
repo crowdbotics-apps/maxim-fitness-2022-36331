@@ -145,6 +145,11 @@ function* submitQuestion({ profile, data, isCheck }) {
         message: "Workout assign successfully.",
         type: "success"
       })
+    }else if (isCheck === "weight") {
+      showMessage({
+        message: "Weight updated successfully.",
+        type: "success"
+      })
     }
   } catch (error) {
     yield put(submitQuestionSuccess(false))

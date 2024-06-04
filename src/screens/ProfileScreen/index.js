@@ -212,6 +212,8 @@ const ProfileScreen = props => {
     }
   }, [])
 
+  const isBlocked = () => profileData?.user_detail?.block_user?.some(item => item?.requested_user === userDetail?.id) ?? false;
+
   return (
     <>
       <SafeAreaView>
@@ -634,7 +636,7 @@ const ProfileScreen = props => {
               />
               <Text
                 style={[styles.mainTextStyle, { marginLeft: 30 }]}
-                text={profileData?.user_detail?.block_user?.length ? "Unblock User" : "Block User"}
+                text={isBlocked() ? "Unblock User" : "Block User"}
               />
             </TouchableOpacity>
           </View>

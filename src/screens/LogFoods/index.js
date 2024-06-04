@@ -512,9 +512,12 @@ const LogFoods = props => {
         ? speechData.map(item => ({
           food_name: item.food_name,
           nf_calories: item.nf_calories || 0,
-          nf_total_carbohydrate: item.nf_total_carbohydrate || 0,
-          nf_protein: item.nf_protein || 0,
-          nf_total_fat: item.nf_total_fat || 0,
+          nf_total_carbohydrate: Math.round
+            (item?.foods?.[0]?.nf_total_carbohydrate / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_protein: Math.round
+            (item?.foods?.[0]?.nf_protein / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_total_fat: Math.round
+            (item?.foods?.[0]?.nf_total_fat / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
           nix_item_id: item.nix_item_id || "",
           weight: item.serving_weight_grams || 1,
           thumb: item.photo.thumb,
@@ -529,9 +532,12 @@ const LogFoods = props => {
         ? commonData.map(item => ({
           food_name: item?.foods?.[0]?.food_name,
           nf_calories: item?.foods?.[0]?.nf_calories || 0,
-          nf_total_carbohydrate: item?.foods?.[0]?.nf_total_carbohydrate || 0,
-          nf_protein: item?.foods?.[0]?.nf_protein || 0,
-          nf_total_fat: item?.foods?.[0]?.nf_total_fat || 0,
+          nf_total_carbohydrate: Math.round
+            (item?.foods?.[0]?.nf_total_carbohydrate / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_protein: Math.round
+            (item?.foods?.[0]?.nf_protein / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_total_fat: Math.round
+            (item?.foods?.[0]?.nf_total_fat / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
           nix_item_id: item?.foods?.[0]?.nix_item_id || "",
           weight: item?.foods?.[0]?.serving_weight_grams || 1,
           thumb: item?.foods?.[0]?.photo.thumb,
@@ -547,13 +553,13 @@ const LogFoods = props => {
           food_name: item?.foods?.[0]?.food_name,
           nf_calories: calculateCalories(item?.foods?.[0]) || 0,
           nf_total_carbohydrate:
-            Math.round(item?.foods?.[0]?.nf_total_carbohydrate / item.serving_qty) *
-            item.total_quantity || 0,
+            Math.round(item?.foods?.[0]?.nf_total_carbohydrate / item?.foods?.[0]?.serving_qty) *
+            item?.foods?.[0]?.total_quantity || 0,
           nf_protein:
-            Math.round(item?.foods?.[0]?.nf_protein / item?.foods?.[0].serving_qty) *
-            item?.foods?.[0].total_quantity || 0,
+            Math.round(item?.foods?.[0]?.nf_protein / item?.foods?.[0]?.serving_qty) *
+            item?.foods?.[0]?.total_quantity || 0,
           nf_total_fat:
-            Math.round(item?.foods?.[0]?.nf_total_fat / item.serving_qty) *
+            Math.round(item?.foods?.[0]?.nf_total_fat / item?.foods?.[0]?.serving_qty) *
             item?.foods?.[0]?.total_quantity || 0,
           nix_item_id: item?.foods?.[0]?.nix_item_id || "",
           weight: item?.foods?.[0]?.serving_weight_grams || 1,
@@ -569,9 +575,12 @@ const LogFoods = props => {
         ? scanData.map(item => ({
           food_name: item?.foods?.[0].food_name,
           nf_calories: item?.foods?.[0].nf_calories || 0,
-          nf_total_carbohydrate: item?.foods?.[0].nf_total_carbohydrate || 0,
-          nf_protein: item?.foods?.[0].nf_protein || 0,
-          nf_total_fat: item?.foods?.[0].nf_total_fat || 0,
+          nf_total_carbohydrate: Math.round
+            (item?.foods?.[0]?.nf_total_carbohydrate / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_protein: Math.round
+            (item?.foods?.[0]?.nf_protein / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
+          nf_total_fat: Math.round
+            (item?.foods?.[0]?.nf_total_fat / item?.foods?.[0].serving_qty) * item?.foods?.[0].total_quantity || 0,
           nix_item_id: item?.foods?.[0].nix_item_id || "",
           weight: item?.foods?.[0].serving_weight_grams || 1,
           thumb: item?.foods?.[0].photo.thumb,
