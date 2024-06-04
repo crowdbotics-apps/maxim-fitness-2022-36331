@@ -184,7 +184,7 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
                                           { color: "#00a1ff" }
                                         ]}
                                         text={`${
-                                          Math.ceil(getPortien([items])) || "0"
+                                          Math.Round(getPortien([items])) || "0"
                                         } g`}
                                       />
                                       <Text
@@ -193,7 +193,7 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
                                           { color: "#fbe232" }
                                         ]}
                                         text={`${
-                                          Math.ceil(getCarbs([items])) || "0"
+                                          Math.Round(getCarbs([items])) || "0"
                                         } g`}
                                       />
                                       <Text
@@ -202,7 +202,7 @@ const MealHistory = ({ mealsByDate, activeTab }) => {
                                           { color: "#ee230d" }
                                         ]}
                                         text={`${
-                                          Math.ceil(getFat([items])) || "0"
+                                          Math.Round(getFat([items])) || "0"
                                         } g`}
                                       />
                                     </View>

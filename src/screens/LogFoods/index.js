@@ -547,11 +547,14 @@ const LogFoods = props => {
           food_name: item?.foods?.[0]?.food_name,
           nf_calories: calculateCalories(item?.foods?.[0]) || 0,
           nf_total_carbohydrate:
-            Math.round(item?.foods?.[0]?.nf_total_carbohydrate) || 0,
+          Math.round(item?.foods?.[0]?.nf_total_carbohydrate / item?.foods?.[0]?.serving_qty) *
+          item?.foods?.[0]?.total_quantity || 0,
           nf_protein:
-            Math.round(item?.foods?.[0]?.nf_protein) || 0,
+          Math.round(item?.foods?.[0]?.nf_protein / item?.foods?.[0]?.serving_qty) *
+          item?.foods?.[0]?.total_quantity || 0,
           nf_total_fat:
-            Math.round(item?.foods?.[0]?.nf_total_fat) || 0,
+          Math.round(item?.foods?.[0]?.nf_total_fat / item?.foods?.[0]?.serving_qty) *
+          item?.foods?.[0]?.total_quantity|| 0,
           nix_item_id: item?.foods?.[0]?.nix_item_id || "",
           weight: item?.foods?.[0]?.serving_weight_grams || 1,
           thumb: item?.foods?.[0]?.photo.thumb,
