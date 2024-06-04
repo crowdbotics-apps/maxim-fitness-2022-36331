@@ -279,7 +279,6 @@ const LogFoods = props => {
     let totalFatCalc = 0
     if (data && data.length) {
       data.forEach(item => {
-        console.log(item, 'item')
         totalCalc += Math.round(
           (item?.food?.calories / item?.unit?.quantity) * item.total_quantity
         )
@@ -338,7 +337,6 @@ const LogFoods = props => {
         });
       }
     });
-    console.log(totalCalc, 'totalCalc', totalProteinCalc, 'totalProteinCalc', totalCarbsCalc, 'totalCarbsCalc', 'totalFatCalc', totalFatCalc)
 
     setTotalCal(totalCalc || 0);
     setTotalProtein(totalProteinCalc || 0);
