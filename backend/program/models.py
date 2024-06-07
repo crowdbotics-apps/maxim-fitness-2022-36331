@@ -231,7 +231,7 @@ class ProgramExercise(models.Model):
     day = models.ForeignKey("Day", on_delete=models.CASCADE, null=True, related_name="day_exercises")
     exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE, null=True, blank=True)
     exercises = models.ManyToManyField("Exercise", related_name="program_exercises", null=True, blank=True)
-    name = models.CharField(max_length=25, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.exercise} >> day: {self.day} >> {self.name}"
@@ -299,16 +299,6 @@ class Workout(models.Model):
         self.save()
         for set in self.sets.all():
             set.reset()
-
-# class WorkoutAssignedExercise(models.Model):
-#     """
-#     use for assigned program exercises according to set types
-#     for superset two exercises will be used, for giantset three exercises will be added and for others one exercise will be added
-#     """
-#     exercises = models.ManyToManyField('Exercise', blank=True, related_name='assigned_workout_exercises')
-#     workout = models.ForeignKey('Workout', related_name='assigned_workout_exercises',
-#                                        on_delete=models.CASCADE, null=True, blank=True)
-#     name = models.CharField(max_length=500, null=True, blank=True)
 
 
 class CustomWorkout(models.Model):
