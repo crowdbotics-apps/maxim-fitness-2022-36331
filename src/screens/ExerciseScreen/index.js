@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Pressable
 } from "react-native"
 import {
   Text,
@@ -1206,31 +1207,40 @@ const ExerciseScreen = props => {
             )}
             <View style={[fill, row, center, regularVMargin]}>
               <View style={fillOnePoint5} />
-              <LinearGradient
-                start={startSocial}
-                end={endSocial}
-                colors={["#fa201b", "#fe5b06"]}
+              <TouchableOpacity
                 style={[
-                  punchBg,
                   center,
-                  row,
-                  borderR10,
-                  height40,
-                  tiny2xHPadding,
                   {
-                    width: "45%",
-                    backgroundColor: "red"
+                    flex: 19,
                   }
                 ]}
+                onPress={() => refModal.current.close()}
               >
-                <Text
-                  large
-                  color="secondary"
-                  bold
-                  text="Got it"
-                  onPress={() => refModal.current.close()}
-                />
-              </LinearGradient>
+                <LinearGradient
+                  start={startSocial}
+                  end={endSocial}
+                  colors={["#fa201b", "#fe5b06"]}
+                  style={[
+                    punchBg,
+                    center,
+                    row,
+                    borderR10,
+                    height40,
+                    tiny2xHPadding,
+                    {
+                      width: "45%",
+                      backgroundColor: "red"
+                    }
+                  ]}
+                >
+                  <Text
+                    large
+                    color="secondary"
+                    bold
+                    text="Got it"
+                  />
+                </LinearGradient>
+              </TouchableOpacity>
               <View style={fillOnePoint5} />
             </View>
           </ScrollView>
