@@ -101,7 +101,6 @@ const ExerciseScreen = props => {
   let deviceHeight = Dimensions.get("window").height
 
   useEffect(() => {
-    setActiveSet(0)
     setTimeout(() => {
       if (repsWeightState?.set_type?.toLowerCase() === "ss") {
         setModal("ss")
@@ -122,58 +121,39 @@ const ExerciseScreen = props => {
         setModal('r')
       }
     }, 500)
-  }, [])
+  }, [repsWeightState])
 
-  const checkModalType = param => {
 
-    switch (param) {
-      case "ss":
-        return (
-          <SetsComponents colors={["#f19a38", "#f7df58"]} text={"Super Sets"} />
-        )
-      case "gs":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Giant Sets"} />
-        )
-      case "ds":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Drop Sets"} />
-        )
-      case "tds":
-        return (
-          <SetsComponents
-            colors={["#ed220d", "#ed220d"]}
-            text={"Triple Drop Sets"}
-          />
-        )
-      case "ct":
-        return (
-          <SetsComponents
-            colors={["#f19a38", "#f7df58"]}
-            text={"Circuit Training"}
-          />
-        )
-      case "r":
-        return (
-          <SetsComponents
-            colors={["#60d937", "#60d937"]}
-            text={"Single Sets"}
-          />
-        )
-      default:
-        break
+  const modalTypes = {
+    ss: { colors: ["#f19a38", "#f7df58"], text: "Super Sets" },
+    gs: { colors: ["#60d937", "#60d937"], text: "Giant Sets" },
+    ds: { colors: ["#60d937", "#60d937"], text: "Drop Sets" },
+    tds: { colors: ["#ed220d", "#ed220d"], text: "Triple Drop Sets" },
+    ct: { colors: ["#f19a38", "#f7df58"], text: "Circuit Training" },
+    r: { colors: ["#60d937", "#60d937"], text: "Single Sets" }
+  };
+
+  const checkModalType = (param) => {
+    const modalConfig = modalTypes[param];
+    if (modalConfig) {
+      return (
+        <SetsComponents
+          colors={modalConfig.colors}
+          text={modalConfig.text}
+        />
+      );
     }
-  }
+    return null;
+  };
+
   const onFocus = useIsFocused()
   useEffect(() => {
-    setActiveSet(0)
     async function getAllData() {
       setParms(route?.params)
       if (isCustom) {
-
         await getCustomWorkoutDataRequest(route?.params?.item?.id)
       } else {
-        await getCSVWorkoutDataRequest(route?.params?.item?.id)
+        await getCSVWorkoutDataRequest({ id: route?.params?.item?.id, mainActive: mainActive, active: active, activeSet: activeSet })
       }
       await getData()
       setExerciseTitle('')
@@ -192,9 +172,9 @@ const ExerciseScreen = props => {
     if (isCustom) {
       await getCustomWorkoutDataRequest(route?.params?.item?.id)
       const setId = await sortExercises(workoutData?.workouts?.[mainActive]?.exercises, workoutData?.workouts?.[mainActive]?.exercises_order ? selectedExercise?.exercises_order : null)?.[active]?.sets?.[activeSet]?.id
-      await props.repsCustomWeightRequest(setId, null, null)
+      props.repsCustomWeightRequest(setId, null, null)
     } else {
-      await getCSVWorkoutDataRequest(route?.params?.item?.id)
+      await getCSVWorkoutDataRequest({ id: route?.params?.item?.id, mainActive: mainActive, active: active, activeSet: activeSet })
       const setId = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.sets?.[activeSet]?.id
       await props.repsWeightRequest(setId, null, null)
 

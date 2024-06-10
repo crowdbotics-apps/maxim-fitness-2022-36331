@@ -1086,9 +1086,9 @@ async function getsessionDetailsApi(data) {
 function* getWorkoutDetails({ data }) {
   try {
 
-    const response = yield call(getsessionDetailsApi, data)
+    const response = yield call(getsessionDetailsApi, data.id)
     yield put(getCustomWorkoutDataSuccess(response.data))
-    yield put(repsWeightRequest(response?.data?.workouts?.[0]?.exercises?.[0]?.sets?.[0]?.id, null, null))
+    yield put(repsWeightRequest(response?.data?.workouts?.[data?.mainActive]?.exercises?.[data?.active]?.sets?.[data?.activeSet]?.id, null, null))
     // yield put(pickSession(null, response?.data, null))
   } catch (e) {
     yield put(getCustomWorkoutDataSuccess(false))
