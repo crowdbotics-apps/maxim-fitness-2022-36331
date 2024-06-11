@@ -232,6 +232,7 @@ class ProgramExercise(models.Model):
     exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE, null=True, blank=True)
     exercises = models.ManyToManyField("Exercise", related_name="program_exercises", null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
+    exercise_ids_for_validation = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.exercise} >> day: {self.day} >> {self.name}"
