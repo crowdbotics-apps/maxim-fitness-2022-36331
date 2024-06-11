@@ -151,7 +151,7 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
 
             try:
                 for row in reader:
-                    if not header_skipped:  # Skip the header row
+                    if not header_skipped and row[0] == 'program_name':  # Skip the header row
                         header_skipped = True
                         continue
 
@@ -227,10 +227,22 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
 
                         # Create or get program exercise and set
                         if day_name.lower() != 'rest':
-                            program_exercise, _ = ProgramExercise.objects.get_or_create(day=day,
-                                                                                        name=program_exercise_name)
-                            program_exercise.exercises.set(exercises)
-                            ProgramSet.objects.get_or_create(
+                            if program_exercise_name in ['GiantSet', 'SuperSet']:
+                                print('hwe')
+
+                            program_exercise = ProgramExercise.objects.filter(
+                                day=day,name=program_exercise_name, exercise_ids_for_validation__exact=exercise_ids
+                            )
+                            if program_exercise.exists():
+                                program_exercise = program_exercise.first()
+                                program_exercise.exercises.set(exercises)
+                            else:
+                                program_exercise = ProgramExercise.objects.create(
+                                    day=day, name=program_exercise_name,
+                                    exercise_ids_for_validation=exercise_ids
+                                )
+                                program_exercise.exercises.set(exercises)
+                            prog_set, created = ProgramSet.objects.get_or_create(
                                 exercise=program_exercise,
                                 set_no=set_no,
                                 reps=reps,
@@ -238,6 +250,7 @@ class ProgramAdmin(nested_admin.NestedModelAdmin):
                                 timer=timer,
                                 set_type=set_type
                             )
+                            print(prog_set.id, created)
                     except Exception as e:
                         self.message_user(request, f"Error creating exercise or set in row {reader.line_num}: {e}",
                                           level='error')
