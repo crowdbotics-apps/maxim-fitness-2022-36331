@@ -98,6 +98,7 @@ const ExerciseScreen = props => {
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [hours, setHours] = useState(0)
+  const [timeCount, setTimeCount] = useState(false);
 
   let deviceHeight = Dimensions.get("window").height
 
@@ -481,7 +482,7 @@ const ExerciseScreen = props => {
                 return (
                   <View>
                     <TouchableOpacity
-                      // disabled={timmer}
+                      disabled={timmer}
                       onPress={() => {
                         setSelectedExercise(item)
                         setMainActive(i)
@@ -696,9 +697,8 @@ const ExerciseScreen = props => {
                     </View>
                   )
                 ) : (
-                  !is_cardio_exercise &&
                   <>
-                    {repsWeightState?.set_type?.toLowerCase() === modal ? (
+                    {repsWeightState?.set_type?.toLowerCase() === modal && !is_cardio_exercise ? (
                       modal && props.loader ? (
                         <View
                           style={[
@@ -737,10 +737,14 @@ const ExerciseScreen = props => {
                       >
                         {item?.sets?.map((set, i) => (
                           <SetButton
+                            disabled={timmer}
                             key={i}
                             item={set}
                             index={i}
-                            onPress={() => setsData(set, i)}
+                            onPress={() => {
+                              setsData(set, i)
+                              setTimeCount(set?.timer)
+                            }}
                             mainContainer={{ marginHorizontal: 5 }}
                             bg={
                               repsWeightState?.id === set?.id &&
@@ -760,30 +764,18 @@ const ExerciseScreen = props => {
                   <ScrollView contentContainerStyle={[fillGrow]}>
                     {repsWeightState?.set_type?.toLowerCase() === "cr" || is_cardio_exercise
                       ?
-                      is_cardio_exercise ? <>
+                      is_cardio_exercise && !item?.sets?.[activeSet]?.done ? <>
                         <CardioRestContainer
-                          upNext={"next"}
                           startRest={timmer}
-                          activeSet={activeSet}
-                          onPress={() => {
-                            isCustom
-                              ? props.customSessionDone(
-                                workoutData.id,
-                                screenNavigation
-                              )
-                              : props.sessionDone(
-                                workoutData?.id,
-                                screenNavigation
-                              )
-                            setStartTimer(false)
-                            setTimmer(false)
-                          }}
-                          resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
+                          resetTime={timeCount || item?.sets?.[activeSet]?.timer}
                           onFinish={() => {
+                            submitData(item)
                             getData()
                             setTimmer(false)
                             setStartTimer(false)
                           }}
+
+
                         />
                       </> : null
 
@@ -849,29 +841,45 @@ const ExerciseScreen = props => {
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        disabled={item && item.done}
-                      />
-
-                      <FatGradientIconButton
-                        buttonText={
-                          repsWeightState?.set_type?.toLowerCase() === "cr"
-                            ? "Complete"
-                            : item?.sets && item?.sets?.[activeSet]?.done
-                              ? is_cardio_exercise && timmer ? "Pause Cardio" : "Done"
-                              : is_cardio_exercise ? "Start Cardio" : "Done, Start Rest"
-                        }
-                        buttonIcon={Images.iconDoneStartRest}
-                        colorsGradient={is_cardio_exercise ? ["#42A341", "#42A341"] : ["#3180BD", "#6EC2FA"]}
-                        colorsGradientDisable={["#d3d3d3", "#838383"]}
-                        disabled={
-                          timmer ||
-                          (item?.sets && item?.sets?.[activeSet]?.done)
-                        }
-                        onPress={() => {
-                          setTimmer(true)
-                          submitData(item)
-                        }}
-                      />
+                        disabled={item && item.done || timmer}
+                      />{
+                        is_cardio_exercise ?
+                          <FatGradientIconButton
+                            buttonText={
+                              item?.sets && item?.sets?.[activeSet]?.done || timmer
+                                ? timmer ? "Pause Cardio" : "Done"
+                                : "Start Cardio"
+                            }
+                            buttonIcon={Images.iconDoneStartRest}
+                            colorsGradient={timmer ? ["#d3d3d3", "#838383"] : ["#42A341", "#42A341"]}
+                            colorsGradientDisable={["#d3d3d3", "#838383"]}
+                            disabled={
+                              (item?.sets && item?.sets?.[activeSet]?.done)
+                            }
+                            onPress={() => {
+                              setTimmer(prev => !prev)
+                            }}
+                          />
+                          : <FatGradientIconButton
+                            buttonText={
+                              repsWeightState?.set_type?.toLowerCase() === "cr"
+                                ? "Complete"
+                                : item?.sets && item?.sets?.[activeSet]?.done
+                                  ? "Done"
+                                  : "Done, Start Rest"
+                            }
+                            buttonIcon={Images.iconDoneStartRest}
+                            colorsGradient={["#3180BD", "#6EC2FA"]}
+                            colorsGradientDisable={["#d3d3d3", "#838383"]}
+                            disabled={
+                              timmer ||
+                              (item?.sets && item?.sets?.[activeSet]?.done)
+                            }
+                            onPress={() => {
+                              setTimmer(true)
+                              submitData(item)
+                            }}
+                          />}
                     </View>
                     {is_cardio_exercise ?
                       <TouchableOpacity

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     View,
     Text,
@@ -16,91 +16,86 @@ const CardioRestContainer = ({
 }) => {
     const widthProgress = Dimensions.get("screen").width;
     const [increment, setIncrement] = useState(0);
-    const [remainingTime, setRemainingTime] = useState(resetTime || 90);
+    const [remainingTime, setRemainingTime] = useState(resetTime);
+    const [isRunning, setIsRunning] = useState(false);
+    const intervalId = useRef(null);
 
     useEffect(() => {
-        let intervalId;
-        if (Platform.OS === "ios") BackgroundTimer.start();
-        if (startRest) {
-            setRemainingTime(resetTime || 90);
-            intervalId = startCountdown(
-                resetTime || 90,
-                time => {
-                    setIncrement(prevIncrement => prevIncrement + 1 / (resetTime || 90));
-                    setRemainingTime(time);
-                },
-                onFinish
-            );
-        } else {
-            setIncrement(0);
-            clearInterval(intervalId);
+        if (startRest && !isRunning) {
+            setIsRunning(true);
+            if (!intervalId.current) {
+                startCountdown(remainingTime);
+            }
+        } else if (!startRest && isRunning) {
+            pauseCountdown();
         }
 
         return () => {
-            clearInterval(intervalId);
+            pauseCountdown();
             if (Platform.OS === "ios") BackgroundTimer.stopBackgroundTimer();
         };
     }, [startRest, resetTime]);
 
+    const startCountdown = (time) => {
+        if (Platform.OS === "ios") BackgroundTimer.start();
+        intervalId.current = BackgroundTimer.setInterval(() => {
+            setRemainingTime(prevTime => {
+                if (prevTime <= 1) {
+                    BackgroundTimer.clearInterval(intervalId.current);
+                    intervalId.current = null;
+                    setIsRunning(false);
+                    onFinish();
+                    return 0;
+                } else {
+                    return prevTime - 1;
+                }
+            });
+            setIncrement(prevIncrement => prevIncrement + 1 / (resetTime || 90));
+        }, 1000);
+    };
+
+    const pauseCountdown = () => {
+        BackgroundTimer.clearInterval(intervalId.current);
+        intervalId.current = null;
+        setIsRunning(false);
+    };
 
     const renderTimeComponent = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
-        return (<View style={styles.textContainer}>
-            <Text style={styles.circleTextStyle}>
-                {`${String(minutes).padStart(2, "0")} : ${String(seconds).padStart(
-                    2,
-                    "0"
-                )}`}
-            </Text>
-            <Text style={styles.remainingTimeText}>
-                Remaining Time
-            </Text>
-        </View>
-
-        )
+        return (
+            <View style={styles.textContainer}>
+                <Text style={styles.circleTextStyle}>
+                    {`${String(minutes).padStart(2, "0")} : ${String(seconds).padStart(
+                        2,
+                        "0"
+                    )}`}
+                </Text>
+                <Text style={styles.remainingTimeText}>
+                    Remaining Time
+                </Text>
+            </View>
+        );
     };
-
 
     return (
         <View style={styles.mainContainer}>
-            {startRest && (
-                <View style={styles.showCircleContainer}>
-                    <Progress.Circle
-                        progress={increment}
-                        size={widthProgress / 2}
-                        borderWidth={0}
-                        thickness={8}
-                        color={"#fff"}
-                        unfilledColor={"#3180BD"}
-                        showsText={true}
-                        formatText={() => renderTimeComponent(remainingTime)}
-                        textStyle={styles.circleTextStyle}
-
-                    />
-                </View>
-            )}
-
+            <View style={styles.showCircleContainer}>
+                <Progress.Circle
+                    progress={increment}
+                    size={widthProgress / 2}
+                    borderWidth={0}
+                    thickness={8}
+                    color={"#fff"}
+                    unfilledColor={"#3180BD"}
+                    showsText={true}
+                    formatText={() => renderTimeComponent(remainingTime)}
+                    textStyle={styles.circleTextStyle}
+                />
+            </View>
         </View>
     );
 };
-
-function startCountdown(seconds, onUpdate, onFinish) {
-    let remainingTime = seconds;
-
-    const updateInterval = BackgroundTimer.setInterval(() => {
-        onUpdate(remainingTime);
-
-        if (remainingTime <= 0) {
-            BackgroundTimer.clearInterval(updateInterval);
-            onFinish();
-        } else {
-            remainingTime--;
-        }
-    }, 1000);
-
-    return updateInterval;
-}
 
 const styles = StyleSheet.create({
     mainContainer: { marginTop: 20, marginHorizontal: 20 },
@@ -108,26 +103,6 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         justifyContent: "center",
         alignItems: "center"
-    },
-    circleTextStyle: {
-        color: "black",
-        fontSize: 18,
-        fontWeight: "bold"
-    },
-    buttonStyle: {
-        borderRadius: 10,
-        height: 40,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row"
-    },
-    buttonText: {
-        fontSize: 18,
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
     },
     circleTextStyle: {
         color: "black",
