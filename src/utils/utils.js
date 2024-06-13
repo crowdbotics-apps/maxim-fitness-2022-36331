@@ -25,7 +25,7 @@ export const transformData = jsonData => {
     // Extract exercises
     const exercisesData = entry?.exercises?.type
     const exercises = exercisesData.map(exercise => exercise?.id)
-
+    let is_cardio = exercisesData?.map(exercise => exercise?.exercise_type?.name === 'Cardio')
     let sets = []
     if (entry?.dualSets && entry?.dualSets) {
       const arrayList = entry?.dualSets.map(item => {
@@ -43,7 +43,8 @@ export const transformData = jsonData => {
     }
     const transformedEntry = {
       exercises,
-      custom_sets: sets
+      custom_sets: sets,
+      is_cardio: is_cardio[0]
     }
     transformedData.push(transformedEntry)
   })

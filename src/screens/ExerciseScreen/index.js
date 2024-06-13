@@ -98,7 +98,6 @@ const ExerciseScreen = props => {
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [hours, setHours] = useState(0)
-  const [timeCount, setTimeCount] = useState(false);
 
   let deviceHeight = Dimensions.get("window").height
 
@@ -697,8 +696,9 @@ const ExerciseScreen = props => {
                     </View>
                   )
                 ) : (
+                  !is_cardio_exercise &&
                   <>
-                    {repsWeightState?.set_type?.toLowerCase() === modal && !is_cardio_exercise ? (
+                    {repsWeightState?.set_type?.toLowerCase() === modal ? (
                       modal && props.loader ? (
                         <View
                           style={[
@@ -743,7 +743,6 @@ const ExerciseScreen = props => {
                             index={i}
                             onPress={() => {
                               setsData(set, i)
-                              setTimeCount(set?.timer)
                             }}
                             mainContainer={{ marginHorizontal: 5 }}
                             bg={
@@ -767,7 +766,7 @@ const ExerciseScreen = props => {
                       is_cardio_exercise && !item?.sets?.[activeSet]?.done ? <>
                         <CardioRestContainer
                           startRest={timmer}
-                          resetTime={timeCount || item?.sets?.[activeSet]?.timer}
+                          resetTime={item?.sets?.[activeSet]?.timer}
                           onFinish={() => {
                             submitData(item)
                             getData()
