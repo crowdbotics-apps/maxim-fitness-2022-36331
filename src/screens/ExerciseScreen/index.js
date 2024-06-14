@@ -577,7 +577,7 @@ const ExerciseScreen = props => {
                 {selectedExercise?.length !== 0
                   ? sortExercises(selectedExercise?.exercises, selectedExercise?.exercises_order ? selectedExercise?.exercises_order : null)?.map((list, i) => (
                     <TouchableOpacity
-                      // disabled={timmer}
+                      disabled={timmer}
                       onPress={() => selectExercise(list, i)}
                       style={[
                         row,
