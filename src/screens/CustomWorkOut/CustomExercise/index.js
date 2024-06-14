@@ -214,7 +214,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setDroupSets({
             ...droupSet,
@@ -266,7 +266,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setDroupSets({
             ...droupSet,
@@ -343,7 +343,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setTimeData(prevState => ({
             ...prevState,
@@ -442,7 +442,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         setTimeData(prevState => ({
           ...prevState,
           seconds: {
@@ -680,7 +680,7 @@ const CustomExercise = props => {
                   <Text style={styles.setTextStyle} text={i + 1} />
                   <Text
                     style={[styles.setTextStyle, Gutters.mediumHMargin]}
-                    text={items.reps}
+                    text={!items.reps ? "-" : items.reps}
                   />
                   <Text
                     style={styles.setTextStyle}
@@ -725,7 +725,7 @@ const CustomExercise = props => {
                     />
                     <Text
                       style={styles.dualSetRepsStyle}
-                      text={items?.exerciseA?.reps}
+                      text={items?.exerciseA?.reps && items?.exerciseA?.reps}
                     />
                     <Text
                       style={styles.dualSetRestStyle}
@@ -749,7 +749,7 @@ const CustomExercise = props => {
                     />
                     <Text
                       style={styles.dualSecondReps}
-                      text={items.exerciseB.reps}
+                      text={items.exerciseB.reps && items.exerciseB.reps}
                     />
                     <Text
                       style={styles.dualSecondRest}
@@ -770,7 +770,7 @@ const CustomExercise = props => {
                         />
                         <Text
                           style={styles.dualSecondReps}
-                          text={items.exerciseC?.reps}
+                          text={items.exerciseC?.reps && items.exerciseC?.reps}
                         />
                         <Text
                           style={styles.dualSecondRest}
@@ -1155,8 +1155,8 @@ const CustomExercise = props => {
                       numberOfLines: 1,
                       marginTop:
                         findingData()?.activeSet &&
-                          (findingData()?.activeSet?.item === "Drop Set" ||
-                            findingData()?.activeSet?.item === "Triple Set")
+                          ((findingData()?.activeSet?.item === "Drop Set" ||
+                            findingData()?.activeSet?.item === "Triple Set") && !isCardio)
                           ? 0
                           : 5
                     }}
@@ -1170,8 +1170,8 @@ const CustomExercise = props => {
                     keyboardType="number-pad"
                     value={`${reps}`}
                   />
-                  {(findingData()?.activeSet?.item === "Drop Set" ||
-                    findingData()?.activeSet?.item === "Triple Set") && (
+                  {((findingData()?.activeSet?.item === "Drop Set" ||
+                    findingData()?.activeSet?.item === "Triple Set") && !isCardio) && (
                       <View
                         style={{
                           flexDirection: "row",
@@ -1206,8 +1206,8 @@ const CustomExercise = props => {
                   {
                     width: 120,
                     opacity:
-                      findingData()?.activeSet?.item === "Drop Set" ||
-                        findingData()?.activeSet?.item === "Triple Set"
+                      (findingData()?.activeSet?.item === "Drop Set" ||
+                        findingData()?.activeSet?.item === "Triple Set" && !isCardio)
                         ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
@@ -1236,7 +1236,7 @@ const CustomExercise = props => {
                       placeholderTextColor={'gray'}
                       onChangeText={val => setMinutes(val)}
                       editable={
-                        findingData()?.activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set" || isCardio
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
                             findingData()?.activeSet?.item ===
@@ -1280,7 +1280,7 @@ const CustomExercise = props => {
                       placeholderTextColor={'gray'}
                       onChangeText={val => setSeconds(val)}
                       editable={
-                        findingData()?.activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set" || isCardio
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
                             findingData()?.activeSet?.item ===
@@ -1372,12 +1372,12 @@ const CustomExercise = props => {
                 }}
                 onPress={() => {
                   if (
-                    findingData()?.activeSet?.item === "Drop Set" ||
-                    findingData()?.activeSet?.item === "Triple Set"
+                    (findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") && !isCardio
                   ) {
                     setSelectIndex(selectIndex + 1)
                     if (
-                      findingData()?.activeSet?.item === "Drop Set"
+                      findingData()?.activeSet?.item === "Drop Set" && !isCardio
                         ? selectIndex + 1 === 2
                         : selectIndex + 1 === 3
                     ) {
@@ -1456,8 +1456,8 @@ const CustomExercise = props => {
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                    (findingData()?.activeSet?.item === "Drop Set" ||
-                      findingData()?.activeSet?.item === "Triple Set") &&
+                    ((findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") && !isCardio) &&
                     selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
