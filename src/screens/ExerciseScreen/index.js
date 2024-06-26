@@ -48,6 +48,7 @@ import {
 import { connect } from "react-redux"
 import { useIsFocused, useRoute } from "@react-navigation/native"
 import { sortExercises } from "../../utils/utils"
+import CardioRestContainer from "../../components/RestContainer/CardioRestContainer"
 
 const ExerciseScreen = props => {
   const {
@@ -58,14 +59,14 @@ const ExerciseScreen = props => {
     getCSVWorkoutDataRequest,
     getCustomWorkoutDataRequest,
     workoutData,
-    setDoneSuccess
+    setDoneSuccess,
+    loader
   } = props
   const route = useRoute()
   let refDescription = useRef("")
   let refWeight = useRef("")
   let refReps = useRef("")
   let refModal = useRef("")
-
   const [videoLoader, setVideoLoader] = useState(false)
   const [mainActive, setMainActive] = useState(0)
   const [active, setActive] = useState(0)
@@ -101,7 +102,6 @@ const ExerciseScreen = props => {
   let deviceHeight = Dimensions.get("window").height
 
   useEffect(() => {
-    setActiveSet(0)
     setTimeout(() => {
       if (repsWeightState?.set_type?.toLowerCase() === "ss") {
         setModal("ss")
@@ -122,58 +122,39 @@ const ExerciseScreen = props => {
         setModal('r')
       }
     }, 500)
-  }, [])
+  }, [repsWeightState])
 
-  const checkModalType = param => {
 
-    switch (param) {
-      case "ss":
-        return (
-          <SetsComponents colors={["#f19a38", "#f7df58"]} text={"Super Sets"} />
-        )
-      case "gs":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Giant Sets"} />
-        )
-      case "ds":
-        return (
-          <SetsComponents colors={["#60d937", "#60d937"]} text={"Drop Sets"} />
-        )
-      case "tds":
-        return (
-          <SetsComponents
-            colors={["#ed220d", "#ed220d"]}
-            text={"Triple Drop Sets"}
-          />
-        )
-      case "ct":
-        return (
-          <SetsComponents
-            colors={["#f19a38", "#f7df58"]}
-            text={"Circuit Training"}
-          />
-        )
-      case "r":
-        return (
-          <SetsComponents
-            colors={["#60d937", "#60d937"]}
-            text={"Single Sets"}
-          />
-        )
-      default:
-        break
+  const modalTypes = {
+    ss: { colors: ["#f19a38", "#f7df58"], text: "Super Sets" },
+    gs: { colors: ["#60d937", "#60d937"], text: "Giant Sets" },
+    ds: { colors: ["#60d937", "#60d937"], text: "Drop Sets" },
+    tds: { colors: ["#ed220d", "#ed220d"], text: "Triple Drop Sets" },
+    ct: { colors: ["#f19a38", "#f7df58"], text: "Circuit Training" },
+    r: { colors: ["#60d937", "#60d937"], text: "Single Sets" }
+  };
+
+  const checkModalType = (param) => {
+    const modalConfig = modalTypes[param];
+    if (modalConfig) {
+      return (
+        <SetsComponents
+          colors={modalConfig.colors}
+          text={modalConfig.text}
+        />
+      );
     }
-  }
+    return null;
+  };
+
   const onFocus = useIsFocused()
   useEffect(() => {
-    setActiveSet(0)
     async function getAllData() {
       setParms(route?.params)
       if (isCustom) {
-
         await getCustomWorkoutDataRequest(route?.params?.item?.id)
       } else {
-        await getCSVWorkoutDataRequest(route?.params?.item?.id)
+        await getCSVWorkoutDataRequest({ id: route?.params?.item?.id, mainActive: mainActive, active: active, activeSet: activeSet })
       }
       await getData()
       setExerciseTitle('')
@@ -186,15 +167,16 @@ const ExerciseScreen = props => {
     setSelectedExercise(workoutData?.workouts?.[mainActive])
 
   }, [workoutData])
+  let is_cardio_exercise = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.exercise_type.name === 'Cardio' || false
 
   const getData = async () => {
 
     if (isCustom) {
       await getCustomWorkoutDataRequest(route?.params?.item?.id)
       const setId = await sortExercises(workoutData?.workouts?.[mainActive]?.exercises, workoutData?.workouts?.[mainActive]?.exercises_order ? selectedExercise?.exercises_order : null)?.[active]?.sets?.[activeSet]?.id
-      await props.repsCustomWeightRequest(setId, null, null)
+      props.repsCustomWeightRequest(setId, null, null)
     } else {
-      await getCSVWorkoutDataRequest(route?.params?.item?.id)
+      await getCSVWorkoutDataRequest({ id: route?.params?.item?.id, mainActive: mainActive, active: active, activeSet: activeSet })
       const setId = workoutData?.workouts?.[mainActive]?.exercises?.[active]?.sets?.[activeSet]?.id
       await props.repsWeightRequest(setId, null, null)
 
@@ -499,7 +481,7 @@ const ExerciseScreen = props => {
                 return (
                   <View>
                     <TouchableOpacity
-                      // disabled={timmer}
+                      disabled={timmer}
                       onPress={() => {
                         setSelectedExercise(item)
                         setMainActive(i)
@@ -595,7 +577,7 @@ const ExerciseScreen = props => {
                 {selectedExercise?.length !== 0
                   ? sortExercises(selectedExercise?.exercises, selectedExercise?.exercises_order ? selectedExercise?.exercises_order : null)?.map((list, i) => (
                     <TouchableOpacity
-                      // disabled={timmer}
+                      disabled={timmer}
                       onPress={() => selectExercise(list, i)}
                       style={[
                         row,
@@ -714,6 +696,7 @@ const ExerciseScreen = props => {
                     </View>
                   )
                 ) : (
+                  !is_cardio_exercise &&
                   <>
                     {repsWeightState?.set_type?.toLowerCase() === modal ? (
                       modal && props.loader ? (
@@ -754,10 +737,13 @@ const ExerciseScreen = props => {
                       >
                         {item?.sets?.map((set, i) => (
                           <SetButton
+                            disabled={timmer}
                             key={i}
                             item={set}
                             index={i}
-                            onPress={() => setsData(set, i)}
+                            onPress={() => {
+                              setsData(set, i)
+                            }}
                             mainContainer={{ marginHorizontal: 5 }}
                             bg={
                               repsWeightState?.id === set?.id &&
@@ -775,55 +761,74 @@ const ExerciseScreen = props => {
                 {/* <====================sets===========end================> */}
                 <View style={[fill, secondaryBg]}>
                   <ScrollView contentContainerStyle={[fillGrow]}>
-                    {repsWeightState?.set_type?.toLowerCase() ===
-                      "cr" ? null : (
-                      <View style={[row, tinyHPadding]}>
-                        <FatExerciseButton
-                          reps
-                          buttonLabel="Reps"
-                          text={repsWeightState?.reps}
-                          onPress={() => {
-                            refReps.current.open()
-                            setShowModalRepsTwo(
-                              repsWeightState &&
-                              repsWeightState?.set_type?.toLowerCase() ===
-                              "ds"
-                            )
-                            setShowModalRepsThree(
-                              repsWeightState &&
-                              repsWeightState?.set_type?.toLowerCase() ===
-                              "tds"
-                            )
+                    {repsWeightState?.set_type?.toLowerCase() === "cr" || is_cardio_exercise
+                      ?
+                      is_cardio_exercise && !item?.sets?.[activeSet]?.done ? <>
+                        <CardioRestContainer
+                          startRest={timmer}
+                          resetTime={item?.sets?.[activeSet]?.timer}
+                          onFinish={() => {
+                            submitData(item)
+                            getData()
+                            setTimmer(false)
+                            setStartTimer(false)
                           }}
-                          loadingReps={props.loader}
-                          repsColor={repsColor}
-                          repsWeightState={repsWeightState}
-                          disabled={props.loader}
+
+
                         />
-                        <FatExerciseButton
-                          weight
-                          buttonLabel="Weight"
-                          text={repsWeightState?.weight}
-                          onPress={() => {
-                            refWeight.current.open()
-                            setShowModalWeightTwo(
-                              repsWeightState &&
-                              repsWeightState?.set_type?.toLowerCase() ===
-                              "ds"
-                            )
-                            setShowModalWeightThree(
-                              repsWeightState &&
-                              repsWeightState?.set_type?.toLowerCase() ===
-                              "tds"
-                            )
-                          }}
-                          loadingWeight={props.loader}
-                          weightColor={weightColor}
-                          repsWeightState={repsWeightState}
-                          disabled={props.loader}
-                        />
-                      </View>
-                    )}
+                      </> : null
+
+                      : (
+                        <>
+
+                          <View style={[row, tinyHPadding]}>
+                            <FatExerciseButton
+                              reps
+                              buttonLabel="Reps"
+                              text={repsWeightState?.reps}
+                              onPress={() => {
+                                refReps.current.open()
+                                setShowModalRepsTwo(
+                                  repsWeightState &&
+                                  repsWeightState?.set_type?.toLowerCase() ===
+                                  "ds"
+                                )
+                                setShowModalRepsThree(
+                                  repsWeightState &&
+                                  repsWeightState?.set_type?.toLowerCase() ===
+                                  "tds"
+                                )
+                              }}
+                              loadingReps={props.loader}
+                              repsColor={repsColor}
+                              repsWeightState={repsWeightState}
+                              disabled={props.loader}
+                            />
+                            <FatExerciseButton
+                              weight
+                              buttonLabel="Weight"
+                              text={repsWeightState?.weight}
+                              onPress={() => {
+                                refWeight.current.open()
+                                setShowModalWeightTwo(
+                                  repsWeightState &&
+                                  repsWeightState?.set_type?.toLowerCase() ===
+                                  "ds"
+                                )
+                                setShowModalWeightThree(
+                                  repsWeightState &&
+                                  repsWeightState?.set_type?.toLowerCase() ===
+                                  "tds"
+                                )
+                              }}
+                              loadingWeight={props.loader}
+                              weightColor={weightColor}
+                              repsWeightState={repsWeightState}
+                              disabled={props.loader}
+                            />
+                          </View>
+                        </>
+                      )}
                     <View style={[row, tinyHPadding, tinyVPadding]}>
                       <FatExerciseIconButton
                         buttonText="Exercise Description"
@@ -835,54 +840,99 @@ const ExerciseScreen = props => {
                         buttonText="Swap Exercise"
                         buttonIcon={Images.iconSwap}
                         onPress={swipeFunc}
-                        disabled={item && item.done}
-                      />
-
-                      <FatGradientIconButton
-                        buttonText={
-                          repsWeightState?.set_type?.toLowerCase() === "cr"
-                            ? "Complete"
-                            : item?.sets && item?.sets?.[activeSet]?.done
-                              ? "Done"
-                              : "Done, Start Rest"
-                        }
-                        buttonIcon={Images.iconDoneStartRest}
-                        colorsGradient={["#3180BD", "#6EC2FA"]}
-                        colorsGradientDisable={["#d3d3d3", "#838383"]}
-                        disabled={
-                          timmer ||
-                          (item?.sets && item?.sets?.[activeSet]?.done)
-                        }
-                        onPress={() => {
-                          setTimmer(true)
-                          submitData(item)
-                        }}
-                      />
+                        disabled={item && item.done || timmer}
+                      />{
+                        is_cardio_exercise ?
+                          <FatGradientIconButton
+                            buttonText={
+                              item?.sets && item?.sets?.[activeSet]?.done || timmer
+                                ? timmer ? "Pause Cardio" : "Done"
+                                : "Start Cardio"
+                            }
+                            buttonIcon={Images.iconDoneStartRest}
+                            colorsGradient={timmer ? ["#d3d3d3", "#838383"] : ["#42A341", "#42A341"]}
+                            colorsGradientDisable={["#d3d3d3", "#838383"]}
+                            disabled={
+                              (item?.sets && item?.sets?.[activeSet]?.done)
+                            }
+                            onPress={() => {
+                              setTimmer(prev => !prev)
+                            }}
+                          />
+                          : <FatGradientIconButton
+                            buttonText={
+                              repsWeightState?.set_type?.toLowerCase() === "cr"
+                                ? "Complete"
+                                : item?.sets && item?.sets?.[activeSet]?.done
+                                  ? "Done"
+                                  : "Done, Start Rest"
+                            }
+                            buttonIcon={Images.iconDoneStartRest}
+                            colorsGradient={["#3180BD", "#6EC2FA"]}
+                            colorsGradientDisable={["#d3d3d3", "#838383"]}
+                            disabled={
+                              timmer ||
+                              (item?.sets && item?.sets?.[activeSet]?.done)
+                            }
+                            onPress={() => {
+                              setTimmer(true)
+                              submitData(item)
+                            }}
+                          />}
                     </View>
-                    <RestContainer
-                      upNext={"next"}
-                      startRest={timmer}
-                      activeSet={activeSet}
-                      onPress={() => {
-                        isCustom
-                          ? props.customSessionDone(
-                            workoutData.id,
-                            screenNavigation
-                          )
-                          : props.sessionDone(
-                            workoutData?.id,
-                            screenNavigation
-                          )
-                        setStartTimer(false)
-                        setTimmer(false)
-                      }}
-                      resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
-                      onFinish={() => {
-                        getData()
-                        setTimmer(false)
-                        setStartTimer(false)
-                      }}
-                    />
+                    {is_cardio_exercise ?
+                      <TouchableOpacity
+                        onPress={() => {
+                          isCustom
+                            ? props.customSessionDone(
+                              workoutData.id,
+                              screenNavigation
+                            )
+                            : props.sessionDone(
+                              workoutData?.id,
+                              screenNavigation
+                            )
+                          setStartTimer(false)
+                          setTimmer(false)
+                        }}
+                        disabled={timmer}
+                        style={[
+                          styles.buttonStyle,
+                          { backgroundColor: timmer ? "#838383" : "#db3b26" }
+                        ]}
+                      >
+                        {loader ? (
+                          <ActivityIndicator size="small" color="#000" style={{ height: 35 }} />
+                        ) : (
+                          <Text style={styles.buttonText}>Finish Workout</Text>
+                        )}
+                      </TouchableOpacity>
+                      :
+                      <RestContainer
+                        upNext={"next"}
+                        startRest={timmer}
+                        activeSet={activeSet}
+                        onPress={() => {
+                          isCustom
+                            ? props.customSessionDone(
+                              workoutData.id,
+                              screenNavigation
+                            )
+                            : props.sessionDone(
+                              workoutData?.id,
+                              screenNavigation
+                            )
+                          setStartTimer(false)
+                          setTimmer(false)
+                        }}
+                        resetTime={item?.sets && item?.sets?.[activeSet]?.timer}
+                        onFinish={() => {
+                          getData()
+                          setTimmer(false)
+                          setStartTimer(false)
+                        }}
+
+                      />}
                   </ScrollView>
                 </View>
               </View>
@@ -1293,6 +1343,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // height: 60,
     flexDirection: "row"
+  },
+  buttonStyle: {
+    borderRadius: 10,
+    height: 40,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    marginHorizontal: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row"
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
   }
 })
 

@@ -90,11 +90,11 @@ const CustomExercise = props => {
   const [selectedDeleteIndex, setSelectedDeleteIndex] = useState(false)
   const [selectedItem, setSelectedItem] = useState([])
   const [activeCard, setActiveCard] = useState({ item: {}, index: 0 })
+  const [isCardio, setIsCardio] = useState(false)
   const [timeData, setTimeData] = useState({
     mints: {},
     seconds: {}
   })
-  const [repsData, setRepsData] = useState([])
   const {
     alignItemsEnd,
     row,
@@ -214,7 +214,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setDroupSets({
             ...droupSet,
@@ -266,7 +266,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setDroupSets({
             ...droupSet,
@@ -343,7 +343,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex]
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         if (selectIndex + 1 === 1) {
           setTimeData(prevState => ({
             ...prevState,
@@ -442,7 +442,7 @@ const CustomExercise = props => {
     const checkData = data?.[exerciseIndex];
 
     if (!setType?.includes(checkData?.activeSet?.item)) {
-      if (findingData()?.activeSet?.item === "Drop Set") {
+      if (findingData()?.activeSet?.item === "Drop Set" && !isCardio) {
         setTimeData(prevState => ({
           ...prevState,
           seconds: {
@@ -586,8 +586,14 @@ const CustomExercise = props => {
         return false
       }
       for (const set of entry.custom_sets) {
-        if (!set.reps) {
-          return false
+        if (entry.is_cardio) {
+          if (!set.rest) {
+            return false
+          }
+        } else {
+          if (!set.reps) {
+            return false
+          }
         }
       }
     }
@@ -674,7 +680,7 @@ const CustomExercise = props => {
                   <Text style={styles.setTextStyle} text={i + 1} />
                   <Text
                     style={[styles.setTextStyle, Gutters.mediumHMargin]}
-                    text={items.reps}
+                    text={!items.reps ? "-" : items.reps}
                   />
                   <Text
                     style={styles.setTextStyle}
@@ -719,7 +725,7 @@ const CustomExercise = props => {
                     />
                     <Text
                       style={styles.dualSetRepsStyle}
-                      text={items?.exerciseA?.reps}
+                      text={items?.exerciseA?.reps && items?.exerciseA?.reps}
                     />
                     <Text
                       style={styles.dualSetRestStyle}
@@ -743,7 +749,7 @@ const CustomExercise = props => {
                     />
                     <Text
                       style={styles.dualSecondReps}
-                      text={items.exerciseB.reps}
+                      text={items.exerciseB.reps && items.exerciseB.reps}
                     />
                     <Text
                       style={styles.dualSecondRest}
@@ -764,7 +770,7 @@ const CustomExercise = props => {
                         />
                         <Text
                           style={styles.dualSecondReps}
-                          text={items.exerciseC?.reps}
+                          text={items.exerciseC?.reps && items.exerciseC?.reps}
                         />
                         <Text
                           style={styles.dualSecondRest}
@@ -863,12 +869,14 @@ const CustomExercise = props => {
                 resetValues()
                 setExerciseIndex(index)
                 getRepsRange(item)
+                setIsCardio(item?.exercises?.type[0]?.exercise_type?.name === 'Cardio')
                 if (item?.exercises?.type?.length === 1) {
                   refRBSheet.current.open()
                 } else {
                   refRBSheetDual.current.open()
                 }
               }}
+              disabled={item?.exercises?.type[0]?.exercise_type?.name === 'Cardio' && (item?.single?.length || item?.dualSets?.length) >= 1}
               style={styles.addSetsButton}
             >
               <Text style={styles.addSetsText} text="Add Set" />
@@ -1004,6 +1012,7 @@ const CustomExercise = props => {
             }}
             placeholder="Workout Title"
             autoCapitalize="none"
+            placeholderTextColor={'gray'}
           />
         </View>
         <FlatList
@@ -1123,82 +1132,82 @@ const CustomExercise = props => {
                 justifyContentBetween
               ]}
             >
-              <View style={styles.secondaryBoxes}>
-                <Text
-                  style={{ color: "#00a1ff", fontWeight: "700" }}
-                  text="Enter Reps"
-                />
-                <Text
-                  style={{ fontSize: 12, color: "black" }}
-                  text={"Round " + (selectIndex + 1)}
-                />
-
-                <TextInput
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "400",
-                    color: "#5e5e5e",
-                    borderBottomColor: "black",
-                    borderBottomWidth: 1,
-                    paddingBottom: -1,
-                    maxWidth: 70,
-                    minWidth: 40,
-                    numberOfLines: 1,
-                    marginTop:
-                      findingData()?.activeSet &&
-                        (findingData()?.activeSet?.item === "Drop Set" ||
-                          findingData()?.activeSet?.item === "Triple Set")
-                        ? 0
-                        : 5
-                  }}
-                  maxLength={4}
-                  onChangeText={val => {
-                    updateDroupSets(val)
-                    setReps(val)
-                  }}
-                  placeholder={repsRangeState?.[0] || '0-100'}
-                  placeholderTextColor={'gray'}
-                  keyboardType="number-pad"
-                  value={`${reps}`}
-                />
-                {(findingData()?.activeSet?.item === "Drop Set" ||
-                  findingData()?.activeSet?.item === "Triple Set") && (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        position: "absolute",
-                        bottom: 8
-                      }}
-                    >
-                      {Array(findingData()?.activeSet?.value)
-                        .fill()
-                        .map((item, index) => (
-                          <Pressable
-                            // onPress={() => {
-                            //   droupSet?.state2 && setReps(droupSet?.state2)
-                            // }}
-                            style={{
-                              height: 5,
-                              width: 5,
-                              borderRadius: 50,
-                              backgroundColor: "black",
-                              marginRight: 5,
-                              opacity: index === selectIndex ? 1 : 0.5
-                            }}
-                          />
-                        ))}
-                    </View>
-                  )}
-              </View>
-
+              {!isCardio &&
+                <View style={styles.secondaryBoxes}>
+                  <Text
+                    style={{ color: "#00a1ff", fontWeight: "700" }}
+                    text="Enter Reps"
+                  />
+                  <Text
+                    style={{ fontSize: 12, color: "black" }}
+                    text={"Round " + (selectIndex + 1)}
+                  />
+                  <TextInput
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "400",
+                      color: "#5e5e5e",
+                      borderBottomColor: "black",
+                      borderBottomWidth: 1,
+                      paddingBottom: -1,
+                      maxWidth: 70,
+                      minWidth: 40,
+                      numberOfLines: 1,
+                      marginTop:
+                        findingData()?.activeSet &&
+                          ((findingData()?.activeSet?.item === "Drop Set" ||
+                            findingData()?.activeSet?.item === "Triple Set") && !isCardio)
+                          ? 0
+                          : 5
+                    }}
+                    maxLength={4}
+                    onChangeText={val => {
+                      updateDroupSets(val)
+                      setReps(val)
+                    }}
+                    placeholder={repsRangeState?.[0] || '0-100'}
+                    placeholderTextColor={'gray'}
+                    keyboardType="number-pad"
+                    value={`${reps}`}
+                  />
+                  {((findingData()?.activeSet?.item === "Drop Set" ||
+                    findingData()?.activeSet?.item === "Triple Set") && !isCardio) && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          position: "absolute",
+                          bottom: 8
+                        }}
+                      >
+                        {Array(findingData()?.activeSet?.value)
+                          .fill()
+                          .map((item, index) => (
+                            <Pressable
+                              // onPress={() => {
+                              //   droupSet?.state2 && setReps(droupSet?.state2)
+                              // }}
+                              style={{
+                                height: 5,
+                                width: 5,
+                                borderRadius: 50,
+                                backgroundColor: "black",
+                                marginRight: 5,
+                                opacity: index === selectIndex ? 1 : 0.5
+                              }}
+                            />
+                          ))}
+                      </View>
+                    )}
+                </View>
+              }
               <View
                 style={[
                   styles.secondaryBoxes,
                   {
                     width: 120,
                     opacity:
-                      findingData()?.activeSet?.item === "Drop Set" ||
-                        findingData()?.activeSet?.item === "Triple Set"
+                      (findingData()?.activeSet?.item === "Drop Set" ||
+                        findingData()?.activeSet?.item === "Triple Set" && !isCardio)
                         ? findingData()?.activeSet?.value !== selectIndex + 1
                           ? 0.8
                           : 1
@@ -1224,9 +1233,10 @@ const CustomExercise = props => {
                       }}
                       keyboardType="number-pad"
                       placeholder="00"
+                      placeholderTextColor={'gray'}
                       onChangeText={val => setMinutes(val)}
                       editable={
-                        findingData()?.activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set" || isCardio
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
                             findingData()?.activeSet?.item ===
@@ -1267,9 +1277,10 @@ const CustomExercise = props => {
                       keyboardType="number-pad"
                       maxLength={3}
                       placeholder="00"
+                      placeholderTextColor={'gray'}
                       onChangeText={val => setSeconds(val)}
                       editable={
-                        findingData()?.activeSet?.item === "Single Set"
+                        findingData()?.activeSet?.item === "Single Set" || isCardio
                           ? true
                           : (findingData()?.activeSet?.item === "Drop Set" ||
                             findingData()?.activeSet?.item ===
@@ -1297,31 +1308,33 @@ const CustomExercise = props => {
                 justifyContentBetween
               ]}
             >
-              <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setCheckedReps(!checkedReps)
-                    // if (reps !== "") {
-                    //   remaingSameDualKeep()
-                    // }
-                  }}
-                >
-                  <Image
-                    source={checkedReps ? radioDoneBlue : radioBlue}
-                    style={{ width: 20, height: 20 }}
-                  />
-                </TouchableOpacity>
+              {!isCardio &&
+                <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCheckedReps(!checkedReps)
+                      // if (reps !== "") {
+                      //   remaingSameDualKeep()
+                      // }
+                    }}
+                  >
+                    <Image
+                      source={checkedReps ? radioDoneBlue : radioBlue}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </TouchableOpacity>
 
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: "#646464",
-                    textAlign: "center"
-                  }}
-                >
-                  Keep reps the{"\n"} same for {"\n"} remaining sets
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: "#646464",
+                      textAlign: "center"
+                    }}
+                  >
+                    Keep reps the{"\n"} same for {"\n"} remaining sets
+                  </Text>
+                </View>
+              }
               <View style={[row, Gutters.smallTMargin, alignItemsCenter]}>
                 <TouchableOpacity
                   onPress={() => {
@@ -1355,16 +1368,16 @@ const CustomExercise = props => {
                   borderRadius: 50,
                   alignItems: "center",
                   width: 120,
-                  opacity: reps === "" ? 0.5 : 1
+                  opacity: reps === "" && !isCardio ? 0.5 : 1
                 }}
                 onPress={() => {
                   if (
-                    findingData()?.activeSet?.item === "Drop Set" ||
-                    findingData()?.activeSet?.item === "Triple Set"
+                    (findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") && !isCardio
                   ) {
                     setSelectIndex(selectIndex + 1)
                     if (
-                      findingData()?.activeSet?.item === "Drop Set"
+                      findingData()?.activeSet?.item === "Drop Set" && !isCardio
                         ? selectIndex + 1 === 2
                         : selectIndex + 1 === 3
                     ) {
@@ -1439,12 +1452,12 @@ const CustomExercise = props => {
                     }
                   }
                 }}
-                disabled={reps !== "" ? false : true}
+                disabled={reps === "" && !isCardio ? true : false}
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
-                    (findingData()?.activeSet?.item === "Drop Set" ||
-                      findingData()?.activeSet?.item === "Triple Set") &&
+                    ((findingData()?.activeSet?.item === "Drop Set" ||
+                      findingData()?.activeSet?.item === "Triple Set") && !isCardio) &&
                     selectIndex + 1 < findingData()?.activeSet?.value
                     ? "Round " + (selectIndex + 2)
                     : "Done"}
@@ -1555,64 +1568,66 @@ const CustomExercise = props => {
                 marginTop: 20
               }}
             >
-              <View>
-                <View style={styles.secondaryBoxes}>
-                  <Text style={{ color: "#00a1ff", fontWeight: "700" }}>
-                    Enter Reps
-                  </Text>
-                  <TextInput
-                    style={{
-                      fontSize: 20,
-                      fontWeight: "400",
-                      color: "#626262",
-                      marginTop: 5,
-                      borderBottomWidth: 1,
-                      maxWidth: 70,
-                      minWidth: 40
-                      // marginTop: 15
-                    }}
-                    maxLength={4}
-                    placeholder={repsRangeState?.[dualSetState - 1] || '0-100'}
-                    value={`${temporaryReps}`}
-                    keyboardType="number-pad"
-                    onChangeText={val => {
-                      updateDualReps(val)
-                      setTemporaryReps(val)
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginTop: 10,
-                    alignItems: "center"
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCheckedReps(!checkedReps)
-                      // if (temporaryReps !== "") {
-                      //   remaingSameDualKeep()
-                      // }
-                    }}
-                  >
-                    <Image
-                      source={checkedReps ? radioDoneBlue : radioBlue}
-                      style={{ width: 20, height: 20 }}
+              {!isCardio &&
+                <View>
+                  <View style={styles.secondaryBoxes}>
+                    <Text style={{ color: "#00a1ff", fontWeight: "700" }}>
+                      Enter Reps
+                    </Text>
+                    <TextInput
+                      style={{
+                        fontSize: 20,
+                        fontWeight: "400",
+                        color: "#626262",
+                        marginTop: 5,
+                        borderBottomWidth: 1,
+                        maxWidth: 70,
+                        minWidth: 40
+                        // marginTop: 15
+                      }}
+                      maxLength={4}
+                      placeholder={repsRangeState?.[dualSetState - 1] || '0-100'}
+                      placeholderTextColor={'gray'}
+                      value={`${temporaryReps}`}
+                      keyboardType="number-pad"
+                      onChangeText={val => {
+                        updateDualReps(val)
+                        setTemporaryReps(val)
+                      }}
                     />
-                  </TouchableOpacity>
-                  <Text
+                  </View>
+                  <View
                     style={{
-                      fontSize: 12,
-                      color: "#646464",
-                      textAlign: "center"
+                      flexDirection: "row",
+                      marginTop: 10,
+                      alignItems: "center"
                     }}
                   >
-                    Keep reps the{"\n"} same for {"\n"} remaining sets
-                  </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCheckedReps(!checkedReps)
+                        // if (temporaryReps !== "") {
+                        //   remaingSameDualKeep()
+                        // }
+                      }}
+                    >
+                      <Image
+                        source={checkedReps ? radioDoneBlue : radioBlue}
+                        style={{ width: 20, height: 20 }}
+                      />
+                    </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#646464",
+                        textAlign: "center"
+                      }}
+                    >
+                      Keep reps the{"\n"} same for {"\n"} remaining sets
+                    </Text>
+                  </View>
                 </View>
-              </View>
-
+              }
               <View>
                 <View
                   style={[
@@ -1645,6 +1660,7 @@ const CustomExercise = props => {
                           color: "#626262"
                         }}
                         placeholder="00"
+                        placeholderTextColor={'gray'}
                         onChangeText={val => {
                           updateMintsSets(val)
                           setMinutes(val)
@@ -1682,6 +1698,7 @@ const CustomExercise = props => {
                           color: "#626262"
                         }}
                         placeholder="00"
+                        placeholderTextColor={'gray'}
                         maxLength={3}
                         value={seconds}
                         // editable={dualSetState === 1 ? false : true}
@@ -1740,7 +1757,7 @@ const CustomExercise = props => {
                 style={[
                   styles.cardStyle,
                   {
-                    opacity: temporaryReps === "" ? 0.5 : 1
+                    opacity: temporaryReps === "" && !isCardio ? 0.5 : 1
                   }
                 ]}
                 onPress={() => {
@@ -2066,7 +2083,7 @@ const CustomExercise = props => {
                     resetValues()
                   }
                 }}
-                disabled={temporaryReps === "" ? true : false}
+                disabled={temporaryReps === "" && !isCardio ? true : false}
               >
                 <Text style={{ color: "#ffff", fontWeight: "700" }}>
                   {findingData()?.activeSet &&
@@ -2487,7 +2504,14 @@ const styles = StyleSheet.create({
     borderRadius: 5, // Rounded corners
   },
   backButtonText: {
-    marginLeft: 5, // Add some space between text and icon
+    marginLeft: 5,
+    color: 'gray'
+  },
+  heading1: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: "#626262"
   },
 })
 

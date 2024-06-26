@@ -59,16 +59,20 @@ const AddExercies = props => {
     setSelectedItem([])
     setActiveSet(false)
     setSelectMuscle(0)
-  }, [isFocused])
-
-  useEffect(() => {
     getExerciseState &&
       props.getExerciseTypeRequest(
         getExerciseState && getExerciseState[0]?.id,
         ""
       )
-    // !activeSet && setActiveSet(data[0])
-  }, [getExerciseState])
+  }, [isFocused, getExerciseState])
+
+  // useEffect(() => {
+  //   getExerciseState &&
+  //     props.getExerciseTypeRequest(
+  //       getExerciseState && getExerciseState[0]?.id,
+  //       ""
+  //     )
+  // }, [getExerciseState])
 
   const onSelectItem = i => {
     let array = [...selectedItem]
